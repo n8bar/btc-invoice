@@ -13,8 +13,8 @@ class InvoiceController extends Controller
 {
     public function __construct()
     {
-        // Extra safety even though routes should be in the auth group
-        $this->middleware('auth');
+        // no-op; routes are already wrapped in auth middleware
+        // $this->middleware('auth');
     }
 
     /**

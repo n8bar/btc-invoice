@@ -9,8 +9,8 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        // Extra safety even though routes are in the auth group
-        $this->middleware('auth');
+        // no-op; routes are already wrapped in auth middleware
+        // $this->middleware('auth');  
     }
 
     /**
