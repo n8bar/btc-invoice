@@ -32,7 +32,14 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // App resources
+    // Clients - custom actions MUST be before the resource
+    Route::get('clients/trash', [ClientController::class, 'trash'])->name('clients.trash');
+    Route::patch('clients/{clientId}/restore', [ClientController::class, 'restore'])
+        ->whereNumber('clientId')->name('clients.restore');
+    Route::delete('clients/{clientId}/force', [ClientController::class, 'forceDestroy'])
+        ->whereNumber('clientId')->name('clients.force-destroy');
+
+    // Standard CRUD
     Route::resource('clients', ClientController::class);
     Route::resource('invoices', InvoiceController::class);
 });

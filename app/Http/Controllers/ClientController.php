@@ -10,7 +10,7 @@ class ClientController extends Controller
     public function __construct()
     {
         // no-op; routes are already wrapped in auth middleware
-        // $this->middleware('auth');  
+        // $this->middleware('auth');
     }
 
     /**
@@ -18,11 +18,13 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $clients = Client::where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(15);
+        $clients = Client::query()
+            ->where('user_id', $request->user()->id)
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
-        return response()->json($clients);
+        return view('clients.index', compact('clients'));
     }
 
     /**
@@ -31,14 +33,23 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'notes' => 'nullable|string',
+            'name'  => ['required','string','max:255'],
+            'email' => ['nullable','email','max:255'],
+            'notes' => ['nullable','string','max:2000'],
         ]);
 
-        $client = Client::create($data + ['user_id' => $request->user()->id]);
+        $client = Client::create([
+            'user_id' => $request->user()->id,
+            'name'    => $data['name'],
+            'email'   => $data['email'] ?? null,
+            'notes'   => $data['notes'] ?? null,
+        ]);
 
-        return response()->json($client, 201);
+        if ($request->wantsJson()) {
+            return response()->json($client, 201);
+        }
+
+        return redirect()->route('clients.index')->with('status', 'Client created.');
     }
 
     /**
@@ -59,16 +70,19 @@ class ClientController extends Controller
         $this->authorizeOwnership($request, $client);
 
         $data = $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'notes' => 'nullable|string',
+            'name'  => ['required','string','max:255'],
+            'email' => ['nullable','email','max:255'],
+            'notes' => ['nullable','string','max:2000'],
         ]);
 
         $client->update($data);
 
-        return response()->json($client->fresh());
-    }
+        if ($request->wantsJson()) {
+            return response()->json($client->fresh());
+        }
 
+        return redirect()->route('clients.index')->with('status', 'Client updated.');
+    }
     /**
      * Soft-delete a client owned by the authenticated user.
      */
@@ -78,7 +92,11 @@ class ClientController extends Controller
 
         $client->delete();
 
-        return response()->json(['deleted' => true]);
+        if ($request->wantsJson()) {
+            return response()->json(['deleted' => true]);
+        }
+
+        return redirect()->route('clients.index')->with('status', 'Client deleted.');
     }
 
     /**
@@ -86,16 +104,60 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return response()->noContent(204);
+        return view('clients.create');
     }
 
     /**
      * Unused in the MVP (UI not built yet). Return 204 to avoid 404s.
      */
-    public function edit(Client $client)
+    public function edit(Request $request, Client $client)
     {
-        return response()->noContent(204);
+        $this->authorizeOwnership($request, $client);
+        return view('clients.edit', ['client' => $client]);
     }
+
+
+    // List trashed clients
+    public function trash(Request $request)
+    {
+        $clients = Client::onlyTrashed()
+            ->where('user_id', $request->user()->id)
+            ->orderByDesc('deleted_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('clients.trash', compact('clients'));
+    }
+
+// Restore by id (includes trashed)
+    public function restore(Request $request, int $clientId)
+    {
+        $client = Client::withTrashed()->findOrFail($clientId);
+        $this->authorizeOwnership($request, $client);
+
+        $client->restore();
+
+        if ($request->wantsJson()) {
+            return response()->json($client->fresh());
+        }
+        return redirect()->route('clients.trash')->with('status', 'Client restored.');
+    }
+
+// Permanently delete by id
+    public function forceDestroy(Request $request, int $clientId)
+    {
+        $client = Client::withTrashed()->findOrFail($clientId);
+        $this->authorizeOwnership($request, $client);
+
+        $client->forceDelete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['deleted' => true]);
+        }
+        return redirect()->route('clients.trash')->with('status', 'Client permanently deleted.');
+    }
+
+
 
     /**
      * Ensure the authenticated user owns the model.
