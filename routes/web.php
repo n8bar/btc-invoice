@@ -39,6 +39,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('clients/{clientId}/force', [ClientController::class, 'forceDestroy'])
         ->whereNumber('clientId')->name('clients.force-destroy');
 
+    // Invoices - custom actions MUST be before the resource
+    Route::get('invoices/trash', [InvoiceController::class, 'trash'])->name('invoices.trash');
+    Route::patch('invoices/{invoiceId}/restore', [InvoiceController::class, 'restore'])
+        ->whereNumber('invoiceId')->name('invoices.restore');
+    Route::delete('invoices/{invoiceId}/force', [InvoiceController::class, 'forceDestroy'])
+        ->whereNumber('invoiceId')->name('invoices.force-destroy');
+
+
     // Standard CRUD
     Route::resource('clients', ClientController::class);
     Route::resource('invoices', InvoiceController::class);

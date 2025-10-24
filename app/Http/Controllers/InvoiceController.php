@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class InvoiceController extends Controller
 {
@@ -20,17 +21,15 @@ class InvoiceController extends Controller
     /**
      * List invoices for the authenticated user (optionally filter by status).
      */
-    public function index(Request $request)
+    public function index(\Illuminate\Http\Request $request)
     {
-        $q = Invoice::where('user_id', $request->user()->id)
-            ->with(['client:id,name,email'])
-            ->latest();
+        $invoices = Invoice::with('client')
+            ->where('user_id', $request->user()->id)
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
 
-        if ($status = $request->query('status')) {
-            $q->where('status', $status);
-        }
-
-        return response()->json($q->paginate(15));
+        return view('invoices.index', compact('invoices'));
     }
 
     /**
@@ -41,52 +40,40 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = $request->user()->id;
+
         $data = $request->validate([
-            'client_id'   => 'required|integer|exists:clients,id',
-            'description' => 'nullable|string',
-            'amount_usd'  => 'required|numeric|min:0.01',
-            'due_date'    => 'nullable|date',
-            'btc_address' => 'nullable|string|max:128',
+            'client_id'   => [
+                'required','integer',
+                Rule::exists('clients','id')->where(fn($q) => $q->where('user_id', $userId)),
+            ],
+            'number'      => [
+                'required','string','max:32',
+                Rule::unique('invoices','number')->where(fn($q) => $q->where('user_id', $userId)),
+            ],
+            'description' => ['nullable','string','max:2000'],
+            'amount_usd'  => ['required','numeric','min:0.01'],
+            'btc_rate'    => ['nullable','numeric','min:0'],         // USD per BTC
+            'amount_btc'  => ['nullable','numeric','min:0'],
+            'btc_address' => ['nullable','string','max:128'],
+            'status'      => ['nullable','in:draft,sent,paid,void'],
+            'due_date'    => ['nullable','date'],
+            'paid_at'     => ['nullable','date'],
+            'txid'        => ['nullable','string','max:128'],
         ]);
 
-        // Ensure the client belongs to the user
-        $client = Client::where('id', $data['client_id'])
-            ->where('user_id', $request->user()->id)
-            ->first();
+        // If rate is provided and BTC amount omitted, compute it.
+        if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {
+            $data['amount_btc'] = round($data['amount_usd'] / $data['btc_rate'], 8);
+        }
 
-        abort_if(!$client, 403, 'Client not found or not owned.');
+        $invoice = Invoice::create($data + ['user_id' => $userId]);
 
-        // Determine BTC address (env default for MVP if not provided)
-        //$btcAddress = $data['btc_address'] ?? config('app.btc_address', env('BTC_ADDRESS')) ?? '';
-        //let's lose the env-wide fallback. and have a per-user default, still overridable per invoice
-        $btcAddress = $data['btc_address'] ?? ($request->user()->btc_address ?? '');
+        if ($request->wantsJson()) {
+            return response()->json($invoice->load('client'), 201);
+        }
 
-        // Fetch price and compute BTC amount (gracefully fallback if external call fails)
-        [$rate, $amountBtc] = $this->lockRateAndAmount((float)$data['amount_usd']);
-
-        // Insert first to obtain ID, then set the final invoice number atomically
-        $invoice = null;
-
-        DB::transaction(function () use ($request, $data, $client, $btcAddress, $rate, $amountBtc, &$invoice) {
-            $invoice = Invoice::create([
-                'user_id'     => $request->user()->id,
-                'client_id'   => $client->id,
-                'number'      => 'PENDING',
-                'description' => $data['description'] ?? null,
-                'amount_usd'  => $data['amount_usd'],
-                'btc_rate'    => $rate,
-                'amount_btc'  => $amountBtc,
-                'btc_address' => $btcAddress ?: 'SET-BTC-ADDRESS',
-                'status'      => 'pending',
-                'due_date'    => $data['due_date'] ?? null,
-            ]);
-
-            // Use the auto-increment ID to ensure a globally unique number
-            $invoice->number = sprintf('INV-%06d', $invoice->id);
-            $invoice->save();
-        });
-
-        return response()->json($invoice->fresh(['client:id,name,email']), 201);
+        return redirect()->route('invoices.index')->with('status', 'Invoice created.');
     }
 
     /**
@@ -103,50 +90,107 @@ class InvoiceController extends Controller
      * - allows changing description, status (to paid/void), txid, due_date, btc_address
      * - does NOT change monetary fields or client_id in the MVP
      */
-    public function update(Request $request, Invoice $invoice)
+    public function update(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorizeOwnership($request, $invoice);
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $userId = $request->user()->id;
 
         $data = $request->validate([
-            'description' => 'nullable|string',
-            'status'      => 'nullable|in:pending,paid,void',
-            'txid'        => 'nullable|string|max:128',
-            'due_date'    => 'nullable|date',
-            'btc_address' => 'nullable|string|max:128',
+            'client_id'   => ['required','integer', Rule::exists('clients','id')->where(fn($q)=>$q->where('user_id',$userId))],
+            'number'      => ['required','string','max:32', Rule::unique('invoices','number')->where(fn($q)=>$q->where('user_id',$userId))->ignore($invoice->id)],
+            'description' => ['nullable','string','max:2000'],
+            'amount_usd'  => ['required','numeric','min:0.01'],
+            'btc_rate'    => ['nullable','numeric','min:0'],
+            'amount_btc'  => ['nullable','numeric','min:0'],
+            'btc_address' => ['nullable','string','max:128'],
+            'status'      => ['nullable','in:draft,sent,paid,void'],
+            'due_date'    => ['nullable','date'],
+            'paid_at'     => ['nullable','date'],
+            'txid'        => ['nullable','string','max:128'],
         ]);
 
-        if (($data['status'] ?? null) === 'paid' && is_null($invoice->paid_at)) {
-            $invoice->paid_at = now();
+        if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {
+            $data['amount_btc'] = round($data['amount_usd'] / $data['btc_rate'], 8);
         }
 
-        $invoice->fill($data)->save();
+        $invoice->update($data);
 
-        return response()->json($invoice->fresh(['client:id,name,email']));
+        if ($request->wantsJson()) return response()->json($invoice->fresh('client'));
+        return redirect()->route('invoices.index')->with('status','Invoice updated.');
     }
+
 
     /**
      * Soft-delete an owned invoice.
      */
-    public function destroy(Request $request, Invoice $invoice)
+    public function destroy(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorizeOwnership($request, $invoice);
-        $invoice->delete();
+        abort_unless($invoice->user_id === $request->user()->id, 403);
 
-        return response()->json(['deleted' => true]);
+        $invoice->delete(); // soft-delete
+
+        if ($request->wantsJson()) {
+            return response()->json(['deleted' => true]);
+        }
+
+        return redirect()->route('invoices.index')->with('status', 'Invoice deleted.');
     }
 
-    /**
-     * Unused in MVP UI. Keep endpoints defined for resource controller.
-     */
-    public function create()
+
+    public function create(\Illuminate\Http\Request $request)
     {
-        return response()->noContent(204);
+        $clients = Client::where('user_id', $request->user()->id)
+            ->orderBy('name')->get(['id','name']);
+
+        return view('invoices.create', compact('clients'));
     }
 
-    public function edit(Invoice $invoice)
+    public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        return response()->noContent(204);
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $clients = Client::where('user_id', $request->user()->id)
+            ->orderBy('name')->get(['id','name']);
+
+        return view('invoices.edit', compact('invoice','clients'));
     }
+
+    public function trash(\Illuminate\Http\Request $request)
+    {
+        $invoices = \App\Models\Invoice::onlyTrashed()
+            ->with('client')
+            ->where('user_id', $request->user()->id)
+            ->orderByDesc('deleted_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('invoices.trash', compact('invoices'));
+    }
+
+    public function restore(\Illuminate\Http\Request $request, int $invoiceId)
+    {
+        $invoice = \App\Models\Invoice::withTrashed()->findOrFail($invoiceId);
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $invoice->restore();
+
+        if ($request->wantsJson()) return response()->json($invoice->fresh('client'));
+        return redirect()->route('invoices.trash')->with('status', 'Invoice restored.');
+    }
+
+    public function forceDestroy(\Illuminate\Http\Request $request, int $invoiceId)
+    {
+        $invoice = \App\Models\Invoice::withTrashed()->findOrFail($invoiceId);
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $invoice->forceDelete();
+
+        if ($request->wantsJson()) return response()->json(['deleted' => true]);
+        return redirect()->route('invoices.trash')->with('status', 'Invoice permanently deleted.');
+    }
+
+
+
 
     /**
      * Guard: ensure the model belongs to the current user.

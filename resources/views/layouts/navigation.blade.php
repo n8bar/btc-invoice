@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
                         Clients
                     </x-nav-link>
+                    <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                        Invoices
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -76,6 +79,10 @@
             <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
                 Clients
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                Invoices
+            </x-responsive-nav-link>
+
         </div>
 
         <!-- Responsive Settings Options -->
