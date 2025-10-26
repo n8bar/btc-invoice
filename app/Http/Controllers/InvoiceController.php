@@ -79,11 +79,15 @@ class InvoiceController extends Controller
     /**
      * Show one invoice owned by the authenticated user.
      */
-    public function show(Request $request, Invoice $invoice)
+    public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorizeOwnership($request, $invoice);
-        return response()->json($invoice->load(['client:id,name,email']));
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        return view('invoices.show', [
+            'invoice' => $invoice->load('client'),
+        ]);
     }
+
 
     /**
      * Update limited fields of an owned invoice.
@@ -188,6 +192,36 @@ class InvoiceController extends Controller
         if ($request->wantsJson()) return response()->json(['deleted' => true]);
         return redirect()->route('invoices.trash')->with('status', 'Invoice permanently deleted.');
     }
+
+    public function setStatus(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice, string $action)
+    {
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $allowed = ['draft','sent','paid','void'];
+        abort_unless(in_array($action, $allowed, true), 404);
+
+        $updates = ['status' => $action];
+        if ($action === 'paid') {
+            $updates['paid_at'] = now();
+        } else {
+            $updates['paid_at'] = null;
+        }
+
+        $invoice->update($updates);
+
+        if ($request->wantsJson()) return response()->json($invoice->fresh('client'));
+        return back()->with('status', 'Status updated.');
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 

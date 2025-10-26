@@ -30,7 +30,9 @@
             <tbody class="divide-y divide-gray-200 bg-white">
             @forelse ($invoices as $inv)
                 <tr>
-                    <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ $inv->number }}</td>
+                    <td class="px-6 py-3 text-sm font-medium text-gray-900">
+                        <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
+                    </td>
                     <td class="px-6 py-3 text-sm">{{ $inv->client->name ?? '—' }}</td>
                     <td class="px-6 py-3 text-sm">${{ number_format($inv->amount_usd, 2) }}</td>
                     <td class="px-6 py-3 text-sm">{{ $inv->amount_btc ?? '—' }}</td>
