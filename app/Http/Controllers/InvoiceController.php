@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use App\Services\BtcRate;
 
 class InvoiceController extends Controller
 {
@@ -41,6 +42,10 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $userId = $request->user()->id;
+
+        if (!$request->filled('number')) {
+            $request->merge(['number' => \App\Models\Invoice::nextNumberForUser($userId)]);
+        }
 
         $data = $request->validate([
             'client_id'   => [
@@ -145,8 +150,12 @@ class InvoiceController extends Controller
     {
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
+        $suggestedNumber = \App\Models\Invoice::nextNumberForUser($request->user()->id);
 
-        return view('invoices.create', compact('clients'));
+        $r = BtcRate::current();
+        $prefillRate = $r['rate_usd'] ?? null;
+
+        return view('invoices.create', compact('clients','suggestedNumber','prefillRate'));
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -213,13 +222,22 @@ class InvoiceController extends Controller
         return back()->with('status', 'Status updated.');
     }
 
+    public function currentRate()
+    {
+        //$this->authorize('viewAny', \App\Models\Invoice::class); // optional; remove if no policies
 
+        $r = \App\Services\BtcRate::current();
+        if (!$r) {
+            return response()->json(['ok' => false, 'message' => 'Rate unavailable'], 503);
+        }
 
-
-
-
-
-
+        return response()->json([
+            'ok'       => true,
+            'rate_usd' => $r['rate_usd'],
+            'as_of'    => $r['as_of']->toIso8601String(),
+            'source'   => $r['source'],
+        ]);
+    }
 
 
 

@@ -25,4 +25,29 @@ class Invoice extends Model
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
+
+
+    public static function nextNumberForUser(int $userId): string
+    {
+        // Start from the highest existing INV-#### for this user
+        $last = static::where('user_id', $userId)
+            ->where('number', 'like', 'INV-%')
+            ->orderByDesc('id')
+            ->value('number');
+
+        $n = 0;
+        if ($last && preg_match('/^INV-(\d{4,})$/', $last, $m)) {
+            $n = (int) $m[1];
+        }
+
+        // Find the next free number (handles gaps/soft-deletes safely)
+        do {
+            $n++;
+            $candidate = 'INV-' . str_pad((string) $n, 4, '0', STR_PAD_LEFT);
+        } while (static::where('user_id', $userId)->where('number', $candidate)->exists());
+
+        return $candidate;
+    }
+
+
 }

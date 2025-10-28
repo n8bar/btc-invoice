@@ -39,6 +39,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('clients/{clientId}/force', [ClientController::class, 'forceDestroy'])
         ->whereNumber('clientId')->name('clients.force-destroy');
 
+    //BTC-USD Rate
+    Route::get('invoices/rate/current', [\App\Http\Controllers\InvoiceController::class, 'currentRate'])
+        ->name('invoices.rate');
+
     // Invoices - custom actions MUST be before the resource
     Route::get('invoices/trash', [InvoiceController::class, 'trash'])->name('invoices.trash');
     Route::patch('invoices/{invoiceId}/restore', [InvoiceController::class, 'restore'])
