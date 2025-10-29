@@ -29,6 +29,12 @@
                         @error('number')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-700">Invoice date</label>
+                        <input type="date" name="invoice_date" value="{{ old('invoice_date', $today) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
+                        @error('invoice_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700">Due date</label>
                         <input type="date" name="due_date" value="{{ old('due_date') }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>

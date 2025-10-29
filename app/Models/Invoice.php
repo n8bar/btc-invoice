@@ -12,13 +12,14 @@ class Invoice extends Model
     protected $fillable = [
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','btc_address',
-        'status','txid','due_date','paid_at',
+        'status','txid','invoice_date','due_date','paid_at',
     ];
 
     protected $casts = [
         'amount_usd' => 'decimal:2',
         'amount_btc' => 'decimal:8',
         'btc_rate'   => 'decimal:2', // USD per BTC
+        'invoice_date' => 'date',
         'due_date'   => 'date',
         'paid_at'    => 'datetime',
     ];

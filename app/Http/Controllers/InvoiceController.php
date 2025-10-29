@@ -65,6 +65,7 @@ class InvoiceController extends Controller
             'due_date'    => ['nullable','date'],
             'paid_at'     => ['nullable','date'],
             'txid'        => ['nullable','string','max:128'],
+            'invoice_date' => ['required','date'],
         ]);
 
         // If rate is provided and BTC amount omitted, compute it.
@@ -116,6 +117,7 @@ class InvoiceController extends Controller
             'due_date'    => ['nullable','date'],
             'paid_at'     => ['nullable','date'],
             'txid'        => ['nullable','string','max:128'],
+            'invoice_date'=> ['required','date'],
         ]);
 
         if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {
@@ -155,7 +157,9 @@ class InvoiceController extends Controller
         $r = BtcRate::current();
         $prefillRate = $r['rate_usd'] ?? null;
 
-        return view('invoices.create', compact('clients','suggestedNumber','prefillRate'));
+        $today = now()->toDateString(); // ✅ for invoice_date default
+
+        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today'));
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)

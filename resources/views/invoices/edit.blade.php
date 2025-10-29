@@ -16,12 +16,19 @@
                     @error('client_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Number</label>
                         <input name="number" value="{{ old('number',$invoice->number) }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('number')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Invoice date</label>
+                        <input type="date" name="invoice_date"
+                               value="{{ old('invoice_date', optional($invoice->invoice_date)->toDateString() ?: now()->toDateString()) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
+                        @error('invoice_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Due date</label>

@@ -72,6 +72,7 @@
                         <dl class="space-y-2 text-sm">
                             <div class="flex justify-between"><dt class="text-gray-600">Client</dt><dd>{{ $invoice->client->name ?? '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">Status</dt><dd class="uppercase">{{ $invoice->status ?? 'draft' }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-gray-600">Invoice date</dt><dd>{{ optional($invoice->invoice_date)->toDateString() ?: '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">Due date</dt><dd>{{ optional($invoice->due_date)->toDateString() ?: '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">Paid at</dt><dd>{{ optional($invoice->paid_at)->toDateTimeString() ?: '—' }}</dd></div>
                         </dl>
