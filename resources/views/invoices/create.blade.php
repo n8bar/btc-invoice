@@ -75,7 +75,7 @@
                         <label class="block text-sm font-medium text-gray-700">Amount (BTC)</label>
                         <input type="number" step="0.00000001" min="0" name="amount_btc" id="amount_btc" value="{{ old('amount_btc') }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
-                        <p class="mt-1 text-xs text-gray-500">If left blank but rate is provided, it will auto-calc.</p>
+                        <p class="mt-1 text-xs text-gray-500">Amounts auto-calculate as you type. Use “Use current rate” to refresh.</p>
                         @error('amount_btc')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -145,6 +145,45 @@
         }
 
         btn?.addEventListener('click', fetchRate);
+
+
+        (() => {
+            const usd = document.getElementById('amount_usd');
+            const rate = document.getElementById('btc_rate');
+            const btc = document.getElementById('amount_btc');
+
+            let active = null; // 'usd' | 'btc' | 'rate'
+
+            const parse = (el) => {
+                const v = parseFloat(el.value);
+                return Number.isFinite(v) ? v : null;
+            };
+
+            const recalc = () => {
+                const r = parse(rate);
+                if (!r || r <= 0) return;
+
+                if (active === 'usd') {
+                    const u = parse(usd);
+                    if (u != null) btc.value = (u / r).toFixed(8);
+                } else if (active === 'btc') {
+                    const b = parse(btc);
+                    if (b != null) usd.value = (b * r).toFixed(2);
+                } else if (active === 'rate') {
+                    // Rate changed: prefer to recompute BTC if USD present, else USD if BTC present
+                    const u = parse(usd), b = parse(btc);
+                    if (u != null) btc.value = (u / r).toFixed(8);
+                    else if (b != null) usd.value = (b * r).toFixed(2);
+                }
+            };
+
+            const on = (el, name) => el.addEventListener('input', () => { active = name; recalc(); });
+            on(usd,  'usd');
+            on(btc,  'btc');
+            on(rate, 'rate');
+        })();
+
+
     </script>
 
 </x-app-layout>
