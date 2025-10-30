@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Invoice extends Model
 {
@@ -22,6 +23,8 @@ class Invoice extends Model
         'invoice_date' => 'date',
         'due_date'   => 'date',
         'paid_at'    => 'datetime',
+        'public_enabled'    => 'boolean',
+        'public_expires_at' => 'datetime',
     ];
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
@@ -82,5 +85,38 @@ class Invoice extends Model
         return 'bitcoin:' . $this->btc_address . ($query ? ('?' . $query) : '');
     }
 
+// Generate a unique token
+    public static function generatePublicToken(): string
+    {
+        do {
+            $token = Str::random(48); // ~288 bits
+        } while (static::where('public_token', $token)->exists());
 
+        return $token;
+    }
+
+// Enable/disable public share (optionally with expiry)
+    public function enablePublicShare(?\Carbon\Carbon $expires = null): self
+    {
+        if (!$this->public_token) {
+            $this->public_token = static::generatePublicToken();
+        }
+        $this->public_enabled = true;
+        $this->public_expires_at = $expires;
+        return tap($this)->save();
+    }
+
+    public function disablePublicShare(): self
+    {
+        $this->public_enabled = false;
+        $this->public_expires_at = null;
+        return tap($this)->save();
+    }
+
+// Absolute public URL accessor
+    public function getPublicUrlAttribute(): ?string
+    {
+        if (!$this->public_enabled || !$this->public_token) return null;
+        return route('invoices.public-print', ['token' => $this->public_token], true);
+    }
 }

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -250,10 +251,83 @@ class InvoiceController extends Controller
     }
 
 
+    public function publicPrint(\Illuminate\Http\Request $request, string $token)
+    {
+        $invoice = \App\Models\Invoice::with('client')
+            ->where('public_enabled', true)
+            ->where('public_token', $token)
+            ->where(function ($q) {
+                $q->whereNull('public_expires_at')
+                    ->orWhere('public_expires_at', '>', now());
+            })
+            ->firstOrFail();
 
+        // Fresh rate every view (we'll add BtcRate::fresh() next bite)
+        $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
+        $rateUsd = $rate['rate_usd'] ?? null;
+        $asOf    = $rate['as_of'] ?? now();
 
+        // Recompute display-only BTC from USD using fresh rate (don’t persist)
+        if ($rateUsd && $invoice->amount_usd) {
+            $invoice->setAttribute('btc_rate', $rateUsd);
+            $invoice->setAttribute('amount_btc', round($invoice->amount_usd / $rateUsd, 8));
+        }
 
+        return response()
+            ->view('invoices.print', [
+                'invoice'    => $invoice->load('client'),
+                'rate_as_of' => $asOf,
+                'public'     => true,
+            ])
+            ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
+    }
+
+    public function enableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $data = $request->validate([
+            'expires'        => ['nullable','date','after:now'],
+            'expires_preset' => ['nullable','in:none,24h,7d,30d'],
+        ]);
+
+        $expires = null;
+        if (!empty($data['expires_preset']) && $data['expires_preset'] !== 'none') {
+            switch ($data['expires_preset']) {
+                case '24h':  $expires = now()->addDay(); break;
+                case '7d':   $expires = now()->addDays(7); break;
+                case '30d':  $expires = now()->addDays(30); break;
+            }
+        } elseif (!empty($data['expires'])) {
+            $expires = \Carbon\Carbon::parse($data['expires']);
+        }
+
+        $invoice->enablePublicShare($expires);
+
+        return back()->with('status', 'Public link enabled.')
+            ->with('public_url', $invoice->public_url);
+    }
+
+    public function disableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $invoice->disablePublicShare();
+
+        return back()->with('status', 'Public link disabled.');
+    }
+
+    public function rotateShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+
+        $invoice->public_token = \App\Models\Invoice::generatePublicToken();
+        $invoice->save();
+
+        return back()->with('status', 'Public link regenerated.')
+            ->with('public_url', $invoice->public_enabled ? $invoice->public_url : null);
+    }
 
 
     /**

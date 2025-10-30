@@ -17,6 +17,10 @@ Route::get('/health', fn () => response()->json(['ok' => true]));
 // Landing page (keep Breeze welcome)
 Route::get('/', fn () => view('welcome'));
 
+// Public, tokenized print view (no auth)
+Route::get('p/{token}', [InvoiceController::class, 'publicPrint'])
+    ->name('invoices.public-print');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated routes
@@ -56,6 +60,15 @@ Route::middleware(['auth'])->group(function () {
     //Printing
     Route::get('invoices/{invoice}/print', [\App\Http\Controllers\InvoiceController::class, 'print'])
         ->name('invoices.print');
+
+    //Sharing
+    Route::patch('invoices/{invoice}/share/enable',  [InvoiceController::class, 'enableShare'])
+        ->name('invoices.share.enable');
+    Route::patch('invoices/{invoice}/share/disable', [InvoiceController::class, 'disableShare'])
+        ->name('invoices.share.disable');
+    Route::patch('invoices/{invoice}/share/rotate', [InvoiceController::class, 'rotateShare'])
+        ->name('invoices.share.rotate');
+
 
 
     // Standard CRUD

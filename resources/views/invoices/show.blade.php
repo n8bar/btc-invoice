@@ -11,7 +11,7 @@
         @default bg-gray-100 text-gray-800
       @endswitch">
       {{ strtoupper($st) }}
-    </span>
+            </span>
         </h2>
     </x-slot>
 
@@ -71,6 +71,8 @@
                 </div>
 
             </div>
+
+
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
                 <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
@@ -206,7 +208,81 @@
                     </dl>
                 </div>
 
+            </div>
 
+            {{-- Public link (shareable print view) --}}
+            <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-700">Public link</h3>
+                    @if ($invoice->public_enabled && $invoice->public_url)
+                        <div class="flex items-center gap-2">
+                            <form action="{{ route('invoices.share.rotate', $invoice) }}" method="POST"
+                                  onsubmit="return confirm('Regenerate public link? Old URL will stop working.');">
+                                @csrf @method('PATCH')
+                                <x-secondary-button type="submit">Rotate link</x-secondary-button>
+                            </form>
+
+                            <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST"
+                                  onsubmit="return confirm('Disable public link?');">
+                                @csrf @method('PATCH')
+                                <x-danger-button>Disable</x-danger-button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+
+                @if (session('public_url'))
+                    <div class="mt-2 rounded bg-green-50 p-2 text-sm text-green-700">
+                        Link enabled:
+                        <a href="{{ session('public_url') }}" target="_blank" rel="noopener" class="underline break-all">
+                            {{ session('public_url') }}
+                        </a>
+                    </div>
+                @endif
+
+                @if ($invoice->public_enabled && $invoice->public_url)
+                    <div class="mt-3">
+                        <div class="flex items-center gap-2">
+                            <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
+                            <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
+                            <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Open
+                            </a>
+                        </div>
+                        @if ($invoice->public_expires_at)
+                            <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
+                        @endif
+                    </div>
+                @else
+                    <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
+                        @csrf @method('PATCH')
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">Expiry preset</label>
+                            <select name="expires_preset" class="mt-1 w-full rounded-md border-gray-300">
+                                <option value="none" selected>No expiry</option>
+                                <option value="24h">24 hours</option>
+                                <option value="7d">7 days</option>
+                                <option value="30d">30 days</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600">Or pick exact datetime</label>
+                            <input type="datetime-local" name="expires" class="mt-1 w-full rounded-md border-gray-300">
+                            <p class="mt-1 text-[11px] text-gray-500">If set, this overrides the preset.</p>
+                        </div>
+
+                        <div>
+                            <x-primary-button class="w-full sm:w-auto">Enable public link</x-primary-button>
+                        </div>
+                    </form>
+
+                    <p class="mt-2 text-xs text-gray-500">
+                        Creates a secret link to a read-only print view that refreshes the BTC rate on each visit.
+                    </p>
+                @endif
             </div>
 
         </div>

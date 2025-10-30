@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <title>Invoice #{{ $invoice->number }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    @if (!empty($public))
+        <meta name="robots" content="noindex,nofollow,noarchive">
+    @endif
+
     <style>
         :root { --gray:#6b7280; --light:#e5e7eb; --dark:#111827; }
         * { box-sizing: border-box; }
@@ -81,6 +86,10 @@
             <tr><th>USD</th><td class="total">${{ number_format($invoice->amount_usd, 2) }}</td></tr>
             <tr><th>BTC</th><td>{{ $invoice->amount_btc ?? '-' }}</td></tr>
             <tr><th>BTC rate (USD/BTC)</th><td>{{ $invoice->btc_rate ?? '-' }}</td></tr>
+            @if (!empty($rate_as_of))
+                <tr><th>Rate as of</th><td class="muted">{{ $rate_as_of->toDateTimeString() }}</td></tr>
+            @endif
+
         </table>
     </section>
 
