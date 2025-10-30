@@ -53,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('invoices/{invoiceId}/force', [InvoiceController::class, 'forceDestroy'])
         ->whereNumber('invoiceId')->name('invoices.force-destroy');
 
+    //Printing
+    Route::get('invoices/{invoice}/print', [\App\Http\Controllers\InvoiceController::class, 'print'])
+        ->name('invoices.print');
+
 
     // Standard CRUD
     Route::resource('clients', ClientController::class);

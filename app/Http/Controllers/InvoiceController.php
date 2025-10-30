@@ -243,6 +243,14 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function print(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        abort_unless($invoice->user_id === $request->user()->id, 403);
+        return view('invoices.print', ['invoice' => $invoice->load('client')]);
+    }
+
+
+
 
 
 

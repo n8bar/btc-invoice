@@ -50,5 +50,37 @@ class Invoice extends Model
         return $candidate;
     }
 
+    public function getBitcoinUriAttribute(): ?string
+    {
+        if (!$this->btc_address) {
+            return null;
+        }
+
+        $params = [];
+
+        // amount must be in BTC with up to 8 decimals
+        if (!empty($this->amount_btc) && (float)$this->amount_btc > 0) {
+            $amt = number_format((float)$this->amount_btc, 8, '.', '');
+            $amt = rtrim(rtrim($amt, '0'), '.'); // trim trailing zeros/dot
+            if ($amt !== '' && $amt !== '0') {
+                $params['amount'] = $amt;
+            }
+        }
+
+        // Optional label/message (kept short)
+        if (!empty($this->number)) {
+            $params['label'] = 'Invoice ' . $this->number;
+        }
+        if (!empty($this->description)) {
+            $msg = mb_strimwidth((string)$this->description, 0, 140, '…');
+            if ($msg !== '') {
+                $params['message'] = $msg;
+            }
+        }
+
+        $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        return 'bitcoin:' . $this->btc_address . ($query ? ('?' . $query) : '');
+    }
+
 
 }
