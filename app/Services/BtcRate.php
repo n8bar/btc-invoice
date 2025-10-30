@@ -36,6 +36,31 @@ class BtcRate
         });
     }
 
+    public static function fresh(): ?array
+    {
+        try {
+            // No cache — always fetch live
+            $res = \Illuminate\Support\Facades\Http::timeout(6)
+                ->retry(2, 200)
+                ->acceptJson()
+                ->get('https://api.coinbase.com/v2/prices/BTC-USD/spot');
+
+            if (!$res->ok()) return null;
+
+            $amount = (float) data_get($res->json(), 'data.amount');
+            if ($amount <= 0) return null;
+
+            return [
+                'rate_usd' => $amount,
+                'as_of'    => now(),
+                'source'   => 'coinbase:spot',
+            ];
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+
     public static function forget(): void
     {
         Cache::forget(self::CACHE_KEY);
