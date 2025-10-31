@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
-use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -90,8 +89,12 @@ class InvoiceController extends Controller
     {
         abort_unless($invoice->user_id === $request->user()->id, 403);
 
+        $rate = BtcRate::current() ?? BtcRate::fresh();
+
         return view('invoices.show', [
-            'invoice' => $invoice->load('client'),
+            'invoice'     => $invoice->load('client'),
+            'rate_usd'    => $rate['rate_usd'] ?? null,
+            'rate_as_of'  => $rate['as_of'] ?? null,
         ]);
     }
 
@@ -263,6 +266,17 @@ class InvoiceController extends Controller
             'source'   => $r['source'],
             'timezone' => $tz,
         ]);
+    }
+
+    public function refreshRate(\Illuminate\Http\Request $request)
+    {
+        $rate = BtcRate::refreshCache();
+
+        if ($rate && isset($rate['as_of'])) {
+            $request->session()->put('rate_as_of', $rate['as_of']);
+        }
+
+        return back()->with('status', 'Rate refreshed.');
     }
 
     public function print(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)

@@ -99,6 +99,17 @@
                             <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $invoice->btc_rate ?? '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $invoice->amount_btc ?? '—' }}</dd></div>
                         </dl>
+                        <div class="mt-3 flex items-center justify-between">
+                            <div class="text-xs text-gray-500">
+                                @if (!empty($rate_as_of))
+                                    Rate as of {{ $rate_as_of->toDayDateTimeString() }}
+                                @endif
+                            </div>
+                            <form method="POST" action="{{ route('invoices.rate.refresh') }}" class="inline">
+                                @csrf
+                                <x-secondary-button type="submit">Refresh rate</x-secondary-button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
