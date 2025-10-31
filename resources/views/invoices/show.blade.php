@@ -101,23 +101,63 @@
                         </dl>
 
                         @php
-                            $rate = $rate ?? (\App\Services\BtcRate::current() ?? \App\Services\BtcRate::fresh());
-                            $raw = $rate['as_of'] ?? null;
-                            $asOf = $raw instanceof \Carbon\Carbon ? $raw : ($raw ? \Carbon\Carbon::parse($raw) : null);
-                            $asOf = $asOf?->setTimezone(config('app.timezone'));
+                            $rateInfo = $rate ?? null;
+                            $asOf = null;
+                            $asOfUtcIso = null;
+                            $asOfFallback = null;
+
+                            if ($rateInfo && !empty($rateInfo['as_of'])) {
+                                $asOf = $rateInfo['as_of'] instanceof \Carbon\Carbon
+                                    ? $rateInfo['as_of']
+                                    : \Carbon\Carbon::parse($rateInfo['as_of']);
+
+                                if ($asOf) {
+                                    $asOfUtcIso = $asOf->copy()->utc()->toIso8601String();
+                                    $asOfFallback = $asOf->copy()
+                                        ->setTimezone(config('app.timezone'))
+                                        ->toDayDateTimeString();
+                                }
+                            }
                         @endphp
 
-                        @if($rate && $asOf)
+                        @if($rateInfo && $asOf && $asOfUtcIso)
                             <div class="mt-2 flex items-center justify-between">
                                 <p class="text-xs text-gray-500">
-                                    Rate as of {{ $asOf->toDayDateTimeString() }}
-                                    <span class="ml-2 text-gray-400">({{ $rate['source'] ?? 'spot' }})</span>
+                                    Rate as of
+                                    <time
+                                        datetime="{{ $asOfUtcIso }}"
+                                        data-utc-ts="{{ $asOfUtcIso }}"
+                                        title="{{ $asOfFallback }}"
+                                        class="font-medium text-gray-600"
+                                    >{{ $asOfFallback }}</time>
+                                    <span class="ml-2 text-gray-400">({{ $rateInfo['source'] ?? 'spot' }})</span>
                                 </p>
                                 <form method="POST" action="{{ route('invoices.rate.refresh') }}" class="inline">
                                     @csrf
                                     <x-secondary-button type="submit">Refresh rate</x-secondary-button>
                                 </form>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    document.querySelectorAll('[data-utc-ts]').forEach((node) => {
+                                        const iso = node.getAttribute('data-utc-ts');
+                                        if (!iso) return;
+
+                                        const parsed = new Date(iso);
+                                        if (Number.isNaN(parsed.getTime())) return;
+
+                                        const localized = parsed.toLocaleString(undefined, {
+                                            dateStyle: 'medium',
+                                            timeStyle: 'short',
+                                        });
+
+                                        if (localized) {
+                                            node.textContent = localized;
+                                        }
+                                    });
+                                });
+                            </script>
                         @endif
 
 

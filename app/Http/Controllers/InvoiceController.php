@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
 
@@ -91,10 +92,13 @@ class InvoiceController extends Controller
 
         $rate = BtcRate::current() ?? BtcRate::fresh();
 
+        if ($rate && isset($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
+            $rate['as_of'] = Carbon::parse($rate['as_of']);
+        }
+
         return view('invoices.show', [
-            'invoice'     => $invoice->load('client'),
-            'rate_usd'    => $rate['rate_usd'] ?? null,
-            'rate_as_of'  => $rate['as_of'] ?? null,
+            'invoice' => $invoice->load('client'),
+            'rate'    => $rate,
         ]);
     }
 
