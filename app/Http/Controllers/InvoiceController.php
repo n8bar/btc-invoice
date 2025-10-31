@@ -246,16 +246,22 @@ class InvoiceController extends Controller
     {
         //$this->authorize('viewAny', \App\Models\Invoice::class); // optional; remove if no policies
 
-        $r = \App\Services\BtcRate::current();
+        $r = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
         if (!$r) {
             return response()->json(['ok' => false, 'message' => 'Rate unavailable'], 503);
         }
 
+        $tz = config('app.timezone');
+        $asOf = $r['as_of'] instanceof \Carbon\CarbonInterface
+            ? $r['as_of']->copy()->setTimezone($tz)
+            : null;
+
         return response()->json([
             'ok'       => true,
             'rate_usd' => $r['rate_usd'],
-            'as_of'    => $r['as_of']->toIso8601String(),
+            'as_of'    => optional($asOf)->toIso8601String(),
             'source'   => $r['source'],
+            'timezone' => $tz,
         ]);
     }
 
@@ -280,7 +286,11 @@ class InvoiceController extends Controller
         // Fresh rate every view (we'll add BtcRate::fresh() next bite)
         $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
         $rateUsd = $rate['rate_usd'] ?? null;
-        $asOf    = $rate['as_of'] ?? now();
+
+        $tz = config('app.timezone');
+        $asOf = $rate['as_of'] instanceof \Carbon\CarbonInterface
+            ? $rate['as_of']->copy()->setTimezone($tz)
+            : now($tz);
 
         // Recompute display-only BTC from USD using fresh rate (don’t persist)
         if ($rateUsd && $invoice->amount_usd) {
@@ -292,6 +302,7 @@ class InvoiceController extends Controller
             ->view('invoices.print', [
                 'invoice'    => $invoice->load('client'),
                 'rate_as_of' => $asOf,
+                'rate_timezone' => $tz,
                 'public'     => true,
             ])
             ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');

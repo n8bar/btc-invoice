@@ -124,6 +124,28 @@
             const usdInput  = document.getElementById('amount_usd');
             const btcInput  = document.getElementById('amount_btc');
             const stampEl   = document.getElementById('rateStamp');
+            const fallbackTz = @json(config('app.timezone'));
+
+            const formatAsOf = (isoString, tz) => {
+                if (!isoString) return '';
+                try {
+                    const zone = tz || fallbackTz;
+                    const formatter = new Intl.DateTimeFormat(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                        timeZone: zone,
+                        timeZoneName: 'short',
+                    });
+                    return `${formatter.format(new Date(isoString))} (${zone})`;
+                } catch (e) {
+                    return new Date(isoString).toLocaleString();
+                }
+            };
 
             async function fetchRate(){
                 try{
@@ -138,7 +160,9 @@
                         const r = parseFloat(rateInput.value);
                         if(r>0) btcInput.value = (usd/r).toFixed(8);
                     }
-                    if(data.as_of) stampEl.textContent = `as of ${new Date(data.as_of).toLocaleString()}`;
+                    if(data.as_of){
+                        stampEl.textContent = `as of ${formatAsOf(data.as_of, data.timezone)}`;
+                    }
                 }catch(e){ alert(e.message || 'Could not fetch rate.'); }
                 finally{ btn.disabled = false; btn.textContent = 'Use current rate'; }
             }

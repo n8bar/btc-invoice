@@ -86,8 +86,12 @@
             <tr><th>USD</th><td class="total">${{ number_format($invoice->amount_usd, 2) }}</td></tr>
             <tr><th>BTC</th><td>{{ $invoice->amount_btc ?? '-' }}</td></tr>
             <tr><th>BTC rate (USD/BTC)</th><td>{{ $invoice->btc_rate ?? '-' }}</td></tr>
+            @php($tz = $rate_timezone ?? config('app.timezone'))
             @if (!empty($rate_as_of))
-                <tr><th>Rate as of</th><td class="muted">{{ $rate_as_of->toDateTimeString() }}</td></tr>
+                <tr>
+                    <th>Rate as of</th>
+                    <td class="muted">{{ $rate_as_of->toDateTimeString() }} {{ $tz }}</td>
+                </tr>
             @endif
 
         </table>
