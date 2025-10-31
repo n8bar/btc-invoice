@@ -17,6 +17,10 @@ Route::get('/health', fn () => response()->json(['ok' => true]));
 // Landing page (keep Breeze welcome)
 Route::get('/', fn () => view('welcome'));
 
+// Public, tokenized print view (no auth)
+Route::get('p/{token}', [InvoiceController::class, 'publicPrint'])
+    ->name('invoices.public-print');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated routes
@@ -38,6 +42,34 @@ Route::middleware(['auth'])->group(function () {
         ->whereNumber('clientId')->name('clients.restore');
     Route::delete('clients/{clientId}/force', [ClientController::class, 'forceDestroy'])
         ->whereNumber('clientId')->name('clients.force-destroy');
+
+    //BTC-USD Rate
+    Route::get('invoices/rate/current', [\App\Http\Controllers\InvoiceController::class, 'currentRate'])
+        ->name('invoices.rate');
+
+    // Invoices - custom actions MUST be before the resource
+    Route::get('invoices/trash', [InvoiceController::class, 'trash'])->name('invoices.trash');
+    Route::patch('invoices/{invoiceId}/restore', [InvoiceController::class, 'restore'])
+        ->whereNumber('invoiceId')->name('invoices.restore');
+    Route::patch('invoices/{invoice}/status/{action}', [InvoiceController::class, 'setStatus'])
+        ->where(['action' => 'sent|paid|void|draft'])
+        ->name('invoices.set-status');
+    Route::delete('invoices/{invoiceId}/force', [InvoiceController::class, 'forceDestroy'])
+        ->whereNumber('invoiceId')->name('invoices.force-destroy');
+
+    //Printing
+    Route::get('invoices/{invoice}/print', [\App\Http\Controllers\InvoiceController::class, 'print'])
+        ->name('invoices.print');
+
+    //Sharing
+    Route::patch('invoices/{invoice}/share/enable',  [InvoiceController::class, 'enableShare'])
+        ->name('invoices.share.enable');
+    Route::patch('invoices/{invoice}/share/disable', [InvoiceController::class, 'disableShare'])
+        ->name('invoices.share.disable');
+    Route::patch('invoices/{invoice}/share/rotate', [InvoiceController::class, 'rotateShare'])
+        ->name('invoices.share.rotate');
+
+
 
     // Standard CRUD
     Route::resource('clients', ClientController::class);
