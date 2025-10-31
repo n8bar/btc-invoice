@@ -121,6 +121,21 @@ class InvoiceController extends Controller
             'invoice_date'=> ['required','date'],
         ]);
 
+        if ($invoice->public_enabled) {
+            // Fields that affect what recipients see
+            $locked = ['client_id','number','description','amount_usd','btc_address','invoice_date','due_date'];
+            foreach ($locked as $f) {
+                // Compare only if field is present in payload and changed
+                if (array_key_exists($f, $data) && $data[$f] != $invoice->{$f}) {
+                    return back()
+                        ->with('status', 'Disable the public link to edit invoice details.')
+                        ->withInput();
+                }
+            }
+        }
+        // allowed to change even when public: status/paid_at/txid/etc.
+
+
         if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {
             $data['amount_btc'] = round($data['amount_usd'] / $data['btc_rate'], 8);
         }
@@ -287,6 +302,10 @@ class InvoiceController extends Controller
     {
         abort_unless($invoice->user_id === $request->user()->id, 403);
 
+        //if ($invoice->status === 'draft') {
+        //    return back()->with('status', 'Public link not allowed for drafts. Mark Sent or Paid first.');
+        //}
+
         $data = $request->validate([
             'expires'        => ['nullable','date','after:now'],
             'expires_preset' => ['nullable','in:none,24h,7d,30d'],
@@ -361,6 +380,9 @@ class InvoiceController extends Controller
 
         return [$rate, $amountBtc];
     }
+
+
+
 
     /**
      * Attempts multiple public endpoints to get USD per BTC.

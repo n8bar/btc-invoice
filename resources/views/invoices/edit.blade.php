@@ -3,6 +3,18 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+
+            @if($invoice->public_enabled)
+                <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
+                    This invoice is currently public. To edit, first
+                    <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
+                          onsubmit="return confirm('Disable the public link?');">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="underline text-red-600 hover:text-red-700">disable the public link</button>
+                    </form>.
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('invoices.update', $invoice) }}" class="space-y-6">
                 @csrf @method('PUT')
 

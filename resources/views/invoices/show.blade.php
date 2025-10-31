@@ -241,19 +241,21 @@
                 @endif
 
                 @if ($invoice->public_enabled && $invoice->public_url)
-                    <div class="mt-3">
-                        <div class="flex items-center gap-2">
-                            <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
-                            <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
-                            <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
-                               class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                                Open
-                            </a>
+                    <p>
+                        <div class="mt-3">
+                            <div class="flex items-center gap-2">
+                                <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
+                                <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
+                                <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
+                                   class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                                    Open
+                                </a>
+                            </div>
+                            @if ($invoice->public_expires_at)
+                                <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
+                            @endif
                         </div>
-                        @if ($invoice->public_expires_at)
-                            <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
-                        @endif
-                    </div>
+                    </p>
                 @else
                     <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
                         @csrf @method('PATCH')
@@ -283,11 +285,25 @@
                         Creates a secret link to a read-only print view that refreshes the BTC rate on each visit.
                     </p>
                 @endif
+
+                @if($invoice->public_enabled)
+                    <br />
+                    <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
+                        <p>
+                            This invoice is currently public. To edit, first
+                            <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
+                                  onsubmit="return confirm('Disable the public link?');">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="underline text-red-600 hover:text-red-700">disable the public link</button>
+                            </form>.
+                        </p>
+                    </div>
+                @endif
             </div>
 
         </div>
     </div>
-
+    <br />
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
