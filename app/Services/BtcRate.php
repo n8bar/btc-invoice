@@ -59,16 +59,26 @@ class BtcRate
 
     public static function refreshCache(): ?array
     {
-        $fresh = self::fresh();
-        if (!$fresh) {
-            return null;
-        }
+        // same key current() uses
+        $key = 'btc_rate:spot';
 
-        $normalized = self::normalize($fresh);
-        Cache::put(self::CACHE_KEY, $normalized, self::TTL);
+        Cache::forget($key);
 
-        return $normalized;
+        $live = static::fresh();
+        if (!$live) return null;
+
+        $payload = [
+            'rate_usd' => $live['rate_usd'],
+            'as_of'    => $live['as_of'] instanceof Carbon
+                ? $live['as_of']
+                : Carbon::parse($live['as_of']),
+            'source'   => $live['source'] ?? 'coinbase:spot',
+        ];
+
+        Cache::put($key, $payload, now()->addHour());
+        return $payload;
     }
+
 
 
     public static function forget(): void

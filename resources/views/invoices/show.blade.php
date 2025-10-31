@@ -99,17 +99,28 @@
                             <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $invoice->btc_rate ?? '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $invoice->amount_btc ?? '—' }}</dd></div>
                         </dl>
-                        <div class="mt-3 flex items-center justify-between">
-                            <div class="text-xs text-gray-500">
-                                @if (!empty($rate_as_of))
-                                    Rate as of {{ $rate_as_of->toDayDateTimeString() }}
-                                @endif
+
+                        @php
+                            $rate = $rate ?? (\App\Services\BtcRate::current() ?? \App\Services\BtcRate::fresh());
+                            $raw = $rate['as_of'] ?? null;
+                            $asOf = $raw instanceof \Carbon\Carbon ? $raw : ($raw ? \Carbon\Carbon::parse($raw) : null);
+                            $asOf = $asOf?->setTimezone(config('app.timezone'));
+                        @endphp
+
+                        @if($rate && $asOf)
+                            <div class="mt-2 flex items-center justify-between">
+                                <p class="text-xs text-gray-500">
+                                    Rate as of {{ $asOf->toDayDateTimeString() }}
+                                    <span class="ml-2 text-gray-400">({{ $rate['source'] ?? 'spot' }})</span>
+                                </p>
+                                <form method="POST" action="{{ route('invoices.rate.refresh') }}" class="inline">
+                                    @csrf
+                                    <x-secondary-button type="submit">Refresh rate</x-secondary-button>
+                                </form>
                             </div>
-                            <form method="POST" action="{{ route('invoices.rate.refresh') }}" class="inline">
-                                @csrf
-                                <x-secondary-button type="submit">Refresh rate</x-secondary-button>
-                            </form>
-                        </div>
+                        @endif
+
+
                     </div>
                 </div>
 
