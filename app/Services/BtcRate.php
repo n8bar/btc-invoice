@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 class BtcRate
 {
-    const CACHE_KEY = 'btc:rate:usd';
+    const CACHE_KEY = 'btc_rate:spot';
     const TTL = 3600; // seconds
 
     /**
@@ -14,33 +15,28 @@ class BtcRate
      */
     public static function current(): ?array
     {
-        return Cache::remember(self::CACHE_KEY, self::TTL, function () {
-            try {
-                $res = Http::timeout(8)
-                    ->acceptJson()
-                    ->get('https://api.coinbase.com/v2/exchange-rates', ['currency' => 'BTC']);
+        $cached = Cache::get(self::CACHE_KEY);
 
-                $usd = data_get($res->json(), 'data.rates.USD');
-                if (!$usd) {
-                    return null;
-                }
+        if ($cached) {
+            return self::normalize($cached);
+        }
 
-                return [
-                    'rate_usd' => (float) $usd, // USD per 1 BTC
-                    'source'   => 'coinbase',
-                    'as_of'    => now(),
-                ];
-            } catch (\Throwable $e) {
-                return null; // fail closed; UI can fall back to manual entry
-            }
-        });
+        $fresh = self::fresh();
+        if (!$fresh) {
+            return null;
+        }
+
+        $normalized = self::normalize($fresh);
+        Cache::put(self::CACHE_KEY, $normalized, self::TTL);
+
+        return $normalized;
     }
 
     public static function fresh(): ?array
     {
         try {
             // No cache — always fetch live
-            $res = \Illuminate\Support\Facades\Http::timeout(6)
+            $res = Http::timeout(6)
                 ->retry(2, 200)
                 ->acceptJson()
                 ->get('https://api.coinbase.com/v2/prices/BTC-USD/spot');
@@ -61,8 +57,35 @@ class BtcRate
     }
 
 
+    public static function refreshCache(): ?array
+    {
+        $fresh = self::fresh();
+        if (!$fresh) {
+            return null;
+        }
+
+        $normalized = self::normalize($fresh);
+        Cache::put(self::CACHE_KEY, $normalized, self::TTL);
+
+        return $normalized;
+    }
+
+
     public static function forget(): void
     {
         Cache::forget(self::CACHE_KEY);
+    }
+
+    private static function normalize(?array $rate): ?array
+    {
+        if (!$rate) {
+            return null;
+        }
+
+        if (!empty($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
+            $rate['as_of'] = Carbon::parse($rate['as_of']);
+        }
+
+        return $rate;
     }
 }

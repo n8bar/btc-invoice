@@ -46,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
     //BTC-USD Rate
     Route::get('invoices/rate/current', [\App\Http\Controllers\InvoiceController::class, 'currentRate'])
         ->name('invoices.rate');
+    Route::post('invoices/rate/refresh', [\App\Http\Controllers\InvoiceController::class, 'refreshRate'])
+        ->name('invoices.rate.refresh');
 
     // Invoices - custom actions MUST be before the resource
     Route::get('invoices/trash', [InvoiceController::class, 'trash'])->name('invoices.trash');
