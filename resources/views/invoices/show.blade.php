@@ -94,14 +94,18 @@
 
                     <div class="p-6">
                         <h3 class="mb-3 text-sm font-semibold text-gray-700">Amounts</h3>
+                        @php
+                            $rateInfo = $rate ?? null;
+                            $displayRateUsd = $rateInfo['rate_usd'] ?? ($invoice->btc_rate ?? null);
+                        @endphp
+
                         <dl class="space-y-2 text-sm">
                             <div class="flex justify-between"><dt class="text-gray-600">USD</dt><dd>${{ number_format($invoice->amount_usd, 2) }}</dd></div>
-                            <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $invoice->btc_rate ?? '—' }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $displayRateUsd !== null ? $displayRateUsd : '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $invoice->amount_btc ?? '—' }}</dd></div>
                         </dl>
 
                         @php
-                            $rateInfo = $rate ?? null;
                             $asOf = null;
                             $asOfUtcIso = null;
                             $asOfFallback = null;
