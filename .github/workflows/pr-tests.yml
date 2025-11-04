@@ -1,17 +1,14 @@
 name: PR Tests
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize]
-
-permissions:
-  contents: read
 
 jobs:
   phpunit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR HEAD
+      - name: Checkout PR head
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -20,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, dom, pdo_sqlite, sqlite3
+          extensions: mbstring, dom, pdo_sqlite, sqlite3, bcmath
           coverage: none
 
       - name: Install Composer deps
@@ -35,6 +32,8 @@ jobs:
             echo 'APP_ENV=testing'
             echo 'DB_CONNECTION=sqlite'
             echo "DB_DATABASE=$(pwd)/database/database.sqlite"
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
           } >> .env
           php artisan key:generate
 
