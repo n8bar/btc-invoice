@@ -7,6 +7,22 @@ on:
 jobs:
   phpunit:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+          MYSQL_USER: laravel
+          MYSQL_PASSWORD: secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v4
@@ -17,25 +33,37 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, dom, pdo_sqlite, sqlite3, bcmath
+          extensions: mbstring, dom, pdo_mysql, bcmath
           coverage: none
+
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Install Composer deps
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Configure test env (sqlite)
+      - name: Configure .env (MySQL)
         run: |
           cp .env.example .env
-          mkdir -p database
-          touch database/database.sqlite
           {
             echo 'APP_ENV=testing'
-            echo 'DB_CONNECTION=sqlite'
-            echo "DB_DATABASE=$(pwd)/database/database.sqlite"
+            echo 'DB_CONNECTION=mysql'
+            echo 'DB_HOST=127.0.0.1'
+            echo 'DB_PORT=3306'
+            echo 'DB_DATABASE=testing'
+            echo 'DB_USERNAME=laravel'
+            echo 'DB_PASSWORD=secret'
             echo 'CACHE_DRIVER=array'
             echo 'SESSION_DRIVER=array'
           } >> .env
           php artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            mysqladmin ping -h 127.0.0.1 -ularavel -psecret && break
+            sleep 2
+          done
 
       - name: Run migrations
         run: php artisan migrate --force
