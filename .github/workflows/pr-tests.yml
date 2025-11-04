@@ -1,0 +1,45 @@
+name: PR Tests
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR HEAD
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Install Composer deps
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Configure test env (sqlite)
+        run: |
+          cp .env.example .env
+          mkdir -p database
+          touch database/database.sqlite
+          {
+            echo 'APP_ENV=testing'
+            echo 'DB_CONNECTION=sqlite'
+            echo "DB_DATABASE=$(pwd)/database/database.sqlite"
+          } >> .env
+          php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run tests
+        run: php artisan test --no-interaction
