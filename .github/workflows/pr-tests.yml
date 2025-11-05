@@ -3,6 +3,12 @@ name: PR Tests
 on:
   pull_request:
     types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - 'codex/**'
+      - 'feat/**'
+      - 'feature/**'
+
 
 jobs:
   phpunit:
