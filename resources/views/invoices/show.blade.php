@@ -96,13 +96,12 @@
                         <h3 class="mb-3 text-sm font-semibold text-gray-700">Amounts</h3>
                         @php
                             $rateInfo = $rate ?? null;
-                            $displayRateUsd = $rateInfo['rate_usd'] ?? ($invoice->btc_rate ?? null);
                         @endphp
 
                         <dl class="space-y-2 text-sm">
                             <div class="flex justify-between"><dt class="text-gray-600">USD</dt><dd>${{ number_format($invoice->amount_usd, 2) }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $displayRateUsd !== null ? $displayRateUsd : '—' }}</dd></div>
-                            <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $invoice->amount_btc ?? '—' }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $displayAmountBtc !== null ? $displayAmountBtc : '—' }}</dd></div>
                         </dl>
 
                         @php
@@ -206,7 +205,7 @@
                             </p>
                         @endif
 
-                        @php $uri = $invoice->bitcoin_uri; @endphp
+                        @php $uri = $displayBitcoinUri; @endphp
 
                         @if ($uri)
                             <div class="flex justify-between">
@@ -225,12 +224,12 @@
                                     <h3 class="mb-2 text-sm font-semibold text-gray-700">Payment QR</h3>
                                     {{--<canvas id="qrBitcoin" width="220" height="220"
                                             class="rounded-lg border border-gray-200 bg-white p-2"></canvas>--}}
-                                    {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(220)->margin(1)->generate($invoice->bitcoin_uri) !!}
+                                    {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(220)->margin(1)->generate($displayBitcoinUri) !!}
 
                                     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
                                     <script>
                                         document.addEventListener('DOMContentLoaded', () => {
-                                            const uri = @json($invoice->bitcoin_uri);
+                                            const uri = @json($displayBitcoinUri);
                                             const img = document.getElementById('qrBitcoin'); // <-- your <img id="qrBitcoin">
                                             if (!uri || !img) return;
 

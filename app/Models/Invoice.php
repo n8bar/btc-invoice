@@ -53,7 +53,10 @@ class Invoice extends Model
         return $candidate;
     }
 
-    public function getBitcoinUriAttribute(): ?string
+    /**
+     * Build a BIP21 URI using an optional override amount.
+     */
+    public function bitcoinUriForAmount(?float $amountBtc): ?string
     {
         if (!$this->btc_address) {
             return null;
@@ -61,13 +64,14 @@ class Invoice extends Model
 
         $params = [];
 
-        // amount must be in BTC with up to 8 decimals
-        if (!empty($this->amount_btc) && (float)$this->amount_btc > 0) {
-            $amt = number_format((float)$this->amount_btc, 8, '.', '');
-            $amt = rtrim(rtrim($amt, '0'), '.'); // trim trailing zeros/dot
-            if ($amt !== '' && $amt !== '0') {
-                $params['amount'] = $amt;
-            }
+        $amountToUse = $amountBtc;
+        if ($amountToUse === null && !empty($this->amount_btc)) {
+            $amountToUse = (float) $this->amount_btc;
+        }
+
+        $formattedAmount = $this->formatBitcoinAmount($amountToUse);
+        if ($formattedAmount !== null) {
+            $params['amount'] = $formattedAmount;
         }
 
         // Optional label/message (kept short)
@@ -83,6 +87,28 @@ class Invoice extends Model
 
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
         return 'bitcoin:' . $this->btc_address . ($query ? ('?' . $query) : '');
+    }
+
+    public function getBitcoinUriAttribute(): ?string
+    {
+        return $this->bitcoinUriForAmount(null);
+    }
+
+    protected function formatBitcoinAmount(?float $amount): ?string
+    {
+        if ($amount === null) {
+            return null;
+        }
+
+        $amount = (float) $amount;
+        if ($amount <= 0) {
+            return null;
+        }
+
+        $formatted = number_format($amount, 8, '.', '');
+        $trimmed = rtrim(rtrim($formatted, '0'), '.');
+
+        return ($trimmed !== '' && $trimmed !== '0') ? $trimmed : null;
     }
 
 // Generate a unique token

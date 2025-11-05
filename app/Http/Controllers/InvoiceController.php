@@ -96,9 +96,38 @@ class InvoiceController extends Controller
             $rate['as_of'] = Carbon::parse($rate['as_of']);
         }
 
+        $invoice = $invoice->load('client');
+
+        $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
+        $amountUsd = $invoice->amount_usd !== null ? (float) $invoice->amount_usd : null;
+
+        $computedBtc = null;
+        if ($rateUsd && $rateUsd > 0 && $amountUsd && $amountUsd > 0) {
+            $computedBtc = round($amountUsd / $rateUsd, 8);
+        }
+
+        $displayAmountBtc = null;
+        if ($computedBtc !== null) {
+            $displayAmountBtc = number_format($computedBtc, 8, '.', '');
+        } elseif ($invoice->amount_btc !== null) {
+            $displayAmountBtc = number_format((float) $invoice->amount_btc, 8, '.', '');
+        }
+
+        $displayRateUsd = null;
+        if ($rateUsd !== null && $rateUsd > 0) {
+            $displayRateUsd = number_format($rateUsd, 2, '.', '');
+        } elseif ($invoice->btc_rate !== null) {
+            $displayRateUsd = number_format((float) $invoice->btc_rate, 2, '.', '');
+        }
+
+        $displayBitcoinUri = $invoice->bitcoinUriForAmount($computedBtc);
+
         return view('invoices.show', [
-            'invoice' => $invoice->load('client'),
-            'rate'    => $rate,
+            'invoice'             => $invoice,
+            'rate'                => $rate,
+            'displayAmountBtc'    => $displayAmountBtc,
+            'displayRateUsd'      => $displayRateUsd,
+            'displayBitcoinUri'   => $displayBitcoinUri,
         ]);
     }
 
