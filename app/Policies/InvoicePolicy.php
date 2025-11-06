@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Invoice;
+use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class InvoicePolicy
+{
+    use HandlesAuthorization;
+
+    /**
+     * Determine whether the user can view any invoices.
+     */
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can view the invoice.
+     */
+    public function view(User $user, Invoice $invoice): bool
+    {
+        return $invoice->user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the user can create invoices.
+     */
+    public function create(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can update the invoice.
+     */
+    public function update(User $user, Invoice $invoice): bool
+    {
+        return $invoice->user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the user can delete the invoice.
+     */
+    public function delete(User $user, Invoice $invoice): bool
+    {
+        return $invoice->user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the user can restore the invoice.
+     */
+    public function restore(User $user, Invoice $invoice): bool
+    {
+        return $invoice->user_id === $user->id;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the invoice.
+     */
+    public function forceDelete(User $user, Invoice $invoice): bool
+    {
+        return $invoice->user_id === $user->id;
+    }
+}
