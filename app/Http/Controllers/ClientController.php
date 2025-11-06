@@ -9,8 +9,7 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        // no-op; routes are already wrapped in auth middleware
-        // $this->middleware('auth');
+        $this->authorizeResource(Client::class, 'client');
     }
 
     /**
@@ -57,8 +56,6 @@ class ClientController extends Controller
      */
     public function show(Request $request, Client $client)
     {
-        $this->authorizeOwnership($request, $client);
-
         return response()->json($client);
     }
 
@@ -67,8 +64,6 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        $this->authorizeOwnership($request, $client);
-
         $data = $request->validate([
             'name'  => ['required','string','max:255'],
             'email' => ['nullable','email','max:255'],
@@ -88,8 +83,6 @@ class ClientController extends Controller
      */
     public function destroy(Request $request, Client $client)
     {
-        $this->authorizeOwnership($request, $client);
-
         $client->delete();
 
         if ($request->wantsJson()) {
@@ -112,7 +105,6 @@ class ClientController extends Controller
      */
     public function edit(Request $request, Client $client)
     {
-        $this->authorizeOwnership($request, $client);
         return view('clients.edit', ['client' => $client]);
     }
 
@@ -120,6 +112,7 @@ class ClientController extends Controller
     // List trashed clients
     public function trash(Request $request)
     {
+        $this->authorize('viewAny', Client::class);
         $clients = Client::onlyTrashed()
             ->where('user_id', $request->user()->id)
             ->orderByDesc('deleted_at')
@@ -133,7 +126,7 @@ class ClientController extends Controller
     public function restore(Request $request, int $clientId)
     {
         $client = Client::withTrashed()->findOrFail($clientId);
-        $this->authorizeOwnership($request, $client);
+        $this->authorize('restore', $client);
 
         $client->restore();
 
@@ -147,7 +140,7 @@ class ClientController extends Controller
     public function forceDestroy(Request $request, int $clientId)
     {
         $client = Client::withTrashed()->findOrFail($clientId);
-        $this->authorizeOwnership($request, $client);
+        $this->authorize('forceDelete', $client);
 
         $client->forceDelete();
 
@@ -155,15 +148,5 @@ class ClientController extends Controller
             return response()->json(['deleted' => true]);
         }
         return redirect()->route('clients.trash')->with('status', 'Client permanently deleted.');
-    }
-
-
-
-    /**
-     * Ensure the authenticated user owns the model.
-     */
-    private function authorizeOwnership(Request $request, Client $client): void
-    {
-        abort_unless($client->user_id === $request->user()->id, 403);
     }
 }

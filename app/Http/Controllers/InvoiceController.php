@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
@@ -16,8 +15,7 @@ class InvoiceController extends Controller
 {
     public function __construct()
     {
-        // no-op; routes are already wrapped in auth middleware
-        // $this->middleware('auth');
+        $this->authorizeResource(Invoice::class, 'invoice');
     }
 
     /**
@@ -88,8 +86,6 @@ class InvoiceController extends Controller
      */
     public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-
         $rate = BtcRate::current() ?? BtcRate::fresh();
 
         if ($rate && isset($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
@@ -139,7 +135,6 @@ class InvoiceController extends Controller
      */
     public function update(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
         $userId = $request->user()->id;
 
         $data = $request->validate([
@@ -188,8 +183,6 @@ class InvoiceController extends Controller
      */
     public function destroy(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-
         $invoice->delete(); // soft-delete
 
         if ($request->wantsJson()) {
@@ -216,8 +209,6 @@ class InvoiceController extends Controller
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
 
@@ -226,6 +217,7 @@ class InvoiceController extends Controller
 
     public function trash(\Illuminate\Http\Request $request)
     {
+        $this->authorize('viewAny', Invoice::class);
         $invoices = \App\Models\Invoice::onlyTrashed()
             ->with('client')
             ->where('user_id', $request->user()->id)
@@ -239,7 +231,7 @@ class InvoiceController extends Controller
     public function restore(\Illuminate\Http\Request $request, int $invoiceId)
     {
         $invoice = \App\Models\Invoice::withTrashed()->findOrFail($invoiceId);
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('restore', $invoice);
 
         $invoice->restore();
 
@@ -250,7 +242,7 @@ class InvoiceController extends Controller
     public function forceDestroy(\Illuminate\Http\Request $request, int $invoiceId)
     {
         $invoice = \App\Models\Invoice::withTrashed()->findOrFail($invoiceId);
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('forceDelete', $invoice);
 
         $invoice->forceDelete();
 
@@ -260,7 +252,7 @@ class InvoiceController extends Controller
 
     public function setStatus(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice, string $action)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('update', $invoice);
 
         $allowed = ['draft','sent','paid','void'];
         abort_unless(in_array($action, $allowed, true), 404);
@@ -308,7 +300,7 @@ class InvoiceController extends Controller
 
     public function print(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('view', $invoice);
         return view('invoices.print', ['invoice' => $invoice->load('client')]);
     }
 
@@ -347,7 +339,7 @@ class InvoiceController extends Controller
 
     public function enableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('update', $invoice);
 
         //if ($invoice->status === 'draft') {
         //    return back()->with('status', 'Public link not allowed for drafts. Mark Sent or Paid first.');
@@ -377,7 +369,7 @@ class InvoiceController extends Controller
 
     public function disableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('update', $invoice);
 
         $invoice->disablePublicShare();
 
@@ -386,7 +378,7 @@ class InvoiceController extends Controller
 
     public function rotateShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
+        $this->authorize('update', $invoice);
 
         $invoice->public_token = \App\Models\Invoice::generatePublicToken();
         $invoice->save();
@@ -394,16 +386,6 @@ class InvoiceController extends Controller
         return back()->with('status', 'Public link regenerated.')
             ->with('public_url', $invoice->public_enabled ? $invoice->public_url : null);
     }
-
-
-    /**
-     * Guard: ensure the model belongs to the current user.
-     */
-    private function authorizeOwnership(Request $request, Invoice $invoice): void
-    {
-        abort_unless($invoice->user_id === $request->user()->id, 403);
-    }
-
     /**
      * Fetch the current BTC/USD spot rate and compute amount BTC for a USD amount.
      * Returns [rateUsdPerBtc, amountBtc]. On failure, uses last known rate or 0.
