@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
@@ -16,8 +15,7 @@ class InvoiceController extends Controller
 {
     public function __construct()
     {
-        // no-op; routes are already wrapped in auth middleware
-        // $this->middleware('auth');
+        $this->authorizeResource(Invoice::class, 'invoice');
     }
 
     /**
@@ -25,8 +23,6 @@ class InvoiceController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
-        $this->authorize('viewAny', Invoice::class);
-
         $invoices = Invoice::with('client')
             ->where('user_id', $request->user()->id)
             ->latest('id')
@@ -44,8 +40,6 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Invoice::class);
-
         $userId = $request->user()->id;
 
         if (!$request->filled('number')) {
@@ -92,8 +86,6 @@ class InvoiceController extends Controller
      */
     public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorize('view', $invoice);
-
         $rate = BtcRate::current() ?? BtcRate::fresh();
 
         if ($rate && isset($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
@@ -143,7 +135,6 @@ class InvoiceController extends Controller
      */
     public function update(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorize('update', $invoice);
         $userId = $request->user()->id;
 
         $data = $request->validate([
@@ -192,8 +183,6 @@ class InvoiceController extends Controller
      */
     public function destroy(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorize('delete', $invoice);
-
         $invoice->delete(); // soft-delete
 
         if ($request->wantsJson()) {
@@ -206,8 +195,6 @@ class InvoiceController extends Controller
 
     public function create(\Illuminate\Http\Request $request)
     {
-        $this->authorize('create', Invoice::class);
-
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
         $suggestedNumber = \App\Models\Invoice::nextNumberForUser($request->user()->id);
@@ -222,8 +209,6 @@ class InvoiceController extends Controller
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $this->authorize('update', $invoice);
-
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
 
@@ -233,7 +218,6 @@ class InvoiceController extends Controller
     public function trash(\Illuminate\Http\Request $request)
     {
         $this->authorize('viewAny', Invoice::class);
-
         $invoices = \App\Models\Invoice::onlyTrashed()
             ->with('client')
             ->where('user_id', $request->user()->id)
@@ -402,11 +386,6 @@ class InvoiceController extends Controller
         return back()->with('status', 'Public link regenerated.')
             ->with('public_url', $invoice->public_enabled ? $invoice->public_url : null);
     }
-
-
-    /**
-     * Guard: ensure the model belongs to the current user.
-     */
     /**
      * Fetch the current BTC/USD spot rate and compute amount BTC for a USD amount.
      * Returns [rateUsdPerBtc, amountBtc]. On failure, uses last known rate or 0.

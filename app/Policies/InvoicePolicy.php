@@ -4,12 +4,9 @@ namespace App\Policies;
 
 use App\Models\Invoice;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InvoicePolicy
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can view any invoices.
      */

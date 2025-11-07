@@ -4,12 +4,9 @@ namespace App\Policies;
 
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ClientPolicy
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can view any clients.
      */

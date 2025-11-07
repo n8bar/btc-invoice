@@ -9,8 +9,7 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        // no-op; routes are already wrapped in auth middleware
-        // $this->middleware('auth');
+        $this->authorizeResource(Client::class, 'client');
     }
 
     /**
@@ -18,8 +17,6 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Client::class);
-
         $clients = Client::query()
             ->where('user_id', $request->user()->id)
             ->orderBy('name')
@@ -34,8 +31,6 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Client::class);
-
         $data = $request->validate([
             'name'  => ['required','string','max:255'],
             'email' => ['nullable','email','max:255'],
@@ -61,8 +56,6 @@ class ClientController extends Controller
      */
     public function show(Request $request, Client $client)
     {
-        $this->authorize('view', $client);
-
         return response()->json($client);
     }
 
@@ -71,8 +64,6 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        $this->authorize('update', $client);
-
         $data = $request->validate([
             'name'  => ['required','string','max:255'],
             'email' => ['nullable','email','max:255'],
@@ -92,8 +83,6 @@ class ClientController extends Controller
      */
     public function destroy(Request $request, Client $client)
     {
-        $this->authorize('delete', $client);
-
         $client->delete();
 
         if ($request->wantsJson()) {
@@ -108,8 +97,6 @@ class ClientController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', Client::class);
-
         return view('clients.create');
     }
 
@@ -118,7 +105,6 @@ class ClientController extends Controller
      */
     public function edit(Request $request, Client $client)
     {
-        $this->authorize('update', $client);
         return view('clients.edit', ['client' => $client]);
     }
 
@@ -127,7 +113,6 @@ class ClientController extends Controller
     public function trash(Request $request)
     {
         $this->authorize('viewAny', Client::class);
-
         $clients = Client::onlyTrashed()
             ->where('user_id', $request->user()->id)
             ->orderByDesc('deleted_at')
@@ -164,7 +149,4 @@ class ClientController extends Controller
         }
         return redirect()->route('clients.trash')->with('status', 'Client permanently deleted.');
     }
-
-
-
 }
