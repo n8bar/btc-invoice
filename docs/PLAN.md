@@ -41,36 +41,39 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Routes: `routes/web.php`.
 - Shared assets: server-side QR generation.
 
-## Current Status (2025-11-07)
-- Client CRUD with soft delete, trash/restore, ownership policies enforced.
-- Invoice flow supports listing, creation, editing, show, status transitions (draft/sent/paid/void), reset-to-draft, soft delete + trash/restore/force delete.
-- Auto-numbering per user.
-- Rate management: current rate buttons, live USD↔BTC conversion, consistent cache key, “Refresh rate” updates on Show page.
-- BTC computation on Show recalculates display amounts without persisting.
-- Payment UX: BIP21 link + “Copy” + print view with server-side SVG QR and thank-you message.
-- Public sharing: `/p/{token}` with enable/disable/rotate/expiry, `noindex`, fetches fresh rate each view.
-- Friendly 403 page aligned with Authorization tests (PR #13 merged).
+## Completed Milestones (2025-11-07)
+1. **Ownership & Access**
+   - Client CRUD includes soft delete, trash/restore, and per-user policies; `Invoice` controllers enforce ownership via `authorizeResource`.
+   - Friendly 403 copy rendered through `bootstrap/app.php`, ensuring Authorization tests pass.
+2. **Invoice UX Foundations**
+   - Auto-numbering per user, status transitions (draft/sent/paid/void) with reset-to-draft, live USD↔BTC conversions, and BIP21 + QR presentation across show/print/public views.
+   - Public sharing (`/p/{token}`) supports enable/disable/rotate/expiry with `noindex` headers and fresh rates per view.
+3. **Test Hardening**
+   - Feature coverage spans public share lifecycle, SEO meta, QR/BIP21 accuracy, soft-delete flows, and rate cache refresh behavior.
+4. **Rate & Currency Correctness**
+   - `docs/RATES.md` defines USD-as-source rules, 8-decimal BTC rounding, and cache TTL expectations; controllers/views share a formatter to keep Show/Print/Public views consistent.
+   - Sail test suite (44 specs) verifies rounding, BIP21 links, and stale-cache fallbacks.
 
 ## Roadmap to Release Candidate
-1. **Test Hardening**
-   - Expand Feature coverage: public share lifecycle (enable/disable/rotate/expiry), noindex meta, Show “as of” behavior, QR presence/BIP21 accuracy, soft-delete visibility, rate cache reuse.
-   - Prefer assertions on stable selectors/headings.
-2. **Rate & Currency Correctness**
-   - Document rounding rules for BTC display and BIP21 amounts.
-   - Add safeguards for stale cache TTL + network fallback behavior.
-3. **Invoice Delivery**
-   - Implement queued Mailables for invoices (signed public URL, optional PDF print attachment).
+5. **Blockchain Payment Detection** *(current MVP gate before delivery)*
+   - Require unique BTC addresses per invoice via user-supplied BIP84 xpub (single-sig). Multisig support deferred to post-MVP roadmap.
+   - Subscribe to mempool + confirmation events (self-hosted node or service) to auto-mark invoices paid, record txid/amount/confirm height.
+   - Remove manual “Mark paid” action; only allow auto-paid status and an admin-only reset for edge cases.
+   - Surface payment events/timestamps in the UI, delivery logs, and notification emails.
+6. **Invoice Delivery** — detailed plan in [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
+   - Implement queued Mailables for invoices (signed public URL).
    - Track send attempts per invoice (timestamp, recipient, status) with retry support.
-4. **Print & Public Polish**
+7. **Print & Public Polish**
    - Improve print template spacing/contrast/fonts; tune QR sizing.
    - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-5. **User Settings**
+8. **User Settings**
    - Allow default BTC address/BIP21 label/memo + invoice terms.
-6. **Observability & Safety**
+7. **Observability & Safety**
    - Structured logs for rate fetches, emails, public access.
    - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-7. **Docs & DX**
+8. **Docs, DX & UX Overhaul**
    - README quick start (Sail), env var references, testing strategy.
+   - Wallet onboarding walkthrough (xpub + mail creds) and redesigned dashboard snapshot.
    - Keep this plan updated by Codex on every meaningful merge.
 
 ## Testing Approach
