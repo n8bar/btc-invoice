@@ -125,8 +125,23 @@ class PublicShareTest extends TestCase
         $response->assertOk();
         $response->assertHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
         $response->assertSee($invoice->number);
+        $response->assertSee('<meta name="robots" content="noindex,nofollow,noarchive">', false);
 
         Carbon::setTestNow();
+    }
+
+    public function test_private_print_view_does_not_include_noindex_meta(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice));
+
+        $response->assertOk();
+        $response->assertHeaderMissing('X-Robots-Tag');
+        $response->assertDontSee('<meta name="robots" content="noindex,nofollow,noarchive">', false);
     }
 
     public function test_public_print_returns_404_when_share_expired(): void
