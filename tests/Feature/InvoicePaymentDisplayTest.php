@@ -50,6 +50,7 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertOk();
         $response->assertSee('href="' . $escapedUri . '"', false);
         $response->assertSee('data-copy-text="' . $escapedUri . '"', false);
+        $response->assertSeeText('0.008');
         $response->assertSee('Payment QR', false);
         $response->assertSee('Thank&nbsp;you!', false);
     }

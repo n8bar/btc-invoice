@@ -16,20 +16,13 @@ class BtcRate
     public static function current(): ?array
     {
         $cached = Cache::get(self::CACHE_KEY);
+        $normalized = self::normalize($cached);
 
-        if ($cached) {
-            return self::normalize($cached);
+        if ($normalized && self::isFresh($normalized)) {
+            return $normalized;
         }
 
-        $fresh = self::fresh();
-        if (!$fresh) {
-            return null;
-        }
-
-        $normalized = self::normalize($fresh);
-        Cache::put(self::CACHE_KEY, $normalized, self::TTL);
-
-        return $normalized;
+        return static::refreshCache();
     }
 
     public static function fresh(): ?array
@@ -90,5 +83,14 @@ class BtcRate
         }
 
         return $rate;
+    }
+
+    private static function isFresh(array $rate): bool
+    {
+        if (empty($rate['as_of']) || !$rate['as_of'] instanceof Carbon) {
+            return false;
+        }
+
+        return $rate['as_of']->diffInSeconds(now()) <= self::TTL;
     }
 }

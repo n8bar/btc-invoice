@@ -94,7 +94,7 @@ class Invoice extends Model
         return $this->bitcoinUriForAmount(null);
     }
 
-    protected function formatBitcoinAmount(?float $amount): ?string
+    public function formatBitcoinAmount(?float $amount): ?string
     {
         if ($amount === null) {
             return null;

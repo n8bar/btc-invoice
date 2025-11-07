@@ -77,6 +77,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
 - Feature tests emphasize authorization, rate refresh, public tokens, email queueing, and print artifacts.
 - Favor model factories and clear policy assertions to keep fixtures simple.
+- Currency/rate expectations live in [`docs/RATES.md`](RATES.md) and must stay in sync with controller + service behavior.
 - Upcoming coverage is drafted in [`docs/tests/TEST_HARDENING.md`](tests/TEST_HARDENING.md); implement those scenarios next.
 
 ## Decisions & Changelog
@@ -86,3 +87,4 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-07 | Docker daemon access adjusted | AL9 configured for Sail via socket group. |
 | 2025-11-07 | PLAN.md established | Plan maintained by Codex; README links to doc. |
 | 2025-11-07 | Added test hardening suites | Public share SEO, rate refresh caching, BIP21 output, and trash/restore flows covered by Sail tests. |
+| 2025-11-07 | Documented rate precision | `docs/RATES.md` defines USD/BTC rounding and cache TTL rules. |

@@ -72,4 +72,4 @@ _CI smoke trigger: documentation-only tweak to re-run the pipeline._
 
 ## Project Plan
 
-See [`docs/PLAN.md`](docs/PLAN.md) for the Codex-maintained delivery plan, branching policy, and roadmap.
+See [`docs/PLAN.md`](docs/PLAN.md) for the Codex-maintained delivery plan, branching policy, and roadmap. Details on rate precision live in [`docs/RATES.md`](docs/RATES.md).
