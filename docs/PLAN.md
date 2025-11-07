@@ -77,6 +77,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
 - Feature tests emphasize authorization, rate refresh, public tokens, email queueing, and print artifacts.
 - Favor model factories and clear policy assertions to keep fixtures simple.
+- Upcoming coverage is drafted in [`docs/tests/TEST_HARDENING.md`](tests/TEST_HARDENING.md); implement those scenarios next.
 
 ## Decisions & Changelog
 | Date (UTC) | Change | Notes |
