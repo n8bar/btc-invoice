@@ -85,3 +85,4 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-07 | PR #13 merged | Friendly 403 copy standardized to satisfy Authorization tests. |
 | 2025-11-07 | Docker daemon access adjusted | AL9 configured for Sail via socket group. |
 | 2025-11-07 | PLAN.md established | Plan maintained by Codex; README links to doc. |
+| 2025-11-07 | Added test hardening suites | Public share SEO, rate refresh caching, BIP21 output, and trash/restore flows covered by Sail tests. |
