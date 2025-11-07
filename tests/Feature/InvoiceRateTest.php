@@ -102,6 +102,29 @@ class InvoiceRateTest extends TestCase
         );
     }
 
+    public function test_show_handles_rate_fetch_failure_gracefully(): void
+    {
+        Cache::forget(BtcRate::CACHE_KEY);
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response(null, 500),
+        ]);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'amount_usd' => 150,
+            'amount_btc' => 0.005,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertDontSee('Rate as of');
+        $response->assertSeeText('BTC rate (USD/BTC)');
+        $response->assertSeeText('—');
+    }
+
     private function makeInvoice(User $owner, array $overrides = []): Invoice
     {
         $client = Client::create([
