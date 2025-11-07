@@ -49,7 +49,7 @@ class InvoiceRateTest extends TestCase
 
         $response->assertOk();
         $response->assertSeeText('30000.00');
-        $response->assertSeeText('0.03000000');
+        $response->assertSeeText('0.03');
         $response->assertSee(
             'data-utc-ts="' . $cachedRate['as_of']->copy()->utc()->toIso8601String() . '"',
             false
@@ -95,11 +95,42 @@ class InvoiceRateTest extends TestCase
 
         $response->assertOk();
         $response->assertSeeText('60000.00');
-        $response->assertSeeText('0.01500000');
+        $response->assertSeeText('0.015');
         $response->assertSee(
             'data-utc-ts="' . Carbon::now()->utc()->toIso8601String() . '"',
             false
         );
+    }
+
+    public function test_stale_cached_rate_fetches_fresh_value(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-03 12:00:00', 'UTC'));
+        Cache::forget(BtcRate::CACHE_KEY);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, ['amount_usd' => 1000]);
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 10000.00,
+            'as_of'    => Carbon::now()->subSeconds(BtcRate::TTL + 10),
+            'source'   => 'cache',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '20000.00'],
+            ], 200),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertSeeText('20000.00');
+        $response->assertSeeText('0.05');
+
+        Http::assertSentCount(1);
     }
 
     public function test_show_handles_rate_fetch_failure_gracefully(): void

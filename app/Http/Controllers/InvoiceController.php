@@ -86,45 +86,19 @@ class InvoiceController extends Controller
      */
     public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
-        $rate = BtcRate::current() ?? BtcRate::fresh();
+        $rate = BtcRate::current();
 
         if ($rate && isset($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
             $rate['as_of'] = Carbon::parse($rate['as_of']);
         }
 
         $invoice = $invoice->load('client');
-
-        $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
-        $amountUsd = $invoice->amount_usd !== null ? (float) $invoice->amount_usd : null;
-
-        $computedBtc = null;
-        if ($rateUsd && $rateUsd > 0 && $amountUsd && $amountUsd > 0) {
-            $computedBtc = round($amountUsd / $rateUsd, 8);
-        }
-
-        $displayAmountBtc = null;
-        if ($computedBtc !== null) {
-            $displayAmountBtc = number_format($computedBtc, 8, '.', '');
-        } elseif ($invoice->amount_btc !== null) {
-            $displayAmountBtc = number_format((float) $invoice->amount_btc, 8, '.', '');
-        }
-
-        $displayRateUsd = null;
-        if ($rateUsd !== null && $rateUsd > 0) {
-            $displayRateUsd = number_format($rateUsd, 2, '.', '');
-        } elseif ($invoice->btc_rate !== null) {
-            $displayRateUsd = number_format((float) $invoice->btc_rate, 2, '.', '');
-        }
-
-        $displayBitcoinUri = $invoice->bitcoinUriForAmount($computedBtc);
+        $display = $this->formatInvoiceDisplay($invoice, $rate);
 
         return view('invoices.show', [
-            'invoice'             => $invoice,
-            'rate'                => $rate,
-            'displayAmountBtc'    => $displayAmountBtc,
-            'displayRateUsd'      => $displayRateUsd,
-            'displayBitcoinUri'   => $displayBitcoinUri,
-        ]);
+            'invoice'           => $invoice,
+            'rate'              => $rate,
+        ] + $display);
     }
 
 
@@ -301,7 +275,16 @@ class InvoiceController extends Controller
     public function print(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
     {
         $this->authorize('view', $invoice);
-        return view('invoices.print', ['invoice' => $invoice->load('client')]);
+
+        $invoice = $invoice->load('client');
+        $rate = BtcRate::current();
+        $display = $this->formatInvoiceDisplay($invoice, $rate);
+
+        return view('invoices.print', [
+            'invoice' => $invoice,
+            'rate_as_of' => $rate['as_of'] ?? null,
+            'public' => false,
+        ] + $display);
     }
 
 
@@ -316,23 +299,20 @@ class InvoiceController extends Controller
             })
             ->firstOrFail();
 
-        // Fresh rate every view (we'll add BtcRate::fresh() next bite)
+        // Fresh rate every view
         $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
         $rateUsd = $rate['rate_usd'] ?? null;
         $asOf    = $rate['as_of'] ?? now();
 
-        // Recompute display-only BTC from USD using fresh rate (don’t persist)
-        if ($rateUsd && $invoice->amount_usd) {
-            $invoice->setAttribute('btc_rate', $rateUsd);
-            $invoice->setAttribute('amount_btc', round($invoice->amount_usd / $rateUsd, 8));
-        }
+        $invoice = $invoice->load('client');
+        $display = $this->formatInvoiceDisplay($invoice, $rate);
 
         return response()
             ->view('invoices.print', [
-                'invoice'    => $invoice->load('client'),
-                'rate_as_of' => $asOf,
-                'public'     => true,
-            ])
+                'invoice'       => $invoice,
+                'rate_as_of'    => $asOf,
+                'public'        => true,
+            ] + $display)
             ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
     }
@@ -441,5 +421,37 @@ class InvoiceController extends Controller
         }
 
         return 0.0;
+    }
+
+    private function formatInvoiceDisplay(Invoice $invoice, ?array $rate): array
+    {
+        $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
+        $amountUsd = $invoice->amount_usd !== null ? (float) $invoice->amount_usd : null;
+
+        $computedBtc = null;
+        if ($rateUsd !== null && $rateUsd > 0 && $amountUsd !== null && $amountUsd > 0) {
+            $computedBtc = round($amountUsd / $rateUsd, 8);
+        }
+
+        $displayAmountBtc = $invoice->formatBitcoinAmount($computedBtc);
+        if ($displayAmountBtc === null && $invoice->amount_btc !== null) {
+            $displayAmountBtc = $invoice->formatBitcoinAmount((float) $invoice->amount_btc);
+        }
+
+        $displayRateUsd = null;
+        if ($rateUsd !== null && $rateUsd > 0) {
+            $displayRateUsd = number_format($rateUsd, 2, '.', '');
+        } elseif ($invoice->btc_rate !== null) {
+            $displayRateUsd = number_format((float) $invoice->btc_rate, 2, '.', '');
+        }
+
+        $displayBitcoinUri = $invoice->bitcoinUriForAmount($computedBtc);
+
+        return [
+            'computedBtc'       => $computedBtc,
+            'displayAmountBtc'  => $displayAmountBtc,
+            'displayRateUsd'    => $displayRateUsd,
+            'displayBitcoinUri' => $displayBitcoinUri,
+        ];
     }
 }
