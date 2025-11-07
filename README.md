@@ -69,3 +69,7 @@ Run tests **inside Sail**:
 ```
 
 _CI smoke trigger: documentation-only tweak to re-run the pipeline._
+
+## Project Plan
+
+See [`docs/PLAN.md`](docs/PLAN.md) for the Codex-maintained delivery plan, branching policy, and roadmap.
