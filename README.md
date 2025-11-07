@@ -66,3 +66,6 @@ Run tests **inside Sail**:
 
 ```bash
 ./vendor/bin/sail artisan test
+```
+
+_CI smoke trigger: documentation-only tweak to re-run the pipeline._
