@@ -13,9 +13,10 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->decimal('amount_usd', 12, 2);            // user-entered USD
             $table->decimal('btc_rate', 18, 8);              // USD per BTC at lock
-            $table->decimal('amount_btc', 18, 8);            // locked BTC amount
-            $table->string('btc_address');                   // static MVP address
-            $table->string('status')->default('pending')->index(); // draft|pending|paid|void
+            $table->decimal('amount_btc', 18, 8)->nullable();            // locked BTC amount
+            $table->string('payment_address')->nullable();   // derived per invoice
+            $table->unsignedBigInteger('derivation_index')->nullable();
+            $table->string('status')->default('draft')->index(); // draft|sent|paid|void
             $table->string('txid')->nullable();              // optional note
             $table->date('due_date')->nullable();
             $table->timestamp('paid_at')->nullable();

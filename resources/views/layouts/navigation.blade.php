@@ -43,6 +43,9 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+                        <x-dropdown-link :href="route('wallet.settings.edit')">
+                            {{ __('Wallet Settings') }}
+                        </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -95,6 +98,9 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('wallet.settings.edit')" :active="request()->routeIs('wallet.settings.*')">
+                    {{ __('Wallet Settings') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

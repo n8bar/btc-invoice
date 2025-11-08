@@ -12,7 +12,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'user_id','client_id','number','description',
-        'amount_usd','btc_rate','amount_btc','btc_address',
+        'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
         'status','txid','invoice_date','due_date','paid_at',
     ];
 
@@ -25,6 +25,7 @@ class Invoice extends Model
         'paid_at'    => 'datetime',
         'public_enabled'    => 'boolean',
         'public_expires_at' => 'datetime',
+        'derivation_index' => 'integer',
     ];
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
@@ -58,7 +59,7 @@ class Invoice extends Model
      */
     public function bitcoinUriForAmount(?float $amountBtc): ?string
     {
-        if (!$this->btc_address) {
+        if (!$this->payment_address) {
             return null;
         }
 
@@ -86,7 +87,7 @@ class Invoice extends Model
         }
 
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-        return 'bitcoin:' . $this->btc_address . ($query ? ('?' . $query) : '');
+        return 'bitcoin:' . $this->payment_address . ($query ? ('?' . $query) : '');
     }
 
     public function getBitcoinUriAttribute(): ?string

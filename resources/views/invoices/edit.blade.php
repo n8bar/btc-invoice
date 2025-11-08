@@ -87,9 +87,12 @@
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">BTC address</label>
-                        <input name="btc_address" value="{{ old('btc_address',$invoice->btc_address) }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
-                        @error('btc_address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        <div class="mt-1 flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
+                            <span>{{ $invoice->payment_address ?: '—' }}</span>
+                            @if ($invoice->payment_address)
+                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status</label>

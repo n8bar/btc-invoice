@@ -21,7 +21,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'btc_address',
     ];
 
     /**
@@ -58,7 +57,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Invoice::class);
     }
-
+    public function walletSetting()
+    {
+        return $this->hasOne(WalletSetting::class);
+    }
 }
-
-
