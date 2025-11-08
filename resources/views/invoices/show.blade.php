@@ -205,6 +205,41 @@
                             </p>
                         @endif
 
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">Paid amount (BTC)</dt>
+                            <dd class="font-mono">
+                                {{ $invoice->payment_amount_formatted ?? '—' }}
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">Confirmations</dt>
+                            <dd class="font-mono">
+                                {{ $invoice->payment_confirmations ?? '—' }}
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">Confirmation height</dt>
+                            <dd class="font-mono">
+                                {{ $invoice->payment_confirmed_height ?? '—' }}
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">Detected at</dt>
+                            <dd class="font-mono">
+                                {{ optional($invoice->payment_detected_at)->toDayDateTimeString() ?? '—' }}
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">Confirmed at</dt>
+                            <dd class="font-mono">
+                                {{ optional($invoice->payment_confirmed_at)->toDayDateTimeString() ?? '—' }}
+                            </dd>
+                        </div>
+
                         @php $uri = $displayBitcoinUri; @endphp
 
                         @if ($uri)

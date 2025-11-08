@@ -61,6 +61,14 @@ class InvoicePaymentDisplayTest extends TestCase
         $invoice = $this->makeInvoice($owner, [
             'amount_btc' => 0.01234567,
         ]);
+        $invoice->forceFill([
+            'txid' => 'abc123',
+            'payment_amount_sat' => 1_234_567,
+            'payment_confirmations' => 2,
+            'payment_confirmed_height' => 830000,
+            'payment_detected_at' => Carbon::parse('2025-01-02 12:00:00', 'UTC'),
+            'payment_confirmed_at' => Carbon::parse('2025-01-02 12:10:00', 'UTC'),
+        ])->save();
 
         $response = $this
             ->actingAs($owner)
@@ -69,6 +77,35 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertOk();
         $response->assertSee('<svg', false);
         $response->assertSee('Scan with any Bitcoin wallet.', false);
+        $response->assertSee('Paid amount (BTC)', false);
+        $response->assertSee('0.01234567', false);
+    }
+
+    public function test_payment_metadata_fields_render_when_present(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner);
+        $invoice->forceFill([
+            'payment_amount_sat' => 1_500_000,
+            'payment_confirmations' => 3,
+            'payment_confirmed_height' => 840123,
+            'payment_detected_at' => Carbon::parse('2025-01-03 01:00:00', 'UTC'),
+            'payment_confirmed_at' => Carbon::parse('2025-01-03 01:15:00', 'UTC'),
+        ])->save();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('Paid amount (BTC)', false);
+        $response->assertSee('0.015', false);
+        $response->assertSee('Confirmations', false);
+        $response->assertSee('3', false);
+        $response->assertSee('Confirmation height', false);
+        $response->assertSee('840123', false);
+        $response->assertSee('Detected at', false);
+        $response->assertSee('Confirmed at', false);
     }
 
     private function makeInvoice(User $owner, array $overrides = []): Invoice

@@ -14,6 +14,8 @@ class Invoice extends Model
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
         'status','txid','invoice_date','due_date','paid_at',
+        'payment_amount_sat','payment_confirmations','payment_confirmed_height',
+        'payment_detected_at','payment_confirmed_at',
     ];
 
     protected $casts = [
@@ -26,7 +28,13 @@ class Invoice extends Model
         'public_enabled'    => 'boolean',
         'public_expires_at' => 'datetime',
         'derivation_index' => 'integer',
+        'payment_amount_sat' => 'integer',
+        'payment_confirmations' => 'integer',
+        'payment_confirmed_height' => 'integer',
+        'payment_detected_at' => 'datetime',
+        'payment_confirmed_at' => 'datetime',
     ];
+    public const SATS_PER_BTC = 100_000_000;
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
@@ -110,6 +118,25 @@ class Invoice extends Model
         $trimmed = rtrim(rtrim($formatted, '0'), '.');
 
         return ($trimmed !== '' && $trimmed !== '0') ? $trimmed : null;
+    }
+
+    public function getPaymentAmountBtcAttribute(): ?float
+    {
+        if ($this->payment_amount_sat === null) {
+            return null;
+        }
+
+        if ($this->payment_amount_sat <= 0) {
+            return null;
+        }
+
+        return round($this->payment_amount_sat / self::SATS_PER_BTC, 8);
+    }
+
+    public function getPaymentAmountFormattedAttribute(): ?string
+    {
+        $amount = $this->payment_amount_btc;
+        return $amount === null ? null : $this->formatBitcoinAmount($amount);
     }
 
 // Generate a unique token

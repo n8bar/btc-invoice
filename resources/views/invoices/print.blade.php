@@ -104,6 +104,26 @@
                 <th>TXID</th>
                 <td class="mono">{{ $invoice->txid ?: '-' }}</td>
             </tr>
+            <tr>
+                <th>Paid amount (BTC)</th>
+                <td class="mono">{{ $invoice->payment_amount_formatted ?? '—' }}</td>
+            </tr>
+            <tr>
+                <th>Confirmations</th>
+                <td class="mono">{{ $invoice->payment_confirmations ?? '—' }}</td>
+            </tr>
+            <tr>
+                <th>Confirmation height</th>
+                <td class="mono">{{ $invoice->payment_confirmed_height ?? '—' }}</td>
+            </tr>
+            <tr>
+                <th>Detected at</th>
+                <td class="mono">{{ optional($invoice->payment_detected_at)->toDateTimeString() ?? '—' }}</td>
+            </tr>
+            <tr>
+                <th>Confirmed at</th>
+                <td class="mono">{{ optional($invoice->payment_confirmed_at)->toDateTimeString() ?? '—' }}</td>
+            </tr>
 
             @php $bitcoinUri = $displayBitcoinUri ?? $invoice->bitcoin_uri; @endphp
 
