@@ -98,7 +98,7 @@
         <table>
             <tr>
                 <th>BTC address</th>
-                <td class="mono">{{ $invoice->btc_address ?: '-' }}</td>
+                <td class="mono">{{ $invoice->payment_address ?: '-' }}</td>
             </tr>
             <tr>
                 <th>TXID</th>

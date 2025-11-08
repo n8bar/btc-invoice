@@ -7,9 +7,11 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
+use App\Services\HdWallet;
 
 class InvoiceController extends Controller
 {
@@ -59,7 +61,6 @@ class InvoiceController extends Controller
             'amount_usd'  => ['required','numeric','min:0.01'],
             'btc_rate'    => ['nullable','numeric','min:0'],         // USD per BTC
             'amount_btc'  => ['nullable','numeric','min:0'],
-            'btc_address' => ['nullable','string','max:128'],
             'status'      => ['nullable','in:draft,sent,paid,void'],
             'due_date'    => ['nullable','date'],
             'paid_at'     => ['nullable','date'],
@@ -72,7 +73,29 @@ class InvoiceController extends Controller
             $data['amount_btc'] = round($data['amount_usd'] / $data['btc_rate'], 8);
         }
 
-        $invoice = Invoice::create($data + ['user_id' => $userId]);
+        $wallet = $request->user()->walletSetting;
+        if (!$wallet) {
+            return redirect()->route('wallet.settings.edit')
+                ->with('status', 'Connect a wallet before creating invoices.');
+        }
+
+        $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
+            $address = app(HdWallet::class)->deriveAddress(
+                $wallet->bip84_xpub,
+                $wallet->next_derivation_index,
+                $wallet->network
+            );
+
+            $invoice = Invoice::create($data + [
+                'user_id' => $userId,
+                'payment_address' => $address,
+                'derivation_index' => $wallet->next_derivation_index,
+            ]);
+
+            $wallet->increment('next_derivation_index');
+
+            return $invoice;
+        });
 
         if ($request->wantsJson()) {
             return response()->json($invoice->load('client'), 201);
@@ -130,7 +153,7 @@ class InvoiceController extends Controller
 
     /**
      * Update limited fields of an owned invoice.
-     * - allows changing description, status (to paid/void), txid, due_date, btc_address
+     * - allows changing description, status (to paid/void), txid, due_date
      * - does NOT change monetary fields or client_id in the MVP
      */
     public function update(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -144,7 +167,6 @@ class InvoiceController extends Controller
             'amount_usd'  => ['required','numeric','min:0.01'],
             'btc_rate'    => ['nullable','numeric','min:0'],
             'amount_btc'  => ['nullable','numeric','min:0'],
-            'btc_address' => ['nullable','string','max:128'],
             'status'      => ['nullable','in:draft,sent,paid,void'],
             'due_date'    => ['nullable','date'],
             'paid_at'     => ['nullable','date'],
@@ -154,7 +176,7 @@ class InvoiceController extends Controller
 
         if ($invoice->public_enabled) {
             // Fields that affect what recipients see
-            $locked = ['client_id','number','description','amount_usd','btc_address','invoice_date','due_date'];
+            $locked = ['client_id','number','description','amount_usd','invoice_date','due_date'];
             foreach ($locked as $f) {
                 // Compare only if field is present in payload and changed
                 if (array_key_exists($f, $data) && $data[$f] != $invoice->{$f}) {
@@ -195,6 +217,11 @@ class InvoiceController extends Controller
 
     public function create(\Illuminate\Http\Request $request)
     {
+        if (!$request->user()->walletSetting) {
+            return redirect()->route('wallet.settings.edit')
+                ->with('status', 'Connect a wallet before creating invoices.');
+        }
+
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
         $suggestedNumber = \App\Models\Invoice::nextNumberForUser($request->user()->id);

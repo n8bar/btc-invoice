@@ -80,13 +80,12 @@
                     </div>
                 </div>
 
+                <div class="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-900">
+                    Payment addresses are generated from your wallet settings for every invoice.
+                    <a href="{{ route('wallet.settings.edit') }}" class="underline">Manage wallet settings</a>.
+                </div>
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">BTC address</label>
-                        <input name="btc_address" value="{{ old('btc_address') }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
-                        @error('btc_address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status</label>
                         <select name="status"
@@ -187,4 +186,3 @@
     </script>
 
 </x-app-layout>
-

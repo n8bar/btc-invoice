@@ -173,9 +173,9 @@
                         <div class="flex justify-between">
                             <dt class="text-gray-600">BTC address</dt>
                             <dd class="font-mono flex items-center gap-2">
-                                <span>{{ $invoice->btc_address ?: '-' }}</span>
-                                @if ($invoice->btc_address)
-                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->btc_address }}">Copy</x-secondary-button>
+                                <span>{{ $invoice->payment_address ?: '-' }}</span>
+                                @if ($invoice->payment_address)
+                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
                                 @endif
                             </dd>
                         </div>
@@ -405,4 +405,3 @@
 
 
 </x-app-layout>
-

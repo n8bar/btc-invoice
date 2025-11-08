@@ -113,7 +113,7 @@ class TrashFlowsTest extends TestCase
             'amount_usd' => 150,
             'btc_rate' => 50000,
             'amount_btc' => 0.003,
-            'btc_address' => 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7k3l0p7',
+            'payment_address' => 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7k3l0zz',
             'status' => 'draft',
             'invoice_date' => Carbon::now()->toDateString(),
             'due_date' => Carbon::now()->addWeek()->toDateString(),

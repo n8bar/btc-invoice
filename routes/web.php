@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\WalletSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/wallet/settings', [WalletSettingsController::class, 'edit'])->name('wallet.settings.edit');
+    Route::post('/wallet/settings', [WalletSettingsController::class, 'update'])->name('wallet.settings.update');
 
     // Clients - custom actions MUST be before the resource
     Route::get('clients/trash', [ClientController::class, 'trash'])->name('clients.trash');

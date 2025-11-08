@@ -47,18 +47,6 @@
             @endif
         </div>
 
-        <!-- BTC Address -->
-        <div class="mt-4">
-            <x-input-label for="btc_address" :value="__('Default BTC Address')" />
-            <x-text-input id="btc_address" name="btc_address" type="text" class="mt-1 block w-full"
-                          :value="old('btc_address', auth()->user()->btc_address)" autocomplete="off" />
-            <x-input-error class="mt-2" :messages="$errors->get('btc_address')" />
-            <p class="text-sm text-gray-500 mt-1">
-                This will prefill new invoices. You can override per invoice.
-            </p>
-        </div>
-
-
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
