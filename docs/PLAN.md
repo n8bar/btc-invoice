@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-07_
+_Last updated: 2025-11-08_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -41,36 +41,39 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Routes: `routes/web.php`.
 - Shared assets: server-side QR generation.
 
-## Current Status (2025-11-07)
-- Client CRUD with soft delete, trash/restore, ownership policies enforced.
-- Invoice flow supports listing, creation, editing, show, status transitions (draft/sent/paid/void), reset-to-draft, soft delete + trash/restore/force delete.
-- Auto-numbering per user.
-- Rate management: current rate buttons, live USD↔BTC conversion, consistent cache key, “Refresh rate” updates on Show page.
-- BTC computation on Show recalculates display amounts without persisting.
-- Payment UX: BIP21 link + “Copy” + print view with server-side SVG QR and thank-you message.
-- Public sharing: `/p/{token}` with enable/disable/rotate/expiry, `noindex`, fetches fresh rate each view.
-- Friendly 403 page aligned with Authorization tests (PR #13 merged).
+## Completed Milestones (2025-11-08)
+1. **Ownership & Access**
+   - Client/Invoice controllers enforce policies via `authorizeResource`; soft-delete flows (trash/restore/force) are locked down.
+   - Shared exception handling renders the friendly 403 copy asserted in Authorization tests.
+2. **Invoice UX Foundations**
+   - Auto-numbering, status transitions (draft/sent/paid/void + reset-to-draft), and live USD↔BTC conversions across show/print/public views with QR + BIP21 output.
+   - Public share links (`/p/{token}`) support enable/disable/rotate/expiry and always render `noindex` headers.
+3. **Test Hardening (codex/test-hardening-*)**
+   - Feature tests now cover public share lifecycle, SEO/noindex, QR/BIP21 accuracy, soft-delete trash/restore/force, and rate refresh/cache reuse.
+4. **Rate & Currency Correctness (codex/rate-precision)**
+   - `docs/RATES.md` codifies USD-as-source + 8-decimal BTC rounding; controllers/views share a formatter and stale cache safeguards.
+5. **Wallet Onboarding & Derived Addresses (codex/phase-a-wallet)**
+   - `/wallet/settings` collects a BIP84 xpub per user (testnet/mainnet); invoice creation now derives a unique Bech32 address via `node_scripts/derive-address.cjs`.
+   - Legacy invoices can be backfilled with the `wallet:assign-invoice-addresses` command, restoring QR/BIP21 output everywhere.
 
 ## Roadmap to Release Candidate
-1. **Test Hardening**
-   - Expand Feature coverage: public share lifecycle (enable/disable/rotate/expiry), noindex meta, Show “as of” behavior, QR presence/BIP21 accuracy, soft-delete visibility, rate cache reuse.
-   - Prefer assertions on stable selectors/headings.
-2. **Rate & Currency Correctness**
-   - Document rounding rules for BTC display and BIP21 amounts.
-   - Add safeguards for stale cache TTL + network fallback behavior.
-3. **Invoice Delivery**
-   - Implement queued Mailables for invoices (signed public URL, optional PDF print attachment).
-   - Track send attempts per invoice (timestamp, recipient, status) with retry support.
-4. **Print & Public Polish**
+6. **Blockchain Payment Detection** *(current MVP gate)*
+   - Require per-invoice addresses derived from user xpubs (done) and hook into a watcher (testnet first) that marks invoices paid when mempool/confirm events land; remove manual “Mark paid.”
+   - Record tx metadata (txid, amount, confirmation height) and emit paid receipts automatically.
+7. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
+   - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
+   - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.
+8. **Print & Public Polish**
    - Improve print template spacing/contrast/fonts; tune QR sizing.
    - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-5. **User Settings**
-   - Allow default BTC address/BIP21 label/memo + invoice terms.
-6. **Observability & Safety**
+9. **User Settings**
+   - Per-user invoice defaults (memo/terms) and future multi-wallet options.
+10. **Observability & Safety**
    - Structured logs for rate fetches, emails, public access.
    - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-7. **Docs & DX**
-   - README quick start (Sail), env var references, testing strategy.
+11. **Docs & DX / UX Overhaul**
+   - Sail quick start, env vars, and automated onboarding walkthroughs.
+   - Wallet UI improvements (explain xpubs, per-wallet instructions, validation helpers) plus dashboard redesign.
    - Keep this plan updated by Codex on every meaningful merge.
 
 ## Testing Approach
@@ -88,3 +91,4 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-07 | PLAN.md established | Plan maintained by Codex; README links to doc. |
 | 2025-11-07 | Added test hardening suites | Public share SEO, rate refresh caching, BIP21 output, and trash/restore flows covered by Sail tests. |
 | 2025-11-07 | Documented rate precision | `docs/RATES.md` defines USD/BTC rounding and cache TTL rules. |
+| 2025-11-08 | Wallet onboarding & derived addresses | `/wallet/settings`, Node-based derivation, and legacy backfill command landed (codex/phase-a-wallet). |

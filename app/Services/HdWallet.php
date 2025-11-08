@@ -9,7 +9,7 @@ class HdWallet
 {
     public function deriveAddress(string $xpub, int $index, string $network = 'testnet'): string
     {
-        $script = base_path('node_scripts/derive-address.js');
+        $script = base_path('node_scripts/derive-address.cjs');
         if (!file_exists($script)) {
             throw new RuntimeException('Wallet derivation script missing.');
         }
