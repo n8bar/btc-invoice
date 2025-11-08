@@ -19,27 +19,18 @@ _Working list of initiatives queued after the MVP ships. Maintained alongside do
 4. **Notification Hub**
    - Slack/webhook integrations for payment events, delivery failures, etc.
 
-## UX & Dashboard
-5. **Onboarding Wizard**
-   - Friendlier xpub collection (wallet-specific steps, QR parsing, validation).
-   - Guided wallet/testnet setup before first invoice.
-
-6. **Dashboard Redesign**
-   - At-a-glance stats (outstanding vs paid, latest payments, delivery issues).
-   - Quick actions for resending invoices or copying share links.
-
-## Observability & Ops
-7. **Structured Logging & Alerting**
+# Observability & Ops
+5. **Structured Logging & Alerting**
    - Centralized log ingestion (ELK/Loki) for rate fetches, payment events, mail sends.
    - Alerts when blockchain watcher or mail queue falls behind.
 
-8. **Automated Deployments**
+6. **Automated Deployments**
    - Terraform/Ansible for infrastructure, CI/CD pipeline for staging/prod.
 
-## Integrations
-9. **Accounting Export**
+# Integrations
+7. **Accounting Export**
    - CSV/JSON exports for accounting packages (QuickBooks, Xero).
    - API hooks so agencies can pull invoice/payment data programmatically.
 
-10. **Fiat On-Ramp / Volatility Tools**
+8. **Fiat On-Ramp / Volatility Tools**
     - Optional integration with OTC partners or conversion APIs for users who want instant conversion.

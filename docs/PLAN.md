@@ -73,7 +73,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
    - Ensure 403/404/500 templates are consistent and leak no sensitive data.
 11. **Docs & DX / UX Overhaul**
    - Sail quick start, env vars, and automated onboarding walkthroughs.
-   - Wallet UI improvements (explain xpubs, per-wallet instructions, validation helpers) plus dashboard redesign.
+   - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers), dashboard snapshot redesign, and onboarding wizard.
    - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
 
 ## Testing Approach
