@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('invoices/{invoiceId}/restore', [InvoiceController::class, 'restore'])
         ->whereNumber('invoiceId')->name('invoices.restore');
     Route::patch('invoices/{invoice}/status/{action}', [InvoiceController::class, 'setStatus'])
-        ->where(['action' => 'sent|paid|void|draft'])
+        ->where(['action' => 'sent|void|draft'])
         ->name('invoices.set-status');
     Route::delete('invoices/{invoiceId}/force', [InvoiceController::class, 'forceDestroy'])
         ->whereNumber('invoiceId')->name('invoices.force-destroy');

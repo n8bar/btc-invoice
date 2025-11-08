@@ -139,6 +139,20 @@ class Invoice extends Model
         return $amount === null ? null : $this->formatBitcoinAmount($amount);
     }
 
+    public function expectedPaymentSats(): ?int
+    {
+        if ($this->amount_btc === null) {
+            return null;
+        }
+
+        $btc = (float) $this->amount_btc;
+        if ($btc <= 0) {
+            return null;
+        }
+
+        return (int) round($btc * self::SATS_PER_BTC);
+    }
+
 // Generate a unique token
     public static function generatePublicToken(): string
     {

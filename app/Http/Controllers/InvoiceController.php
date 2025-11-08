@@ -255,15 +255,13 @@ class InvoiceController extends Controller
     {
         $this->authorize('update', $invoice);
 
-        $allowed = ['draft','sent','paid','void'];
+        $allowed = ['draft','sent','void'];
         abort_unless(in_array($action, $allowed, true), 404);
 
-        $updates = ['status' => $action];
-        if ($action === 'paid') {
-            $updates['paid_at'] = now();
-        } else {
-            $updates['paid_at'] = null;
-        }
+        $updates = [
+            'status' => $action,
+            'paid_at' => null,
+        ];
 
         $invoice->update($updates);
 

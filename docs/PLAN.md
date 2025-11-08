@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-08_
+_Last updated: 2025-11-09_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -58,8 +58,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 
 ## Roadmap to Release Candidate
 6. **Blockchain Payment Detection** *(current MVP gate)*
-    - Require per-invoice addresses derived from user xpubs (done) and hook into a watcher (testnet first) that marks invoices paid when mempool/confirm events land; remove manual “Mark paid.”
-    - Record tx metadata (txid, amount, confirmation height) and emit paid receipts automatically.
+    - Sail command `wallet:watch-payments` polls mempool.space (testnet/mainnet) per invoice, auto-marks invoices paid, records tx metadata (txid, sats, confirmations/height), and removes the manual “Mark paid” flow.
+    - Next: run the watcher on a schedule/queue and emit paid receipts immediately after the confirmation threshold.
 7. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
     - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
     - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.

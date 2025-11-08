@@ -24,7 +24,6 @@
                 @php
                     $st = $invoice->status ?? 'draft';
                     $canMarkSent = !in_array($st, ['sent','paid','void']);
-                    $canMarkPaid = !in_array($st, ['paid','void']);
                     $canVoid     = $st !== 'void';
                 @endphp
 
@@ -34,14 +33,6 @@
                         @csrf @method('PATCH')
                         <x-secondary-button type="submit" :disabled="!$canMarkSent">
                             Mark sent
-                        </x-secondary-button>
-                    </form>
-
-                    {{-- Mark paid --}}
-                    <form method="POST" action="{{ route('invoices.set-status', ['invoice'=>$invoice,'action'=>'paid']) }}" class="inline">
-                        @csrf @method('PATCH')
-                        <x-secondary-button type="submit" :disabled="!$canMarkPaid">
-                            Mark paid
                         </x-secondary-button>
                     </form>
 
