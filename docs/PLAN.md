@@ -74,7 +74,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 11. **Docs & DX / UX Overhaul**
    - Sail quick start, env vars, and automated onboarding walkthroughs.
    - Wallet UI improvements (explain xpubs, per-wallet instructions, validation helpers) plus dashboard redesign.
-   - Keep this plan updated by Codex on every meaningful merge.
+   - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
 
 ## Testing Approach
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
