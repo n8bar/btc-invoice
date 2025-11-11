@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-09_
+_Last updated: 2025-11-10_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -41,7 +41,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Routes: `routes/web.php`.
 - Shared assets: server-side QR generation.
 
-## Completed Milestones (2025-11-08)
+## Completed Milestones (2025-11-10)
 1. **Ownership & Access**
     - Client/Invoice controllers enforce policies via `authorizeResource`; soft-delete flows (trash/restore/force) are locked down.
     - Shared exception handling renders the friendly 403 copy asserted in Authorization tests.
@@ -55,26 +55,26 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 5. **Wallet Onboarding & Derived Addresses (codex/phase-a-wallet)**
     - `/wallet/settings` collects a BIP84 xpub per user (testnet/mainnet); invoice creation now derives a unique Bech32 address via `node_scripts/derive-address.cjs`.
     - Legacy invoices can be backfilled with the `wallet:assign-invoice-addresses` command, restoring QR/BIP21 output everywhere.
+6. **Blockchain Payment Detection (codex/blockchain-watcher)**
+    - Sail command `wallet:watch-payments` polls mempool.space for each invoice address, stores txid/confirmations metadata, and auto-marks invoices paid.
+    - `MempoolClient` caches tip height lookups while `InvoicePaymentDetector` enforces sat tolerance + confirmation thresholds for all invoices with wallet settings.
 
 ## Roadmap to Release Candidate
-6. **Blockchain Payment Detection** *(current MVP gate)*
-    - Sail command `wallet:watch-payments` polls mempool.space (testnet/mainnet) per invoice, auto-marks invoices paid, records tx metadata (txid, sats, confirmations/height), and removes the manual “Mark paid” flow.
-    - Next: run the watcher on a schedule/queue and emit paid receipts immediately after the confirmation threshold.
-7. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
+6. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
     - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
     - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.
-8. **Print & Public Polish**
+7. **Print & Public Polish**
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-9. **User Settings**
+8. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-10. **Observability & Safety**
+9. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-11. **Docs & DX**
+10. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
-12. **UX Overhaul**
+11. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
@@ -95,3 +95,4 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-07 | Added test hardening suites | Public share SEO, rate refresh caching, BIP21 output, and trash/restore flows covered by Sail tests. |
 | 2025-11-07 | Documented rate precision | `docs/RATES.md` defines USD/BTC rounding and cache TTL rules. |
 | 2025-11-08 | Wallet onboarding & derived addresses | `/wallet/settings`, Node-based derivation, and legacy backfill command landed (codex/phase-a-wallet). |
+| 2025-11-10 | Blockchain watcher command wired | `wallet:watch-payments` + mempool client integrated into bootstrap; invoices now auto-mark when payments land. |
