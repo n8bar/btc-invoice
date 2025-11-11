@@ -58,6 +58,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 6. **Blockchain Payment Detection (codex/blockchain-watcher)**
     - Sail command `wallet:watch-payments` polls mempool.space for each invoice address, stores txid/confirmations metadata, and auto-marks invoices paid.
     - `MempoolClient` caches tip height lookups while `InvoicePaymentDetector` enforces sat tolerance + confirmation thresholds for all invoices with wallet settings.
+    - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
 
 ## Roadmap to Release Candidate
 6. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
@@ -96,3 +97,4 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-07 | Documented rate precision | `docs/RATES.md` defines USD/BTC rounding and cache TTL rules. |
 | 2025-11-08 | Wallet onboarding & derived addresses | `/wallet/settings`, Node-based derivation, and legacy backfill command landed (codex/phase-a-wallet). |
 | 2025-11-10 | Blockchain watcher command wired | `wallet:watch-payments` + mempool client integrated into bootstrap; invoices now auto-mark when payments land. |
+| 2025-11-10 | Watcher scheduling automated | Scheduler runs `wallet:watch-payments` every minute with overlap protection + background execution. |
