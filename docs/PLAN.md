@@ -61,21 +61,21 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
 
 ## Roadmap to Release Candidate
-6. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
+7. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
     - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
     - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.
-7. **Print & Public Polish**
+8. **Print & Public Polish**
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-8. **User Settings**
+9. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-9. **Observability & Safety**
+10. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-10. **Docs & DX**
+11. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
-11. **UX Overhaul**
+12. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
