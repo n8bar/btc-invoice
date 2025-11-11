@@ -1,5 +1,7 @@
 <?php
 
+use App\Console\Commands\AssignInvoiceAddresses;
+use App\Console\Commands\WatchInvoicePayments;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -19,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([
+        AssignInvoiceAddresses::class,
+        WatchInvoicePayments::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
