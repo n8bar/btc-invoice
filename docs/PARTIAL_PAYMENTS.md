@@ -66,5 +66,6 @@
 
 ## Open Decisions
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
-- Overpayments: do we record the extra sats and show “Overpaid” or just show surplus without changing status? Proposed: show surplus but keep status `paid`.
-- Manual adjustments: do we allow admins to edit payment rows (e.g., if a tx is incorrect)? Proposed: yes via future admin tooling.
+- **Overpayments**: record the surplus, keep status `paid`, and introduce two levels of handling:
+    - **Noise tolerance** (≤ 1k sats or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
+    - **Significant overpay** (> tolerance) — flag the invoice for the owner (UI + notification) with recommended actions: refund minus fees, credit the excess toward the next invoice, or mark it resolved. Future automation can email the client with those options if we don’t act within a configured SLA.

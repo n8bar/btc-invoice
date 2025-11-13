@@ -37,3 +37,6 @@ _Working list of initiatives queued after the MVP ships. Maintained alongside do
 
 9. **Additional Cryptocurrencies**
     - Track alternate chain addresses per invoice and support derivation/sending for other cryptocurrencies once Bitcoin MVP stabilizes.
+
+10. **Manual Payment Adjustments**
+    - Admin tooling to edit or annotate logged payments (fix tx metadata, override amounts, or reconcile disputes) outside the automated watcher flows.
