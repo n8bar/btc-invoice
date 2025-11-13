@@ -61,7 +61,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
    Okay - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
 
 ## Roadmap to Release Candidate
-7. **Partial Payments & Receipts**
+7. **Partial Payments & Receipts** — see [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md)
     - Accept underpayments, log each tx (sats + USD snapshot), and surface a `partial` status until totals reach the invoice amount.
     - Increase watcher tolerance (±100 sats) and expose payment history on the invoice view.
 8. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
