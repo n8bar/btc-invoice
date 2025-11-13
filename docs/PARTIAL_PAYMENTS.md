@@ -64,7 +64,7 @@
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.
 
-## Open Decisions
+## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
 - **Overpayments / Tips**: record the surplus (treat it as a tip by default), keep status `paid`, and introduce two levels of handling:
     - **Noise tolerance** (≤ $10 USD equivalent or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
