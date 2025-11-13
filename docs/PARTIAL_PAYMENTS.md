@@ -67,5 +67,5 @@
 ## Open Decisions
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
 - **Overpayments**: record the surplus, keep status `paid`, and introduce two levels of handling:
-    - **Noise tolerance** (≤ $5 USD equivalent or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
-    - **Significant overpay** (> tolerance) — flag the invoice for the owner (UI + notification) with recommended actions: refund minus fees, credit the excess toward the next invoice, or mark it resolved. Future automation can email the client with those options if we don’t act within a configured SLA.
+    - **Noise tolerance** (≤ $10 USD equivalent or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
+    - **Significant overpay** (> tolerance) — flag the invoice for the owner (UI + notification) with recommended actions: refund minus fees, credit the excess toward the next invoice, or mark it resolved. If a client has multiple overpaid invoices, batch the refund/credit calculation so the owner can settle them in one transaction to minimize fees. Future automation can email the client with those options if we don’t act within a configured SLA.
