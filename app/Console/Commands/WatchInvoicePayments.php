@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Invoice;
+use App\Models\InvoicePayment;
+use App\Services\BtcRate;
 use App\Services\InvoicePaymentDetector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -48,9 +50,8 @@ class WatchInvoicePayments extends Command
                     continue;
                 }
 
-                $this->applyDetection($invoice, $result);
+                $this->recordPayment($invoice, $result);
                 $updated++;
-                $this->info("Invoice {$invoice->id} marked paid via {$result['txid']} ({$result['sats']} sats).");
             }
         });
 
@@ -59,34 +60,51 @@ class WatchInvoicePayments extends Command
         return Command::SUCCESS;
     }
 
-    private function applyDetection(Invoice $invoice, array $result): void
+    private function recordPayment(Invoice $invoice, array $result): void
     {
-        $updates = [
-            'txid' => $result['txid'],
-            'payment_amount_sat' => $result['sats'],
-            'payment_confirmations' => $result['confirmations'],
-            'payment_confirmed_height' => $result['block_height'],
-        ];
+        DB::transaction(function () use ($invoice, $result) {
+            $payment = InvoicePayment::firstOrNew([
+                'invoice_id' => $invoice->id,
+                'txid' => $result['txid'],
+            ]);
 
-        if (!$invoice->payment_detected_at) {
-            $updates['payment_detected_at'] = $result['detected_at'];
-        }
+            if (!$payment->exists) {
+                $rate = BtcRate::current();
+                $usdRate = $rate['rate_usd'] ?? null;
+                $fiatAmount = $usdRate ? round(($result['sats'] / Invoice::SATS_PER_BTC) * (float) $usdRate, 2) : null;
 
-        if ($result['confirmed'] && ($result['confirmed_at'] ?? null)) {
-            $updates['payment_confirmed_at'] = $result['confirmed_at'];
-        }
+                $payment->fill([
+                    'sats_received' => $result['sats'],
+                    'detected_at' => $result['detected_at'],
+                    'usd_rate' => $usdRate,
+                    'fiat_amount' => $fiatAmount,
+                ]);
+            } else {
+                $payment->sats_received = $result['sats'];
+            }
 
-        $requiredConfs = (int) config('blockchain.confirmations_required', 1);
-        if ($result['confirmations'] >= $requiredConfs) {
-            $updates['status'] = 'paid';
-            $updates['paid_at'] = $result['confirmed_at'] ?? $result['detected_at'];
-        } elseif ($invoice->status !== 'paid') {
-            $updates['status'] = 'paid';
-            $updates['paid_at'] = $result['detected_at'];
-        }
+            $payment->block_height = $result['block_height'];
+            if ($result['confirmed'] && ($result['confirmed_at'] ?? null)) {
+                $payment->confirmed_at = $result['confirmed_at'];
+            }
 
-        DB::transaction(function () use ($invoice, $updates) {
-            $invoice->fill($updates)->save();
+            $payment->save();
+
+            $invoice->payment_amount_sat = $invoice->payments()->sum('sats_received');
+            $invoice->txid = $result['txid'];
+            $invoice->payment_confirmations = $result['confirmations'];
+            $invoice->payment_confirmed_height = $result['block_height'];
+            $invoice->payment_detected_at = $invoice->payment_detected_at ?: $result['detected_at'];
+            if ($result['confirmed'] && ($result['confirmed_at'] ?? null)) {
+                $invoice->payment_confirmed_at = $result['confirmed_at'];
+            }
+
+            $invoice->refreshPaymentState($result['confirmed_at'] ?? $result['detected_at']);
         });
+
+        $invoice->refresh();
+        $paidSats = $invoice->payment_amount_sat ?? 0;
+        $status = strtoupper($invoice->status ?? 'sent');
+        $this->info("Invoice {$invoice->id} {$status}: {$result['txid']} ({$result['sats']} sats, total {$paidSats}).");
     }
 }

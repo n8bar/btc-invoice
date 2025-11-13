@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -35,9 +37,13 @@ class Invoice extends Model
         'payment_confirmed_at' => 'datetime',
     ];
     public const SATS_PER_BTC = 100_000_000;
+    public const PAYMENT_SAT_TOLERANCE = 100;
+    public const OVERPAY_USD_TOLERANCE = 10.0;
+    public const OVERPAY_PERCENT_TOLERANCE = 1.0;
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
+    public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
 
 
     public static function nextNumberForUser(int $userId): string
@@ -60,6 +66,69 @@ class Invoice extends Model
         } while (static::where('user_id', $userId)->where('number', $candidate)->exists());
 
         return $candidate;
+    }
+
+    public function getPaidSatsAttribute(): int
+    {
+        if ($this->relationLoaded('payments')) {
+            return (int) $this->payments->sum('sats_received');
+        }
+
+        return (int) $this->payments()->sum('sats_received');
+    }
+
+    public function getOutstandingSatsAttribute(): ?int
+    {
+        $expected = $this->expectedPaymentSats();
+        if ($expected === null) {
+            return null;
+        }
+
+        return max($expected - $this->paid_sats, 0);
+    }
+
+    public function hasSignificantOverpayment(): bool
+    {
+        $expected = $this->expectedPaymentSats();
+        if ($expected === null || $expected <= 0) {
+            return false;
+        }
+
+        $paid = $this->paid_sats;
+        if ($paid <= $expected) {
+            return false;
+        }
+
+        $surplus = $paid - $expected;
+        $usdRate = $this->btc_rate ?: null;
+        $surplusUsd = $usdRate ? ($surplus / self::SATS_PER_BTC) * (float) $usdRate : 0;
+        $percent = ($surplus / $expected) * 100;
+
+        return $surplusUsd >= self::OVERPAY_USD_TOLERANCE || $percent >= self::OVERPAY_PERCENT_TOLERANCE;
+    }
+
+    public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void
+    {
+        $paidSats = $this->payments()->sum('sats_received');
+        $this->payment_amount_sat = $paidSats;
+
+        $expected = $this->expectedPaymentSats();
+
+        if ($expected !== null && $paidSats > 0) {
+            if ($paidSats + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+                if ($this->status !== 'paid') {
+                    $this->status = 'paid';
+                }
+
+                if (!$this->paid_at) {
+                    $this->paid_at = $reference ?? now();
+                }
+            } elseif (!in_array($this->status, ['draft','void'], true)) {
+                $this->status = 'partial';
+            }
+        }
+
+        $this->save();
     }
 
     /**

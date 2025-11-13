@@ -267,6 +267,7 @@ class InvoiceController extends Controller
         ];
 
         $invoice->update($updates);
+        $invoice->refreshPaymentState();
 
         if ($request->wantsJson()) return response()->json($invoice->fresh('client'));
         return back()->with('status', 'Status updated.');

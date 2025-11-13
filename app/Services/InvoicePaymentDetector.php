@@ -31,20 +31,14 @@ class InvoicePaymentDetector
             return null;
         }
 
-        $expected = $invoice->expectedPaymentSats();
-        if ($expected === null) {
-            return null;
-        }
-
         $transactions = $this->mempoolClient->transactions($network, $address);
         if (empty($transactions)) {
             return null;
         }
 
-        $tolerance = 5; // satoshis leeway for rounding differences
         foreach ($transactions as $tx) {
             $received = $this->satsReceivedForAddress($tx, $address);
-            if ($received <= 0 || $received + $tolerance < $expected) {
+            if ($received <= 0) {
                 continue;
             }
 
