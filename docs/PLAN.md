@@ -61,13 +61,16 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
 
 ## Roadmap to Release Candidate
-7. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
+7. **Partial Payments & Receipts**
+    - Accept underpayments, log each tx (sats + USD snapshot), and surface a `partial` status until totals reach the invoice amount.
+    - Increase watcher tolerance (±100 sats) and expose payment history on the invoice view.
+8. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
     - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
     - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.
-8. **Print & Public Polish**
+9. **Print & Public Polish**
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-9. **User Settings**
+10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
 10. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
@@ -79,6 +82,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
+13. **CryptoZing.app Deployment (RC)**
+    - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
 
 ## Testing Approach
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.

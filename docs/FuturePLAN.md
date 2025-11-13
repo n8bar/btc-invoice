@@ -34,3 +34,6 @@ _Working list of initiatives queued after the MVP ships. Maintained alongside do
 
 8. **Fiat On-Ramp / Volatility Tools**
     - Optional integration with OTC partners or conversion APIs for users who want instant conversion.
+
+9. **Additional Cryptocurrencies**
+    - Track alternate chain addresses per invoice and support derivation/sending for other cryptocurrencies once Bitcoin MVP stabilizes.
