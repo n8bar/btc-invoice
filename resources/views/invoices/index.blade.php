@@ -13,11 +13,16 @@
     <a href="{{ route('invoices.create') }}"><x-primary-button>New Invoice</x-primary-button></a>
 </div>
 
+@php $showIdColumn = $showInvoiceIds ?? false; @endphp
+
 <div class="overflow-hidden rounded-lg bg-white shadow">
     @isset($invoices)
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
             <tr>
+                @if ($showIdColumn)
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                @endif
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">USD</th>
@@ -30,6 +35,9 @@
             <tbody class="divide-y divide-gray-200 bg-white">
             @forelse ($invoices as $inv)
                 <tr>
+                    @if ($showIdColumn)
+                        <td class="px-6 py-3 text-sm text-gray-700">{{ $inv->id }}</td>
+                    @endif
                     <td class="px-6 py-3 text-sm font-medium text-gray-900">
                         <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
                     </td>
@@ -56,7 +64,8 @@
 
                 </tr>
             @empty
-                <tr><td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">No invoices yet.</td></tr>
+                @php $emptyColspan = $showIdColumn ? 8 : 7; @endphp
+                <tr><td colspan="{{ $emptyColspan }}" class="px-6 py-10 text-center text-sm text-gray-500">No invoices yet.</td></tr>
             @endforelse
             </tbody>
         </table>

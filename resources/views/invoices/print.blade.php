@@ -30,6 +30,24 @@
         .badge-draft { background:#f3f4f6; color:#374151; }
         .no-print { text-align:right; margin-bottom: 12px; }
         .btn { border:1px solid var(--light); padding:8px 12px; border-radius:8px; background:#fff; cursor:pointer; }
+        .paid-watermark {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .paid-watermark span {
+            font-size: clamp(48px, 12vw, 140px);
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: rgba(220, 38, 38, 0.15);
+            transform: rotate(-18deg);
+            text-transform: uppercase;
+        }
+        .container { position: relative; z-index: 1; }
         @media print {
             .no-print { display:none; }
             body { margin: 0; }
@@ -37,6 +55,12 @@
     </style>
 </head>
 <body>
+@php $st = $invoice->status ?? 'draft'; @endphp
+@if (!empty($public) && $st === 'paid')
+    <div class="paid-watermark">
+        <span>Paid</span>
+    </div>
+@endif
 <div class="container">
 
     <div class="no-print">
@@ -44,7 +68,6 @@
         <a class="btn" href="{{ route('invoices.show', $invoice) }}" style="margin-left:8px;">Back</a>
     </div>
 
-    @php $st = $invoice->status ?? 'draft'; @endphp
     <header style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px;">
         <div>
             <h1>Invoice <span class="muted">#{{ $invoice->number }}</span></h1>

@@ -31,7 +31,10 @@ class InvoiceController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('invoices.index', compact('invoices'));
+        return view('invoices.index', [
+            'invoices' => $invoices,
+            'showInvoiceIds' => $request->user()->show_invoice_ids,
+        ]);
     }
 
     /**

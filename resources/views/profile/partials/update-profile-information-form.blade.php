@@ -47,6 +47,21 @@
             @endif
         </div>
 
+        <div class="flex items-start gap-3">
+            <div>
+                <input id="show_invoice_ids" type="checkbox" name="show_invoice_ids" value="1"
+                       @checked(old('show_invoice_ids', $user->show_invoice_ids))
+                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+            </div>
+            <div>
+                <x-input-label for="show_invoice_ids" :value="__('Show invoice IDs in list')" />
+                <p class="text-sm text-gray-500">
+                    {{ __('Display the internal invoice ID as the first column on the invoice list.') }}
+                </p>
+                <x-input-error class="mt-2" :messages="$errors->get('show_invoice_ids')" />
+            </div>
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

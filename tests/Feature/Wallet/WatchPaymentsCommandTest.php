@@ -19,8 +19,10 @@ class WatchPaymentsCommandTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
         $invoice = $this->makeInvoice();
 
+        $base = config('blockchain.mempool.testnet_base');
+
         Http::fake([
-            'https://mempool.space/testnet/api/address/' . $invoice->payment_address . '/txs' => Http::response([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
                 [
                     'txid' => 'abc123',
                     'status' => [
@@ -55,8 +57,10 @@ class WatchPaymentsCommandTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2025-01-02 09:00:00', 'UTC'));
         $invoice = $this->makeInvoice();
 
+        $base = config('blockchain.mempool.testnet_base');
+
         Http::fake([
-            'https://mempool.space/testnet/api/address/' . $invoice->payment_address . '/txs' => Http::response([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
                 [
                     'txid' => 'def456',
                     'status' => [
@@ -72,7 +76,7 @@ class WatchPaymentsCommandTest extends TestCase
                     ],
                 ],
             ], 200),
-            'https://mempool.space/testnet/api/blocks/tip/height' => Http::response('250002', 200),
+            "{$base}/blocks/tip/height" => Http::response('250002', 200),
         ]);
 
         $this->artisan('wallet:watch-payments')
