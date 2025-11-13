@@ -64,7 +64,7 @@
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.
 
-## Open Questions
-- Should we allow paying `draft` invoices? Probably not; enforce `status !== draft` before we accept payments.
+## Open Decisions
+- **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
 - Overpayments: do we record the extra sats and show “Overpaid” or just show surplus without changing status? Proposed: show surplus but keep status `paid`.
 - Manual adjustments: do we allow admins to edit payment rows (e.g., if a tx is incorrect)? Proposed: yes via future admin tooling.
