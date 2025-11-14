@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-10_
+_Last updated: 2025-11-13_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -56,9 +56,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `/wallet/settings` collects a BIP84 xpub per user (testnet/mainnet); invoice creation now derives a unique Bech32 address via `node_scripts/derive-address.cjs`.
     - Legacy invoices can be backfilled with the `wallet:assign-invoice-addresses` command, restoring QR/BIP21 output everywhere.
 6. **Blockchain Payment Detection (codex/blockchain-watcher)**
-    - Sail command `wallet:watch-payments` polls mempool.space for each invoice address, stores txid/confirmations metadata, and auto-marks invoices paid.
+    - Sail command `wallet:watch-payments` polls mempool.space (testnet4/mainnet) for each invoice address, stores tx metadata, logs partials, and auto-marks invoices paid once confirmations hit the threshold.
     - `MempoolClient` caches tip height lookups while `InvoicePaymentDetector` enforces sat tolerance + confirmation thresholds for all invoices with wallet settings.
-   Okay - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
+    - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
 
 ## Roadmap to Release Candidate
 7. **Partial Payments & Receipts** — see [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md)
@@ -72,17 +72,17 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
 10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-10. **Observability & Safety**
+11. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-11. **Docs & DX**
+12. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
-12. **UX Overhaul**
+13. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
-13. **CryptoZing.app Deployment (RC)**
+14. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
 
 ## Testing Approach
