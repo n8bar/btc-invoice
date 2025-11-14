@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-13_
+_Last updated: 2025-11-14_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
