@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\BtcRate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -106,6 +107,72 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('840123', false);
         $response->assertSee('Detected at', false);
         $response->assertSee('Confirmed at', false);
+    }
+
+    public function test_partial_invoice_displays_payment_history_and_outstanding(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'partial',
+            'amount_btc' => 0.01,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-partial-1',
+            'sats_received' => 400_000,
+            'detected_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'usd_rate' => 38_000,
+            'fiat_amount' => 152.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertSee('Payment history', false);
+        $response->assertSee('tx-partial-1', false);
+        $response->assertSee('Outstanding balance', false);
+        $response->assertSee('0.004', false); // 400k sats
+    }
+
+    public function test_print_view_shows_payment_history_table(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+            'amount_btc' => 0.012,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-print-1',
+            'sats_received' => 600_000,
+            'detected_at' => Carbon::parse('2025-01-05 08:00:00', 'UTC'),
+            'usd_rate' => 36_000,
+            'fiat_amount' => 216.00,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-print-2',
+            'sats_received' => 600_000,
+            'detected_at' => Carbon::parse('2025-01-05 09:00:00', 'UTC'),
+            'usd_rate' => 36_500,
+            'fiat_amount' => 219.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice->fresh('payments')));
+
+        $response->assertSee('Payment history', false);
+        $response->assertSee('tx-print-1', false);
+        $response->assertSee('tx-print-2', false);
     }
 
     private function makeInvoice(User $owner, array $overrides = []): Invoice

@@ -118,12 +118,24 @@ class InvoiceController extends Controller
             $rate['as_of'] = Carbon::parse($rate['as_of']);
         }
 
-        $invoice = $invoice->load('client');
+        $invoice = $invoice->load([
+            'client',
+            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+        ]);
         $display = $this->formatInvoiceDisplay($invoice, $rate);
+
+        $expectedSats = $invoice->expectedPaymentSats();
+        $paidSats = $invoice->payments->sum('sats_received');
+        $outstandingSats = $expectedSats !== null ? max($expectedSats - $paidSats, 0) : null;
 
         return view('invoices.show', [
             'invoice'           => $invoice,
             'rate'              => $rate,
+            'paymentSummary'    => [
+                'expected_sats' => $expectedSats,
+                'paid_sats' => $paidSats,
+                'outstanding_sats' => $outstandingSats,
+            ],
         ] + $display);
     }
 
@@ -305,14 +317,26 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        $invoice = $invoice->load('client');
+        $invoice = $invoice->load([
+            'client',
+            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+        ]);
         $rate = BtcRate::current();
         $display = $this->formatInvoiceDisplay($invoice, $rate);
+
+        $expectedSats = $invoice->expectedPaymentSats();
+        $paidSats = $invoice->payments->sum('sats_received');
+        $outstandingSats = $expectedSats !== null ? max($expectedSats - $paidSats, 0) : null;
 
         return view('invoices.print', [
             'invoice' => $invoice,
             'rate_as_of' => $rate['as_of'] ?? null,
             'public' => false,
+            'paymentSummary' => [
+                'expected_sats' => $expectedSats,
+                'paid_sats' => $paidSats,
+                'outstanding_sats' => $outstandingSats,
+            ],
         ] + $display);
     }
 

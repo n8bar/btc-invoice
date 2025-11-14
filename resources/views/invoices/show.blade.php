@@ -1,6 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        @php $st = $invoice->status ?? 'draft'; @endphp
+        @php
+            $st = $invoice->status ?? 'draft';
+            $summary = $paymentSummary ?? ['expected_sats' => null, 'paid_sats' => null, 'outstanding_sats' => null];
+            $formatBtc = function (?int $sats) use ($invoice) {
+                if ($sats === null) {
+                    return '—';
+                }
+
+                return $invoice->formatBitcoinAmount($sats / \App\Models\Invoice::SATS_PER_BTC) ?? '—';
+            };
+        @endphp
         <h2 class="text-xl font-semibold leading-tight">
             Invoice <span class="text-gray-500">#{{ $invoice->number }}</span>
             <span class="ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
@@ -61,6 +71,44 @@
 
                 </div>
 
+                @if ($invoice->payments->isNotEmpty())
+                    <div class="p-6 border-t">
+                        <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                    <tr>
+                                        <th class="px-2 py-2 text-left">Detected</th>
+                                        <th class="px-2 py-2 text-left">TXID</th>
+                                        <th class="px-2 py-2 text-right">BTC</th>
+                                        <th class="px-2 py-2 text-right">USD</th>
+                                        <th class="px-2 py-2 text-left">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @foreach ($invoice->payments as $payment)
+                                        <tr>
+                                            <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
+                                            <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                                            <td class="px-2 py-2 text-right">
+                                                {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
+                                            </td>
+                                            <td class="px-2 py-2 text-right">
+                                                @if ($payment->fiat_amount !== null)
+                                                    ${{ number_format($payment->fiat_amount, 2) }}
+                                                @else
+                                                    —
+                                                @endif
+                                            </td>
+                                            <td class="px-2 py-2">{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+
             </div>
 
 
@@ -94,6 +142,20 @@
                             <div class="flex justify-between"><dt class="text-gray-600">BTC rate (USD/BTC)</dt><dd>{{ $displayRateUsd !== null ? $displayRateUsd : '—' }}</dd></div>
                             <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $displayAmountBtc !== null ? $displayAmountBtc : '—' }}</dd></div>
                         </dl>
+
+                        @if ($summary['expected_sats'])
+                            <div class="mt-4 rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900">
+                                <div class="flex justify-between"><span>Expected</span><span>{{ $formatBtc($summary['expected_sats']) }} BTC</span></div>
+                                <div class="flex justify-between"><span>Received</span><span>{{ $formatBtc($summary['paid_sats']) }} BTC</span></div>
+                                <div class="flex justify-between font-semibold"><span>Outstanding balance</span><span>{{ $formatBtc($summary['outstanding_sats']) }} BTC</span></div>
+                            </div>
+                        @endif
+
+                        @if ($invoice->hasSignificantOverpayment())
+                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900">
+                                Tip detected — this invoice has received more BTC than requested. Consider crediting or refunding the surplus.
+                            </div>
+                        @endif
 
                         @php
                             $asOf = null;

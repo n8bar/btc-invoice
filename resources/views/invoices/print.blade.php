@@ -55,7 +55,24 @@
     </style>
 </head>
 <body>
-@php $st = $invoice->status ?? 'draft'; @endphp
+@php
+    $st = $invoice->status ?? 'draft';
+    $summary = $paymentSummary ?? [
+        'expected_sats' => $invoice->expectedPaymentSats(),
+        'paid_sats' => $invoice->payments->sum('sats_received'),
+        'outstanding_sats' => null,
+    ];
+    if ($summary['outstanding_sats'] === null && $summary['expected_sats']) {
+        $summary['outstanding_sats'] = max($summary['expected_sats'] - ($summary['paid_sats'] ?? 0), 0);
+    }
+    $formatBtc = function (?int $sats) use ($invoice) {
+        if ($sats === null) {
+            return '—';
+        }
+
+        return $invoice->formatBitcoinAmount($sats / \App\Models\Invoice::SATS_PER_BTC) ?? '—';
+    };
+@endphp
 @if (!empty($public) && $st === 'paid')
     <div class="paid-watermark">
         <span>Paid</span>
@@ -114,6 +131,23 @@
             @endif
 
         </table>
+
+        @if ($summary['expected_sats'])
+            <div style="margin-top:12px; border:1px dashed #c7d2fe; border-radius:10px; padding:12px; font-size:13px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Expected</span>
+                    <strong>{{ $formatBtc($summary['expected_sats']) }} BTC</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Received</span>
+                    <strong>{{ $formatBtc($summary['paid_sats']) }} BTC</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-weight:700;">
+                    <span>Outstanding balance</span>
+                    <span>{{ $formatBtc($summary['outstanding_sats']) }} BTC</span>
+                </div>
+            </div>
+        @endif
     </section>
 
     <section class="box" style="margin-bottom:16px;">
@@ -172,6 +206,40 @@
 
         </table>
     </section>
+
+    @if ($invoice->payments->isNotEmpty())
+        <section class="box" style="margin-bottom:16px;">
+            <h3 style="margin:0 0 8px; font-size:14px;">Payment history</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Detected</th>
+                        <th>TXID</th>
+                        <th style="text-align:right;">BTC</th>
+                        <th style="text-align:right;">USD</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($invoice->payments as $payment)
+                        <tr>
+                            <td>{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
+                            <td class="mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                            <td style="text-align:right;">{{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}</td>
+                            <td style="text-align:right;">
+                                @if ($payment->fiat_amount !== null)
+                                    ${{ number_format($payment->fiat_amount, 2) }}
+                                @else
+                                    —
+                                @endif
+                            </td>
+                            <td>{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </section>
+    @endif
 
 </div>
 </body>
