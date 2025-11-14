@@ -91,6 +91,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Favor model factories and clear policy assertions to keep fixtures simple.
 - Currency/rate expectations live in [`docs/RATES.md`](RATES.md) and must stay in sync with controller + service behavior.
 - Upcoming coverage is drafted in [`docs/tests/TEST_HARDENING.md`](tests/TEST_HARDENING.md); implement those scenarios next.
+- New feature work (partial payments UI, invoice delivery, etc.) should follow a TDD flow wherever practical, while existing areas continue to pick up pragmatic coverage as they evolve.
 
 ## Decisions & Changelog
 | Date (UTC) | Change | Notes |
