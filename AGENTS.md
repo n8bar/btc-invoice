@@ -26,3 +26,4 @@
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
 - Whenever `docs/**` changes, commit/push those updates right away (I review docs via GitHub’s UI).
+- When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
