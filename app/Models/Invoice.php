@@ -18,6 +18,8 @@ class Invoice extends Model
         'status','txid','invoice_date','due_date','paid_at',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
         'payment_detected_at','payment_confirmed_at',
+        'last_overpayment_alert_at','last_underpayment_alert_at',
+        'last_past_due_owner_alert_at','last_past_due_client_alert_at',
     ];
 
     protected $casts = [
@@ -35,6 +37,10 @@ class Invoice extends Model
         'payment_confirmed_height' => 'integer',
         'payment_detected_at' => 'datetime',
         'payment_confirmed_at' => 'datetime',
+        'last_overpayment_alert_at' => 'datetime',
+        'last_underpayment_alert_at' => 'datetime',
+        'last_past_due_owner_alert_at' => 'datetime',
+        'last_past_due_client_alert_at' => 'datetime',
     ];
     public const SATS_PER_BTC = 100_000_000;
     public const PAYMENT_SAT_TOLERANCE = 100;

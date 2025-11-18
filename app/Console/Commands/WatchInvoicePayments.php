@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Services\BtcRate;
+use App\Services\InvoiceAlertService;
 use App\Services\InvoicePaymentDetector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,10 @@ class WatchInvoicePayments extends Command
 
     protected $description = 'Poll known invoice addresses for payments and auto-mark invoices paid.';
 
-    public function __construct(private readonly InvoicePaymentDetector $detector)
+    public function __construct(
+        private readonly InvoicePaymentDetector $detector,
+        private readonly InvoiceAlertService $alerts
+    )
     {
         parent::__construct();
     }
@@ -51,6 +55,7 @@ class WatchInvoicePayments extends Command
                 }
 
                 $this->recordPayments($invoice, $results);
+                $this->alerts->checkPaymentThresholds($invoice->fresh('payments'));
                 $updated += count($results);
             }
         });

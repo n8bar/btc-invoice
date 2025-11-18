@@ -2,6 +2,7 @@
 
 use App\Console\Commands\AssignInvoiceAddresses;
 use App\Console\Commands\BackfillInvoicePayments;
+use App\Console\Commands\SendPastDueInvoiceAlerts;
 use App\Console\Commands\WatchInvoicePayments;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ->everyMinute()
             ->withoutOverlapping()
             ->runInBackground();
+        $schedule->command('invoices:send-past-due-alerts')->dailyAt('02:00');
     })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -34,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         AssignInvoiceAddresses::class,
         BackfillInvoicePayments::class,
+        SendPastDueInvoiceAlerts::class,
         WatchInvoicePayments::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {

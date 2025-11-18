@@ -5,12 +5,14 @@ namespace App\Listeners;
 use App\Events\InvoicePaid;
 use App\Jobs\DeliverInvoiceMail;
 use App\Models\InvoiceDelivery;
+use App\Services\InvoiceAlertService;
 
 class SendInvoiceReceipt
 {
-    /**
-     * Handle the event.
-     */
+    public function __construct(private readonly InvoiceAlertService $alerts)
+    {
+    }
+
     public function handle(InvoicePaid $event): void
     {
             $invoice = $event->invoice->fresh(['client','user']);
@@ -41,5 +43,6 @@ class SendInvoiceReceipt
             ]);
 
             DeliverInvoiceMail::dispatch($delivery);
+            $this->alerts->sendOwnerPaidNotice($invoice);
     }
 }

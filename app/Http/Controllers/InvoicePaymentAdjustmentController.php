@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Services\BtcRate;
+use App\Services\InvoiceAlertService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,6 +13,10 @@ use Illuminate\Validation\Rule;
 
 class InvoicePaymentAdjustmentController extends Controller
 {
+    public function __construct(private readonly InvoiceAlertService $alerts)
+    {
+    }
+
     public function store(Request $request, Invoice $invoice): RedirectResponse
     {
         $this->authorize('update', $invoice);
@@ -53,6 +58,8 @@ class InvoicePaymentAdjustmentController extends Controller
         ]);
 
         $invoice->refreshPaymentState();
+        $invoice->refresh();
+        $this->alerts->checkPaymentThresholds($invoice);
 
         return back()->with('status', 'Adjustment recorded.');
     }

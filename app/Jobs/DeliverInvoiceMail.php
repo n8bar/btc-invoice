@@ -2,8 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Mail\InvoiceOverpaymentClientMail;
+use App\Mail\InvoiceOverpaymentOwnerMail;
+use App\Mail\InvoicePastDueClientMail;
+use App\Mail\InvoicePastDueOwnerMail;
 use App\Mail\InvoicePaidReceiptMail;
 use App\Mail\InvoiceReadyMail;
+use App\Mail\InvoiceUnderpaymentClientMail;
+use App\Mail\InvoiceUnderpaymentOwnerMail;
+use App\Mail\InvoiceOwnerPaidNoticeMail;
 use App\Models\InvoiceDelivery;
 use App\Services\MailAlias;
 use Illuminate\Bus\Queueable;
@@ -29,7 +36,7 @@ class DeliverInvoiceMail implements ShouldQueue
             return;
         }
 
-        $invoice = $delivery->invoice()->with(['client','user'])->first();
+        $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
         if (!$invoice || !$invoice->client) {
             $delivery->update([
                 'status' => 'failed',
@@ -40,6 +47,13 @@ class DeliverInvoiceMail implements ShouldQueue
 
         $mailable = match ($delivery->type) {
             'receipt' => new InvoicePaidReceiptMail($invoice, $delivery),
+            'owner_paid_notice' => new InvoiceOwnerPaidNoticeMail($invoice, $delivery),
+            'past_due_owner' => new InvoicePastDueOwnerMail($invoice, $delivery),
+            'past_due_client' => new InvoicePastDueClientMail($invoice, $delivery),
+            'client_overpay_alert' => new InvoiceOverpaymentClientMail($invoice, $delivery),
+            'owner_overpay_alert' => new InvoiceOverpaymentOwnerMail($invoice, $delivery),
+            'client_underpay_alert' => new InvoiceUnderpaymentClientMail($invoice, $delivery),
+            'owner_underpay_alert' => new InvoiceUnderpaymentOwnerMail($invoice, $delivery),
             default => new InvoiceReadyMail($invoice, $delivery),
         };
 
