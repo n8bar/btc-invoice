@@ -19,6 +19,7 @@ class InvoicePayment extends Model
         'fiat_amount',
         'note',
         'meta',
+        'is_adjustment',
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class InvoicePayment extends Model
         'usd_rate' => 'decimal:2',
         'fiat_amount' => 'decimal:2',
         'meta' => 'array',
+        'is_adjustment' => 'boolean',
     ];
 
     public function invoice(): BelongsTo

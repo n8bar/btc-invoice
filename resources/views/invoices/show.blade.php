@@ -120,7 +120,15 @@
                                                     —
                                                 @endif
                                             </td>
-                                            <td class="px-2 py-2">{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                                            <td class="px-2 py-2">
+                                                @if ($payment->is_adjustment)
+                                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                                        {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
+                                                    </span>
+                                                @else
+                                                    {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                                @endif
+                                            </td>
                                             <td class="px-2 py-2 align-top">
                                                 <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
                                                 <form method="POST"
@@ -152,8 +160,48 @@
 
             </div>
 
-            <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
-                Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
+            <div class="rounded-lg bg-white p-6 shadow">
+                <h3 class="text-sm font-semibold text-gray-700">Manual adjustments</h3>
+                <p class="mt-1 text-xs text-gray-500">
+                    Credit or reopen balances without editing on-chain payments. Use this when a payment misses the tolerance threshold.
+                </p>
+                <form method="POST" action="{{ route('invoices.payments.adjustments.store', $invoice) }}" class="mt-4 space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
+                            <input type="number" name="amount_usd" step="0.01" min="0.01"
+                                   value="{{ old('amount_usd') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('amount_usd')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Direction</label>
+                            <select name="direction"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="increase" @selected(old('direction') === 'increase')>Credit invoice (reduce outstanding)</option>
+                                <option value="decrease" @selected(old('direction') === 'decrease')>Reopen balance (increase outstanding)</option>
+                            </select>
+                            @error('direction')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
+                        <textarea name="note" rows="2"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                  placeholder="Document the reason for this adjustment">{{ old('note') }}</textarea>
+                        @error('note')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <x-primary-button>Add adjustment</x-primary-button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2">
+                <p>Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.</p>
+                <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter an adjustment above so the ledger stays accurate without touching the original chain data.</p>
             </div>
 
             @php
@@ -326,6 +374,22 @@
                         @if ($invoice->hasSignificantOverpayment())
                             <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900">
                                 Tip detected — this invoice has received more BTC than requested. Consider crediting or refunding the surplus.
+                            </div>
+                        @endif
+
+                        @if ($invoice->hasSignificantUnderpayment())
+                            <div class="mt-3 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900">
+                                Underpayment detected — the outstanding balance exceeds the tolerance. Follow up with the client or record a manual adjustment.
+                            </div>
+                        @endif
+
+                        @if ($invoice->requiresClientOverpayAlert())
+                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900">
+                                Client alert will show on the public invoice (overpayment ~{{ number_format($invoice->overpaymentPercent(), 1) }}%). Overpayments are gratuities unless you manually adjust.
+                            </div>
+                        @elseif ($invoice->requiresClientUnderpayAlert())
+                            <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+                                Client alert will show on the public invoice (underpayment ~{{ number_format($invoice->underpaymentPercent(), 1) }}%). Follow up with the client or adjust the balance.
                             </div>
                         @endif
 

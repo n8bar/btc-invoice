@@ -301,7 +301,13 @@
                                     —
                                 @endif
                             </td>
-                            <td>{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                            <td>
+                                @if ($payment->is_adjustment)
+                                    {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
+                                @else
+                                    {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                @endif
+                            </td>
                             <td>{{ $payment->note ?: '—' }}</td>
                         </tr>
                     @endforeach
@@ -310,9 +316,24 @@
         </section>
     @endif
 
-    <div style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
-        Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
-    </div>
+    @php
+        $overpayPercent = $invoice->overpaymentPercent();
+        $underpayPercent = $invoice->underpaymentPercent();
+    @endphp
+    @if ($invoice->requiresClientOverpayAlert())
+        <div style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
+            This invoice appears overpaid by approximately {{ number_format($overpayPercent, 1) }}%.
+            Overpayments are treated as gratuities by default, so please notify the invoice sender if this was a mistake.
+        </div>
+    @elseif ($invoice->requiresClientUnderpayAlert())
+        <div style="border:1px solid #fee2e2; background:#fef2f2; color:#b91c1c; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
+            An outstanding balance of roughly {{ number_format($underpayPercent, 1) }}% remains. Please send the remaining amount or contact the invoice sender for assistance.
+        </div>
+    @else
+        <div style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
+            Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
+        </div>
+    @endif
 
 </div>
 @if ($rateAsOfIso)

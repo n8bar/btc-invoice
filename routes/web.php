@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\WalletSettingsController;
 use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
+use App\Http\Controllers\InvoicePaymentAdjustmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.deliver');
     Route::patch('invoices/{invoice}/payments/{payment}/note', [InvoicePaymentNoteController::class, 'update'])
         ->name('invoices.payments.note');
+    Route::post('invoices/{invoice}/payments/adjustments', [InvoicePaymentAdjustmentController::class, 'store'])
+        ->name('invoices.payments.adjustments.store');
 
 
     // Standard CRUD

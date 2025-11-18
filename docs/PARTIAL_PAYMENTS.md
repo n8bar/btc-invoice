@@ -74,9 +74,7 @@
 4. ✅ Watcher tolerance (±100 sats) is enforced and detection/confirmation timestamps surface in the payment history UI.
 5. ✅ Payment history rows display the captured USD rate/fiat amount and owners can annotate each payment with short notes.
 6. ✅ Automatic invoice delivery + paid receipt emails log to `invoice_deliveries`, with queue-backed mailers and profile toggles.
-
-## Roadmap to Release Candidate
-7. Trigger owner alerts for significant over- or under-payments (per the tolerance rules) and provide a manual adjustment flow to reconcile errors without editing the original tx rows.
+7. ✅ Owners can record manual adjustments (credit/debit) when a payment exceeds tolerance, and both owners + clients see alerts when over/under payments exceed 15% of the invoice total (client messaging reiterates that overpayments default to gratuities unless they notify the sender).
 
 ## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”

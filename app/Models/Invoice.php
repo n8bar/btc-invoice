@@ -40,6 +40,9 @@ class Invoice extends Model
     public const PAYMENT_SAT_TOLERANCE = 100;
     public const OVERPAY_USD_TOLERANCE = 10.0;
     public const OVERPAY_PERCENT_TOLERANCE = 1.0;
+    public const UNDERPAY_USD_TOLERANCE = 10.0;
+    public const UNDERPAY_PERCENT_TOLERANCE = 1.0;
+    public const CLIENT_ALERT_PERCENT = 15.0;
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
@@ -106,6 +109,70 @@ class Invoice extends Model
         $percent = ($surplus / $expected) * 100;
 
         return $surplusUsd >= self::OVERPAY_USD_TOLERANCE || $percent >= self::OVERPAY_PERCENT_TOLERANCE;
+    }
+
+    public function hasSignificantUnderpayment(): bool
+    {
+        $expected = $this->expectedPaymentSats();
+        if ($expected === null || $expected <= 0) {
+            return false;
+        }
+
+        $paid = $this->paid_sats;
+        if ($paid + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+            return false;
+        }
+
+        $deficit = max($expected - $paid, 0);
+        $usdRate = $this->btc_rate ?: null;
+        $deficitUsd = $usdRate ? ($deficit / self::SATS_PER_BTC) * (float) $usdRate : 0;
+        $percent = ($deficit / $expected) * 100;
+
+        return $deficitUsd >= self::UNDERPAY_USD_TOLERANCE || $percent >= self::UNDERPAY_PERCENT_TOLERANCE;
+    }
+
+    public function overpaymentPercent(): ?float
+    {
+        $expected = $this->expectedPaymentSats();
+        if ($expected === null || $expected <= 0) {
+            return null;
+        }
+
+        $paid = $this->paid_sats;
+        if ($paid <= $expected) {
+            return null;
+        }
+
+        $surplus = $paid - $expected;
+        return ($surplus / $expected) * 100;
+    }
+
+    public function underpaymentPercent(): ?float
+    {
+        $expected = $this->expectedPaymentSats();
+        if ($expected === null || $expected <= 0) {
+            return null;
+        }
+
+        $paid = $this->paid_sats;
+        if ($paid + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+            return null;
+        }
+
+        $deficit = max($expected - $paid, 0);
+        return ($deficit / $expected) * 100;
+    }
+
+    public function requiresClientOverpayAlert(): bool
+    {
+        $percent = $this->overpaymentPercent();
+        return $percent !== null && $percent >= self::CLIENT_ALERT_PERCENT;
+    }
+
+    public function requiresClientUnderpayAlert(): bool
+    {
+        $percent = $this->underpaymentPercent();
+        return $percent !== null && $percent >= self::CLIENT_ALERT_PERCENT;
     }
 
     public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void

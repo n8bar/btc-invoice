@@ -84,6 +84,67 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('0.01234567', false);
     }
 
+    public function test_print_view_displays_client_overpayment_alert_when_above_threshold(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+        ]);
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $overpaySats = (int) round($expectedSats * 1.2); // 20% over
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-overpay',
+            'sats_received' => $overpaySats,
+            'detected_at' => Carbon::now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 120.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice->fresh('payments')));
+
+        $response->assertSee('overpaid by approximately', false);
+        $response->assertSee('Overpayments are treated as gratuities by default', false);
+    }
+
+    public function test_print_view_displays_client_underpayment_alert_when_above_threshold(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+        ]);
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $partialSats = (int) round($expectedSats * 0.6); // 40% outstanding
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-underpay',
+            'sats_received' => $partialSats,
+            'detected_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 120.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice->fresh('payments')));
+
+        $response->assertSee('An outstanding balance of roughly', false);
+    }
+
     public function test_payment_metadata_fields_render_when_present(): void
     {
         $owner = User::factory()->create();
