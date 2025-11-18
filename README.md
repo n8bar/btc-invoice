@@ -1,75 +1,58 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Bitcoin Invoice Generator
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. The delivery plan, roadmap, and branching policy live in [`docs/PLAN.md`](docs/PLAN.md).
 
-## About Laravel
+## Highlights
+- **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
+- **Wallet integration:** Each user configures a BIP84 xpub under `/wallet/settings`; invoices derive unique Bech32 addresses and the watcher (`wallet:watch-payments`) logs incoming payments.
+- **Partial payment ledger:** Every transaction lands in `invoice_payments` with sats + USD snapshots, outstanding balance summaries, editable owner notes, and tip detection.
+- **Invoice delivery + receipts:** Owners send invoices via email, see real-time delivery logs, and automatically email receipts when the watcher marks an invoice paid.
+- **Catch-all friendly testing:** Outbound mail is routed through Mailgun and, while `MAIL_ALIAS_ENABLED=true`, every recipient rewrites to the Mailgun catch-all (`MAIL_ALIAS_DOMAIN`) so we can test safely.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Getting Started
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Prerequisites
+- Docker + Docker Compose
+- Node 20+ (for optional local Vite builds)
+- Mailgun (or equivalent SMTP provider) for outbound email
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Initial setup
+1. Copy the env template and customize credentials:
+   ```bash
+   cp .env.example .env
+   ```
+   Required keys:
+   - `APP_URL` / `APP_PUBLIC_URL` – domain used in generated links (e.g., `https://cryptozing.app`).
+   - `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_*`.
+   - `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app` while routing everything to the Mailgun catch-all.
+2. Install dependencies & start Sail:
+   ```bash
+   ./vendor/bin/sail up -d
+   ./vendor/bin/sail composer install
+   ./vendor/bin/sail npm install && ./vendor/bin/sail npm run build
+   ```
+3. Run migrations and seeders (includes demo user + wallet prompts):
+   ```bash
+   ./vendor/bin/sail artisan migrate --seed
+   ```
+4. Log in via `http://localhost` (or your hosts-mapped domain) using the seeded credentials, configure a wallet xpub under `/wallet/settings`, and you’re ready to issue invoices.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## Testing
-
-Run tests **inside Sail**:
-
+### Running tests
+Execute the full suite via Sail:
 ```bash
 ./vendor/bin/sail artisan test
 ```
 
-_CI smoke trigger: documentation-only tweak to re-run the pipeline._
+## Configuration Notes
+- **Wallet watcher:** `./vendor/bin/sail artisan wallet:watch-payments` polls mempool.space and updates invoice/payment state. It runs automatically via the scheduler container once Sail is up.
+- **Mail aliasing:** Keep `MAIL_ALIAS_ENABLED` on while the product is in pre-production so all outgoing mail lands in the Mailgun catch-all route. Disable it (or clear the domain) before the RC deploy so recipients get their real email addresses.
+- **Public links:** `APP_PUBLIC_URL` controls the base URL used in invoice emails/public share links. Set it per environment (localhost for dev, `https://cryptozing.app` for production).
 
-## Project Plan
+## Documentation & Specs
+- Delivery plan & roadmap: [`docs/PLAN.md`](docs/PLAN.md)
+- Future backlog: [`docs/FuturePLAN.md`](docs/FuturePLAN.md)
+- Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
+- Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
+- Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
 
-See [`docs/PLAN.md`](docs/PLAN.md) for the Codex-maintained delivery plan, branching policy, and roadmap. Details on rate precision live in [`docs/RATES.md`](docs/RATES.md).
+For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
