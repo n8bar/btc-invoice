@@ -37,7 +37,7 @@
 
 ## Out of Scope / Future
 - Logo uploads and rich-template editor (post-MVP).
-- Multi-language templates (track under UX Overhaul).
+- Multi-language templates (post-MVP).
 
 ## Testing
 - Update existing `InvoicePaymentDisplayTest` and `PublicShareTest` to assert the new customizable fields render.
