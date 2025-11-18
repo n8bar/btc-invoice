@@ -90,5 +90,46 @@
                 >{{ __('Saved.') }}</p>
             @endif
         </div>
+
+        <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700">Invoice branding defaults</h3>
+            <p class="text-xs text-gray-600">
+                These values populate new invoices automatically. You can override them per invoice when needed.
+            </p>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <x-input-label for="billing_name" :value="__('Billing name')" />
+                    <x-text-input id="billing_name" name="billing_name" type="text" class="mt-1 block w-full"
+                                  :value="old('billing_name', $user->billing_name)" autocomplete="organization" />
+                    <x-input-error class="mt-2" :messages="$errors->get('billing_name')" />
+                </div>
+                <div>
+                    <x-input-label for="billing_email" :value="__('Billing email')" />
+                    <x-text-input id="billing_email" name="billing_email" type="email" class="mt-1 block w-full"
+                                  :value="old('billing_email', $user->billing_email)" autocomplete="email" />
+                    <x-input-error class="mt-2" :messages="$errors->get('billing_email')" />
+                </div>
+                <div>
+                    <x-input-label for="billing_phone" :value="__('Billing phone')" />
+                    <x-text-input id="billing_phone" name="billing_phone" type="text" class="mt-1 block w-full"
+                                  :value="old('billing_phone', $user->billing_phone)" autocomplete="tel" />
+                    <x-input-error class="mt-2" :messages="$errors->get('billing_phone')" />
+                </div>
+            </div>
+            <div>
+                <x-input-label for="billing_address" :value="__('Billing address')" />
+                <textarea id="billing_address" name="billing_address" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="123 Main Street&#10;Suite 100&#10;Denver, CO 80202">{{ old('billing_address', $user->billing_address) }}</textarea>
+                <x-input-error class="mt-2" :messages="$errors->get('billing_address')" />
+            </div>
+            <div>
+                <x-input-label for="invoice_footer_note" :value="__('Invoice footer note')" />
+                <textarea id="invoice_footer_note" name="invoice_footer_note" rows="2"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="Net 7 · Send BTC only to the address above">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
+                <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note')" />
+            </div>
+        </div>
     </form>
 </section>

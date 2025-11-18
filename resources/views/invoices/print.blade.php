@@ -76,6 +76,7 @@
         'last_payment_detected_at' => null,
         'last_payment_confirmed_at' => null,
     ];
+    $billingDetails = $billingDetails ?? $invoice->billingDetails();
 @endphp
 @if (!empty($public) && $st === 'paid')
     <div class="paid-watermark">
@@ -116,6 +117,26 @@
                 <div><strong>{{ $invoice->client->name ?? '-' }}</strong></div>
                 <div class="muted">{{ $invoice->client->email ?? '' }}</div>
             </div>
+        </div>
+    </section>
+
+    <section class="box" style="margin-bottom:16px;">
+        <h3 style="margin:0 0 8px; font-size:14px;">Bill From</h3>
+        <div style="font-size:14px;">
+            <div><strong>{{ $billingDetails['name'] ?? ($invoice->user->billing_name ?? $invoice->user->name) }}</strong></div>
+            @if (!empty($billingDetails['email']))
+                <div class="muted"><a href="mailto:{{ $billingDetails['email'] }}" style="color:#4f46e5;">{{ $billingDetails['email'] }}</a></div>
+            @endif
+            @if (!empty($billingDetails['phone']))
+                <div class="muted">{{ $billingDetails['phone'] }}</div>
+            @endif
+            @if (!empty($billingDetails['address_lines']))
+                <div class="muted" style="margin-top:6px; line-height:1.4;">
+                    @foreach ($billingDetails['address_lines'] as $line)
+                        <div>{{ $line }}</div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </section>
 
@@ -335,6 +356,11 @@
         </div>
     @endif
 
+    @if (!empty($billingDetails['footer_note']))
+        <div style="border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
+            {{ $billingDetails['footer_note'] }}
+        </div>
+    @endif
 </div>
 @if ($rateAsOfIso)
     <script>

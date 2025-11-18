@@ -69,7 +69,18 @@ class InvoiceController extends Controller
             'paid_at'     => ['nullable','date'],
             'txid'        => ['nullable','string','max:128'],
             'invoice_date' => ['required','date'],
+            'billing_name_override' => ['nullable','string','max:255'],
+            'billing_email_override' => ['nullable','email','max:255'],
+            'billing_phone_override' => ['nullable','string','max:255'],
+            'billing_address_override' => ['nullable','string','max:2000'],
+            'invoice_footer_note_override' => ['nullable','string','max:1000'],
         ]);
+
+        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override'] as $field) {
+            if (array_key_exists($field, $data) && $data[$field] !== null && trim((string) $data[$field]) === '') {
+                $data[$field] = null;
+            }
+        }
 
         // If rate is provided and BTC amount omitted, compute it.
         if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {
@@ -122,6 +133,7 @@ class InvoiceController extends Controller
             'client',
             'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
             'deliveries' => fn ($query) => $query->latest('id'),
+            'user',
         ]);
         $display = $this->formatInvoiceDisplay($invoice, $rate);
         $summary = $this->buildPaymentSummary($invoice, $rate, $display['computedBtc'] ?? null);
@@ -161,7 +173,18 @@ class InvoiceController extends Controller
             'paid_at'     => ['nullable','date'],
             'txid'        => ['nullable','string','max:128'],
             'invoice_date'=> ['required','date'],
+            'billing_name_override' => ['nullable','string','max:255'],
+            'billing_email_override' => ['nullable','email','max:255'],
+            'billing_phone_override' => ['nullable','string','max:255'],
+            'billing_address_override' => ['nullable','string','max:2000'],
+            'invoice_footer_note_override' => ['nullable','string','max:1000'],
         ]);
+
+        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override'] as $field) {
+            if (array_key_exists($field, $data) && $data[$field] !== null && trim((string) $data[$field]) === '') {
+                $data[$field] = null;
+            }
+        }
 
         if ($invoice->public_enabled) {
             // Fields that affect what recipients see
@@ -219,8 +242,9 @@ class InvoiceController extends Controller
         $prefillRate = $r['rate_usd'] ?? null;
 
         $today = now()->toDateString(); // ✅ for invoice_date default
+        $brandingDefaults = $this->brandingDefaults($request->user());
 
-        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today'));
+        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today','brandingDefaults'));
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -228,7 +252,9 @@ class InvoiceController extends Controller
         $clients = Client::where('user_id', $request->user()->id)
             ->orderBy('name')->get(['id','name']);
 
-        return view('invoices.edit', compact('invoice','clients'));
+        $brandingDefaults = $this->brandingDefaults($request->user());
+
+        return view('invoices.edit', compact('invoice','clients','brandingDefaults'));
     }
 
     public function trash(\Illuminate\Http\Request $request)
@@ -320,6 +346,7 @@ class InvoiceController extends Controller
         $invoice = $invoice->load([
             'client',
             'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'user',
         ]);
         $rate = BtcRate::current();
         $display = $this->formatInvoiceDisplay($invoice, $rate);
@@ -356,7 +383,7 @@ class InvoiceController extends Controller
         $rateUsd = $rate['rate_usd'] ?? null;
         $asOf    = $rate['as_of'] ?? now();
 
-        $invoice = $invoice->load('client');
+        $invoice = $invoice->load(['client','user']);
         $display = $this->formatInvoiceDisplay($invoice, $rate);
         $summary = $this->buildPaymentSummary($invoice, $rate, $display['computedBtc'] ?? null);
 
@@ -600,6 +627,18 @@ class InvoiceController extends Controller
             'displayAmountBtc'  => $displayAmountBtc,
             'displayRateUsd'    => $displayRateUsd,
             'displayBitcoinUri' => $displayBitcoinUri,
+            'billingDetails'    => $invoice->billingDetails(),
+        ];
+    }
+
+    private function brandingDefaults($user): array
+    {
+        return [
+            'name' => $user->billing_name ?: $user->name,
+            'email' => $user->billing_email ?: $user->email,
+            'phone' => $user->billing_phone,
+            'address' => $user->billing_address,
+            'footer_note' => $user->invoice_footer_note,
         ];
     }
 }

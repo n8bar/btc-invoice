@@ -23,6 +23,11 @@ class User extends Authenticatable
         'password',
         'show_invoice_ids',
         'auto_receipt_emails',
+        'billing_name',
+        'billing_email',
+        'billing_phone',
+        'billing_address',
+        'invoice_footer_note',
     ];
 
     /**
@@ -47,6 +52,9 @@ class User extends Authenticatable
             'password' => 'hashed',
             'show_invoice_ids' => 'boolean',
             'auto_receipt_emails' => 'boolean',
+            'billing_name' => 'string',
+            'billing_email' => 'string',
+            'billing_phone' => 'string',
         ];
     }
 

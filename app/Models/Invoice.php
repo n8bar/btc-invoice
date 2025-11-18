@@ -18,6 +18,8 @@ class Invoice extends Model
         'status','txid','invoice_date','due_date','paid_at',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
         'payment_detected_at','payment_confirmed_at',
+        'billing_name_override','billing_email_override','billing_phone_override',
+        'billing_address_override','invoice_footer_note_override',
         'last_overpayment_alert_at','last_underpayment_alert_at',
         'last_past_due_owner_alert_at','last_past_due_client_alert_at',
     ];
@@ -54,6 +56,36 @@ class Invoice extends Model
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
     public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
     public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
+
+    public function billingDetails(): array
+    {
+        $this->loadMissing('user');
+        $user = $this->user;
+
+        $name = $this->billing_name_override
+            ?: ($user?->billing_name ?: $user?->name);
+        $email = $this->billing_email_override
+            ?: ($user?->billing_email ?: $user?->email);
+        $phone = $this->billing_phone_override
+            ?: ($user?->billing_phone);
+        $address = $this->billing_address_override
+            ?: ($user?->billing_address);
+        $footer = $this->invoice_footer_note_override
+            ?: ($user?->invoice_footer_note);
+
+        $addressLines = $address
+            ? preg_split("/\r\n|\n|\r/", trim($address)) ?: []
+            : [];
+
+        return [
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address,
+            'address_lines' => array_filter($addressLines, fn ($line) => trim($line) !== ''),
+            'footer_note' => $footer,
+        ];
+    }
 
 
     public static function nextNumberForUser(int $userId): string

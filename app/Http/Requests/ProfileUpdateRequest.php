@@ -27,6 +27,11 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'show_invoice_ids' => ['nullable', 'boolean'],
             'auto_receipt_emails' => ['nullable', 'boolean'],
+            'billing_name' => ['nullable','string','max:255'],
+            'billing_email' => ['nullable','email','max:255'],
+            'billing_phone' => ['nullable','string','max:255'],
+            'billing_address' => ['nullable','string','max:2000'],
+            'invoice_footer_note' => ['nullable','string','max:1000'],
         ];
     }
 }

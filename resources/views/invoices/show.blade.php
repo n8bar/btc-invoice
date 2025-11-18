@@ -199,6 +199,13 @@
                 </form>
             </div>
 
+            @if (!empty($billingDetails['footer_note']))
+                <div class="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-1">Footer note</h3>
+                    <p class="whitespace-pre-line">{{ $billingDetails['footer_note'] }}</p>
+                </div>
+            @endif
+
             <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2">
                 <p>Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.</p>
                 <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter an adjustment above so the ledger stays accurate without touching the original chain data.</p>
@@ -311,6 +318,26 @@
                     <div class="p-6 border-b">
                         <h3 class="mb-2 text-sm font-semibold text-gray-700">Description</h3>
                         <p class="text-sm text-gray-800 whitespace-pre-line">{{ $invoice->description ?: '—' }}</p>
+                    </div>
+
+                    <div class="p-6 border-b md:border-b-0">
+                        <h3 class="mb-2 text-sm font-semibold text-gray-700">Biller</h3>
+                        <dl class="space-y-1 text-sm text-gray-700">
+                            <div class="flex justify-between"><dt>Name</dt><dd>{{ $billingDetails['name'] ?? $invoice->user->name }}</dd></div>
+                            @if (!empty($billingDetails['email']))
+                                <div class="flex justify-between"><dt>Email</dt><dd><a href="mailto:{{ $billingDetails['email'] }}" class="text-indigo-600 hover:underline">{{ $billingDetails['email'] }}</a></dd></div>
+                            @endif
+                            @if (!empty($billingDetails['phone']))
+                                <div class="flex justify-between"><dt>Phone</dt><dd>{{ $billingDetails['phone'] }}</dd></div>
+                            @endif
+                        </dl>
+                        @if (!empty($billingDetails['address_lines']))
+                            <div class="mt-3 text-sm text-gray-700">
+                                @foreach ($billingDetails['address_lines'] as $line)
+                                    <div>{{ $line }}</div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <div class="p-6">
