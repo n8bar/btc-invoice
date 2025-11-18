@@ -115,4 +115,20 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary Catch-all Aliasing
+    |--------------------------------------------------------------------------
+    |
+    | While we test outbound email against a catch-all mailbox, we rewrite
+    | every recipient so real customer addresses are never contacted.
+    | Disable this (or leave domain empty) before the RC deployment.
+    |
+    */
+
+    'aliasing' => [
+        'enabled' => env('MAIL_ALIAS_ENABLED', false),
+        'domain' => env('MAIL_ALIAS_DOMAIN'),
+    ],
+
 ];

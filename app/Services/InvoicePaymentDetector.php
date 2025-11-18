@@ -14,7 +14,9 @@ class InvoicePaymentDetector
     }
 
     /**
-     * @return array{
+     * Detect all payments for an invoice address.
+     *
+     * @return array<int, array{
      *     txid: string,
      *     sats: int,
      *     confirmed: bool,
@@ -22,19 +24,22 @@ class InvoicePaymentDetector
      *     block_height: int|null,
      *     detected_at: \Illuminate\Support\Carbon,
      *     confirmed_at: \Illuminate\Support\Carbon|null
-     * }|null
+     * }>
      */
-    public function detect(Invoice $invoice, string $network): ?array
+    public function detectPayments(Invoice $invoice, string $network): array
     {
         $address = $invoice->payment_address;
         if (!$address) {
-            return null;
+            return [];
         }
 
         $transactions = $this->mempoolClient->transactions($network, $address);
         if (empty($transactions)) {
-            return null;
+            return [];
         }
+
+        $payments = [];
+        $tipHeight = null;
 
         foreach ($transactions as $tx) {
             $received = $this->satsReceivedForAddress($tx, $address);
@@ -45,21 +50,22 @@ class InvoicePaymentDetector
             $status = $tx['status'] ?? [];
             $confirmed = (bool) ($status['confirmed'] ?? false);
             $blockHeight = $status['block_height'] ?? null;
-            $detectedAt = Carbon::now();
+            $detectedAt = $this->detectedAtFromStatus($status);
             $confirmedAt = null;
-
-            if (!empty($status['block_time'])) {
-                $detectedAt = Carbon::createFromTimestamp($status['block_time'])->timezone(config('app.timezone'));
-            }
-
             $confirmations = 0;
+
             if ($confirmed && $blockHeight) {
-                $tip = $this->mempoolClient->tipHeight($network);
-                $confirmations = $tip && $tip >= $blockHeight ? max(1, $tip - $blockHeight + 1) : 1;
+                if ($tipHeight === null) {
+                    $tipHeight = $this->mempoolClient->tipHeight($network);
+                }
+
+                $confirmations = $tipHeight && $tipHeight >= $blockHeight
+                    ? max(1, $tipHeight - $blockHeight + 1)
+                    : 1;
                 $confirmedAt = $detectedAt;
             }
 
-            return [
+            $payments[] = [
                 'txid' => $tx['txid'],
                 'sats' => $received,
                 'confirmed' => $confirmed,
@@ -70,7 +76,21 @@ class InvoicePaymentDetector
             ];
         }
 
-        return null;
+        return $payments;
+    }
+
+    private function detectedAtFromStatus(array $status): Carbon
+    {
+        $timestamp = $status['block_time']
+            ?? $status['received_time']
+            ?? $status['time']
+            ?? null;
+
+        if ($timestamp) {
+            return Carbon::createFromTimestamp($timestamp)->timezone(config('app.timezone'));
+        }
+
+        return Carbon::now();
     }
 
     private function satsReceivedForAddress(array $tx, string $address): int

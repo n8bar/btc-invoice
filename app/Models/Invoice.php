@@ -44,6 +44,7 @@ class Invoice extends Model
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
     public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
+    public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
 
 
     public static function nextNumberForUser(int $userId): string
@@ -109,6 +110,8 @@ class Invoice extends Model
 
     public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void
     {
+        $originalStatus = $this->status;
+        $becamePaid = false;
         $paidSats = $this->payments()->sum('sats_received');
         $this->payment_amount_sat = $paidSats;
 
@@ -118,6 +121,7 @@ class Invoice extends Model
             if ($paidSats + self::PAYMENT_SAT_TOLERANCE >= $expected) {
                 if ($this->status !== 'paid') {
                     $this->status = 'paid';
+                    $becamePaid = true;
                 }
 
                 if (!$this->paid_at) {
@@ -129,12 +133,16 @@ class Invoice extends Model
         }
 
         $this->save();
+
+        if ($becamePaid && $this->status === 'paid') {
+            event(new \App\Events\InvoicePaid($this->fresh(['client','user','deliveries'])));
+        }
     }
 
     /**
      * Build a BIP21 URI using an optional override amount.
      */
-    public function bitcoinUriForAmount(?float $amountBtc): ?string
+    public function bitcoinUriForAmount(?float $amountBtc, bool $allowFallback = true): ?string
     {
         if (!$this->payment_address) {
             return null;
@@ -143,7 +151,7 @@ class Invoice extends Model
         $params = [];
 
         $amountToUse = $amountBtc;
-        if ($amountToUse === null && !empty($this->amount_btc)) {
+        if ($amountToUse === null && $allowFallback && !empty($this->amount_btc)) {
             $amountToUse = (float) $this->amount_btc;
         }
 
@@ -254,6 +262,8 @@ class Invoice extends Model
     public function getPublicUrlAttribute(): ?string
     {
         if (!$this->public_enabled || !$this->public_token) return null;
-        return route('invoices.public-print', ['token' => $this->public_token], true);
+        $path = route('invoices.public-print', ['token' => $this->public_token], false);
+        $base = rtrim(config('app.public_url', config('app.url')), '/');
+        return $base . $path;
     }
 }

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'show_invoice_ids',
+        'auto_receipt_emails',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'show_invoice_ids' => 'boolean',
+            'auto_receipt_emails' => 'boolean',
         ];
     }
 

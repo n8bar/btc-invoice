@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\WalletSettingsController;
+use App\Http\Controllers\InvoicePaymentNoteController;
+use App\Http\Controllers\InvoiceDeliveryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +76,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('invoices/{invoice}/share/rotate', [InvoiceController::class, 'rotateShare'])
         ->name('invoices.share.rotate');
 
+    Route::post('invoices/{invoice}/deliver', [InvoiceDeliveryController::class, 'store'])
+        ->name('invoices.deliver');
+    Route::patch('invoices/{invoice}/payments/{payment}/note', [InvoicePaymentNoteController::class, 'update'])
+        ->name('invoices.payments.note');
 
 
     // Standard CRUD

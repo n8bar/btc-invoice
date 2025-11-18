@@ -129,6 +129,10 @@ class InvoiceRateTest extends TestCase
         $response->assertOk();
         $response->assertSeeText('20000.00');
         $response->assertSeeText('0.05');
+        $response->assertSee(
+            'data-utc-ts="' . Carbon::now()->utc()->toIso8601String() . '"',
+            false
+        );
 
         Http::assertSentCount(1);
     }

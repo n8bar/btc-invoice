@@ -158,6 +158,73 @@ class WatchPaymentsCommandTest extends TestCase
         ]);
     }
 
+    public function test_command_records_multiple_partial_transactions(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-04 12:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 50_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'partial-aaa',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 400_000,
+                        ],
+                    ],
+                ],
+                [
+                    'txid' => 'partial-bbb',
+                    'status' => [
+                        'confirmed' => true,
+                        'block_height' => 250100,
+                        'block_time' => Carbon::now()->subMinutes(5)->timestamp,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 600_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+            "{$base}/blocks/tip/height" => Http::response('250105', 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')
+            ->assertExitCode(0);
+
+        $invoice->refresh();
+        $this->assertSame('paid', $invoice->status);
+        $this->assertSame(1_000_000, $invoice->payment_amount_sat);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'partial-aaa',
+            'sats_received' => 400_000,
+        ]);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'partial-bbb',
+            'sats_received' => 600_000,
+        ]);
+    }
+
     private function makeInvoice(): Invoice
     {
         $user = User::factory()->create();

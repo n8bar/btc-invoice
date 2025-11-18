@@ -35,6 +35,9 @@
 - When we log each payment, capture the USD/BTC rate:
     - Use the cached rate if it’s fresh (< defined TTL), otherwise call `BtcRate::refresh`.
     - Store `usd_rate` and `fiat_amount = sats_received / 1e8 * usd_rate`.
+- Treat the original USD invoice total as canonical; each payment reduces the outstanding USD balance using its captured `usd_rate` so owners always see dollars knocked off at the moment funds arrived (BTC volatility never retroactively changes settled USD).
+- Owner/public summary boxes always present USD first (e.g., `Expected: $500.00 (0.0123 BTC)`, `Outstanding: $125.00 (0.0031 BTC)`). Received shows the settled USD total only, since BTC varies per payment.
+- QR/BIP21 requests target the *current outstanding USD balance*, converted to BTC using the latest available rate; once the balance hits zero, the QR omits the `amount` parameter altogether.
 
 ## UI / API
 1. **Invoice Show Page**
@@ -63,6 +66,17 @@
     - Confirmations updating existing payment rows.
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.
+
+## Completed Tasks
+1. ✅ `invoice_payments` table stores every tx with sats + USD snapshot per detection.
+2. ✅ Watcher (`wallet:watch-payments`) records multiple partials per invoice and refreshes status/outstanding totals automatically.
+3. ✅ UI shows payment history, USD-first summary, and QR codes that target the outstanding balance.
+4. ✅ Watcher tolerance (±100 sats) is enforced and detection/confirmation timestamps surface in the payment history UI.
+5. ✅ Payment history rows display the captured USD rate/fiat amount and owners can annotate each payment with short notes.
+6. ✅ Automatic invoice delivery + paid receipt emails log to `invoice_deliveries`, with queue-backed mailers and profile toggles.
+
+## Roadmap to Release Candidate
+7. Trigger owner alerts for significant over- or under-payments (per the tolerance rules) and provide a manual adjustment flow to reconcile errors without editing the original tx rows.
 
 ## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”

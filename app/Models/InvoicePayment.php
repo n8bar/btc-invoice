@@ -17,6 +17,7 @@ class InvoicePayment extends Model
         'block_height',
         'usd_rate',
         'fiat_amount',
+        'note',
         'meta',
     ];
 

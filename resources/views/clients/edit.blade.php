@@ -1,3 +1,4 @@
+<x-emoji-favicon symbol="🧩" bg="#E0F2F1" />
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight">Edit Client</h2>

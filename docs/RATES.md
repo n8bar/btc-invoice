@@ -4,8 +4,8 @@ _Last updated: 2025-11-07_
 
 ## Source of Truth
 - USD amounts entered by the user are canonical.
-- BTC amounts are derived from USD ÷ rate and can be recomputed at any time when viewing, printing, or refreshing.
-- BIP21 URIs and QR codes always reflect the latest displayed BTC amount.
+- BTC amounts are derived from USD ÷ current rate and recomputed whenever we render show/print/public views (unless rate data is unavailable, in which case we fall back to the stored BTC value).
+- BIP21 URIs and QR codes reflect the BTC amount computed from the latest available rate so invoices always ask for enough sats at payment time; when payments knock the USD balance down, the QR recomputes using the outstanding USD only.
 
 ## Rounding Rules
 - BTC values are rounded to **8 decimal places** (satoshi precision) using standard rounding.
@@ -20,7 +20,7 @@ _Last updated: 2025-11-07_
 ## Refresh Flow
 1. `BtcRate::current()` attempts to use the warm cache when it is inside the TTL window.
 2. Stale or missing cache entries trigger `refreshCache()` (live fetch) transparently.
-3. The Show page exposes a "Refresh rate" action that forces `refreshCache()` and recomputes BTC/QR data without mutating stored USD amounts.
+3. The Show page exposes a "Refresh rate" action that forces `refreshCache()` and recomputes the BTC/QR output (USD stays canonical).
 
 ## Test Expectations
 - Feature tests assert 8-decimal BTC precision on the Show page, BIP21 links, and QR copy buttons.

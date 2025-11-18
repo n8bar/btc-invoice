@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Policies\ClientPolicy;
 use App\Policies\InvoicePolicy;
 use App\Services\Blockchain\MempoolClient;
+use App\Services\MailAlias;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,15 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(MempoolClient::class, function ($app) {
             return new MempoolClient(config('blockchain'));
+        });
+
+        $this->app->singleton(MailAlias::class, function ($app) {
+            $config = $app['config']->get('mail.aliasing', []);
+
+            return new MailAlias(
+                $config['domain'] ?? null,
+                (bool) ($config['enabled'] ?? false)
+            );
         });
     }
 

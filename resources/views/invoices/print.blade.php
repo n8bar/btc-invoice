@@ -9,6 +9,12 @@
         <meta name="robots" content="noindex,nofollow,noarchive">
     @endif
 
+    @php
+        $iconSymbol = !empty($public) ? '🌐' : '💸';
+        $printFavicon = rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="50%" y="60%" font-size="36" text-anchor="middle">' . $iconSymbol . '</text></svg>');
+    @endphp
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,{{ $printFavicon }}">
+
     <style>
         :root { --gray:#6b7280; --light:#e5e7eb; --dark:#111827; }
         * { box-sizing: border-box; }
@@ -58,20 +64,18 @@
 @php
     $st = $invoice->status ?? 'draft';
     $summary = $paymentSummary ?? [
-        'expected_sats' => $invoice->expectedPaymentSats(),
-        'paid_sats' => $invoice->payments->sum('sats_received'),
+        'expected_usd' => null,
+        'expected_btc_formatted' => null,
+        'expected_sats' => null,
+        'received_usd' => 0.0,
+        'received_sats' => null,
+        'outstanding_usd' => null,
+        'outstanding_btc_formatted' => null,
+        'outstanding_btc_float' => null,
         'outstanding_sats' => null,
+        'last_payment_detected_at' => null,
+        'last_payment_confirmed_at' => null,
     ];
-    if ($summary['outstanding_sats'] === null && $summary['expected_sats']) {
-        $summary['outstanding_sats'] = max($summary['expected_sats'] - ($summary['paid_sats'] ?? 0), 0);
-    }
-    $formatBtc = function (?int $sats) use ($invoice) {
-        if ($sats === null) {
-            return '—';
-        }
-
-        return $invoice->formatBitcoinAmount($sats / \App\Models\Invoice::SATS_PER_BTC) ?? '—';
-    };
 @endphp
 @if (!empty($public) && $st === 'paid')
     <div class="paid-watermark">
@@ -126,26 +130,80 @@
             <tr><th>USD</th><td class="total">${{ number_format($invoice->amount_usd, 2) }}</td></tr>
             <tr><th>BTC</th><td>{{ $displayAmountBtc ?? ($invoice->amount_btc ?? '-') }}</td></tr>
             <tr><th>BTC rate (USD/BTC)</th><td>{{ $displayRateUsd ?? ($invoice->btc_rate ?? '-') }}</td></tr>
-            @if (!empty($rate_as_of))
-                <tr><th>Rate as of</th><td class="muted">{{ $rate_as_of->toDateTimeString() }}</td></tr>
+            @php
+                $rateAsOfIso = null;
+                $rateAsOfFallback = null;
+                if (!empty($rate_as_of)) {
+                    $rateCarbon = $rate_as_of instanceof \Carbon\Carbon
+                        ? $rate_as_of
+                        : \Carbon\Carbon::parse($rate_as_of);
+                    if ($rateCarbon) {
+                        $rateAsOfIso = $rateCarbon->copy()->utc()->toIso8601String();
+                        $rateAsOfFallback = $rateCarbon->copy()
+                            ->setTimezone(config('app.timezone'))
+                            ->toDayDateTimeString();
+                    }
+                }
+            @endphp
+            @if ($rateAsOfIso)
+                <tr>
+                    <th>Rate as of</th>
+                    <td class="muted">
+                        <time
+                            datetime="{{ $rateAsOfIso }}"
+                            data-utc-ts="{{ $rateAsOfIso }}"
+                            title="{{ $rateAsOfFallback }}"
+                            class="font-medium text-gray-600"
+                        >{{ $rateAsOfFallback }}</time>
+                    </td>
+                </tr>
             @endif
 
         </table>
 
-        @if ($summary['expected_sats'])
+        @php
+            $currency = fn (?float $value) => $value === null ? '—' : ('$' . number_format($value, 2));
+        @endphp
+
+        @if (!is_null($summary['expected_usd']))
             <div style="margin-top:12px; border:1px dashed #c7d2fe; border-radius:10px; padding:12px; font-size:13px;">
                 <div style="display:flex; justify-content:space-between;">
                     <span>Expected</span>
-                    <strong>{{ $formatBtc($summary['expected_sats']) }} BTC</strong>
+                    <strong>
+                        {{ $currency($summary['expected_usd']) }}
+                        @if (!empty($summary['expected_btc_formatted']))
+                            ({{ $summary['expected_btc_formatted'] }} BTC)
+                        @endif
+                    </strong>
                 </div>
                 <div style="display:flex; justify-content:space-between;">
                     <span>Received</span>
-                    <strong>{{ $formatBtc($summary['paid_sats']) }} BTC</strong>
+                    <strong>{{ $currency($summary['received_usd']) }}</strong>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-weight:700;">
                     <span>Outstanding balance</span>
-                    <span>{{ $formatBtc($summary['outstanding_sats']) }} BTC</span>
+                    <span>
+                        {{ $currency($summary['outstanding_usd']) }}
+                        @if (!empty($summary['outstanding_btc_formatted']))
+                            ({{ $summary['outstanding_btc_formatted'] }} BTC)
+                        @endif
+                    </span>
                 </div>
+            </div>
+        @endif
+
+        @php
+            $lastDetected = $summary['last_payment_detected_at'] ?? null;
+            $lastConfirmed = $summary['last_payment_confirmed_at'] ?? null;
+        @endphp
+
+        @if ($lastDetected)
+            <div style="margin-top:8px; font-size:12px; color:#4b5563;">
+                Last payment detected
+                {{ $lastDetected->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }}
+                @if ($lastConfirmed)
+                    (confirmed {{ $lastConfirmed->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }})
+                @endif
             </div>
         @endif
     </section>
@@ -192,6 +250,10 @@
                             <div>
                                 {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(180)->margin(0)->generate($bitcoinUri) !!}
                                 <div class="muted" style="font-size:12px; margin-top:6px;">Scan with any Bitcoin wallet.</div>
+                                <div class="muted" style="font-size:11px; margin-top:4px; line-height:1.3;">
+                                    BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
+                                    refresh right before sending payment; printed copies may be stale.
+                                </div>
                             </div>
 
                             <div style="flex:1; text-align:right;">
@@ -207,7 +269,7 @@
         </table>
     </section>
 
-    @if ($invoice->payments->isNotEmpty())
+@if ($invoice->payments->isNotEmpty())
         <section class="box" style="margin-bottom:16px;">
             <h3 style="margin:0 0 8px; font-size:14px;">Payment history</h3>
             <table>
@@ -218,6 +280,7 @@
                         <th style="text-align:right;">BTC</th>
                         <th style="text-align:right;">USD</th>
                         <th>Status</th>
+                        <th>Note</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -228,12 +291,18 @@
                             <td style="text-align:right;">{{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}</td>
                             <td style="text-align:right;">
                                 @if ($payment->fiat_amount !== null)
-                                    ${{ number_format($payment->fiat_amount, 2) }}
+                                    <div>${{ number_format($payment->fiat_amount, 2) }}</div>
+                                    @if ($payment->usd_rate !== null)
+                                        <div style="font-size:11px; color:#6b7280;">
+                                            @ ${{ number_format((float) $payment->usd_rate, 2) }} USD/BTC
+                                        </div>
+                                    @endif
                                 @else
                                     —
                                 @endif
                             </td>
                             <td>{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                            <td>{{ $payment->note ?: '—' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -241,6 +310,32 @@
         </section>
     @endif
 
+    <div style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
+        Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
+    </div>
+
 </div>
+@if ($rateAsOfIso)
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-utc-ts]').forEach((node) => {
+                const iso = node.getAttribute('data-utc-ts');
+                if (!iso) return;
+
+                const parsed = new Date(iso);
+                if (Number.isNaN(parsed.getTime())) return;
+
+                const localized = parsed.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                });
+
+                if (localized) {
+                    node.textContent = localized;
+                }
+            });
+        });
+    </script>
+@endif
 </body>
 </html>

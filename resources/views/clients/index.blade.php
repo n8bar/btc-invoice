@@ -1,5 +1,6 @@
 
 {{-- resources/views/clients/index.blade.php --}}
+<x-emoji-favicon symbol="👥" bg="#E0F2FE" />
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight">Clients</h2>

@@ -33,6 +33,8 @@ class InvoicePaymentDisplayTest extends TestCase
         $invoice = $this->makeInvoice($owner, [
             'description' => 'BTC Consulting',
             'amount_usd' => 320,
+            'btc_rate' => 40000,
+            'amount_btc' => round(320 / 40000, 8),
         ]);
 
         Cache::put(BtcRate::CACHE_KEY, [
@@ -41,7 +43,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'source'   => 'cache',
         ], BtcRate::TTL);
 
-        $expectedUri = $invoice->bitcoinUriForAmount(round(320 / 40000, 8));
+        $expectedUri = $invoice->bitcoinUriForAmount((float) $invoice->amount_btc);
         $escapedUri = e($expectedUri);
 
         $response = $this
@@ -117,6 +119,12 @@ class InvoicePaymentDisplayTest extends TestCase
             'amount_btc' => 0.01,
         ]);
 
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 50_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
         InvoicePayment::create([
             'invoice_id' => $invoice->id,
             'txid' => 'tx-partial-1',
@@ -134,8 +142,130 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('Payment history', false);
         $response->assertSee('tx-partial-1', false);
+        $response->assertSee('Expected', false);
+        $response->assertSee('$500.00', false);
+        $response->assertSee('(0.01 BTC)', false);
+        $response->assertSee('Received', false);
+        $response->assertSee('$152.00', false);
         $response->assertSee('Outstanding balance', false);
-        $response->assertSee('0.004', false); // 400k sats
+        $response->assertSee('$348.00', false);
+        $response->assertSee('(0.00696 BTC)', false);
+        $detectedDisplay = Carbon::parse('2025-01-04 10:00:00', 'UTC')
+            ->setTimezone(config('app.timezone'))
+            ->toDayDateTimeString();
+        $response->assertSee('Last payment detected', false);
+        $response->assertSee($detectedDisplay, false);
+    }
+
+    public function test_bitcoin_uri_targets_outstanding_balance(): void
+    {
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-partial-qr',
+            'sats_received' => 200_000,
+            'detected_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 80.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        // Outstanding USD = 120 => 0.003 BTC at $40k
+        $response->assertSee('amount=0.003', false);
+        $response->assertSee('$80.00', false);
+        $response->assertSee('$120.00', false);
+    }
+
+    public function test_outstanding_balance_zeroed_within_tolerance(): void
+    {
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 45_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+            'amount_usd' => 225,
+            'btc_rate' => 45_000,
+            'amount_btc' => 0.005,
+        ]);
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $partialSats = $expectedSats - 50;
+        $fiatAmount = round(($partialSats / Invoice::SATS_PER_BTC) * 45_000, 2);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-tolerance',
+            'sats_received' => $partialSats,
+            'detected_at' => Carbon::now(),
+            'usd_rate' => 45_000,
+            'fiat_amount' => $fiatAmount,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertSeeInOrder(['Outstanding balance', '$0.00'], false);
+    }
+
+    public function test_owner_can_update_payment_note(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-note-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::parse('2025-01-05 12:00:00', 'UTC'),
+            'usd_rate' => 35_000,
+            'fiat_amount' => 35.00,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('invoices.payments.note', [$invoice, $payment]), [
+                'note' => 'First partial from client',
+                'source_payment_id' => $payment->id,
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'id' => $payment->id,
+            'note' => 'First partial from client',
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')))
+            ->assertSee('First partial from client', false)
+            ->assertSee('@ $35,000.00 USD/BTC', false);
     }
 
     public function test_print_view_shows_payment_history_table(): void

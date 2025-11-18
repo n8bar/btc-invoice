@@ -1,3 +1,4 @@
+<x-emoji-favicon symbol="✍️" bg="#FCE7F3" />
 <x-app-layout>
     <x-slot name="header"><h2 class="text-xl font-semibold leading-tight">New Invoice</h2></x-slot>
 
@@ -63,7 +64,7 @@
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('btc_rate')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
-                    <p class="mt-1 text-xs text-gray-500">Prefilled from cached rate; you can update it.</p>
+                    <p class="mt-1 text-xs text-gray-500">This rate is just for display—each payment uses the USD/BTC rate captured at the moment funds arrive.</p>
                     <button type="button"
                             id="useCurrentRate"
                             class="mt-2 inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">

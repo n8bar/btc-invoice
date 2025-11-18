@@ -1,6 +1,8 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
+Latest scope update (2025-11-16): partial payments, payment history UX, and invoice delivery + auto receipts are live; backlog below covers post-MVP bets.
+
 ## Infrastructure & Payments
 1. **Self-Hosted Bitcoin Node + Watcher**
    - Deploy bitcoind + Electrum indexer or mempool.space instance.
@@ -15,9 +17,11 @@ _Working list of initiatives queued after the MVP ships. Maintained alongside do
 3. **Receipt PDFs for Paid Invoices**
    - Once payments auto-mark invoices as paid, generate immutable PDF receipts (rate + tx snapshot).
    - Email customers/owners with attachments + status history.
+   - Extend the current `InvoiceReadyMail`/`InvoicePaidReceipt` flows so `invoice_deliveries` rows capture PDF metadata + sent status in one place.
 
 4. **Notification Hub**
    - Slack/webhook integrations for payment events, delivery failures, etc.
+   - Reuse `InvoicePaid` events and delivery log updates to emit notifications without polling.
 
 # Observability & Ops
 5. **Structured Logging & Alerting**
@@ -40,3 +44,4 @@ _Working list of initiatives queued after the MVP ships. Maintained alongside do
 
 10. **Manual Payment Adjustments**
     - Admin tooling to edit or annotate logged payments (fix tx metadata, override amounts, or reconcile disputes) outside the automated watcher flows.
+    - Build atop the `invoice_payments` ledger + owner notes so adjustments stay auditable and raw tx rows remain untouched.

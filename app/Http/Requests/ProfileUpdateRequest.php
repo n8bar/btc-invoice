@@ -26,6 +26,7 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'show_invoice_ids' => ['nullable', 'boolean'],
+            'auto_receipt_emails' => ['nullable', 'boolean'],
         ];
     }
 }

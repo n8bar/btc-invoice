@@ -1,15 +1,23 @@
+@if(!request()->routeIs('invoices.public-print'))
+    <x-emoji-favicon symbol="💸" bg="#FEF3C7" />
+@endif
 <x-app-layout>
     <x-slot name="header">
         @php
             $st = $invoice->status ?? 'draft';
-            $summary = $paymentSummary ?? ['expected_sats' => null, 'paid_sats' => null, 'outstanding_sats' => null];
-            $formatBtc = function (?int $sats) use ($invoice) {
-                if ($sats === null) {
-                    return '—';
-                }
-
-                return $invoice->formatBitcoinAmount($sats / \App\Models\Invoice::SATS_PER_BTC) ?? '—';
-            };
+            $summary = $paymentSummary ?? [
+                'expected_usd' => null,
+                'expected_btc_formatted' => null,
+                'expected_sats' => null,
+                'received_usd' => 0.0,
+                'received_sats' => null,
+                'outstanding_usd' => null,
+                'outstanding_btc_formatted' => null,
+                'outstanding_btc_float' => null,
+                'outstanding_sats' => null,
+                'last_payment_detected_at' => null,
+                'last_payment_confirmed_at' => null,
+            ];
         @endphp
         <h2 class="text-xl font-semibold leading-tight">
             Invoice <span class="text-gray-500">#{{ $invoice->number }}</span>
@@ -28,6 +36,12 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('status'))
+                <div class="rounded-md bg-green-50 p-4 text-sm text-green-700">
+                    {{ session('status') }}
+                </div>
+            @endif
 
             <div class="flex items-center justify-between">
                 <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:underline">← Back to Invoices</a>
@@ -83,6 +97,7 @@
                                         <th class="px-2 py-2 text-right">BTC</th>
                                         <th class="px-2 py-2 text-right">USD</th>
                                         <th class="px-2 py-2 text-left">Status</th>
+                                        <th class="px-2 py-2 text-left">Note</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
@@ -95,12 +110,38 @@
                                             </td>
                                             <td class="px-2 py-2 text-right">
                                                 @if ($payment->fiat_amount !== null)
-                                                    ${{ number_format($payment->fiat_amount, 2) }}
+                                                    <div>${{ number_format($payment->fiat_amount, 2) }}</div>
+                                                    @if ($payment->usd_rate !== null)
+                                                        <div class="text-xs text-gray-500">
+                                                            @ ${{ number_format((float) $payment->usd_rate, 2) }} USD/BTC
+                                                        </div>
+                                                    @endif
                                                 @else
                                                     —
                                                 @endif
                                             </td>
                                             <td class="px-2 py-2">{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</td>
+                                            <td class="px-2 py-2 align-top">
+                                                <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
+                                                <form method="POST"
+                                                      action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
+                                                      class="mt-2 space-y-2">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
+                                                    <textarea name="note" rows="2"
+                                                              class="w-full rounded border-gray-300 text-sm"
+                                                              placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                    @if ($errors->has('note') && old('source_payment_id') == $payment->id)
+                                                        <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
+                                                    @endif
+                                                    <div class="flex justify-end">
+                                                        <x-secondary-button type="submit" class="text-xs px-3 py-1">
+                                                            Save
+                                                        </x-secondary-button>
+                                                    </div>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -110,6 +151,99 @@
                 @endif
 
             </div>
+
+            <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+                Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
+            </div>
+
+            @php
+                $canDeliver = $invoice->client && !empty($invoice->client->email) && $invoice->public_enabled;
+            @endphp
+
+            <div class="rounded-lg bg-white p-6 shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
+                        <p class="text-xs text-gray-500">Emails include the public share link, summary, and optional note.</p>
+                    </div>
+                    @if (!$invoice->public_enabled)
+                        <span class="text-xs text-red-600">Enable public link first</span>
+                    @elseif (!$invoice->client || empty($invoice->client->email))
+                        <span class="text-xs text-red-600">Add a client email first</span>
+                    @endif
+                </div>
+                <form method="POST" action="{{ route('invoices.deliver', $invoice) }}" class="mt-3 space-y-3">
+                    @csrf
+                    <textarea name="message" rows="2" class="w-full rounded border-gray-300 text-sm"
+                              placeholder="Optional note to include in the email">{{ old('message') }}</textarea>
+                    @error('message')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="cc_self" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                               @checked(old('cc_self'))>
+                        CC myself
+                    </label>
+                    <div>
+                        <x-primary-button type="submit" :disabled="!$canDeliver">Send invoice</x-primary-button>
+                    </div>
+                </form>
+            </div>
+
+            @if ($invoice->deliveries->isNotEmpty())
+                <div class="rounded-lg bg-white p-6 shadow">
+                    <h3 class="mb-3 text-sm font-semibold text-gray-700">Delivery log</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                <tr>
+                                    <th class="px-2 py-2 text-left">Type</th>
+                                    <th class="px-2 py-2 text-left">Recipient</th>
+                                    <th class="px-2 py-2 text-left">Status</th>
+                                    <th class="px-2 py-2 text-left">Queued</th>
+                                    <th class="px-2 py-2 text-left">Sent</th>
+                                    <th class="px-2 py-2 text-left">Error</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach ($invoice->deliveries as $delivery)
+                                    <tr>
+                                        <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
+                                        <td class="px-2 py-2">
+                                            {{ $delivery->recipient }}
+                                            @if ($delivery->cc)
+                                                <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
+                                        @php
+                                            $queued = $delivery->dispatched_at;
+                                            $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
+                                            $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                            $sent = $delivery->sent_at;
+                                            $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
+                                            $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                        @endphp
+                                        <td class="px-2 py-2 text-sm text-gray-600">
+                                            @if ($queuedIso)
+                                                <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        <td class="px-2 py-2 text-sm text-gray-600">
+                                            @if ($sentIso)
+                                                <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        <td class="px-2 py-2 text-sm text-red-600">{{ $delivery->error_message ?: '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
 
 
 
@@ -143,12 +277,50 @@
                             <div class="flex justify-between"><dt class="text-gray-600">BTC</dt><dd>{{ $displayAmountBtc !== null ? $displayAmountBtc : '—' }}</dd></div>
                         </dl>
 
-                        @if ($summary['expected_sats'])
-                            <div class="mt-4 rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900">
-                                <div class="flex justify-between"><span>Expected</span><span>{{ $formatBtc($summary['expected_sats']) }} BTC</span></div>
-                                <div class="flex justify-between"><span>Received</span><span>{{ $formatBtc($summary['paid_sats']) }} BTC</span></div>
-                                <div class="flex justify-between font-semibold"><span>Outstanding balance</span><span>{{ $formatBtc($summary['outstanding_sats']) }} BTC</span></div>
+                        @php
+                            $currency = fn (?float $value) => $value === null ? '—' : ('$' . number_format($value, 2));
+                        @endphp
+
+                        @if (!is_null($summary['expected_usd']))
+                            <div class="mt-4 rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Expected</span>
+                                    <span>
+                                        {{ $currency($summary['expected_usd']) }}
+                                        @if (!empty($summary['expected_btc_formatted']))
+                                            ({{ $summary['expected_btc_formatted'] }} BTC)
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Received</span>
+                                    <span>{{ $currency($summary['received_usd']) }}</span>
+                                </div>
+                                <div class="flex justify-between font-semibold">
+                                    <span>Outstanding balance</span>
+                                    <span>
+                                        {{ $currency($summary['outstanding_usd']) }}
+                                        @if (!empty($summary['outstanding_btc_formatted']))
+                                            ({{ $summary['outstanding_btc_formatted'] }} BTC)
+                                        @endif
+                                    </span>
+                                </div>
                             </div>
+                        @endif
+
+                        @php
+                            $lastDetected = $summary['last_payment_detected_at'] ?? null;
+                            $lastConfirmed = $summary['last_payment_confirmed_at'] ?? null;
+                        @endphp
+
+                        @if ($lastDetected)
+                            <p class="mt-2 text-xs text-gray-500">
+                                Last payment detected
+                                {{ $lastDetected->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }}
+                                @if ($lastConfirmed)
+                                    (confirmed {{ $lastConfirmed->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }})
+                                @endif
+                            </p>
                         @endif
 
                         @if ($invoice->hasSignificantOverpayment())
@@ -193,27 +365,6 @@
                                     <x-secondary-button type="submit">Refresh rate</x-secondary-button>
                                 </form>
                             </div>
-
-                            <script>
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    document.querySelectorAll('[data-utc-ts]').forEach((node) => {
-                                        const iso = node.getAttribute('data-utc-ts');
-                                        if (!iso) return;
-
-                                        const parsed = new Date(iso);
-                                        if (Number.isNaN(parsed.getTime())) return;
-
-                                        const localized = parsed.toLocaleString(undefined, {
-                                            dateStyle: 'medium',
-                                            timeStyle: 'short',
-                                        });
-
-                                        if (localized) {
-                                            node.textContent = localized;
-                                        }
-                                    });
-                                });
-                            </script>
                         @endif
 
 
@@ -329,6 +480,10 @@
                                     </script>
 
                                     <p class="mt-2 text-xs text-gray-500">Scan with any Bitcoin wallet.</p>
+                                    <p class="mt-1 text-[11px] text-gray-500 leading-snug">
+                                        BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
+                                        refresh right before sending payment; printed copies may be stale.
+                                    </p>
                                 </div>
 
                                 <!-- Right: big centered Thank you -->
@@ -457,6 +612,27 @@
         </div>
     </div>
     <br />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-utc-ts]').forEach((node) => {
+                const iso = node.getAttribute('data-utc-ts');
+                if (!iso) return;
+
+                const parsed = new Date(iso);
+                if (Number.isNaN(parsed.getTime())) return;
+
+                const localized = parsed.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                });
+
+                if (localized) {
+                    node.textContent = localized;
+                }
+            });
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

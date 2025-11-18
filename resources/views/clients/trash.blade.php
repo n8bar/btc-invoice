@@ -1,3 +1,4 @@
+<x-emoji-favicon symbol="🧺" bg="#FFE4E6" />
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight">Clients - Trash</h2>

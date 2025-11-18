@@ -25,6 +25,8 @@
     - `.env` additions: `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS`, plus document SMTP expectations in README/PLAN.
     - Profile setting for “Auto-email paid receipts to client” (default on).
     - Feature flag to disable Invoice Delivery globally if mail isn’t configured.
+    - `APP_PUBLIC_URL` defines the domain used in public share links embedded in emails; staging can leave this as localhost, but production must set it to `https://cryptozing.app`.
+    - Temporary catch-all aliasing during pre-production: `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app` rewrites every outgoing recipient to the CryptoZing catch-all route managed in Mailgun. Disable this flag (or clear the domain) as part of the RC deployment checklist when real emails should go to customers.
 
 5. **Mailables**
     - `App\Mail\InvoiceReadyMail`: includes client name, invoice summary, CTA button linking to public share, optional custom note.

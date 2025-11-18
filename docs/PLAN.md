@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-14_
+_Last updated: 2025-11-16_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -12,6 +12,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Database: MySQL (Sail). SQLite only for specific tests if ever configured.
 - QR generation handled server-side via `simplesoftwareio/simple-qrcode`.
 - Timezone default on server: **America/Denver**.
+- `APP_PUBLIC_URL` controls the absolute domain used in public-share links (emails). In production set it to `https://cryptozing.app` so outbound links never point at localhost.
 
 ## Run Rules (Sail Only)
 - All PHP/Artisan/Test commands must run through Sail (`./vendor/bin/sail ...`). No host PHP or package installs.
@@ -41,7 +42,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 - Routes: `routes/web.php`.
 - Shared assets: server-side QR generation.
 
-## Completed Milestones (2025-11-10)
+## Completed Milestones
 1. **Ownership & Access**
     - Client/Invoice controllers enforce policies via `authorizeResource`; soft-delete flows (trash/restore/force) are locked down.
     - Shared exception handling renders the friendly 403 copy asserted in Authorization tests.
@@ -59,39 +60,49 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Sail command `wallet:watch-payments` polls mempool.space (testnet4/mainnet) for each invoice address, stores tx metadata, logs partials, and auto-marks invoices paid once confirmations hit the threshold.
     - `MempoolClient` caches tip height lookups while `InvoicePaymentDetector` enforces sat tolerance + confirmation thresholds for all invoices with wallet settings.
     - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
+    - Docker Compose ships a dedicated `scheduler` service that runs `php artisan schedule:work`, so local/dev stacks keep the watcher alive automatically (2025-11-14).
+7. **Partial Payments & Outstanding Summaries (codex/partial-payments)**
+    - `invoice_payments` table (plus `wallet:backfill-payments`) stores every transaction with sats, USD snapshot, optional notes, and tip detection backed by `Invoice::PAYMENT_SAT_TOLERANCE`.
+    - Invoice show/print/public views now surface USD-first Expected/Received/Outstanding totals, outstanding-targeted QR/BIP21 links, and payment history tables with editable owner notes.
+    - `InvoicePaymentDetector` + watcher refresh the outstanding balance after each detection so `partial` status, `paid_at`, and tolerance handling stay accurate everywhere.
+8. **Invoice Delivery & Auto Receipts (codex/invoice-delivery)**
+    - `/invoices/{invoice}/deliver` gate-keeps on client email + public share, then queues `DeliverInvoiceMail` jobs that render `InvoiceReadyMail` with optional CC + note.
+    - `invoice_deliveries` log table fuels the show page’s delivery log with status, CC, dispatch/sent timestamps, and surfaced errors.
+    - `InvoicePaid` events trigger the `SendInvoiceReceipt` listener (respecting each user’s `auto_receipt_emails` toggle) which logs/queues `InvoicePaidReceiptMail` receipts after invoices cross the paid threshold.
+    - Pre-production stacks rewrite outbound recipients via `MAIL_ALIAS_ENABLED/MAIL_ALIAS_DOMAIN` (pointed at `mailer.cryptozing.app`) so every message lands in the Mailgun catch-all route; disable this before the RC deploy.
 
 ## Roadmap to Release Candidate
-7. **Partial Payments & Receipts** — see [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md)
-    - Accept underpayments, log each tx (sats + USD snapshot), and surface a `partial` status until totals reach the invoice amount.
-    - Increase watcher tolerance (±100 sats) and expose payment history on the invoice view.
-8. **Invoice Delivery** — see [`docs/INVOICE_DELIVERY.md`](INVOICE_DELIVERY.md)
-    - Queued Mailables with signed public link, delivery logs, and a “Send invoice” form.
-    - Logged attempts surface on the invoice page; receipt emails trigger after auto-paid events.
 9. **Print & Public Polish**
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
 10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-11. **Observability & Safety**
+11. **Partial Payment Alerts & Reconciliation**
+    - Bubble up significant over/under payments (UI + notifications) and add manual adjustment tooling that can credit/refund surplus without mutating original ledger rows.
+12. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-12. **Docs & DX**
+13. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
-13. **UX Overhaul**
+14. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
-14. **CryptoZing.app Deployment (RC)**
+        - Add an Edit button on the invoice show view that links to the edit form, and return to the show view after saving.
+    - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
+15. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
+    - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
+    - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
 
 ## Testing Approach
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
-- Feature tests emphasize authorization, rate refresh, public tokens, email queueing, and print artifacts.
+- Feature tests emphasize authorization, rate refresh, public tokens, partial payment summaries, delivery queue/log flows, and print/public artifacts.
 - Favor model factories and clear policy assertions to keep fixtures simple.
 - Currency/rate expectations live in [`docs/RATES.md`](RATES.md) and must stay in sync with controller + service behavior.
 - Upcoming coverage is drafted in [`docs/tests/TEST_HARDENING.md`](tests/TEST_HARDENING.md); implement those scenarios next.
-- New feature work (partial payments UI, invoice delivery, etc.) should follow a TDD flow wherever practical, while existing areas continue to pick up pragmatic coverage as they evolve.
+- New feature work (delivery enhancements, print/public polish, user settings, alerts, etc.) should follow a TDD flow wherever practical, while existing areas continue to pick up pragmatic coverage as they evolve.
 
 ## Decisions & Changelog
 | Date (UTC) | Change | Notes |
@@ -104,3 +115,5 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 | 2025-11-08 | Wallet onboarding & derived addresses | `/wallet/settings`, Node-based derivation, and legacy backfill command landed (codex/phase-a-wallet). |
 | 2025-11-10 | Blockchain watcher command wired | `wallet:watch-payments` + mempool client integrated into bootstrap; invoices now auto-mark when payments land. |
 | 2025-11-10 | Watcher scheduling automated | Scheduler runs `wallet:watch-payments` every minute with overlap protection + background execution. |
+| 2025-11-14 | Partial payments UI + outstanding summaries | `invoice_payments` table shipped with watcher backfill, USD-first summaries, and outstanding-targeted QR/BIP21 output. |
+| 2025-11-15 | Invoice delivery + automated receipts | `invoice_deliveries` log, manual send form, queue job, and `auto_receipt_emails` toggle landed (codex/invoice-delivery). |

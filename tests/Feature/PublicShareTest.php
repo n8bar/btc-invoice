@@ -88,6 +88,17 @@ class PublicShareTest extends TestCase
         $response->assertSessionHas('public_url', $invoice->public_url);
     }
 
+    public function test_public_url_uses_configured_public_base(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner);
+
+        config(['app.public_url' => 'https://billing.cryptozing.app']);
+        $invoice->enablePublicShare();
+
+        $this->assertStringStartsWith('https://billing.cryptozing.app/', $invoice->refresh()->public_url);
+    }
+
     public function test_non_owner_cannot_toggle_public_share(): void
     {
         $owner = User::factory()->create();
