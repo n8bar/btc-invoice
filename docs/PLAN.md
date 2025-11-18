@@ -76,7 +76,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 9. **Print & Public Polish**
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-    - Billing entity details (profile defaults + per-invoice overrides) should display on both print/public layouts; see [`docs/PRINT_PUBLIC_POLISH.md`](docs/PRINT_PUBLIC_POLISH.md).
+    - Billing entity details (profile defaults + per-invoice overrides) should display on both print/public layouts; see [`PRINT_PUBLIC_POLISH.md`](PRINT_PUBLIC_POLISH.md).
 10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
 11. **Partial Payment Alerts & Reconciliation**
@@ -87,7 +87,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 13. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
-    - Notifications (paid, past-due, over/under payment) follow [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
+    - Notifications (paid, past-due, over/under payment) follow [`NOTIFICATIONS.md`](NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
 14. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
