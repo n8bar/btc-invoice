@@ -54,5 +54,6 @@ Execute the full suite via Sail:
 - Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
 - Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
 - Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
+- Notification spec: [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
