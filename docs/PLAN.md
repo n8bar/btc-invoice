@@ -77,6 +77,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Improve print template spacing/contrast/fonts; tune QR sizing.
     - Public page: lightweight branding, “as of” note, clear disabled/expired states.
     - Billing entity details (profile defaults + per-invoice overrides) should display on both print/public layouts; see [`PRINT_PUBLIC_POLISH.md`](PRINT_PUBLIC_POLISH.md).
+    - Branding heading defaults + per-invoice overrides power the header placeholder; create/edit forms tuck these fields under a collapsible “Branding & footer” disclosure.
 10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
 11. **Partial Payment Alerts & Reconciliation**

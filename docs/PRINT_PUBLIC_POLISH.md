@@ -8,7 +8,7 @@
 ## Scope
 1. **Header & Branding**
    - Display the invoice owner’s name (and optional company field once profile settings support it) at the top-left of both print/public views.
-   - Reserve a placeholder area for a future logo upload; for now, allow custom text like “CryptoZing Invoice” that can be set per user and overridden per invoice.
+   - Reserve a placeholder area for a future logo upload; for now, allow custom text like “CryptoZing Invoice” that can be set per user and overridden per invoice via `branding_heading` / `branding_heading_override`.
    - Include contact info (email/phone) pulled from the user profile; make these fields editable per invoice before printing.
 
 2. **Typography & Layout**
@@ -24,6 +24,7 @@
 
 4. **User Customizable Fields**
    - Introduce profile-level defaults:
+     - `branding_heading`
      - `billing_name`
      - `billing_address` (multi-line text)
      - `billing_email` / `billing_phone`
