@@ -77,25 +77,25 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Feature tests assert private/public views render the customizable fields; docs/specs (`PRINT_PUBLIC_POLISH.md`) stay in sync with the shipped behavior.
 
 ## Roadmap to Release Candidate
-9. **User Settings**
+10. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-10. **Partial Payment Alerts & Reconciliation**
+11. **Partial Payment Alerts & Reconciliation**
     - Bubble up significant over/under payments (UI + notifications) and add manual adjustment tooling that can credit/refund surplus without mutating original ledger rows.
-11. **Observability & Safety**
+12. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-12. **Docs & DX**
+13. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
     - Notifications (paid, past-due, over/under payment) follow [`NOTIFICATIONS.md`](NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
-13. **UX Overhaul**
+14. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
         - Add an Edit button on the invoice show view that links to the edit form, and return to the show view after saving.
     - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
     - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
-14. **CryptoZing.app Deployment (RC)**
+15. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
