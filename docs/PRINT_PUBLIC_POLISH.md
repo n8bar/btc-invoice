@@ -13,7 +13,7 @@
 
 2. **Typography & Layout**
    - Tighten spacing around the summary cards so the expected/received/outstanding block fits in one column on paper.
-   - Adjust QR sizing to scale between 160–200px depending on layout breakpoints; ensure captions explain how to refresh rates.
+   - Use a consistent 180px QR render (per current template constraints) and keep the caption that explains how to refresh rates before paying.
    - Ensure the “Thank you!” block and payment details don’t collapse on smaller screens; add consistent padding on public view.
 
 3. **Status Messaging**
