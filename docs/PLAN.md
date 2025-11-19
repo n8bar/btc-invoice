@@ -71,32 +71,31 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `invoice_deliveries` log table fuels the show page’s delivery log with status, CC, dispatch/sent timestamps, and surfaced errors.
     - `InvoicePaid` events trigger the `SendInvoiceReceipt` listener (respecting each user’s `auto_receipt_emails` toggle) which logs/queues `InvoicePaidReceiptMail` receipts after invoices cross the paid threshold.
     - Pre-production stacks rewrite outbound recipients via `MAIL_ALIAS_ENABLED/MAIL_ALIAS_DOMAIN` (pointed at `mailer.cryptozing.app`) so every message lands in the Mailgun catch-all route; disable this before the RC deploy.
+9. **Print & Public Polish (main)**
+    - Print + public templates now share the same biller heading/name/contact/footer data with profile defaults + per-invoice overrides rendered via a collapsible “Branding & footer” block on create/edit forms.
+    - Public links differentiate active/disabled states, keep the QR + “rate as of” hints polished, and show friendlier expired messaging with owner contact info.
+    - Feature tests assert private/public views render the customizable fields; docs/specs (`PRINT_PUBLIC_POLISH.md`) stay in sync with the shipped behavior.
 
 ## Roadmap to Release Candidate
-9. **Print & Public Polish**
-    - Improve print template spacing/contrast/fonts; tune QR sizing.
-    - Public page: lightweight branding, “as of” note, clear disabled/expired states.
-    - Billing entity details (profile defaults + per-invoice overrides) should display on both print/public layouts; see [`PRINT_PUBLIC_POLISH.md`](PRINT_PUBLIC_POLISH.md).
-    - Branding heading defaults + per-invoice overrides power the header placeholder; create/edit forms tuck these fields under a collapsible “Branding & footer” disclosure.
-10. **User Settings**
+9. **User Settings**
     - Per-user invoice defaults (memo/terms) and future multi-wallet options.
-11. **Partial Payment Alerts & Reconciliation**
+10. **Partial Payment Alerts & Reconciliation**
     - Bubble up significant over/under payments (UI + notifications) and add manual adjustment tooling that can credit/refund surplus without mutating original ledger rows.
-12. **Observability & Safety**
+11. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-13. **Docs & DX**
+12. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
     - Notifications (paid, past-due, over/under payment) follow [`NOTIFICATIONS.md`](NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
-14. **UX Overhaul**
+13. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
         - Add an Edit button on the invoice show view that links to the edit form, and return to the show view after saving.
     - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
     - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
-15. **CryptoZing.app Deployment (RC)**
+14. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
