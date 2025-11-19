@@ -6,6 +6,9 @@
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
             <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
                 @csrf
+                @php
+                    $invoiceDefaults = $invoiceDefaults ?? ['description'=>null,'due_date'=>null,'terms_days'=>null];
+                @endphp
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Client</label>
@@ -37,16 +40,21 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Due date</label>
-                        <input type="date" name="due_date" value="{{ old('due_date') }}"
+                        <input type="date" name="due_date" value="{{ old('due_date', $invoiceDefaults['due_date'] ?? null) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('due_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        @if (!empty($invoiceDefaults['terms_days']))
+                            <p class="mt-1 text-xs text-gray-500">
+                                Defaults to {{ $invoiceDefaults['terms_days'] }} days after the invoice date.
+                            </p>
+                        @endif
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Description</label>
                     <textarea name="description" rows="3"
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $invoiceDefaults['description'] ?? null) }}</textarea>
                     @error('description')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 

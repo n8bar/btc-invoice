@@ -29,6 +29,8 @@ class User extends Authenticatable
         'billing_address',
         'invoice_footer_note',
         'branding_heading',
+        'invoice_default_description',
+        'invoice_default_terms_days',
     ];
 
     /**
@@ -57,6 +59,7 @@ class User extends Authenticatable
             'billing_email' => 'string',
             'billing_phone' => 'string',
             'branding_heading' => 'string',
+            'invoice_default_terms_days' => 'integer',
         ];
     }
 
@@ -74,5 +77,10 @@ class User extends Authenticatable
     public function walletSetting()
     {
         return $this->hasOne(WalletSetting::class);
+    }
+
+    public function walletAccounts()
+    {
+        return $this->hasMany(UserWalletAccount::class);
     }
 }

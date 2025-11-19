@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\WalletAccountRequest;
 use App\Http\Requests\WalletSettingRequest;
+use App\Models\UserWalletAccount;
 use Illuminate\Http\Request;
 
 class WalletSettingsController extends Controller
 {
+    private const MAX_ADDITIONAL_ACCOUNTS = 3;
+
     public function edit(Request $request)
     {
         return view('wallet.settings', [
             'wallet' => $request->user()->walletSetting,
+            'walletAccounts' => $request->user()->walletAccounts()
+                ->orderBy('label')
+                ->get(),
+            'maxAdditionalWallets' => self::MAX_ADDITIONAL_ACCOUNTS,
         ]);
     }
 
@@ -33,5 +41,33 @@ class WalletSettingsController extends Controller
 
         return redirect()->route('wallet.settings.edit')
             ->with('status', 'Wallet settings saved.');
+    }
+
+    public function storeAccount(WalletAccountRequest $request)
+    {
+        $user = $request->user();
+
+        if ($user->walletAccounts()->count() >= self::MAX_ADDITIONAL_ACCOUNTS) {
+            return back()
+                ->withErrors(['label' => 'You have reached the additional wallet limit.'])
+                ->withInput();
+        }
+
+        $user->walletAccounts()->create($request->validated());
+
+        return redirect()->route('wallet.settings.edit')
+            ->with('status', 'Additional wallet saved.');
+    }
+
+    public function destroyAccount(Request $request, UserWalletAccount $account)
+    {
+        if ($account->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $account->delete();
+
+        return redirect()->route('wallet.settings.edit')
+            ->with('status', 'Wallet removed.');
     }
 }

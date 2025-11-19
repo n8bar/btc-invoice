@@ -41,6 +41,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/wallet/settings', [WalletSettingsController::class, 'edit'])->name('wallet.settings.edit');
     Route::post('/wallet/settings', [WalletSettingsController::class, 'update'])->name('wallet.settings.update');
+    Route::post('/wallet/settings/accounts', [WalletSettingsController::class, 'storeAccount'])
+        ->name('wallet.settings.accounts.store');
+    Route::delete('/wallet/settings/accounts/{account}', [WalletSettingsController::class, 'destroyAccount'])
+        ->whereNumber('account')->name('wallet.settings.accounts.destroy');
 
     // Clients - custom actions MUST be before the resource
     Route::get('clients/trash', [ClientController::class, 'trash'])->name('clients.trash');

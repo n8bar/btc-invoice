@@ -9,6 +9,7 @@ This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sa
 - **Invoice delivery + receipts:** Owners send invoices via email, see real-time delivery logs, and automatically email receipts when the watcher marks an invoice paid.
 - **Catch-all friendly testing:** Outbound mail is routed through Mailgun and, while `MAIL_ALIAS_ENABLED=true`, every recipient rewrites to the Mailgun catch-all (`MAIL_ALIAS_DOMAIN`) so we can test safely.
 - **Branding controls:** Set a default invoice heading plus billing name/contact/footer text in your profile and override them per invoice; public/print views (including public links) stay in sync automatically.
+- **Invoice defaults & wallets:** Profile settings include memo/terms defaults so new invoices auto-fill description/due dates, and wallet settings can stash extra xpubs ahead of multi-wallet selection.
 
 ## Getting Started
 

@@ -137,5 +137,27 @@
                 <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note')" />
             </div>
         </div>
+
+        <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700">Invoice defaults</h3>
+            <p class="text-xs text-gray-600">
+                Memo text and payment terms will auto-fill new invoices unless you override them per invoice.
+            </p>
+            <div>
+                <x-input-label for="invoice_default_description" :value="__('Default memo / description')" />
+                <textarea id="invoice_default_description" name="invoice_default_description" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          placeholder="Weekly retainer for CryptoZing">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
+                <x-input-error class="mt-2" :messages="$errors->get('invoice_default_description')" />
+            </div>
+            <div>
+                <x-input-label for="invoice_default_terms_days" :value="__('Payment terms (days)')" />
+                <x-text-input id="invoice_default_terms_days" name="invoice_default_terms_days" type="number" min="0" max="365"
+                              class="mt-1 block w-full"
+                              :value="old('invoice_default_terms_days', $user->invoice_default_terms_days)" />
+                <p class="mt-1 text-xs text-gray-500">Set how many days after the invoice date the due date should default to. Leave blank to pick dates manually.</p>
+                <x-input-error class="mt-2" :messages="$errors->get('invoice_default_terms_days')" />
+            </div>
+        </div>
     </form>
 </section>

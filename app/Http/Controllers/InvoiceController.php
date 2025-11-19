@@ -94,6 +94,8 @@ class InvoiceController extends Controller
                 ->with('status', 'Connect a wallet before creating invoices.');
         }
 
+        $data = $this->applyInvoiceDefaults($request->user(), $data);
+
         $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
             $address = app(HdWallet::class)->deriveAddress(
                 $wallet->bip84_xpub,
@@ -249,8 +251,9 @@ class InvoiceController extends Controller
 
         $today = now()->toDateString(); // ✅ for invoice_date default
         $brandingDefaults = $this->brandingDefaults($request->user());
+        $invoiceDefaults = $this->invoiceDefaults($request->user(), $today);
 
-        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today','brandingDefaults'));
+        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today','brandingDefaults','invoiceDefaults'));
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -654,5 +657,40 @@ class InvoiceController extends Controller
             'footer_note' => $user->invoice_footer_note,
             'heading' => $user->branding_heading,
         ];
+    }
+
+    private function invoiceDefaults($user, string $invoiceDate): array
+    {
+        $description = $user->invoice_default_description;
+        $termsDays = $user->invoice_default_terms_days;
+        $dueDate = null;
+
+        if ($termsDays !== null) {
+            $dueDate = Carbon::parse($invoiceDate)->addDays($termsDays)->toDateString();
+        }
+
+        return [
+            'description' => $description,
+            'due_date' => $dueDate,
+            'terms_days' => $termsDays,
+        ];
+    }
+
+    private function applyInvoiceDefaults($user, array $data): array
+    {
+        if (empty($data['description']) && !empty($user->invoice_default_description)) {
+            $data['description'] = $user->invoice_default_description;
+        }
+
+        if (empty($data['due_date']) && $user->invoice_default_terms_days !== null) {
+            $referenceDate = !empty($data['invoice_date'])
+                ? Carbon::parse($data['invoice_date'])
+                : now();
+            $data['due_date'] = $referenceDate->copy()
+                ->addDays($user->invoice_default_terms_days)
+                ->toDateString();
+        }
+
+        return $data;
     }
 }

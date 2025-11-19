@@ -1,0 +1,123 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Client;
+use App\Models\User;
+use App\Models\UserWalletAccount;
+use App\Models\WalletSetting;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Tests\TestCase;
+
+class UserSettingsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_invoice_store_applies_user_defaults(): void
+    {
+        $owner = User::factory()->create([
+            'invoice_default_description' => 'Weekly retainer',
+            'invoice_default_terms_days' => 10,
+        ]);
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+            'notes' => null,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-TEST',
+                'description' => '',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+            ])
+            ->assertRedirect(route('invoices.index'));
+
+        $invoice = $owner->invoices()->latest('id')->first();
+        $this->assertSame('Weekly retainer', $invoice->description);
+        $this->assertSame('2025-01-11', Carbon::parse($invoice->due_date)->toDateString());
+    }
+
+    public function test_invoice_create_prefills_defaults(): void
+    {
+        $owner = User::factory()->create([
+            'invoice_default_description' => 'Consulting retainer',
+            'invoice_default_terms_days' => 7,
+        ]);
+        $this->createWalletSetting($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('Consulting retainer', false);
+        $expectedDue = now()->addDays(7)->toDateString();
+        $response->assertSee('value="' . $expectedDue . '"', false);
+    }
+
+    public function test_user_can_add_and_remove_additional_wallet_accounts(): void
+    {
+        $owner = User::factory()->create();
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.accounts.store'), [
+                'label' => 'Cold storage',
+                'network' => 'testnet',
+                'bip84_xpub' => 'vpub' . str_repeat('a', 20),
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $this->assertDatabaseHas('user_wallet_accounts', [
+            'user_id' => $owner->id,
+            'label' => 'Cold storage',
+        ]);
+
+        $account = UserWalletAccount::where('user_id', $owner->id)->first();
+
+        $this
+            ->actingAs($owner)
+            ->delete(route('wallet.settings.accounts.destroy', $account))
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $this->assertDatabaseMissing('user_wallet_accounts', [
+            'id' => $account->id,
+        ]);
+    }
+
+    public function test_user_cannot_delete_other_wallet_account(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+
+        $account = UserWalletAccount::factory()->create([
+            'user_id' => $other->id,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->delete(route('wallet.settings.accounts.destroy', $account))
+            ->assertForbidden();
+    }
+
+    private function createWalletSetting(User $user): WalletSetting
+    {
+        return WalletSetting::create([
+            'user_id' => $user->id,
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub' . str_repeat('1', 20),
+            'next_derivation_index' => 0,
+        ]);
+    }
+}
