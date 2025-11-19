@@ -96,6 +96,27 @@ class UserSettingsTest extends TestCase
         ]);
     }
 
+    public function test_user_can_update_invoice_settings_page(): void
+    {
+        $owner = User::factory()->create();
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('settings.invoice.update'), [
+                'branding_heading' => 'CryptoZing Invoice',
+                'billing_name' => 'CryptoZing LLC',
+                'billing_email' => 'billing@cryptozing.app',
+                'invoice_default_description' => 'Weekly retainer',
+                'invoice_default_terms_days' => 14,
+            ])
+            ->assertRedirect(route('settings.invoice.edit'));
+
+        $owner->refresh();
+        $this->assertSame('Weekly retainer', $owner->invoice_default_description);
+        $this->assertSame(14, $owner->invoice_default_terms_days);
+        $this->assertSame('CryptoZing Invoice', $owner->branding_heading);
+    }
+
     public function test_user_cannot_delete_other_wallet_account(): void
     {
         $owner = User::factory()->create();
