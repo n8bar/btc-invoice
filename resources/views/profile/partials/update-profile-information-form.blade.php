@@ -104,26 +104,26 @@
                     <x-input-error class="mt-2" :messages="$errors->get('branding_heading')" />
                 </div>
                 <div>
-                    <x-input-label for="billing_name" :value="__('Billing name')" />
+                    <x-input-label for="billing_name" :value="__('Biller name')" />
                     <x-text-input id="billing_name" name="billing_name" type="text" class="mt-1 block w-full"
                                   :value="old('billing_name', $user->billing_name)" autocomplete="organization" />
                     <x-input-error class="mt-2" :messages="$errors->get('billing_name')" />
                 </div>
                 <div>
-                    <x-input-label for="billing_email" :value="__('Billing email')" />
+                    <x-input-label for="billing_email" :value="__('Biller email')" />
                     <x-text-input id="billing_email" name="billing_email" type="email" class="mt-1 block w-full"
                                   :value="old('billing_email', $user->billing_email)" autocomplete="email" />
                     <x-input-error class="mt-2" :messages="$errors->get('billing_email')" />
                 </div>
                 <div>
-                    <x-input-label for="billing_phone" :value="__('Billing phone')" />
+                    <x-input-label for="billing_phone" :value="__('Biller phone')" />
                     <x-text-input id="billing_phone" name="billing_phone" type="text" class="mt-1 block w-full"
                                   :value="old('billing_phone', $user->billing_phone)" autocomplete="tel" />
                     <x-input-error class="mt-2" :messages="$errors->get('billing_phone')" />
                 </div>
             </div>
             <div>
-                <x-input-label for="billing_address" :value="__('Billing address')" />
+                <x-input-label for="billing_address" :value="__('Biller address')" />
                 <textarea id="billing_address" name="billing_address" rows="3"
                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                           placeholder="123 Main Street&#10;Suite 100&#10;Denver, CO 80202">{{ old('billing_address', $user->billing_address) }}</textarea>

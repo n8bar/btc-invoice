@@ -114,7 +114,7 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('branding_heading_override')" />
                             </div>
                             <div>
-                                <x-input-label for="billing_name_override" :value="__('Billing name')" />
+                                <x-input-label for="billing_name_override" :value="__('Biller name')" />
                                 <x-text-input id="billing_name_override" name="billing_name_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_name_override', $invoice->billing_name_override)"
@@ -122,7 +122,7 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
                             </div>
                             <div>
-                                <x-input-label for="billing_email_override" :value="__('Billing email')" />
+                                <x-input-label for="billing_email_override" :value="__('Biller email')" />
                                 <x-text-input id="billing_email_override" name="billing_email_override" type="email"
                                               class="mt-1 block w-full"
                                               :value="old('billing_email_override', $invoice->billing_email_override)"
@@ -130,7 +130,7 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
                             </div>
                             <div>
-                                <x-input-label for="billing_phone_override" :value="__('Billing phone')" />
+                                <x-input-label for="billing_phone_override" :value="__('Biller phone')" />
                                 <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_phone_override', $invoice->billing_phone_override)"
@@ -139,7 +139,7 @@
                             </div>
                         </div>
                         <div>
-                            <x-input-label for="billing_address_override" :value="__('Billing address')" />
+                            <x-input-label for="billing_address_override" :value="__('Biller address')" />
                             <textarea id="billing_address_override" name="billing_address_override" rows="3"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                       placeholder="{{ $brand['address'] }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
