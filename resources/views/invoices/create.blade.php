@@ -87,54 +87,71 @@
                 </div>
 
                 @php
-                    $brand = $brandingDefaults ?? ['name'=>null,'email'=>null,'phone'=>null,'address'=>null,'footer_note'=>null];
+                    $brand = $brandingDefaults ?? ['heading'=>null,'name'=>null,'email'=>null,'phone'=>null,'address'=>null,'footer_note'=>null];
+                    $brandingFieldNames = [
+                        'branding_heading_override','billing_name_override','billing_email_override','billing_phone_override',
+                        'billing_address_override','invoice_footer_note_override',
+                    ];
+                    $brandingHasErrors = collect($brandingFieldNames)->contains(fn ($field) => $errors->has($field));
+                    $brandingHasInput = collect($brandingFieldNames)->contains(fn ($field) => filled(old($field)));
+                    $brandingOpen = $brandingHasErrors || $brandingHasInput;
                 @endphp
-                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-700">Branding &amp; footer</h3>
-                        <p class="text-xs text-gray-500">Leave fields blank to use your profile defaults.</p>
-                    </div>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <x-input-label for="billing_name_override" :value="__('Billing name')" />
-                            <x-text-input id="billing_name_override" name="billing_name_override" type="text"
-                                          class="mt-1 block w-full"
-                                          :value="old('billing_name_override')"
-                                          placeholder="{{ $brand['name'] }}" />
-                            <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
+                <details class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" @if($brandingOpen) open @endif>
+                    <summary class="flex cursor-pointer items-center justify-between text-sm font-semibold text-gray-700">
+                        <span>Branding &amp; footer</span>
+                        <span class="text-xs font-normal text-gray-500">Leave fields blank to use profile defaults.</span>
+                    </summary>
+                    <div class="mt-4 space-y-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <x-input-label for="branding_heading_override" :value="__('Invoice heading')" />
+                                <x-text-input id="branding_heading_override" name="branding_heading_override" type="text"
+                                              class="mt-1 block w-full"
+                                              :value="old('branding_heading_override')"
+                                              placeholder="{{ $brand['heading'] ?? 'CryptoZing Invoice' }}" />
+                                <x-input-error class="mt-2" :messages="$errors->get('branding_heading_override')" />
+                            </div>
+                            <div>
+                                <x-input-label for="billing_name_override" :value="__('Billing name')" />
+                                <x-text-input id="billing_name_override" name="billing_name_override" type="text"
+                                              class="mt-1 block w-full"
+                                              :value="old('billing_name_override')"
+                                              placeholder="{{ $brand['name'] }}" />
+                                <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
+                            </div>
+                            <div>
+                                <x-input-label for="billing_email_override" :value="__('Billing email')" />
+                                <x-text-input id="billing_email_override" name="billing_email_override" type="email"
+                                              class="mt-1 block w-full"
+                                              :value="old('billing_email_override')"
+                                              placeholder="{{ $brand['email'] }}" />
+                                <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
+                            </div>
+                            <div>
+                                <x-input-label for="billing_phone_override" :value="__('Billing phone')" />
+                                <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
+                                              class="mt-1 block w-full"
+                                              :value="old('billing_phone_override')"
+                                              placeholder="{{ $brand['phone'] }}" />
+                                <x-input-error class="mt-2" :messages="$errors->get('billing_phone_override')" />
+                            </div>
                         </div>
                         <div>
-                            <x-input-label for="billing_email_override" :value="__('Billing email')" />
-                            <x-text-input id="billing_email_override" name="billing_email_override" type="email"
-                                          class="mt-1 block w-full"
-                                          :value="old('billing_email_override')"
-                                          placeholder="{{ $brand['email'] }}" />
-                            <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
+                            <x-input-label for="billing_address_override" :value="__('Billing address')" />
+                            <textarea id="billing_address_override" name="billing_address_override" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                      placeholder="{{ $brand['address'] }}">{{ old('billing_address_override') }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('billing_address_override')" />
                         </div>
                         <div>
-                            <x-input-label for="billing_phone_override" :value="__('Billing phone')" />
-                            <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
-                                          class="mt-1 block w-full"
-                                          :value="old('billing_phone_override')"
-                                          placeholder="{{ $brand['phone'] }}" />
-                            <x-input-error class="mt-2" :messages="$errors->get('billing_phone_override')" />
+                            <x-input-label for="invoice_footer_note_override" :value="__('Footer note (public & print)')" />
+                            <textarea id="invoice_footer_note_override" name="invoice_footer_note_override" rows="2"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                      placeholder="{{ $brand['footer_note'] }}">{{ old('invoice_footer_note_override') }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note_override')" />
                         </div>
                     </div>
-                    <div>
-                        <x-input-label for="billing_address_override" :value="__('Billing address')" />
-                        <textarea id="billing_address_override" name="billing_address_override" rows="3"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                  placeholder="{{ $brand['address'] }}">{{ old('billing_address_override') }}</textarea>
-                        <x-input-error class="mt-2" :messages="$errors->get('billing_address_override')" />
-                    </div>
-                    <div>
-                        <x-input-label for="invoice_footer_note_override" :value="__('Footer note (public & print)')" />
-                        <textarea id="invoice_footer_note_override" name="invoice_footer_note_override" rows="2"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                  placeholder="{{ $brand['footer_note'] }}">{{ old('invoice_footer_note_override') }}</textarea>
-                        <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note_override')" />
-                    </div>
-                </div>
+                </details>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>

@@ -89,6 +89,11 @@
 @if (!empty($public) && ! $linkActive)
     <div class="container">
         <div class="box" style="border-color:#fecaca;background:#fff1f2;">
+            @if (!empty($billingDetails['heading']))
+                <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size:12px; margin-bottom:4px;">
+                    {{ $billingDetails['heading'] }}
+                </div>
+            @endif
             <h2 style="margin:0 0 8px;font-size:18px;color:#b91c1c;">This invoice is no longer available</h2>
             <p style="margin:0 0 8px;font-size:14px;color:#7f1d1d;">
                 The public payment link has been disabled or expired. Please contact
@@ -113,6 +118,11 @@
 
     <header style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px;">
         <div>
+            @if (!empty($billingDetails['heading']))
+                <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size:12px; margin-bottom:4px;">
+                    {{ $billingDetails['heading'] }}
+                </div>
+            @endif
             <h1>Invoice <span class="muted">#{{ $invoice->number }}</span></h1>
             <div class="muted" style="font-size:14px;">Generated {{ now()->toDateString() }}</div>
         </div>

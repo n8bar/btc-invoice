@@ -98,6 +98,12 @@
             </p>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
+                    <x-input-label for="branding_heading" :value="__('Invoice heading')" />
+                    <x-text-input id="branding_heading" name="branding_heading" type="text" class="mt-1 block w-full"
+                                  :value="old('branding_heading', $user->branding_heading)" placeholder="CryptoZing Invoice" />
+                    <x-input-error class="mt-2" :messages="$errors->get('branding_heading')" />
+                </div>
+                <div>
                     <x-input-label for="billing_name" :value="__('Billing name')" />
                     <x-text-input id="billing_name" name="billing_name" type="text" class="mt-1 block w-full"
                                   :value="old('billing_name', $user->billing_name)" autocomplete="organization" />

@@ -20,6 +20,11 @@
             ];
         @endphp
         @php $billingDetails = $billingDetails ?? $invoice->billingDetails(); @endphp
+        @if (!empty($billingDetails['heading']))
+            <p class="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+                {{ $billingDetails['heading'] }}
+            </p>
+        @endif
         <h2 class="text-xl font-semibold leading-tight">
             Invoice <span class="text-gray-500">#{{ $invoice->number }}</span>
             <span class="ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium

@@ -74,9 +74,10 @@ class InvoiceController extends Controller
             'billing_phone_override' => ['nullable','string','max:255'],
             'billing_address_override' => ['nullable','string','max:2000'],
             'invoice_footer_note_override' => ['nullable','string','max:1000'],
+            'branding_heading_override' => ['nullable','string','max:255'],
         ]);
 
-        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override'] as $field) {
+        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override','branding_heading_override'] as $field) {
             if (array_key_exists($field, $data) && $data[$field] !== null && trim((string) $data[$field]) === '') {
                 $data[$field] = null;
             }
@@ -178,9 +179,10 @@ class InvoiceController extends Controller
             'billing_phone_override' => ['nullable','string','max:255'],
             'billing_address_override' => ['nullable','string','max:2000'],
             'invoice_footer_note_override' => ['nullable','string','max:1000'],
+            'branding_heading_override' => ['nullable','string','max:255'],
         ]);
 
-        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override'] as $field) {
+        foreach (['billing_name_override','billing_email_override','billing_phone_override','billing_address_override','invoice_footer_note_override','branding_heading_override'] as $field) {
             if (array_key_exists($field, $data) && $data[$field] !== null && trim((string) $data[$field]) === '') {
                 $data[$field] = null;
             }
@@ -188,7 +190,11 @@ class InvoiceController extends Controller
 
         if ($invoice->public_enabled) {
             // Fields that affect what recipients see
-            $locked = ['client_id','number','description','amount_usd','invoice_date','due_date'];
+            $locked = [
+                'client_id','number','description','amount_usd','invoice_date','due_date',
+                'billing_name_override','billing_email_override','billing_phone_override',
+                'billing_address_override','invoice_footer_note_override','branding_heading_override',
+            ];
             foreach ($locked as $f) {
                 // Compare only if field is present in payload and changed
                 if (array_key_exists($f, $data) && $data[$f] != $invoice->{$f}) {
@@ -646,6 +652,7 @@ class InvoiceController extends Controller
             'phone' => $user->billing_phone,
             'address' => $user->billing_address,
             'footer_note' => $user->invoice_footer_note,
+            'heading' => $user->branding_heading,
         ];
     }
 }

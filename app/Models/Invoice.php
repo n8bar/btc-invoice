@@ -19,7 +19,7 @@ class Invoice extends Model
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
         'payment_detected_at','payment_confirmed_at',
         'billing_name_override','billing_email_override','billing_phone_override',
-        'billing_address_override','invoice_footer_note_override',
+        'billing_address_override','invoice_footer_note_override','branding_heading_override',
         'last_overpayment_alert_at','last_underpayment_alert_at',
         'last_past_due_owner_alert_at','last_past_due_client_alert_at',
     ];
@@ -72,6 +72,8 @@ class Invoice extends Model
             ?: ($user?->billing_address);
         $footer = $this->invoice_footer_note_override
             ?: ($user?->invoice_footer_note);
+        $heading = $this->branding_heading_override
+            ?: ($user?->branding_heading);
 
         $addressLines = $address
             ? preg_split("/\r\n|\n|\r/", trim($address)) ?: []
@@ -84,6 +86,7 @@ class Invoice extends Model
             'address' => $address,
             'address_lines' => array_filter($addressLines, fn ($line) => trim($line) !== ''),
             'footer_note' => $footer,
+            'heading' => $heading,
         ];
     }
 

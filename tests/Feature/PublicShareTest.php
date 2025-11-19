@@ -157,7 +157,11 @@ class PublicShareTest extends TestCase
 
     public function test_public_print_returns_message_when_share_expired(): void
     {
-        $owner = User::factory()->create();
+        $owner = User::factory()->create([
+            'billing_name' => 'CryptoZing LLC',
+            'billing_email' => 'billing@cryptozing.app',
+            'billing_phone' => '555-1234',
+        ]);
         $invoice = $this->makeInvoice($owner, [
             'public_enabled' => true,
             'public_token' => 'tok_expired',
@@ -166,7 +170,46 @@ class PublicShareTest extends TestCase
 
         $this->get(route('invoices.public-print', ['token' => 'tok_expired']))
             ->assertOk()
-            ->assertSee('This invoice is no longer available');
+            ->assertSee('This invoice is no longer available')
+            ->assertSee('CryptoZing LLC')
+            ->assertSee('billing@cryptozing.app')
+            ->assertSee('555-1234');
+    }
+
+    public function test_public_print_displays_branding_details_when_active(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        Cache::forget(BtcRate::CACHE_KEY);
+
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '42000.00'],
+            ], 200),
+        ]);
+
+        $owner = User::factory()->create([
+            'branding_heading' => 'CryptoZing Invoice',
+            'billing_name' => 'CryptoZing LLC',
+            'billing_email' => 'billing@cryptozing.app',
+        ]);
+        $invoice = $this->makeInvoice($owner, [
+            'public_enabled' => true,
+            'public_token' => 'tok_branding',
+            'public_expires_at' => Carbon::now()->addDay(),
+            'branding_heading_override' => 'Studio Invoice',
+            'billing_name_override' => 'Studio LLC',
+            'billing_email_override' => 'studio@example.com',
+            'billing_phone_override' => '555-0100',
+        ]);
+
+        $this->get(route('invoices.public-print', ['token' => 'tok_branding']))
+            ->assertOk()
+            ->assertSee('Studio Invoice', false)
+            ->assertSee('Studio LLC', false)
+            ->assertSee('studio@example.com', false)
+            ->assertSee('555-0100', false);
+
+        Carbon::setTestNow();
     }
 
     private function makeInvoice(User $owner, array $overrides = []): Invoice

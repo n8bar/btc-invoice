@@ -28,6 +28,7 @@ class User extends Authenticatable
         'billing_phone',
         'billing_address',
         'invoice_footer_note',
+        'branding_heading',
     ];
 
     /**
@@ -55,6 +56,7 @@ class User extends Authenticatable
             'billing_name' => 'string',
             'billing_email' => 'string',
             'billing_phone' => 'string',
+            'branding_heading' => 'string',
         ];
     }
 

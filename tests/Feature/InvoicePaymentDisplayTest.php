@@ -87,12 +87,14 @@ class InvoicePaymentDisplayTest extends TestCase
     public function test_print_view_uses_billing_overrides_and_footer_note(): void
     {
         $owner = User::factory()->create([
+            'branding_heading' => 'CryptoZing Invoice',
             'billing_name' => 'CryptoZing LLC',
             'billing_email' => 'hello@cryptozing.app',
             'billing_address' => "123 Main St\nDenver, CO 80202",
             'invoice_footer_note' => 'Net 7',
         ]);
         $invoice = $this->makeInvoice($owner, [
+            'branding_heading_override' => 'Custom Studio Invoice',
             'billing_name_override' => 'Custom Studio',
             'billing_email_override' => 'studio@example.com',
             'billing_address_override' => "742 Evergreen Terrace\nSpringfield, USA",
@@ -103,6 +105,7 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.print', $invoice));
 
+        $response->assertSee('Custom Studio Invoice', false);
         $response->assertSee('Custom Studio', false);
         $response->assertSee('studio@example.com', false);
         $response->assertSee('Send BTC only.', false);
@@ -200,6 +203,7 @@ class InvoicePaymentDisplayTest extends TestCase
     public function test_show_displays_billing_details_and_footer_note(): void
     {
         $owner = User::factory()->create([
+            'branding_heading' => 'CryptoZing Invoice',
             'billing_name' => 'CryptoZing LLC',
             'billing_email' => 'owner@example.com',
             'billing_phone' => '555-1234',
@@ -208,6 +212,7 @@ class InvoicePaymentDisplayTest extends TestCase
         ]);
 
         $invoice = $this->makeInvoice($owner, [
+            'branding_heading_override' => null,
             'billing_name_override' => 'Custom Studio',
             'invoice_footer_note_override' => 'Send BTC only to this address.',
         ]);
@@ -216,6 +221,7 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.show', $invoice));
 
+        $response->assertSee('CryptoZing Invoice', false);
         $response->assertSee('Custom Studio', false);
         $response->assertSee('Send BTC only to this address.', false);
     }

@@ -32,6 +32,7 @@ class ProfileUpdateRequest extends FormRequest
             'billing_phone' => ['nullable','string','max:255'],
             'billing_address' => ['nullable','string','max:2000'],
             'invoice_footer_note' => ['nullable','string','max:1000'],
+            'branding_heading' => ['nullable','string','max:255'],
         ];
     }
 }
