@@ -78,11 +78,32 @@
     ];
     $billingDetails = $billingDetails ?? $invoice->billingDetails();
 @endphp
-@if (!empty($public) && $st === 'paid')
+@php
+    $linkActive = $link_active ?? true;
+@endphp
+@if (!empty($public) && $st === 'paid' && $linkActive)
     <div class="paid-watermark">
         <span>Paid</span>
     </div>
 @endif
+@if (!empty($public) && ! $linkActive)
+    <div class="container">
+        <div class="box" style="border-color:#fecaca;background:#fff1f2;">
+            <h2 style="margin:0 0 8px;font-size:18px;color:#b91c1c;">This invoice is no longer available</h2>
+            <p style="margin:0 0 8px;font-size:14px;color:#7f1d1d;">
+                The public payment link has been disabled or expired. Please contact
+                {{ $billingDetails['name'] ?? $invoice->user->name }}
+                @if(!empty($billingDetails['email']))
+                    via <a href="mailto:{{ $billingDetails['email'] }}" style="color:#1d4ed8;">{{ $billingDetails['email'] }}</a>
+                @endif
+                @if(!empty($billingDetails['phone']))
+                    {{ empty($billingDetails['email']) ? 'at' : 'or' }} {{ $billingDetails['phone'] }}
+                @endif
+                for assistance.
+            </p>
+        </div>
+    </div>
+@else
 <div class="container">
 
     <div class="no-print">
@@ -361,6 +382,8 @@
             {{ $billingDetails['footer_note'] }}
         </div>
     @endif
+@endif
+
 </div>
 @if ($rateAsOfIso)
     <script>

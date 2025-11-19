@@ -155,7 +155,7 @@ class PublicShareTest extends TestCase
         $response->assertDontSee('<meta name="robots" content="noindex,nofollow,noarchive">', false);
     }
 
-    public function test_public_print_returns_404_when_share_expired(): void
+    public function test_public_print_returns_message_when_share_expired(): void
     {
         $owner = User::factory()->create();
         $invoice = $this->makeInvoice($owner, [
@@ -165,7 +165,8 @@ class PublicShareTest extends TestCase
         ]);
 
         $this->get(route('invoices.public-print', ['token' => 'tok_expired']))
-            ->assertNotFound();
+            ->assertOk()
+            ->assertSee('This invoice is no longer available');
     }
 
     private function makeInvoice(User $owner, array $overrides = []): Invoice
