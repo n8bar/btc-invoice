@@ -75,10 +75,12 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Print + public templates now share the same biller heading/name/contact/footer data with profile defaults + per-invoice overrides rendered via a collapsible “Branding & footer” block on create/edit forms.
     - Public links differentiate active/disabled states, keep the QR + “rate as of” hints polished, and show friendlier expired messaging with owner contact info.
     - Feature tests assert private/public views render the customizable fields; docs/specs (`PRINT_PUBLIC_POLISH.md`) stay in sync with the shipped behavior.
+10. **User Settings (main)**
+    - Profile page now includes invoice memo + payment-term defaults so new invoices auto-fill description/due dates when owners leave those fields blank.
+    - Wallet settings gained an “additional wallets” section to stash extra xpubs for the future multi-wallet selector; stored accounts aren’t active yet but keep DNS/Xpub data ready.
+    - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 
 ## Roadmap to Release Candidate
-10. **User Settings**
-    - Per-user invoice defaults (memo/terms) and future multi-wallet options.
 11. **Partial Payment Alerts & Reconciliation**
     - Bubble up significant over/under payments (UI + notifications) and add manual adjustment tooling that can credit/refund surplus without mutating original ledger rows.
 12. **Observability & Safety**
