@@ -97,6 +97,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
         - Add an Edit button on the invoice show view that links to the edit form, and return to the show view after saving.
     - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
     - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
+    - **Invoice Settings polish:** revisit the new Invoice Settings page/branding defaults as part of the UX pass—capture copy tweaks, layout improvements, and any additional controls after design feedback.
 15. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
