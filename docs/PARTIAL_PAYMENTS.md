@@ -67,6 +67,22 @@
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.
 
+## Upcoming Work — Proactive Partial Alerts
+- **Copy & UX adjustments**
+    - Update invoice delivery emails + public/print views with a “Send one payment” guidance block that calls out miner fees when splitting payments and links to support copy.
+    - Surface the same reminder when owners copy the payment link inside the app so they can reinforce the expectation with clients manually.
+- **Watcher-triggered email alert**
+    - When the watcher logs a second unconfirmed payment for the same invoice (i.e., client is fragmenting the payment), enqueue a one-time email to the client explaining the risk of additional fees and suggesting they consolidate funds before sending more.
+    - Include the current outstanding USD/BTC amounts and the original due date so the reminder is actionable.
+    - Respect existing notification toggles and Mailgun aliasing behavior.
+- **Owner notification**
+    - Send an FYI email (or dashboard banner) to the invoice owner when we warn the client so they can follow up directly if needed.
+    - Log the event on the invoice show page under a “Partial payment alerts” activity list for auditing.
+- **Testing plan**
+    - Feature tests covering watcher-triggered mail dispatch (using fakes), ensuring only the first multi-payment event generates the warning per invoice.
+    - Blade/mail snapshot tests for the new guidance copy.
+    - Assert that invoices with intended partials (manual adjustments marked as “expected partial”) can opt out once that feature exists.
+
 ## Completed Tasks
 1. ✅ `invoice_payments` table stores every tx with sats + USD snapshot per detection.
 2. ✅ Watcher (`wallet:watch-payments`) records multiple partials per invoice and refreshes status/outstanding totals automatically.
