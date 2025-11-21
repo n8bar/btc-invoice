@@ -75,13 +75,7 @@
 5. ✅ Payment history rows display the captured USD rate/fiat amount and owners can annotate each payment with short notes.
 6. ✅ Automatic invoice delivery + paid receipt emails log to `invoice_deliveries`, with queue-backed mailers and profile toggles.
 7. ✅ Owners can record manual adjustments (credit/debit) when a payment exceeds tolerance, and both owners + clients see alerts when over/under payments exceed 15% of the invoice total (client messaging reiterates that overpayments default to gratuities unless they notify the sender).
-
-## Upcoming Work
-8. **Proactive partial alerts**
-    - **Copy & UX adjustments:** Update invoice delivery emails + public/print views with a “Send one payment” reminder that calls out miner fees when splitting transactions, and surface the same guidance when owners copy the payment link so they can reinforce it manually.
-    - **Watcher-triggered client email:** When the watcher logs a second unconfirmed payment for the same invoice (i.e., the client is fragmenting the payment), enqueue a one-time warning email detailing the outstanding USD/BTC amounts, original due date, and the miner-fee risk. Respect notification toggles and Mailgun aliasing.
-    - **Owner notification & logging:** Send an FYI to the invoice owner (email or dashboard banner) and log the event on the invoice show page under a “Partial payment alerts” activity section.
-    - **Testing plan:** Add feature tests for watcher-triggered mail dispatch (ensuring only the first multi-payment event triggers the warning), Blade/mail snapshots for the new copy, and opt-out coverage for intentionally partial invoices once that flag exists.
+8. ✅ Proactive partial-payment alerts: clients see “send one payment” guidance across invoice emails/public views, watchers send a one-time warning email (plus owner FYI + delivery log) after the second payment attempt, and tests cover the new flow.
 
 ## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”

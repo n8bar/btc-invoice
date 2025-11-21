@@ -11,6 +11,8 @@ use App\Mail\InvoiceReadyMail;
 use App\Mail\InvoiceUnderpaymentClientMail;
 use App\Mail\InvoiceUnderpaymentOwnerMail;
 use App\Mail\InvoiceOwnerPaidNoticeMail;
+use App\Mail\InvoicePartialWarningClientMail;
+use App\Mail\InvoicePartialWarningOwnerMail;
 use App\Models\InvoiceDelivery;
 use App\Services\MailAlias;
 use Illuminate\Bus\Queueable;
@@ -54,6 +56,8 @@ class DeliverInvoiceMail implements ShouldQueue
             'owner_overpay_alert' => new InvoiceOverpaymentOwnerMail($invoice, $delivery),
             'client_underpay_alert' => new InvoiceUnderpaymentClientMail($invoice, $delivery),
             'owner_underpay_alert' => new InvoiceUnderpaymentOwnerMail($invoice, $delivery),
+            'client_partial_warning' => new \App\Mail\InvoicePartialWarningClientMail($invoice, $delivery),
+            'owner_partial_warning' => new \App\Mail\InvoicePartialWarningOwnerMail($invoice, $delivery),
             default => new InvoiceReadyMail($invoice, $delivery),
         };
 

@@ -34,6 +34,8 @@ class InvoiceAlertService
         if ($invoice->requiresClientUnderpayAlert()) {
             $this->maybeSendUnderpayAlert($invoice);
         }
+
+        $this->maybeSendPartialWarning($invoice);
     }
 
     public function sendPastDueAlerts(Invoice $invoice): void
@@ -131,5 +133,29 @@ class InvoiceAlertService
         }
 
         return $lastSent->diffInMinutes(now()) >= self::ALERT_COOLDOWN_MINUTES;
+    }
+
+    private function maybeSendPartialWarning(Invoice $invoice): void
+    {
+        if (!$invoice->shouldWarnAboutPartialPayments()) {
+            return;
+        }
+
+        if (!$this->shouldSend($invoice->last_partial_warning_sent_at)) {
+            return;
+        }
+
+        $client = $invoice->client;
+        if ($client && !empty($client->email)) {
+            $this->queueDelivery($invoice, 'client_partial_warning', $client->email);
+        }
+
+        $owner = $invoice->user;
+        if ($owner && !empty($owner->email)) {
+            $this->queueDelivery($invoice, 'owner_partial_warning', $owner->email);
+        }
+
+        $invoice->last_partial_warning_sent_at = now();
+        $invoice->save();
     }
 }

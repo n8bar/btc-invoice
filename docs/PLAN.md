@@ -65,7 +65,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `invoice_payments` table (plus `wallet:backfill-payments`) stores every transaction with sats, USD snapshot, optional notes, and tip detection backed by `Invoice::PAYMENT_SAT_TOLERANCE`.
     - Invoice show/print/public views now surface USD-first Expected/Received/Outstanding totals, outstanding-targeted QR/BIP21 links, and payment history tables with editable owner notes.
     - `InvoicePaymentDetector` + watcher refresh the outstanding balance after each detection so `partial` status, `paid_at`, and tolerance handling stay accurate everywhere.
-    - Owners can record manual adjustments for significant discrepancies, and clients see over/under-payment alerts once the variance exceeds 15% (overpayment alert reminds them gratuities are default). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) for the full spec + future alert plan.
+    - Owners can record manual adjustments for significant discrepancies, and clients see over/under-payment alerts once the variance exceeds 15% (overpayment alert reminds them gratuities are default). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) for the full spec.
+    - Proactive partial-payment alerts now warn clients (and notify owners) when multiple payment attempts are detected, and invoice emails/public views remind clients to send the full balance in one payment to avoid extra miner fees.
 8. **Invoice Delivery & Auto Receipts (codex/invoice-delivery)**
     - `/invoices/{invoice}/deliver` gate-keeps on client email + public share, then queues `DeliverInvoiceMail` jobs that render `InvoiceReadyMail` with optional CC + note.
     - `invoice_deliveries` log table fuels the show page’s delivery log with status, CC, dispatch/sent timestamps, and surfaced errors.
@@ -81,16 +82,14 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 
 ## Roadmap to Release Candidate
-11. **Partial Payment Alerts & Reconciliation**
-    - Bubble up significant over/under payments (UI + notifications) and add manual adjustment tooling that can credit/refund surplus without mutating original ledger rows.
-12. **Observability & Safety**
+11. **Observability & Safety**
     - Structured logs for rate fetches, emails, public access.
     - Ensure 403/404/500 templates are consistent and leak no sensitive data.
-13. **Docs & DX**
+12. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
     - Notifications (paid, past-due, over/under payment) follow [`NOTIFICATIONS.md`](NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
-14. **UX Overhaul**
+13. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
@@ -98,7 +97,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
     - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
     - **Invoice Settings polish:** revisit the new Invoice Settings page/branding defaults as part of the UX pass—capture copy tweaks, layout improvements, and any additional controls after design feedback.
-15. **CryptoZing.app Deployment (RC)**
+14. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.

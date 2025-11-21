@@ -581,6 +581,10 @@
                                         BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
                                         refresh right before sending payment; printed copies may be stale.
                                     </p>
+                                    <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900">
+                                        <strong>Send one payment:</strong> please send the entire outstanding balance in a single transaction.
+                                        Splitting the invoice across multiple payments usually adds miner fees and can delay settlement.
+                                    </div>
                                 </div>
 
                                 <!-- Right: big centered Thank you -->
@@ -659,6 +663,10 @@
                             @if ($invoice->public_expires_at)
                                 <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
                             @endif
+                            <p class="mt-2 text-xs text-amber-700">
+                                Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
+                                Splitting the payment often increases miner fees.
+                            </p>
                         </div>
                     </p>
                 @else

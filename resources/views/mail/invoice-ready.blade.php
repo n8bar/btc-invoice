@@ -15,6 +15,10 @@ Your invoice for **${{ number_format($invoice->amount_usd, 2) }}** is ready. Fol
 **Status:** {{ strtoupper($invoice->status ?? 'draft') }}
 </x-mail::panel>
 
+<x-mail::panel>
+**Tip:** Send the full balance in a single Bitcoin transaction. Splitting the invoice into multiple payments usually adds extra miner fees and can slow down processing.
+</x-mail::panel>
+
 @if ($publicUrl)
 <x-mail::button :url="$publicUrl">
 View Invoice

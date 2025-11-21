@@ -225,6 +225,124 @@ class WatchPaymentsCommandTest extends TestCase
         ]);
     }
 
+    public function test_partial_warning_emails_sent_on_second_payment_attempt(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-05 08:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 48_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'warn-aaa',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 300_000,
+                        ],
+                    ],
+                ],
+                [
+                    'txid' => 'warn-bbb',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 200_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $invoice->refresh();
+        $this->assertSame('partial', $invoice->status);
+        $this->assertNotNull($invoice->last_partial_warning_sent_at);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'client_partial_warning',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'owner_partial_warning',
+        ]);
+    }
+
+    public function test_partial_warning_not_resent_within_cooldown(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-06 08:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 46_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        $payload = [
+            [
+                'txid' => 'warn-ccc',
+                'status' => [
+                    'confirmed' => false,
+                    'block_height' => null,
+                    'block_time' => null,
+                ],
+                'vout' => [
+                    [
+                        'scriptpubkey_address' => $invoice->payment_address,
+                        'value' => 350_000,
+                    ],
+                ],
+            ],
+            [
+                'txid' => 'warn-ddd',
+                'status' => [
+                    'confirmed' => false,
+                    'block_height' => null,
+                    'block_time' => null,
+                ],
+                'vout' => [
+                    [
+                        'scriptpubkey_address' => $invoice->payment_address,
+                        'value' => 350_000,
+                    ],
+                ],
+            ],
+        ];
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response($payload, 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $this->assertEquals(1, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'client_partial_warning')->count());
+        $this->assertEquals(1, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_partial_warning')->count());
+    }
+
     private function makeInvoice(): Invoice
     {
         $user = User::factory()->create();
