@@ -83,8 +83,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 
 ## Roadmap to Release Candidate
 11. **Observability & Safety**
-    - Structured logs for rate fetches, emails, public access.
-    - Ensure 403/404/500 templates are consistent and leak no sensitive data.
+    - Add structured logging around payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate), with a shared formatter.
+    - Expose a lightweight health probe (DB + cache) and lay groundwork for metrics (counters for payments processed/mails queued).
+    - Harden public/error flows: normalize token handling on public print, enforce external API timeouts, and ensure 403/404/500 templates leak no sensitive data. Keep Mailgun aliasing enforced in non-prod.
 12. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
