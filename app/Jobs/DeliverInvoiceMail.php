@@ -74,6 +74,12 @@ class DeliverInvoiceMail implements ShouldQueue
                 'error_code' => null,
                 'error_message' => null,
             ]);
+            Log::info('invoice_delivery.sent', [
+                'delivery_id' => $delivery->id,
+                'invoice_id' => $invoice->id,
+                'type' => $delivery->type,
+                'recipient' => $delivery->recipient,
+            ]);
         } catch (\Throwable $e) {
             $delivery->update([
                 'status' => 'failed',

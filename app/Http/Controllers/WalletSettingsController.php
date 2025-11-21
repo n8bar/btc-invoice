@@ -28,6 +28,19 @@ class WalletSettingsController extends Controller
 
         $payload = $request->validated();
 
+        // Validate the xpub by deriving a single address to catch bad keys early.
+        try {
+            app(\App\Services\HdWallet::class)->deriveAddress(
+                $payload['bip84_xpub'],
+                0,
+                $payload['network']
+            );
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['bip84_xpub' => 'Invalid BIP84 xpub/vpub for ' . $payload['network'] . '.'])
+                ->withInput();
+        }
+
         $wallet = $user->walletSetting()->updateOrCreate(['user_id' => $user->id], [
             'network' => $payload['network'],
             'bip84_xpub' => $payload['bip84_xpub'],

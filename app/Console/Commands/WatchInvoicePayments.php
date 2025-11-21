@@ -9,6 +9,7 @@ use App\Services\InvoiceAlertService;
 use App\Services\InvoicePaymentDetector;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WatchInvoicePayments extends Command
 {
@@ -131,9 +132,18 @@ class WatchInvoicePayments extends Command
         $invoice->refresh();
         $paidSats = $invoice->payment_amount_sat ?? 0;
         $status = strtoupper($invoice->status ?? 'sent');
+        $outstanding = $invoice->outstanding_sats;
 
         foreach ($logs as $log) {
             $this->info("Invoice {$invoice->id} {$status}: {$log['txid']} ({$log['sats']} sats, total {$paidSats}).");
+            Log::info('invoice.payment.detected', [
+                'invoice_id' => $invoice->id,
+                'status' => $invoice->status,
+                'txid' => $log['txid'],
+                'sats' => $log['sats'],
+                'paid_sats' => $paidSats,
+                'outstanding_sats' => $outstanding,
+            ]);
         }
     }
 }

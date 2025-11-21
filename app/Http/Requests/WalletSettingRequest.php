@@ -26,4 +26,11 @@ class WalletSettingRequest extends FormRequest
             'bip84_xpub' => ['required', 'string', 'max:256', 'regex:/^(vpub|zpub|xpub|tpub)[A-Za-z0-9]+$/'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'bip84_xpub.regex' => 'Enter a valid BIP84 xpub/vpub for the selected network.',
+        ];
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\WalletSettingsController;
 use App\Http\Controllers\InvoiceSettingsController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
 use App\Http\Controllers\InvoicePaymentAdjustmentController;
@@ -17,7 +18,7 @@ use App\Http\Controllers\InvoicePaymentAdjustmentController;
 */
 
 // Simple health probe for uptime checks / container orchestrators
-Route::get('/health', fn () => response()->json(['ok' => true]));
+Route::get('/health', HealthController::class);
 
 // Landing page (keep Breeze welcome)
 Route::get('/', fn () => view('welcome'));

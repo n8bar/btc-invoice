@@ -96,23 +96,30 @@ class InvoiceController extends Controller
 
         $data = $this->applyInvoiceDefaults($request->user(), $data);
 
-        $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
-            $address = app(HdWallet::class)->deriveAddress(
-                $wallet->bip84_xpub,
-                $wallet->next_derivation_index,
-                $wallet->network
-            );
+        try {
+            $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
+                $address = app(HdWallet::class)->deriveAddress(
+                    $wallet->bip84_xpub,
+                    $wallet->next_derivation_index,
+                    $wallet->network
+                );
 
-            $invoice = Invoice::create($data + [
-                'user_id' => $userId,
-                'payment_address' => $address,
-                'derivation_index' => $wallet->next_derivation_index,
-            ]);
+                $invoice = Invoice::create($data + [
+                    'user_id' => $userId,
+                    'payment_address' => $address,
+                    'derivation_index' => $wallet->next_derivation_index,
+                ]);
 
-            $wallet->increment('next_derivation_index');
+                $wallet->increment('next_derivation_index');
 
-            return $invoice;
-        });
+                return $invoice;
+            });
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('wallet.settings.edit')
+                ->withErrors(['bip84_xpub' => 'Unable to derive a payment address. Please verify your wallet xpub/vpub.'])
+                ->withInput();
+        }
 
         if ($request->wantsJson()) {
             return response()->json($invoice->load('client'), 201);
@@ -384,6 +391,13 @@ class InvoiceController extends Controller
 
         $linkActive = $invoice->public_enabled
             && (empty($invoice->public_expires_at) || $invoice->public_expires_at->isFuture());
+
+        \Log::info('invoice.public_print', [
+            'invoice_id' => $invoice->id,
+            'token_hash' => sha1($token),
+            'link_active' => $linkActive,
+            'ip' => $request->ip(),
+        ]);
 
         if ($linkActive) {
             $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();

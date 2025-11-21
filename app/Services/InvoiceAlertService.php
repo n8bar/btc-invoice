@@ -123,6 +123,13 @@ class InvoiceAlertService
             'dispatched_at' => now(),
         ]);
 
+        \Log::info('invoice_delivery.queued', [
+            'invoice_id' => $invoice->id,
+            'delivery_id' => $delivery->id,
+            'type' => $type,
+            'recipient' => $recipient,
+        ]);
+
         DeliverInvoiceMail::dispatch($delivery);
     }
 

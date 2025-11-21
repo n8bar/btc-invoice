@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 class BtcRate
 {
     const CACHE_KEY = 'btc_rate:spot';
@@ -32,9 +33,12 @@ class BtcRate
             $res = Http::timeout(6)
                 ->retry(2, 200)
                 ->acceptJson()
-                ->get('https://api.coinbase.com/v2/prices/BTC-USD/spot');
+            ->get('https://api.coinbase.com/v2/prices/BTC-USD/spot');
 
-            if (!$res->ok()) return null;
+            if (!$res->ok()) {
+                Log::warning('btc_rate.fetch_failed', ['status' => $res->status(), 'body' => $res->body()]);
+                return null;
+            }
 
             $amount = (float) data_get($res->json(), 'data.amount');
             if ($amount <= 0) return null;
@@ -45,6 +49,7 @@ class BtcRate
                 'source'   => 'coinbase:spot',
             ];
         } catch (\Throwable $e) {
+            Log::warning('btc_rate.fetch_error', ['error' => $e->getMessage()]);
             return null;
         }
     }
@@ -61,6 +66,10 @@ class BtcRate
         $normalized = static::normalize($fresh);
 
         Cache::put(self::CACHE_KEY, $normalized, self::TTL);
+        Log::info('btc_rate.cached', [
+            'rate_usd' => $normalized['rate_usd'] ?? null,
+            'source' => $normalized['source'] ?? 'unknown',
+        ]);
 
         return $normalized;
     }
