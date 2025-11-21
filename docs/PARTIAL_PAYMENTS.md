@@ -67,22 +67,6 @@
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.
 
-## Upcoming Work — Proactive Partial Alerts
-- **Copy & UX adjustments**
-    - Update invoice delivery emails + public/print views with a “Send one payment” guidance block that calls out miner fees when splitting payments and links to support copy.
-    - Surface the same reminder when owners copy the payment link inside the app so they can reinforce the expectation with clients manually.
-- **Watcher-triggered email alert**
-    - When the watcher logs a second unconfirmed payment for the same invoice (i.e., client is fragmenting the payment), enqueue a one-time email to the client explaining the risk of additional fees and suggesting they consolidate funds before sending more.
-    - Include the current outstanding USD/BTC amounts and the original due date so the reminder is actionable.
-    - Respect existing notification toggles and Mailgun aliasing behavior.
-- **Owner notification**
-    - Send an FYI email (or dashboard banner) to the invoice owner when we warn the client so they can follow up directly if needed.
-    - Log the event on the invoice show page under a “Partial payment alerts” activity list for auditing.
-- **Testing plan**
-    - Feature tests covering watcher-triggered mail dispatch (using fakes), ensuring only the first multi-payment event generates the warning per invoice.
-    - Blade/mail snapshot tests for the new guidance copy.
-    - Assert that invoices with intended partials (manual adjustments marked as “expected partial”) can opt out once that feature exists.
-
 ## Completed Tasks
 1. ✅ `invoice_payments` table stores every tx with sats + USD snapshot per detection.
 2. ✅ Watcher (`wallet:watch-payments`) records multiple partials per invoice and refreshes status/outstanding totals automatically.
@@ -91,6 +75,13 @@
 5. ✅ Payment history rows display the captured USD rate/fiat amount and owners can annotate each payment with short notes.
 6. ✅ Automatic invoice delivery + paid receipt emails log to `invoice_deliveries`, with queue-backed mailers and profile toggles.
 7. ✅ Owners can record manual adjustments (credit/debit) when a payment exceeds tolerance, and both owners + clients see alerts when over/under payments exceed 15% of the invoice total (client messaging reiterates that overpayments default to gratuities unless they notify the sender).
+
+## Upcoming Work
+8. **Proactive partial alerts**
+    - **Copy & UX adjustments:** Update invoice delivery emails + public/print views with a “Send one payment” reminder that calls out miner fees when splitting transactions, and surface the same guidance when owners copy the payment link so they can reinforce it manually.
+    - **Watcher-triggered client email:** When the watcher logs a second unconfirmed payment for the same invoice (i.e., the client is fragmenting the payment), enqueue a one-time warning email detailing the outstanding USD/BTC amounts, original due date, and the miner-fee risk. Respect notification toggles and Mailgun aliasing.
+    - **Owner notification & logging:** Send an FYI to the invoice owner (email or dashboard banner) and log the event on the invoice show page under a “Partial payment alerts” activity section.
+    - **Testing plan:** Add feature tests for watcher-triggered mail dispatch (ensuring only the first multi-payment event triggers the warning), Blade/mail snapshots for the new copy, and opt-out coverage for intentionally partial invoices once that flag exists.
 
 ## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
