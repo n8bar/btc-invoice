@@ -166,45 +166,6 @@
 
             </div>
 
-            <div class="rounded-lg bg-white p-6 shadow">
-                <h3 class="text-sm font-semibold text-gray-700">Manual adjustments</h3>
-                <p class="mt-1 text-xs text-gray-500">
-                    Credit or reopen balances without editing on-chain payments. Use this when a payment misses the tolerance threshold.
-                </p>
-                <form method="POST" action="{{ route('invoices.payments.adjustments.store', $invoice) }}" class="mt-4 space-y-4">
-                    @csrf
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
-                            <input type="number" name="amount_usd" step="0.01" min="0.01"
-                                   value="{{ old('amount_usd') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('amount_usd')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Direction</label>
-                            <select name="direction"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="increase" @selected(old('direction') === 'increase')>Credit invoice (reduce outstanding)</option>
-                                <option value="decrease" @selected(old('direction') === 'decrease')>Reopen balance (increase outstanding)</option>
-                            </select>
-                            @error('direction')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
-                        <textarea name="note" rows="2"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                  placeholder="Document the reason for this adjustment">{{ old('note') }}</textarea>
-                        @error('note')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                    </div>
-                    <div class="flex justify-end">
-                        <x-primary-button>Add adjustment</x-primary-button>
-                    </div>
-                </form>
-            </div>
-
             @if (!empty($billingDetails['footer_note']))
                 <div class="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700">
                     <h3 class="text-sm font-semibold text-gray-700 mb-1">Footer note</h3>
@@ -250,59 +211,78 @@
             </div>
 
             @if ($invoice->deliveries->isNotEmpty())
-                <div class="rounded-lg bg-white p-6 shadow">
-                    <h3 class="mb-3 text-sm font-semibold text-gray-700">Delivery log</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                                <tr>
-                                    <th class="px-2 py-2 text-left">Type</th>
-                                    <th class="px-2 py-2 text-left">Recipient</th>
-                                    <th class="px-2 py-2 text-left">Status</th>
-                                    <th class="px-2 py-2 text-left">Queued</th>
-                                    <th class="px-2 py-2 text-left">Sent</th>
-                                    <th class="px-2 py-2 text-left">Error</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                @foreach ($invoice->deliveries as $delivery)
-                                    <tr>
-                                        <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
-                                        <td class="px-2 py-2">
-                                            {{ $delivery->recipient }}
-                                            @if ($delivery->cc)
-                                                <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
-                                        @php
-                                            $queued = $delivery->dispatched_at;
-                                            $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
-                                            $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
-                                            $sent = $delivery->sent_at;
-                                            $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
-                                            $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
-                                        @endphp
-                                        <td class="px-2 py-2 text-sm text-gray-600">
-                                            @if ($queuedIso)
-                                                <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
-                                            @else
-                                                —
-                                            @endif
-                                        </td>
-                                        <td class="px-2 py-2 text-sm text-gray-600">
-                                            @if ($sentIso)
-                                                <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
-                                            @else
-                                                —
-                                            @endif
-                                        </td>
-                                        <td class="px-2 py-2 text-sm text-red-600">{{ $delivery->error_message ?: '—' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                @php $deliveryCount = $invoice->deliveries->count(); @endphp
+                <style>
+                    details.delivery-log[open] .show-label { display: none; }
+                    details.delivery-log:not([open]) .hide-label { display: none; }
+                    summary.delivery-log-summary { cursor: pointer; }
+                </style>
+                <div class="rounded-lg bg-white shadow">
+                    <details class="delivery-log" open>
+                        <summary class="delivery-log-summary flex select-none items-center justify-between px-6 py-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-700">Delivery log</h3>
+                                <p class="text-xs text-gray-500">{{ $deliveryCount }} entr{{ $deliveryCount === 1 ? 'y' : 'ies' }}</p>
+                            </div>
+                            <span class="text-xs text-indigo-600 show-label">Show</span>
+                            <span class="text-xs text-gray-500 hide-label">Hide</span>
+                        </summary>
+                        <div class="border-t border-gray-100 px-6 pb-6">
+                            <div class="overflow-y-auto overflow-x-auto rounded border border-gray-100" style="max-height: 24rem;">
+                                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left">Type</th>
+                                            <th class="px-2 py-2 text-left">Recipient</th>
+                                            <th class="px-2 py-2 text-left">Status</th>
+                                            <th class="px-2 py-2 text-left">Queued</th>
+                                            <th class="px-2 py-2 text-left">Sent</th>
+                                            <th class="px-2 py-2 text-left">Error</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach ($invoice->deliveries as $delivery)
+                                            <tr>
+                                                <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
+                                                <td class="px-2 py-2">
+                                                    {{ $delivery->recipient }}
+                                                    @if ($delivery->cc)
+                                                        <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
+                                                @php
+                                                    $queued = $delivery->dispatched_at;
+                                                    $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
+                                                    $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                    $sent = $delivery->sent_at;
+                                                    $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
+                                                    $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                @endphp
+                                                <td class="px-2 py-2 text-sm text-gray-600">
+                                                    @if ($queuedIso)
+                                                        <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2 text-sm text-gray-600">
+                                                    @if ($sentIso)
+                                                        <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2 text-sm text-red-600">
+                                                    {{ $delivery->error_message ?: 'None' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             @endif
 
@@ -712,6 +692,45 @@
                         </p>
                     </div>
                 @endif
+            </div>
+
+            <div class="mt-6 rounded-lg bg-white p-6 shadow">
+                <h3 class="text-sm font-semibold text-gray-700">Manual adjustments</h3>
+                <p class="mt-1 text-xs text-gray-500">
+                    Credit or reopen balances without editing on-chain payments. Use this when a payment misses the tolerance threshold.
+                </p>
+                <form method="POST" action="{{ route('invoices.payments.adjustments.store', $invoice) }}" class="mt-4 space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
+                            <input type="number" name="amount_usd" step="0.01" min="0.01"
+                                   value="{{ old('amount_usd') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('amount_usd')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Direction</label>
+                            <select name="direction"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="increase" @selected(old('direction') === 'increase')>Credit invoice (reduce outstanding)</option>
+                                <option value="decrease" @selected(old('direction') === 'decrease')>Reopen balance (increase outstanding)</option>
+                            </select>
+                            @error('direction')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
+                        <textarea name="note" rows="2"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                  placeholder="Document the reason for this adjustment">{{ old('note') }}</textarea>
+                        @error('note')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <x-primary-button>Add adjustment</x-primary-button>
+                    </div>
+                </form>
             </div>
 
         </div>
