@@ -5,12 +5,12 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 ## Outputs
 - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
 - Wallet UX improvements (xpub guidance, network cues, validation helpers).
-- Invoice show/edit polish (add Edit on show → return to show after save; layout tweaks).
+- Invoices & Clients UI polish (CRUD surfaces, show/edit flows, print/public/share, delivery logs/actions).
 - Public/share layouts refresh to mirror updated show/print patterns.
 - Guided onboarding wizard (wallet setup → create invoice → deliver).
 - User-level toggles for overpayment note and QR refresh reminder.
 - Per-user editable email templates (invoice send/reminders/alerts).
-- Invoice Settings polish (branding defaults, layout/copy refinements).
+- Settings/auth polish (Profile, Invoice Settings, Wallet Settings) and branded Login/Logout UX.
 
 ## Completed Tasks
 1. Dashboard snapshot redesign (counts/totals/recent payments).
@@ -56,6 +56,7 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
-- UX changes reflected in show/public/print without breaking auth or ownership constraints.
+- UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
+- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles and editable templates behave as specified.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.
