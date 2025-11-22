@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class Invoice extends Model
@@ -58,6 +60,34 @@ class Invoice extends Model
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
     public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
     public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
+
+    public function scopeOwnedBy(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->whereIn('status', ['draft', 'sent', 'partial']);
+    }
+
+    public function scopePastDue(Builder $query, ?Carbon $today = null): Builder
+    {
+        $today = $today ?: Carbon::today(config('app.timezone'));
+        return $query->whereIn('status', ['sent', 'partial'])
+            ->whereDate('due_date', '<', $today);
+    }
+
+    public function scopeDueSoon(Builder $query, ?Carbon $today = null): Builder
+    {
+        $today = $today ?: Carbon::today(config('app.timezone'));
+        $end = $today->copy()->addDays(7);
+
+        return $query->whereIn('status', ['sent', 'partial'])
+            ->whereDate('due_date', '>=', $today)
+            ->whereDate('due_date', '<=', $end);
+    }
 
     public function billingDetails(): array
     {
