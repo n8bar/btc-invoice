@@ -1,7 +1,12 @@
 # Project Changelog
 
-| Date (UTC) | Change | Notes |
-|------------|--------|-------|
+| Date (America/Denver) | Change | Notes |
+|-----------------------|--------|-------|
+| 2025-11-22 | Dashboard snapshot added | Dashboard now shows open/past-due counts, outstanding totals, recent payments with per-user cached snapshot. |
+| 2025-11-22 | UX Overhaul spec added | Added `docs/UX_OVERHAUL_SPEC.md` and linked PLAN/README for Item 12 scope. |
+| 2025-11-22 | Print view + timezone fixes | Print view hides back link on public, uses invoice-created date (Denver), formats BTC/rate via shared helpers; changelog column switched to America/Denver; app timezone set to America/Denver. |
+| 2025-11-22 | UX Overhaul ordering set | PLAN Item 12 reordered (dashboard → wallet UX → show/edit polish → public/share refresh → onboarding wizard → toggles → templates → settings polish). |
+| 2025-11-22 | Docs & DX spec drafted | Added `docs/DOCS_DX_SPEC.md`, reordered PLAN to prioritize UX Overhaul before Docs/DX, and linked README. |
 | 2025-11-07 | PR #13 merged | Friendly 403 copy standardized to satisfy Authorization tests. |
 | 2025-11-07 | Docker daemon access adjusted | AL9 configured for Sail via socket group. |
 | 2025-11-07 | PLAN.md established | Plan maintained by Codex; README links to doc. |

@@ -29,6 +29,11 @@ class UserSettingsTest extends TestCase
             'notes' => null,
         ]);
 
+        $this->mock(\App\Services\HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
         $this
             ->actingAs($owner)
             ->post(route('invoices.store'), [
@@ -137,7 +142,7 @@ class UserSettingsTest extends TestCase
         return WalletSetting::create([
             'user_id' => $user->id,
             'network' => 'testnet',
-            'bip84_xpub' => 'vpub' . str_repeat('1', 20),
+            'bip84_xpub' => 'vpub5YKwTqL37YBiHSzfXaVJKMMHoPVuLPekJPd3pSXL9x9yNfQKDd3PcDjMqwihtghTh6xgfjj8nDjfGDUy3PDnALp2ABpPnz4m8SdwTRcGKCw',
             'next_derivation_index' => 0,
         ]);
     }

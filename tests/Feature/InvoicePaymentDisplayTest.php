@@ -265,8 +265,11 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Outstanding balance', false);
         $response->assertSee('$348.00', false);
         $response->assertSee('(0.00696 BTC)', false);
-        $detectedDisplay = Carbon::parse('2025-01-04 10:00:00', 'UTC')
-            ->setTimezone(config('app.timezone'))
+        $detectedDisplay = optional(
+            $invoice->fresh('payments')->payments->max('detected_at')
+        )
+            ?->copy()
+            ->timezone(config('app.timezone'))
             ->toDayDateTimeString();
         $response->assertSee('Last payment detected', false);
         $response->assertSee($detectedDisplay, false);

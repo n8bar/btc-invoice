@@ -20,7 +20,8 @@ class PublicShareTest extends TestCase
 
     public function test_owner_can_enable_public_share_with_expiry_preset(): void
     {
-        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        $fixedNow = Carbon::parse('2025-01-01 12:00:00', config('app.timezone'));
+        Carbon::setTestNow($fixedNow);
 
         $owner = User::factory()->create();
         $invoice = $this->makeInvoice($owner);

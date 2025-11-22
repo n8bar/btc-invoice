@@ -80,6 +80,7 @@
 @endphp
 @php
     $linkActive = $link_active ?? true;
+    $rateAsOfIso = null;
 @endphp
 @if (!empty($public) && $st === 'paid' && $linkActive)
     <div class="paid-watermark">
@@ -113,7 +114,9 @@
 
     <div class="no-print">
         <button class="btn" onclick="window.print()">Print</button>
-        <a class="btn" href="{{ route('invoices.show', $invoice) }}" style="margin-left:8px;">Back</a>
+        @if (empty($public))
+            <a class="btn" href="{{ route('invoices.show', $invoice) }}" style="margin-left:8px;">Back</a>
+        @endif
     </div>
 
     <header style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px;">
@@ -124,7 +127,11 @@
                 </div>
             @endif
             <h1>Invoice <span class="muted">#{{ $invoice->number }}</span></h1>
-            <div class="muted" style="font-size:14px;">Generated {{ now()->toDateString() }}</div>
+            @php
+                $issuedAt = $invoice->invoice_date?->copy()->setTimezone(config('app.timezone'))
+                    ?? $invoice->created_at?->copy()->setTimezone(config('app.timezone'));
+            @endphp
+            <div class="muted" style="font-size:14px;">Generated {{ $issuedAt ? $issuedAt->toDateString() : '-' }}</div>
         </div>
         <span class="badge
         {{ $st==='paid' ? 'badge-paid' : ($st==='sent' ? 'badge-sent' : ($st==='void' ? 'badge-void' : 'badge-draft')) }}">
@@ -180,8 +187,8 @@
         <h3 style="margin:0 0 8px; font-size:14px;">Amounts</h3>
         <table>
             <tr><th>USD</th><td class="total">${{ number_format($invoice->amount_usd, 2) }}</td></tr>
-            <tr><th>BTC</th><td>{{ $displayAmountBtc ?? ($invoice->amount_btc ?? '-') }}</td></tr>
-            <tr><th>BTC rate (USD/BTC)</th><td>{{ $displayRateUsd ?? ($invoice->btc_rate ?? '-') }}</td></tr>
+            <tr><th>BTC</th><td>{{ $displayAmountBtc !== null ? $displayAmountBtc : '—' }}</td></tr>
+            <tr><th>BTC rate (USD/BTC)</th><td>{{ $displayRateUsd !== null ? $displayRateUsd : '—' }}</td></tr>
             @php
                 $rateAsOfIso = null;
                 $rateAsOfFallback = null;
@@ -285,11 +292,35 @@
             </tr>
             <tr>
                 <th>Detected at</th>
-                <td class="mono">{{ optional($invoice->payment_detected_at)->toDateTimeString() ?? '—' }}</td>
+                @php
+                    $detectedAt = $invoice->payment_detected_at;
+                    $detectedIso = $detectedAt?->copy()->utc()->toIso8601String();
+                @endphp
+                <td class="mono">
+                    @if ($detectedIso)
+                        <time data-utc-ts="{{ $detectedIso }}" datetime="{{ $detectedIso }}">
+                            {{ $detectedAt->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }}
+                        </time>
+                    @else
+                        —
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th>Confirmed at</th>
-                <td class="mono">{{ optional($invoice->payment_confirmed_at)->toDateTimeString() ?? '—' }}</td>
+                @php
+                    $confirmedAt = $invoice->payment_confirmed_at;
+                    $confirmedIso = $confirmedAt?->copy()->utc()->toIso8601String();
+                @endphp
+                <td class="mono">
+                    @if ($confirmedIso)
+                        <time data-utc-ts="{{ $confirmedIso }}" datetime="{{ $confirmedIso }}">
+                            {{ $confirmedAt->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }}
+                        </time>
+                    @else
+                        —
+                    @endif
+                </td>
             </tr>
 
             @php $bitcoinUri = $displayBitcoinUri ?? $invoice->bitcoin_uri; @endphp
@@ -399,27 +430,25 @@
 @endif
 
 </div>
-@if ($rateAsOfIso)
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-utc-ts]').forEach((node) => {
-                const iso = node.getAttribute('data-utc-ts');
-                if (!iso) return;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-utc-ts]').forEach((node) => {
+            const iso = node.getAttribute('data-utc-ts');
+            if (!iso) return;
 
-                const parsed = new Date(iso);
-                if (Number.isNaN(parsed.getTime())) return;
+            const parsed = new Date(iso);
+            if (Number.isNaN(parsed.getTime())) return;
 
-                const localized = parsed.toLocaleString(undefined, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                });
-
-                if (localized) {
-                    node.textContent = localized;
-                }
+            const localized = parsed.toLocaleString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
             });
+
+            if (localized) {
+                node.textContent = localized;
+            }
         });
-    </script>
-@endif
+    });
+</script>
 </body>
 </html>

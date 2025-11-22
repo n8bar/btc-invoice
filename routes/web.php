@@ -35,7 +35,7 @@ Route::get('p/{token}', [InvoiceController::class, 'publicPrint'])
 
 Route::middleware(['auth'])->group(function () {
     // Breeze dashboard
-    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+    Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
 
     // Breeze profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

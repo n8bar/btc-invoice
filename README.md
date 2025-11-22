@@ -53,6 +53,8 @@ Execute the full suite via Sail:
 ## Documentation & Specs
 - Delivery plan & roadmap: [`docs/PLAN.md`](docs/PLAN.md)
 - Future backlog: [`docs/FuturePLAN.md`](docs/FuturePLAN.md)
+- Docs & DX spec: [`docs/DOCS_DX_SPEC.md`](docs/DOCS_DX_SPEC.md)
+- UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
 - Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
 - Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
 - Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
