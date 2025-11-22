@@ -25,7 +25,21 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
+                @php
+                    $themePreference = auth()->user()?->theme ?? 'system';
+                @endphp
+                <div x-data="themeToggle({ endpoint: '{{ route('theme.update') }}', initial: '{{ $themePreference }}' })" class="flex items-center gap-1">
+                    <button type="button" @click="set('light')" :class="buttonClass('light')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        ☀️
+                    </button>
+                    <button type="button" @click="set('dark')" :class="buttonClass('dark')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        🌙
+                    </button>
+                    <button type="button" @click="set('system')" :class="buttonClass('system')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        🖥️
+                    </button>
+                </div>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -89,6 +103,23 @@
                 Invoices
             </x-responsive-nav-link>
 
+            <div class="px-4">
+                @php
+                    $themePreference = auth()->user()?->theme ?? 'system';
+                @endphp
+                <div x-data="themeToggle({ endpoint: '{{ route('theme.update') }}', initial: '{{ $themePreference }}' })" class="flex items-center gap-2">
+                    <button type="button" @click="set('light')" :class="buttonClass('light')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        ☀️
+                    </button>
+                    <button type="button" @click="set('dark')" :class="buttonClass('dark')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        🌙
+                    </button>
+                    <button type="button" @click="set('system')" :class="buttonClass('system')" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+                        🖥️
+                    </button>
+                </div>
+            </div>
+
         </div>
 
         <!-- Responsive Settings Options -->
@@ -123,3 +154,41 @@
         </div>
     </div>
 </nav>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('themeToggle', ({ endpoint, initial }) => ({
+            theme: initial || 'system',
+            init() {
+                this.apply(this.theme);
+            },
+            buttonClass(target) {
+                return this.theme === target
+                    ? 'border-indigo-500 text-indigo-700'
+                    : 'border-gray-200 text-gray-700';
+            },
+            set(theme) {
+                this.theme = theme;
+                this.apply(theme);
+                this.persist(theme);
+            },
+            apply(theme) {
+                const root = document.documentElement;
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const useDark = theme === 'dark' || (theme === 'system' && prefersDark);
+                root.classList.toggle('dark', useDark);
+                root.dataset.theme = theme;
+            },
+            persist(theme) {
+                fetch(endpoint, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ theme }),
+                }).catch(() => {});
+            },
+        }));
+    });
+</script>

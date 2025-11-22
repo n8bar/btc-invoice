@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@php
+    $themePreference = auth()->user()?->theme ?? 'system';
+    $isDark = $themePreference === 'dark';
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ $themePreference }}" class="{{ $isDark ? 'dark' : '' }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,8 +21,8 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-slate-100">
+        <div class="min-h-screen">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -35,5 +39,24 @@
                 {{ $slot }}
             </main>
         </div>
+        <script>
+            (() => {
+                const root = document.documentElement;
+                const pref = root.dataset.theme || 'system';
+                const prefersDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const apply = (mode) => {
+                    const useDark = mode === 'dark' || (mode === 'system' && prefersDark());
+                    root.classList.toggle('dark', useDark);
+                    root.dataset.themeApplied = useDark ? 'dark' : 'light';
+                };
+
+                apply(pref);
+
+                if (pref === 'system' && window.matchMedia) {
+                    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+                    mql.addEventListener('change', () => apply(pref));
+                }
+            })();
+        </script>
     </body>
 </html>

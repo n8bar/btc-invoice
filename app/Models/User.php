@@ -31,6 +31,7 @@ class User extends Authenticatable
         'branding_heading',
         'invoice_default_description',
         'invoice_default_terms_days',
+        'theme',
     ];
 
     /**
@@ -60,6 +61,7 @@ class User extends Authenticatable
             'billing_phone' => 'string',
             'branding_heading' => 'string',
             'invoice_default_terms_days' => 'integer',
+            'theme' => 'string',
         ];
     }
 

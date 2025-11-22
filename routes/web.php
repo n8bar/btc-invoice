@@ -10,6 +10,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
 use App\Http\Controllers\InvoicePaymentAdjustmentController;
+use App\Http\Controllers\ThemePreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ Route::get('p/{token}', [InvoiceController::class, 'publicPrint'])
 Route::middleware(['auth'])->group(function () {
     // Breeze dashboard
     Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
+    Route::patch('/theme', ThemePreferenceController::class)->name('theme.update');
 
     // Breeze profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

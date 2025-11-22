@@ -22,10 +22,12 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Edge cases: amounts format per `docs/RATES.md`; no public/share tokens exposed; detected_at fallback to created_at.
    - Tests: Feature coverage asserts counts/totals and recent payments list for owner, ignores foreign/trashed invoices, caps to 5 ordered payments, and checks per-user cache isolation/refresh expectations.
    - Performance: recent payments limited to 5 with minimal eager-loads; joins scoped by ownership and soft deletes.
+2. Light/Dark mode toggle
+   - Theme preference stored per user (`light`/`dark`/`system`) with class-based dark mode and `prefers-color-scheme` fallback.
+   - Header toggle (desktop + mobile) updates UI immediately and persists via auth route; layout applies theme to root, and Tailwind dark mode is class-based.
+   - Tests cover preference persistence and validation.
 
 ## ToDo
-2. Light/Dark mode toggle
-   - Add a theme toggle in the header (left of user dropdown) that switches light/dark modes across the app; persist per user.
 3. Landing page refresh
    - Replace Laravel branding on the welcome/landing page with CryptoZing branding/logo while keeping Login and Register buttons; ensure copy and visuals align with the app’s UX and brand.
 4. Wallet UX improvements
