@@ -88,15 +88,13 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap to Release Candidate
 12. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
-    - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
-    - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
-    - Invoice show/edit polish: add an Edit button on the show view that links to the edit form, and return to the show view after saving.
-    - Public/share layouts refresh to align client-facing views with the updated show/print patterns.
-    - Guided onboarding wizard that routes new users through wallet setup → invoice creation → delivery.
-    - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
-    - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
-    - **Invoice Settings polish:** revisit the new Invoice Settings page/branding defaults as part of the UX pass—capture copy tweaks, layout improvements, and any additional controls after design feedback.
-    - Note: finalize Docs & DX after UX changes land so onboarding/quick start reflect the refreshed UI.
+    - Dashboard snapshot (done) plus wallet UX improvements (xpub guidance, validation helpers).
+    - Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
+    - Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
+    - Guided onboarding wizard: wallet setup → create invoice → deliver.
+    - User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
+    - Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
+    - Note: keep docs/quick start in sync after UX changes land.
 13. **Mailer & Alerts Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
