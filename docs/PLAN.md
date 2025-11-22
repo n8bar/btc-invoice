@@ -98,7 +98,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 13. **Mailer & Alerts Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
-    - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health.
+    - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health; align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
 14. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
     - Ship a Sail-first quick start + env var reference for new contributors (clone → `./vendor/bin/sail up -d` → migrate/seed).
