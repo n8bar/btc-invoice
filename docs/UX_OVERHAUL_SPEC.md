@@ -31,9 +31,12 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 4. Wallet UX improvements
    - Inline explainer for xpub formats per network; show network badge; derive-test feedback inline.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
-5. Invoice show/edit polish
-   - Show view includes Edit button; edit redirects back to show on save.
-   - Layout cleanup for billing info, payment summary, alerts; maintain policy enforcement.
+5. Invoice and related UI polish
+   - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
+   - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
+   - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
+   - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
+   - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
 6. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
