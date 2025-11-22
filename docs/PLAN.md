@@ -82,16 +82,11 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 
 ## Roadmap to Release Candidate
-11. **Observability & Safety**
-    - Add structured logging around payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate), with a shared formatter.
-    - Expose a lightweight health probe (DB + cache) and lay groundwork for metrics (counters for payments processed/mails queued).
-    - Harden public/error flows: normalize token handling on public print, enforce external API timeouts, and ensure 403/404/500 templates leak no sensitive data. Keep Mailgun aliasing enforced in non-prod.
-    - Validate wallet xpubs on save (derive test) and guard invoice creation with friendly errors when derivation fails; defer richer wallet UX to #13.
-12. **Docs & DX**
+11. **Docs & DX**
     - Sail quick start, env vars, and automated onboarding walkthroughs.
     - Post-MVP initiatives live in [`docs/FuturePLAN.md`](FuturePLAN.md).
     - Notifications (paid, past-due, over/under payment) follow [`NOTIFICATIONS.md`](NOTIFICATIONS.md); ensure owner + client emails are covered before RC.
-13. **UX Overhaul**
+12. **UX Overhaul**
     - Wallet UX improvements (explain xpubs, wallet-specific steps, QR parsing, validation helpers).
     - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
         - Guided onboarding wizard and refreshed invoice public/share layouts.
@@ -99,7 +94,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - User-level customization toggles for the overpayment note and QR refresh reminder, with controls exposed under profile settings.
     - Email templates (client invoices, reminders, alerts) become per-user editable via profile settings so copy can be customized without code changes.
     - **Invoice Settings polish:** revisit the new Invoice Settings page/branding defaults as part of the UX pass—capture copy tweaks, layout improvements, and any additional controls after design feedback.
-14. **CryptoZing.app Deployment (RC)**
+13. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
