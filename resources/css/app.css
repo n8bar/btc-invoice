@@ -3,42 +3,122 @@
 @tailwind utilities;
 
 :root {
+    --color-bg: #f3f4f6;
+    --color-surface: #ffffff;
+    --color-border: #e5e7eb;
+    --color-text: #0f172a;
+    --color-muted: #6b7280;
+    --color-primary: #0b1f3a; /* midnight blue */
+    --color-accent: #ff6b00; /* electric orange */
+    --color-surface-subtle: #f8fafc;
     color-scheme: light;
 }
 
 .dark {
+    --color-bg: #0b1f3a; /* midnight blue */
+    --color-surface: #111827; /* slate surface */
+    --color-surface-subtle: #0f172a;
+    --color-border: #1f2937;
+    --color-text: #e5e7eb;
+    --color-muted: #9ca3af;
+    --color-primary: #ff6b00; /* keep primary pop in dark */
+    --color-accent: #ff6b00;
     color-scheme: dark;
 }
 
-.dark .bg-white {
-    @apply bg-slate-900;
+@layer base {
+    body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+    }
+
+    a {
+        color: var(--color-primary);
+    }
 }
 
-.dark .bg-gray-100 {
-    @apply bg-slate-900;
+@layer components {
+    .card-surface {
+        background-color: var(--color-surface);
+        border-color: var(--color-border);
+    }
+}
+
+/* Light/dark overrides for common utility classes */
+.dark .bg-white,
+.dark .bg-gray-50 {
+    background-color: var(--color-surface) !important;
+}
+
+.dark .bg-gray-100,
+.dark .bg-gray-200 {
+    background-color: var(--color-surface-subtle) !important;
 }
 
 .dark .text-gray-900,
 .dark .text-gray-800 {
-    @apply text-slate-100;
+    color: var(--color-text) !important;
 }
 
-.dark .text-gray-700 {
-    @apply text-slate-200;
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-gray-500 {
+    color: var(--color-muted) !important;
 }
 
-.dark .text-gray-600 {
-    @apply text-slate-300;
+.dark .border-gray-100,
+.dark .border-gray-200 {
+    border-color: var(--color-border) !important;
 }
 
-.dark .border-gray-100 {
-    @apply border-slate-700;
-}
-
-.dark .hover\:bg-gray-50:hover {
-    @apply hover:bg-slate-800;
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover {
+    background-color: #1f2937 !important;
 }
 
 .dark .hover\:text-gray-700:hover {
-    @apply hover:text-slate-100;
+    color: var(--color-text) !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+.dark .shadow-sm,
+.dark .shadow {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.dark table {
+    color: var(--color-text);
+}
+
+.dark thead {
+    background-color: var(--color-surface-subtle);
+}
+
+.dark tr {
+    border-color: var(--color-border);
+}
+
+.dark .ring-1 {
+    --tw-ring-color: var(--color-border);
+}
+
+.dark .text-indigo-600,
+.dark .hover\:text-indigo-500:hover {
+    color: var(--color-accent) !important;
+}
+
+.dark .bg-indigo-600,
+.dark .hover\:bg-indigo-500:hover {
+    background-color: var(--color-primary) !important;
+}
+
+.dark .border-indigo-500 {
+    border-color: var(--color-primary) !important;
 }
