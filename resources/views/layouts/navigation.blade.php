@@ -158,9 +158,15 @@
     (() => {
         const applyTheme = (theme) => {
             const root = document.documentElement;
+            const body = document.body;
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             const useDark = theme === 'dark' || (theme === 'system' && prefersDark);
-            root.classList.toggle('dark', useDark);
+
+            [root, body].forEach((node) => {
+                if (!node) return;
+                node.classList.toggle('dark', useDark);
+            });
+
             root.dataset.theme = theme;
         };
 
@@ -179,7 +185,7 @@
         const initThemeToggles = () => {
             document.querySelectorAll('[data-theme-endpoint]').forEach((container) => {
                 const endpoint = container.getAttribute('data-theme-endpoint');
-                const initial = container.getAttribute('data-theme-initial') || 'system';
+                const initial = container.getAttribute('data-theme-initial') || document.documentElement.dataset.theme || 'system';
                 const buttons = Array.from(container.querySelectorAll('[data-theme-set]'));
 
                 const setActive = (theme) => {
