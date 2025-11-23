@@ -167,6 +167,11 @@
                 node.classList.toggle('dark', useDark);
             });
 
+            if (body) {
+                body.style.backgroundColor = useDark ? '#0f172a' : '#f3f4f6';
+                body.style.color = useDark ? '#e2e8f0' : '#0f172a';
+            }
+
             root.dataset.theme = theme;
         };
 
