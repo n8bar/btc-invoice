@@ -193,6 +193,7 @@
                 };
 
                 setActive(initial);
+                applyTheme(initial);
 
                 buttons.forEach((btn) => {
                     btn.addEventListener('click', () => {
