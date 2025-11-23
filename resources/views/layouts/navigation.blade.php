@@ -182,7 +182,7 @@
             }).catch(() => {});
         };
 
-        const initThemeToggles = () => {
+        (() => {
             document.querySelectorAll('[data-theme-endpoint]').forEach((container) => {
                 const endpoint = container.getAttribute('data-theme-endpoint');
                 const initial = container.getAttribute('data-theme-initial') || document.documentElement.dataset.theme || 'system';
@@ -212,8 +212,6 @@
                     });
                 });
             });
-        };
-
-        document.addEventListener('DOMContentLoaded', initThemeToggles);
+        })();
     })();
 </script>
