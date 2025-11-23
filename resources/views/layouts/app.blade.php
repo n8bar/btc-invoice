@@ -42,12 +42,14 @@
         <script>
             (() => {
                 const root = document.documentElement;
-                const pref = root.dataset.theme || 'system';
+                const saved = localStorage.getItem('theme');
+                const pref = saved || root.dataset.theme || 'system';
                 const prefersDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const apply = (mode) => {
                     const useDark = mode === 'dark' || (mode === 'system' && prefersDark());
                     root.classList.toggle('dark', useDark);
                     root.dataset.themeApplied = useDark ? 'dark' : 'light';
+                    root.dataset.theme = mode;
                 };
 
                 apply(pref);

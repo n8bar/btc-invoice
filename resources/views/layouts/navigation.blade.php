@@ -185,7 +185,8 @@
         (() => {
             document.querySelectorAll('[data-theme-endpoint]').forEach((container) => {
                 const endpoint = container.getAttribute('data-theme-endpoint');
-                const initial = container.getAttribute('data-theme-initial') || document.documentElement.dataset.theme || 'system';
+                const saved = localStorage.getItem('theme');
+                const initial = saved || container.getAttribute('data-theme-initial') || document.documentElement.dataset.theme || 'system';
                 const buttons = Array.from(container.querySelectorAll('[data-theme-set]'));
 
                 const setActive = (theme) => {
@@ -200,12 +201,14 @@
 
                 setActive(initial);
                 applyTheme(initial);
+                localStorage.setItem('theme', initial);
 
                 buttons.forEach((btn) => {
                     btn.addEventListener('click', () => {
                         const theme = btn.getAttribute('data-theme-set');
                         applyTheme(theme);
                         setActive(theme);
+                        localStorage.setItem('theme', theme);
                         if (endpoint) {
                             persistTheme(endpoint, theme);
                         }
