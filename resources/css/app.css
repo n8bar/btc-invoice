@@ -66,6 +66,16 @@
     color: var(--color-muted) !important;
 }
 
+.dark .bg-green-50 { background-color: #064e3b !important; }
+.dark .text-green-700 { color: #d1fae5 !important; }
+.dark .bg-yellow-50 { background-color: #78350f !important; }
+.dark .text-yellow-900,
+.dark .text-yellow-800 { color: #fef9c3 !important; }
+.dark .bg-blue-50 { background-color: #1e3a8a !important; }
+.dark .text-blue-700 { color: #bfdbfe !important; }
+.dark .bg-red-50 { background-color: #7f1d1d !important; }
+.dark .text-red-700 { color: #fee2e2 !important; }
+
 .dark .border-gray-100,
 .dark .border-gray-200 {
     border-color: var(--color-border) !important;

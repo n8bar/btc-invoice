@@ -174,7 +174,7 @@
             @endif
 
             <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2">
-                <p>Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.</p>
+                <p>Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.</p>
                 <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter an adjustment above so the ledger stays accurate without touching the original chain data.</p>
             </div>
 

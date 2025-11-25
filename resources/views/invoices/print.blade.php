@@ -418,7 +418,7 @@
         </div>
     @else
         <div style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size:13px; margin-bottom:16px;">
-            Overpayments are treated as gratuities by default. If a payment went over in error, please notify us immediately.
+            Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.
         </div>
     @endif
 
