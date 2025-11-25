@@ -1,5 +1,3 @@
-<?php
-{{-- resources/views/clients/create.blade.php --}}
 <x-emoji-favicon symbol="➕" bg="#F3E8FF" />
 <x-app-layout>
     <x-slot name="header">
