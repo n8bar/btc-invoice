@@ -570,7 +570,7 @@
                                 <!-- Right: big centered Thank you -->
                                 <div class="flex-1 min-h-[220px] flex items-center justify-center">
                                     <div class="select-none text-6xl md:text-7xl font-extrabold leading-none tracking-tight">
-                                        <span class="text-indigo-950">Thank&nbsp;you!</span>
+                                        <span class="text-indigo-950" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.4), -1px -1px 2px rgba(0,0,0,0.4);">Thank&nbsp;you!</span>
                                     </div>
                                 </div>
                             </div>
