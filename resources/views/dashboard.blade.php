@@ -103,8 +103,8 @@
                             <div class="text-3xl font-bold text-gray-900">{{ $counts['upcoming_due'] ?? 0 }}</div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700">📅</span>
-                            <div class="rounded-full bg-sky-50 text-sky-700 px-3 py-1 text-xs font-semibold">Due soon</div>
+                            <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700 dark:bg-sky-900 dark:text-sky-200">📅</span>
+                            <div class="rounded-full bg-sky-50 text-sky-700 dark:bg-sky-900 dark:text-sky-200 px-3 py-1 text-xs font-semibold">Due soon</div>
                         </div>
                     </div>
                     <p class="mt-2 text-sm text-gray-500">Invoices due in the next 7 days.</p>
@@ -118,8 +118,8 @@
                             <div class="text-3xl font-bold text-gray-900">${{ number_format($totals['payments_last_7d_usd'] ?? 0, 2) }}</div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">✅</span>
-                            <div class="rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-semibold">{{ $counts['payments_last_7d'] ?? 0 }} payments</div>
+                            <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100">✅</span>
+                            <div class="rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100 px-3 py-1 text-xs font-semibold">{{ $counts['payments_last_7d'] ?? 0 }} payments</div>
                         </div>
                     </div>
                     <p class="mt-2 text-sm text-gray-500">Total detected in the last 7 days.</p>
