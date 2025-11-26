@@ -24,11 +24,11 @@
                 @if ($showIdColumn)
                     <th class="px-0 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 @endif
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
+                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
+                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th class="px-0 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
             </thead>
@@ -38,18 +38,18 @@
                 @if ($showIdColumn)
                     <td class="px-0 py-3 text-sm text-gray-700">{{ $inv->id }}</td>
                 @endif
-                    <td class="px-6 py-3 text-sm font-medium text-gray-900">
+                    <td class="px-2 py-3 text-sm font-medium text-gray-900">
                         <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
                     </td>
-                    <td class="px-6 py-3 text-sm">{{ $inv->client->name ?? '—' }}</td>
-                    <td class="px-6 py-3 text-sm">
+                    <td class="px-2 py-3 text-sm">{{ $inv->client->name ?? '—' }}</td>
+                    <td class="px-2 py-3 text-sm">
                         <div class="flex flex-col">
                             <span>${{ number_format($inv->amount_usd, 2) }}</span>
                             <span class="text-xs text-gray-500">{{ $inv->amount_btc ?? '—' }} BTC</span>
                         </div>
                     </td>
-                    <td class="px-6 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
-                    <td class="px-6 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
+                    <td class="px-2 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
+                    <td class="px-2 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
                     <td class="px-0 py-3 text-sm align-middle">
                         <div class="flex flex-nowrap justify-end items-center gap-2">
                             <a href="{{ route('invoices.edit', $inv) }}"
