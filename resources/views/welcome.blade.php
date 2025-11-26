@@ -12,7 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased min-h-screen bg-gray-900 text-slate-100">
-    <div class="relative overflow-hidden">
+    <div class="relative overflow-hidden min-h-screen">
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/60 via-gray-900 to-black pointer-events-none"></div>
 
         <div class="relative max-w-6xl mx-auto px-6 py-12 lg:py-16">
