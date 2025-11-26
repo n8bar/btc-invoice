@@ -29,7 +29,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th class="px-0 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
@@ -50,7 +50,7 @@
                     </td>
                     <td class="px-6 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
-                    <td class="px-6 py-3 text-sm align-middle">
+                    <td class="px-0 py-3 text-sm align-middle">
                         <div class="flex flex-nowrap justify-end items-center gap-2">
                             <a href="{{ route('invoices.edit', $inv) }}"
                                class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">
