@@ -43,25 +43,25 @@
                         <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
                     </td>
                     <td class="px-6 py-3 text-sm">{{ $inv->client->name ?? '—' }}</td>
-                    <td class="px-6 py-3 text-sm">${{ number_format($inv->amount_usd, 2) }}</td>
-                    <td class="px-6 py-3 text-sm">{{ $inv->amount_btc ?? '—' }}</td>
+                    <td class="px-6 py-3 text-sm">
+                        <div class="flex flex-col">
+                            <span>${{ number_format($inv->amount_usd, 2) }}</span>
+                            <span class="text-xs text-gray-500">{{ $inv->amount_btc ?? '—' }} BTC</span>
+                        </div>
+                    </td>
                     <td class="px-6 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
                     <td class="px-6 py-3 text-sm align-middle">
-                        <div class="flex flex-nowrap justify-end items-center gap-2">
-                            <a href="{{ route('invoices.edit', $inv) }}"
-                               class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">
-                                Edit
-                            </a>
-
-                            <form action="{{ route('invoices.destroy', $inv) }}" method="POST" class="inline"
-                                  onsubmit="return confirm('Delete invoice {{ $inv->number }}?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
-                                    Delete
-                                </button>
-                            </form>
+                        <div class="flex justify-end">
+                            <x-action-menu>
+                                <a href="{{ route('invoices.edit', $inv) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Edit</a>
+                                <form action="{{ route('invoices.destroy', $inv) }}" method="POST" class="block"
+                                      onsubmit="return confirm('Delete invoice {{ $inv->number }}?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50">Delete</button>
+                                </form>
+                            </x-action-menu>
                         </div>
                     </td>
 
