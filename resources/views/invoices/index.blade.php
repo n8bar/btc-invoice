@@ -47,8 +47,8 @@
                     <td class="px-6 py-3 text-sm">{{ $inv->amount_btc ?? '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
-                    <td class="px-6 py-3 text-sm">
-                        <div class="flex flex-wrap justify-end gap-2">
+                    <td class="px-6 py-3 text-sm align-middle">
+                        <div class="flex flex-wrap justify-end items-center gap-2">
                             <a href="{{ route('invoices.edit', $inv) }}"
                                class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">
                                 Edit
