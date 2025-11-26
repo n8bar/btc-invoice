@@ -144,9 +144,13 @@ class DashboardSnapshot
             $amountUsd = $this->paymentUsdValue($invoice, $payment);
             $isPartial = false;
             if ($invoice) {
-                $expected = $invoice->expectedPaymentSats();
-                if ($expected !== null && $expected > 0) {
-                    $isPartial = $payment->sats_received + Invoice::PAYMENT_SAT_TOLERANCE < $expected;
+                if ($invoice->status === 'partial') {
+                    $isPartial = true;
+                } else {
+                    $expected = $invoice->expectedPaymentSats();
+                    if ($expected !== null && $expected > 0) {
+                        $isPartial = $payment->sats_received + Invoice::PAYMENT_SAT_TOLERANCE < $expected;
+                    }
                 }
             }
 
