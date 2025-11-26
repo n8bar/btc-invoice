@@ -26,19 +26,19 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Notes</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+                        <th class="px-0 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
+                        <th class="px-2 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
+                        <th class="px-2 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Notes</th>
+                        <th class="px-0 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse ($clients as $client)
                         <tr>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                            <td class="whitespace-nowrap px-0 py-4 text-sm text-gray-900">
                                 {{ $client->name }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            <td class="whitespace-nowrap px-2 py-4 text-sm">
                                 @if ($client->email)
                                     <a href="mailto:{{ $client->email }}" class="text-indigo-600 hover:underline">
                                         {{ $client->email }}
@@ -47,23 +47,25 @@
                                     <span class="text-gray-400">—</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
+                            <td class="px-2 py-4 text-sm text-gray-700">
                                 {{ \Illuminate\Support\Str::limit($client->notes ?? '', 120) }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
-                                <a href="{{ route('clients.edit', $client) }}"
-                                   class="mr-2 inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                                    Edit
-                                </a>
-                                <form action="{{ route('clients.destroy', $client) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            onclick="return confirm('Delete {{ $client->name }}?')"
-                                            class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700">
-                                        Delete
-                                    </button>
-                                </form>
+                            <td class="whitespace-nowrap px-0 py-4 text-right text-sm">
+                                <div class="flex flex-nowrap justify-end items-center gap-2">
+                                    <a href="{{ route('clients.edit', $client) }}"
+                                       class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                                        ✏️
+                                    </a>
+                                    <form action="{{ route('clients.destroy', $client) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                onclick="return confirm('Delete {{ $client->name }}?')"
+                                                class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
