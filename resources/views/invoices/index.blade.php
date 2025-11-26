@@ -22,7 +22,7 @@
             <thead class="bg-gray-50">
             <tr>
                 @if ($showIdColumn)
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-0 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 @endif
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
@@ -35,9 +35,9 @@
             <tbody class="divide-y divide-gray-200 bg-white">
             @forelse ($invoices as $inv)
                 <tr>
-                    @if ($showIdColumn)
-                        <td class="px-6 py-3 text-sm text-gray-700">{{ $inv->id }}</td>
-                    @endif
+                @if ($showIdColumn)
+                    <td class="px-0 py-3 text-sm text-gray-700">{{ $inv->id }}</td>
+                @endif
                     <td class="px-6 py-3 text-sm font-medium text-gray-900">
                         <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
                     </td>
