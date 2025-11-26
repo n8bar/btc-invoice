@@ -46,7 +46,7 @@
                         Bitcoin invoicing that stays accurate end-to-end.
                     </h1>
                     <p class="text-lg text-slate-200 max-w-2xl">
-                        Generate invoices with live BTC/USD locking, BIP21 QR links, and automated payment detection. Send, track, and reconcile with confidence—your wallet xpub, our watcher.
+                        Generate invoices with USD-first amounts, live BTC quotes, BIP21 QR links, and automated payment detection. Send, track, and reconcile with confidence—your wallet xpub, our watcher.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         @auth
@@ -73,7 +73,7 @@
                         </div>
                         <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10">
                             <div class="text-xs uppercase text-indigo-200 font-semibold">Accurate</div>
-                            <div class="mt-1 font-semibold">BTC/USD locking, partials tracked</div>
+                            <div class="mt-1 font-semibold">USD-first quoting, partials tracked</div>
                         </div>
                     </div>
                 </div>
