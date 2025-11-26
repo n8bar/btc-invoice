@@ -47,20 +47,22 @@
                     <td class="px-6 py-3 text-sm">{{ $inv->amount_btc ?? '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ optional($inv->due_date)->toDateString() ?: '—' }}</td>
                     <td class="px-6 py-3 text-sm">{{ $inv->status ?? 'draft' }}</td>
-                    <td class="px-6 py-3 text-sm text-right">
-                        <a href="{{ route('invoices.edit', $inv) }}"
-                           class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">
-                            Edit
-                        </a>
+                    <td class="px-6 py-3 text-sm">
+                        <div class="flex flex-wrap justify-end gap-2">
+                            <a href="{{ route('invoices.edit', $inv) }}"
+                               class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50">
+                                Edit
+                            </a>
 
-                        <form action="{{ route('invoices.destroy', $inv) }}" method="POST" class="inline"
-                              onsubmit="return confirm('Delete invoice {{ $inv->number }}?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
-                                Delete
-                            </button>
-                        </form>
+                            <form action="{{ route('invoices.destroy', $inv) }}" method="POST" class="inline"
+                                  onsubmit="return confirm('Delete invoice {{ $inv->number }}?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </td>
 
                 </tr>
