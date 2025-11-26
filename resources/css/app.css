@@ -81,6 +81,8 @@
 .dark .text-blue-700 { color: #c7d2fe !important; }
 .dark .text-blue-800,
 .dark .text-blue-900 { color: #e0e7ff !important; }
+.dark .bg-sky-50 { background-color: #0b192c !important; }
+.dark .text-sky-700 { color: #bae6fd !important; }
 .dark .bg-indigo-50,
 .dark .bg-indigo-50\/70 { background-color: #0d0c26 !important; }
 .dark .text-indigo-700,
@@ -89,6 +91,8 @@
 .dark .bg-red-50 { background-color: #1a0505 !important; }
 .dark .text-red-700 { color: #fecdd3 !important; }
 .dark .text-red-900 { color: #ffe4e6 !important; }
+.dark .bg-emerald-50 { background-color: #0b2318 !important; }
+.dark .text-emerald-700 { color: #bbf7d0 !important; }
 .dark .bg-gray-50,
 .dark .bg-gray-50\/60,
 .dark .bg-gray-100 { background-color: var(--color-surface-subtle) !important; }
