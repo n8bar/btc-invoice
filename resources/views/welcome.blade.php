@@ -46,7 +46,7 @@
                         Bitcoin invoicing that stays accurate end-to-end.
                     </h1>
                     <p class="text-lg text-slate-200 max-w-2xl">
-                        Generate invoices with USD-first amounts, live BTC quotes, BIP21 QR links, and automated payment detection. Send, track, and reconcile with confidence—your wallet xpub, our watcher.
+                        Generate invoices with USD-first amounts, live BTC quotes, BIP21 QR links, and automated payment detection. Send, track, and reconcile with confidence—your wallet xpub, our on-chain watcher.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         @auth
