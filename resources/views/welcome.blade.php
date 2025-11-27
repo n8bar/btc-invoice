@@ -46,7 +46,7 @@
                         Bitcoin invoicing that stays accurate end-to-end.
                     </h1>
                     <p class="text-lg text-slate-200 max-w-2xl">
-                        Generate invoices with USD-first amounts, live BTC quotes, BIP21 QR links, and automated payment detection. Send, track, and settle with confidence—your wallet xpub, our on-chain watcher.
+                        Invoice in USD with live BTC quotes your clients can trust, and give them a simple QR to pay. Our on-chain watcher listens for payments and tracks partial payments too, confirming when sats land and updating your status automatically. No manual checks or guesswork, just clear amounts, an easy payment path, and real on-chain signals from send to settle.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         @auth
