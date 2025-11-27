@@ -39,7 +39,7 @@
 
             <div class="grid gap-10 lg:[grid-template-columns:1.2fr_1fr] lg:items-center">
                 <div class="space-y-6">
-                    <div class="inline-flex items-center gap-3 px-4 py-2 text-2xl font-semibold tracking-wide text-indigo-200">
+                    <div class="inline-flex items-center gap-3 px-4 py-2 text-2xl font-semibold tracking-wide text-indigo-200 border border-white/20 rounded-full">
                         <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="h-16 w-auto">
                         CryptoZing.app
                     </div>
