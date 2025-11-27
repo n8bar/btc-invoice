@@ -26,10 +26,10 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Theme preference stored per user (`light`/`dark`/`system`) with class-based dark mode and `prefers-color-scheme` fallback.
    - Header toggle (desktop + mobile) updates UI immediately and persists via auth route; layout applies theme to root, and Tailwind dark mode is class-based.
    - Tests cover preference persistence and validation.
+3. Landing page refresh
+   - Dark-themed CryptoZing hero with updated headline/copy, larger logos (brand badge + hero image), CTA/button states, and staggered feature cards (wallet-ready, client-friendly, accurate, on-chain aware, delivery-ready, public links).
 
 ## ToDo
-3. Landing page refresh
-   - Replace Laravel branding on the welcome/landing page with CryptoZing branding/logo while keeping Login and Register buttons; ensure copy and visuals align with the app’s UX and brand.
 4. Wallet UX improvements
    - Inline explainer for xpub formats per network; show network badge; derive-test feedback inline.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
