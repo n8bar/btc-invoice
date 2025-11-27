@@ -41,7 +41,7 @@
                 <div class="space-y-6">
                     <div class="inline-flex items-center gap-3 px-4 py-2 text-2xl font-semibold tracking-wide text-indigo-200 border border-white/20 rounded-full">
                         <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="h-16 w-auto">
-                        CryptoZing.app
+                        CryptoZing.app&nbsp;&nbsp;
                     </div>
                     <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
                         Invoice Bitcoin today,<br class="hidden sm:block" /> track payments on-chain.
@@ -63,18 +63,48 @@
                             </a>
                         @endauth
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4 text-sm text-slate-200">
                         <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10">
-                            <div class="text-xs uppercase text-indigo-200 font-semibold">Wallet-ready</div>
-                            <div class="mt-1 font-semibold">BIP84 xpub + mempool watcher</div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">🔐</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">Wallet-ready</div>
+                            </div>
+                            <div class="mt-2 font-semibold">BIP84 xpub + on-chain watcher</div>
                         </div>
-                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10">
-                            <div class="text-xs uppercase text-indigo-200 font-semibold">Client-friendly</div>
-                            <div class="mt-1 font-semibold">Public share links + receipts</div>
+                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10 md:translate-y-2">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">🔗</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">Client-friendly</div>
+                            </div>
+                            <div class="mt-2 font-semibold">Public share links + receipts</div>
                         </div>
-                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10">
-                            <div class="text-xs uppercase text-indigo-200 font-semibold">Accurate</div>
-                            <div class="mt-1 font-semibold">USD-first quoting, partials tracked</div>
+                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10 md:translate-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">🎯</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">Accurate</div>
+                            </div>
+                            <div class="mt-2 font-semibold">USD-first quoting, on-chain partials tracked</div>
+                        </div>
+                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10 md:translate-y-6">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">🛰️</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">On-chain aware</div>
+                            </div>
+                            <div class="mt-2 font-semibold">Live detection from send to settle</div>
+                        </div>
+                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10 md:translate-y-8">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">📧</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">Delivery-ready</div>
+                            </div>
+                            <div class="mt-2 font-semibold">Email sends + status logging</div>
+                        </div>
+                        <div class="rounded-lg bg-white/5 p-4 ring-1 ring-white/10 md:translate-y-10">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl" aria-hidden="true">🌐</span>
+                                <div class="text-xs uppercase text-indigo-200 font-semibold">Public links</div>
+                            </div>
+                            <div class="mt-2 font-semibold">Noindex shareable views your clients trust</div>
                         </div>
                     </div>
                 </div>

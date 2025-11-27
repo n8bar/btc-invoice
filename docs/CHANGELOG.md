@@ -5,6 +5,7 @@
 | 2025-11-23 | Light/Dark theme toggle | Per-user theme preference (light/dark/system) added with header toggle, class-based dark mode, and tests; PLAN/UX spec updated to mark it done. |
 | 2025-11-23 | UX Overhaul spec updated | Marked dashboard snapshot complete; broadened UI polish to invoices/clients and settings/auth; outputs/DoD realigned with current ToDo list. |
 | 2025-11-23 | PLAN alignment updates | PLAN UX Overhaul section synced with spec and mailer/alerts audit now links to `docs/NOTIFICATIONS.md`. |
+| 2025-11-23 | Landing page refreshed | Dark-themed CryptoZing hero with larger logos, updated copy, staggered feature cards, and CTA/brand badge polish. |
 | 2025-11-22 | Dashboard snapshot added | Dashboard now shows open/past-due counts, outstanding totals, recent payments with per-user cached snapshot. |
 | 2025-11-22 | UX Overhaul spec added | Added `docs/UX_OVERHAUL_SPEC.md` and linked PLAN/README for Item 12 scope. |
 | 2025-11-22 | Print view + timezone fixes | Print view hides back link on public, uses invoice-created date (Denver), formats BTC/rate via shared helpers; changelog column switched to America/Denver; app timezone set to America/Denver. |
