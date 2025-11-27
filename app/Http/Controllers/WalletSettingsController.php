@@ -6,6 +6,7 @@ use App\Http\Requests\WalletAccountRequest;
 use App\Http\Requests\WalletSettingRequest;
 use App\Models\UserWalletAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class WalletSettingsController extends Controller
 {
@@ -13,20 +14,25 @@ class WalletSettingsController extends Controller
 
     public function edit(Request $request)
     {
+        $network = Config::get('wallet.default_network', 'testnet');
+
         return view('wallet.settings', [
             'wallet' => $request->user()->walletSetting,
             'walletAccounts' => $request->user()->walletAccounts()
                 ->orderBy('label')
                 ->get(),
             'maxAdditionalWallets' => self::MAX_ADDITIONAL_ACCOUNTS,
+            'defaultNetwork' => $network,
         ]);
     }
 
     public function update(WalletSettingRequest $request)
     {
         $user = $request->user();
+        $network = Config::get('wallet.default_network', 'testnet');
 
         $payload = $request->validated();
+        $payload['network'] = $network;
 
         // Validate the xpub by deriving a single address to catch bad keys early.
         try {
@@ -59,6 +65,7 @@ class WalletSettingsController extends Controller
     public function storeAccount(WalletAccountRequest $request)
     {
         $user = $request->user();
+        $network = Config::get('wallet.default_network', 'testnet');
 
         if ($user->walletAccounts()->count() >= self::MAX_ADDITIONAL_ACCOUNTS) {
             return back()
@@ -66,7 +73,10 @@ class WalletSettingsController extends Controller
                 ->withInput();
         }
 
-        $user->walletAccounts()->create($request->validated());
+        $payload = $request->validated();
+        $payload['network'] = $network;
+
+        $user->walletAccounts()->create($payload);
 
         return redirect()->route('wallet.settings.edit')
             ->with('status', 'Additional wallet saved.');

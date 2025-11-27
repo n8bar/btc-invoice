@@ -17,7 +17,6 @@ class WalletAccountRequest extends FormRequest
     {
         return [
             'label' => ['required','string','max:64'],
-            'network' => ['required','in:testnet,mainnet'],
             'bip84_xpub' => ['required','string','max:255'],
         ];
     }

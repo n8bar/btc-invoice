@@ -79,7 +79,6 @@ class UserSettingsTest extends TestCase
             ->actingAs($owner)
             ->post(route('wallet.settings.accounts.store'), [
                 'label' => 'Cold storage',
-                'network' => 'testnet',
                 'bip84_xpub' => 'vpub' . str_repeat('a', 20),
             ])
             ->assertRedirect(route('wallet.settings.edit'));

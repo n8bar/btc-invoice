@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-11-23 | Wallet settings mainnet-first | Network selector removed; WALLET_NETWORK env sets network, UI shows badge, xpub validation updated; additional wallets follow the configured network. |
 | 2025-11-23 | Light/Dark theme toggle | Per-user theme preference (light/dark/system) added with header toggle, class-based dark mode, and tests; PLAN/UX spec updated to mark it done. |
 | 2025-11-23 | UX Overhaul spec updated | Marked dashboard snapshot complete; broadened UI polish to invoices/clients and settings/auth; outputs/DoD realigned with current ToDo list. |
 | 2025-11-23 | PLAN alignment updates | PLAN UX Overhaul section synced with spec and mailer/alerts audit now links to `docs/NOTIFICATIONS.md`. |

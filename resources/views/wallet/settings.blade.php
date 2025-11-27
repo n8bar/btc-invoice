@@ -11,7 +11,7 @@
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <p class="mb-4 text-sm text-gray-600">
-                        {{ __('Provide a BIP84 xpub so a unique Bitcoin address is generated per invoice. For testnet, paste the vpub for your external chain (m/84\'/1\'/0\'/0).') }}
+                        {{ __('Provide a BIP84 xpub so a unique Bitcoin address is generated per invoice. The network is set from WALLET_NETWORK (currently :network).', ['network' => strtoupper($defaultNetwork)]) }}
                     </p>
 
                     @if (session('status'))
@@ -21,19 +21,15 @@
                     @endif
 
                     @php
-                        $selectedNetwork = old('network', optional($wallet)->network ?? 'testnet');
                         $xpubValue = old('bip84_xpub', optional($wallet)->bip84_xpub ?? '');
                     @endphp
                     <form method="POST" action="{{ route('wallet.settings.update') }}" class="space-y-6">
                         @csrf
-                        <div>
-                            <x-input-label for="network" :value="__('Network')" />
-                            <select id="network" name="network" class="mt-1 block w-full rounded border-gray-300" required>
-                                @foreach (['testnet' => 'Bitcoin Testnet', 'mainnet' => 'Bitcoin Mainnet'] as $value => $label)
-                                    <option value="{{ $value }}" @selected($selectedNetwork === $value)>{{ $label }}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('network')" />
+                        <div class="flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                            <span class="text-sm font-semibold text-gray-800">Network</span>
+                            <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                                {{ $defaultNetwork === 'mainnet' ? 'Bitcoin Mainnet' : 'Bitcoin Testnet' }}
+                            </span>
                         </div>
 
                         <div>
@@ -86,15 +82,11 @@
                                                   value="{{ old('label') }}" placeholder="Cold storage" />
                                     <x-input-error class="mt-2" :messages="$errors->walletAccount?->get('label')" />
                                 </div>
-                                <div>
-                                    <x-input-label for="additional_network" :value="__('Network')" />
-                                    <select id="additional_network" name="network"
-                                            class="mt-1 block w-full rounded border-gray-300">
-                                        @foreach (['testnet' => 'Bitcoin Testnet', 'mainnet' => 'Bitcoin Mainnet'] as $value => $label)
-                                            <option value="{{ $value }}" @selected(old('network')===$value)>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                    <x-input-error class="mt-2" :messages="$errors->walletAccount?->get('network')" />
+                                <div class="flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                                    <span class="text-sm font-semibold text-gray-800">Network</span>
+                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                                        {{ $defaultNetwork === 'mainnet' ? 'Bitcoin Mainnet' : 'Bitcoin Testnet' }}
+                                    </span>
                                 </div>
                                 <div>
                                     <x-input-label for="additional_bip84_xpub" :value="__('BIP84 xpub')" />
