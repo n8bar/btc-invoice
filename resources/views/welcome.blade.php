@@ -43,7 +43,7 @@
                         CryptoZing.app
                     </div>
                     <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-                        Bitcoin invoicing that stays accurate end-to-end.
+                        Invoice Bitcoin today, track payments on-chain.
                     </h1>
                     <p class="text-lg text-slate-200 max-w-2xl">
                         Invoice in USD with live BTC quotes your clients can trust, and give them a simple QR to pay. Our on-chain watcher listens for payments and tracks partial payments too, confirming when sats land and updating your status automatically. No manual checks or guesswork, just clear amounts, an easy payment path, and real on-chain signals from send to settle.
