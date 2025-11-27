@@ -39,7 +39,7 @@
 
             <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
                 <div class="space-y-6">
-                    <div class="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-200 ring-1 ring-white/20">
+                    <div class="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold tracking-wide text-indigo-200 ring-1 ring-white/20">
                         CryptoZing.app
                     </div>
                     <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
