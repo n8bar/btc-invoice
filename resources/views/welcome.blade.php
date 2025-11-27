@@ -79,9 +79,7 @@
                 </div>
 
                 <div class="flex justify-center lg:justify-end">
-                    <div class="rounded-2xl bg-white/5 p-6 ring-1 ring-white/10 shadow-xl">
-                        <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="mx-auto h-72 w-auto">
-                    </div>
+                    <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="mx-auto h-72 w-auto">
                 </div>
             </div>
         </div>
