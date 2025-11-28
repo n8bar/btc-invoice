@@ -33,27 +33,29 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 4. Wallet UX improvements
    - Inline explainer for xpub formats per network; show network badge; derive-test feedback inline.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
-5. Invoices & Clients UI polish
+5. Login screen refresh
+   - Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark theme.
+6. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
-6. Public/share refresh
+7. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
-7. Onboarding wizard
+8. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
-8. User settings & auth UX
+9. User settings & auth UX
    - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
    - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
    - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
-9. Editable email templates
+10. Editable email templates
    - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
    - Preview + reset-to-default; validation to prevent empty required tokens.
-10. Invoice Settings polish
+11. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
 
 ## Definition of Done
