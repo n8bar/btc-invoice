@@ -33,7 +33,8 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 4. Login screen refresh
    - Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark theme.
 5. Wallet UX improvements
-   - Inline explainer for xpub formats per network; show network badge; derive-test feedback inline.
+   - Mainnet-first UI: hide network selection; network derives from config/env, with testnet available only via env for dev/testing.
+   - Inline explainer for xpub formats per network (xpub/zpub), show network badge; derive-test feedback inline.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
 6. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
