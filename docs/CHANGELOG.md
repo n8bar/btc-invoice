@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-11-23 | PLAN mainnet cutover item added | Inserted mainnet cutover prep ahead of RC deploy and clarified Item 12 as testnet-focused; RC checklist remains linked. |
 | 2025-11-23 | RC rollout checklist added | Added `docs/RC_ROLLOUT_CHECKLIST.md`, linked PLAN item 16 verification and README docs section. |
 | 2025-11-23 | Partial-payment warning documented | NOTIFICATIONS now lists the proactive partial-payment client warning + owner FYI already described in PARTIAL_PAYMENTS; PLAN/README linked new DX docs. |
 | 2025-11-23 | Wallet settings mainnet-first | Network selector removed; WALLET_NETWORK env sets network, UI shows badge, xpub validation updated; additional wallets follow the configured network. |

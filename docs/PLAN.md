@@ -88,7 +88,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 
 ## Roadmap to Release Candidate
 12. **Payment Address Accuracy (bug fix)**
-    - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (testnet/mainnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
+    - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (current network: testnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
     - Verification: derivation audit (sample invoices vs xpub/network/path) plus watcher sanity run after fixes.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
@@ -111,7 +111,11 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
     - Definition of Done: the quick start + onboarding docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
-16. **CryptoZing.app Deployment (RC)**
+16. **Mainnet Cutover Preparation**
+    - Plan and execute the switch from testnet to mainnet once UX/mail audits are stable. Define env flips, wallet/xpub validation on mainnet, and a pilot send on mainnet before general availability.
+    - Create a backout plan and audit steps to ensure existing testnet invoices remain intact or are clearly segregated.
+    - Verification: mainnet dress rehearsal (env flip in staging, sample invoice/address derivation, watcher sanity, mail/send sanity) with sign-off.
+17. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
