@@ -115,7 +115,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
-    - Verification: RC rollout checklist (APP_PUBLIC_URL, alias flip, migrate/test, smoke send, public-link sanity).
+    - Verification: RC rollout checklist (APP_PUBLIC_URL, alias flip, migrate/test, smoke send, public-link sanity); see [`docs/RC_ROLLOUT_CHECKLIST.md`](RC_ROLLOUT_CHECKLIST.md).
 
 ## Testing Approach
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
