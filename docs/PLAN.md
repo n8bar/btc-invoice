@@ -89,6 +89,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap to Release Candidate
 12. **Payment Address Accuracy (bug fix)**
     - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (testnet/mainnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
+    - Verification: derivation audit (sample invoices vs xpub/network/path) plus watcher sanity run after fixes.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
     - Dashboard snapshot (done) and light/dark theme toggle (done) plus wallet UX improvements (xpub guidance, validation helpers).
@@ -102,6 +103,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
     - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health; align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
+    - Verification: one alias-off drill in a safe env (DKIM/SPF/DMARC + links) and observe queue/backoff/alerts.
 15. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
     - Sail-first quick start and onboarding docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](get-live/ONBOARDING_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
@@ -113,6 +115,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
+    - Verification: RC rollout checklist (APP_PUBLIC_URL, alias flip, migrate/test, smoke send, public-link sanity).
 
 ## Testing Approach
 - Execute suite via Sail: `./vendor/bin/sail artisan test`.
