@@ -27,6 +27,10 @@
    - Triggered when `underpaymentPercent() >= 15%` (after tolerance). Same entry point as overpay (watcher or manual adjustment that reopens balance).
    - Email lists the outstanding USD/BTC amounts and links to the public invoice so the client can settle.
    - Owner also receives a brief notice (“Client underpayment alert sent”) so they’re aware of the outreach.
+5. **Proactive Partial-Payment Warning (Client + Owner FYI)**
+   - Fired after the watcher detects multiple partial payments on the same invoice to encourage a single payment and reduce miner fees.
+   - Client email reminds them to send one payment for the outstanding balance; owner gets an FYI in the delivery log/CC.
+   - Logged via `invoice_deliveries` (e.g., `partial_warning_client`, `partial_warning_owner`) and respects aliasing in non-prod.
 
 ## Implementation Notes
 - Use the existing job/mailable pattern (`DeliverInvoiceMail` + `invoice_deliveries`) for all new emails so aliasing + logging stay consistent.
@@ -37,6 +41,7 @@
   - `InvoiceOverpaymentClientMail`
   - `InvoiceUnderpaymentClientMail`
   - (Optional) `InvoiceUnderpaymentOwnerMail` if we want a distinct copy instead of CCing.
+  - `InvoicePartialPaymentWarningClientMail` (plus owner FYI mail/CC)
 - Add a lightweight service that raises “notification intents” from watcher/manual-adjustment flows and deduplicates sends (e.g., don’t send multiple overpay emails for the same invoice unless the percentage keeps climbing and a configured interval has passed).
 - Persist last-alert timestamps on `invoices` (columns such as `last_overpayment_alert_at`, `last_underpayment_alert_at`, `last_past_due_alert_at`) to prevent repeated sends within 24h.
 - Scheduler additions:

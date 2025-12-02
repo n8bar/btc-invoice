@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-16_
+_Last updated: 2025-11-23_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -8,7 +8,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 
 ## Stack / Environment
 - Laravel 12 + PHP 8.4 with Breeze + Tailwind UI.
-- Dockerized via Laravel Sail; containers: `laravel.test` (PHP-FPM/Nginx) and `mysql`.
+- Dockerized via Laravel Sail; containers: `laravel.test` (PHP-FPM/Nginx), `scheduler` (runs `php artisan schedule:work`), and `mysql`.
 - Database: MySQL (Sail). SQLite only for specific tests if ever configured.
 - QR generation handled server-side via `simplesoftwareio/simple-qrcode`.
 - Timezone default on server: **America/Denver**.
@@ -79,6 +79,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 10. **User Settings (main)**
     - Profile page now includes invoice memo + payment-term defaults so new invoices auto-fill description/due dates when owners leave those fields blank.
     - Wallet settings gained an “additional wallets” section to stash extra xpubs for the future multi-wallet selector; stored accounts aren’t active yet but keep DNS/Xpub data ready.
+    - Wallet settings are now mainnet-first: network derives from `WALLET_NETWORK` env, the selector is removed, and the UI shows the network badge while keeping additional wallets on the configured network.
     - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 11. **Observability & Safety (main)**
     - Structured logs cover payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate).
@@ -103,8 +104,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health; align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
 15. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
-    - Ship a Sail-first quick start + env var reference for new contributors (clone → `./vendor/bin/sail up -d` → migrate/seed).
-    - Add an onboarding walkthrough that covers wallet setup, issuing an invoice, delivering it, and seeing the payment flow (screenshots OK).
+    - Sail-first quick start and onboarding docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](get-live/ONBOARDING_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
+    - Add any future onboarding polish (screenshots, new flows) in those docs and keep env references current.
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
     - Definition of Done: the quick start + onboarding docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.

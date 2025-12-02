@@ -1,6 +1,6 @@
 # Bitcoin Invoice Generator
 
-This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. The delivery plan, roadmap, and branching policy live in [`docs/PLAN.md`](docs/PLAN.md).
+This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md); the delivery plan, roadmap, and branching policy live in [`docs/PLAN.md`](docs/PLAN.md).
 
 ## Highlights
 - **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
@@ -54,10 +54,14 @@ Execute the full suite via Sail:
 - Delivery plan & roadmap: [`docs/PLAN.md`](docs/PLAN.md)
 - Future backlog: [`docs/FuturePLAN.md`](docs/FuturePLAN.md)
 - Docs & DX spec: [`docs/DOCS_DX_SPEC.md`](docs/DOCS_DX_SPEC.md)
+- Quick start: [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md)
+- Onboarding walkthrough: [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](docs/get-live/ONBOARDING_WALKTHROUGH.md)
 - UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
+- Print/Public polish spec: [`docs/PRINT_PUBLIC_POLISH.md`](docs/PRINT_PUBLIC_POLISH.md)
 - Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
 - Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
 - Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
 - Notification spec: [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md)
+- Test hardening draft: [`docs/tests/TEST_HARDENING.md`](docs/tests/TEST_HARDENING.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
