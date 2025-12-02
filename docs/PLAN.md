@@ -86,7 +86,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Wallet xpubs are validated on save via a derive test; invoice creation guards derivation failures with a friendly redirect to wallet settings.
 
 ## Roadmap to Release Candidate
-12. **UX Overhaul**
+12. **Payment Address Accuracy**
+    - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (testnet/mainnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
+13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
     - Dashboard snapshot (done) and light/dark theme toggle (done) plus wallet UX improvements (xpub guidance, validation helpers).
     - Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
@@ -95,18 +97,18 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
     - Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
-13. **Mailer & Alerts Audit**
+14. **Mailer & Alerts Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
     - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health; align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
-14. **Docs & DX**
+15. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
     - Ship a Sail-first quick start + env var reference for new contributors (clone → `./vendor/bin/sail up -d` → migrate/seed).
     - Add an onboarding walkthrough that covers wallet setup, issuing an invoice, delivering it, and seeing the payment flow (screenshots OK).
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
     - Definition of Done: the quick start + onboarding docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
-15. **CryptoZing.app Deployment (RC)**
+16. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.
