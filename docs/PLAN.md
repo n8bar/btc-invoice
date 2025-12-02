@@ -86,7 +86,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Wallet xpubs are validated on save via a derive test; invoice creation guards derivation failures with a friendly redirect to wallet settings.
 
 ## Roadmap to Release Candidate
-12. **Payment Address Accuracy**
+12. **Payment Address Accuracy (bug fix)**
     - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (testnet/mainnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
