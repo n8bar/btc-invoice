@@ -2,6 +2,7 @@
 
 use App\Console\Commands\AssignInvoiceAddresses;
 use App\Console\Commands\BackfillInvoicePayments;
+use App\Console\Commands\ReassignInvoiceAddresses;
 use App\Console\Commands\SendPastDueInvoiceAlerts;
 use App\Console\Commands\WatchInvoicePayments;
 use App\Providers\AppServiceProvider;
@@ -38,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         BackfillInvoicePayments::class,
         SendPastDueInvoiceAlerts::class,
         WatchInvoicePayments::class,
+        ReassignInvoiceAddresses::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         //

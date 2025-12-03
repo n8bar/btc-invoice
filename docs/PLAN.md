@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-11-23_
+_Last updated: 2025-12-01_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -87,9 +87,11 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Wallet xpubs are validated on save via a derive test; invoice creation guards derivation failures with a friendly redirect to wallet settings.
 
 ## Roadmap to Release Candidate
-12. **Payment Address Accuracy (bug fix)**
+12. **Payment & Address Accuracy (bug fixes)**
     - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (current network: testnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
-    - Verification: derivation audit (sample invoices vs xpub/network/path) plus watcher sanity run after fixes.
+    - Audit (2025-12-01): 8 testnet invoices derived from the legacy branch `m/84'/1'/0'/index`; none matched the expected external chain. `wallet:reassign-invoice-addresses` now supports `--include-paid`, `--reset-payments`, and `--use-next-index`; applied to all 8 invoices (including paid/partial), moving them to fresh external-chain indexes, clearing payment logs, resetting statuses to sent, and advancing wallet `next_derivation_index`.
+    - Incoming: add confirmation-gated payment status (`pending` before confirmed paid), RBF-safe cleanup (drop/ignore missing unconfirmed txids), and paid transitions only after confirmation threshold (default 1; user-configurable post-RC). Update UI copy, tests, and docs; see [`docs/PAYMENT_CONFIRMATIONS.md`](PAYMENT_CONFIRMATIONS.md) for the strategy.
+    - Verification: derivation audit (sample invoices vs xpub/network/path) plus watcher sanity run after fixes. _Next_: spot-check watcher against a corrected invoice.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
     - Dashboard snapshot (done) and light/dark theme toggle (done) plus wallet UX improvements (xpub guidance, validation helpers).
