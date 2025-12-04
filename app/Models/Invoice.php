@@ -55,7 +55,9 @@ class Invoice extends Model
     public const UNDERPAY_USD_TOLERANCE = 10.0;
     public const UNDERPAY_PERCENT_TOLERANCE = 1.0;
     public const CLIENT_ALERT_PERCENT = 15.0;
-    public const SMALL_BALANCE_RESOLUTION_USD = 5.0;
+    public const SMALL_BALANCE_RESOLUTION_FLOOR_USD = 1.0;
+    public const SMALL_BALANCE_RESOLUTION_PERCENT = 0.01; // 1% of expected USD
+    public const SMALL_BALANCE_RESOLUTION_CAP_USD = 50.0;
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
@@ -438,6 +440,7 @@ class Invoice extends Model
             'outstanding_sats' => $outstandingSats,
             'last_payment_detected_at' => $lastDetected,
             'last_payment_confirmed_at' => $lastConfirmed,
+            'small_balance_threshold_usd' => $expectedUsd !== null ? $this->smallBalanceResolutionThresholdUsd($expectedUsd) : null,
         ];
     }
 
@@ -554,5 +557,17 @@ class Invoice extends Model
     private function paymentIsConfirmed(InvoicePayment $payment): bool
     {
         return $payment->is_adjustment || $payment->confirmed_at !== null;
+    }
+
+    public function smallBalanceResolutionThresholdUsd(float $expectedUsd): float
+    {
+        if ($expectedUsd <= 0) {
+            return 0.0;
+        }
+
+        $percentPortion = $expectedUsd * self::SMALL_BALANCE_RESOLUTION_PERCENT;
+        $ceiling = min($percentPortion, self::SMALL_BALANCE_RESOLUTION_CAP_USD);
+
+        return max(self::SMALL_BALANCE_RESOLUTION_FLOOR_USD, round($ceiling, 2));
     }
 }

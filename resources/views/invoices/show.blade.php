@@ -389,8 +389,9 @@
                         @endif
 
                         @php
-                            $smallBalanceThreshold = \App\Models\Invoice::SMALL_BALANCE_RESOLUTION_USD;
+                            $smallBalanceThreshold = $summary['small_balance_threshold_usd'] ?? null;
                             $canResolveSmall = ($summary['outstanding_usd'] ?? 0) > 0
+                                && $smallBalanceThreshold !== null
                                 && ($summary['outstanding_usd'] ?? 0) <= $smallBalanceThreshold
                                 && $invoice->status !== 'paid';
                         @endphp
@@ -399,7 +400,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <div class="font-semibold">Resolve small balance</div>
-                                        <div class="text-xs text-emerald-800">Creates a manual credit for the remaining amount and marks the invoice paid.</div>
+                                        <div class="text-xs text-emerald-800">Creates a manual credit for the remaining amount and marks the invoice paid (threshold {{ $currency($smallBalanceThreshold) }}).</div>
                                     </div>
                                     <form method="POST" action="{{ route('invoices.payments.adjustments.resolve', $invoice) }}">
                                         @csrf

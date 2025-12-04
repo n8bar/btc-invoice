@@ -29,12 +29,19 @@ class InvoicePaymentAdjustmentController extends Controller
 
         $summary = $invoice->paymentSummary($rateInfo);
         $outstandingUsd = $summary['outstanding_usd'] ?? null;
+        $expectedUsd = $summary['expected_usd'] ?? null;
 
         if ($outstandingUsd === null || $outstandingUsd <= 0) {
             return back()->with('status', 'No outstanding balance to resolve.');
         }
 
-        if ($outstandingUsd > Invoice::SMALL_BALANCE_RESOLUTION_USD) {
+        if ($expectedUsd === null || $expectedUsd <= 0) {
+            return back()->withErrors(['amount_usd' => 'Unable to determine expected amount.']);
+        }
+
+        $threshold = $invoice->smallBalanceResolutionThresholdUsd($expectedUsd);
+
+        if ($outstandingUsd > $threshold) {
             return back()->withErrors(['amount_usd' => 'Outstanding balance exceeds the small-balance resolution threshold.']);
         }
 
