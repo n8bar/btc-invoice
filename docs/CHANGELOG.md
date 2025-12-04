@@ -2,7 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2025-12-04 | Small-balance resolution spec | Documented exact outstanding display (no dust masking) and a manual “Resolve small balance” adjustment to settle tiny residual USD and mark invoices paid; see PLAN and PARTIAL_PAYMENTS. |
+| 2025-12-04 | Small-balance resolution spec | Documented exact outstanding display (no dust masking) and a manual “Resolve small balance” adjustment (threshold = `max($1, min(1% of expected USD, $50))`) to settle tiny residual USD and mark invoices paid; see PLAN and PARTIAL_PAYMENTS. |
 | 2025-12-03 | Partial payments spec clarified | Documented USD-as-source with per-payment rate locking, floating outstanding BTC for QR, and status gating on confirmed USD (pending/partial/paid); aligned PAYMENT_CONFIRMATIONS and PLAN notes. |
 | 2025-12-01 | Payment & address accuracy scope expanded | PLAN Item 12 now covers confirmation-gated payments (`pending` until confirmed), RBF-safe cleanup for dropped unconfirmed txids, and configurable confirmation thresholds (default 1; per-user post-RC). |
 | 2025-11-23 | PLAN mainnet cutover item added | Inserted mainnet cutover prep ahead of RC deploy and clarified Item 12 as testnet-focused; RC checklist remains linked. |

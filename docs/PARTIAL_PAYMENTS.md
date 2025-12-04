@@ -65,7 +65,7 @@
 
 ## Small Balance Resolution
 - Outstanding USD/BTC should display the exact residual (no UI masking for dust). Status `paid` hinges solely on confirmed USD >= expected USD.
-- When the residual is below a small, configurable threshold, surface an explicit “Resolve small balance” control that records a manual credit adjustment for the remaining USD (at the latest available rate) and marks the invoice paid. The adjustment is logged in `invoice_payments` as an `is_adjustment` row for auditability.
+- When the residual is below the small-balance threshold, surface an explicit “Resolve small balance” control that records a manual credit adjustment for the remaining USD (at the latest available rate) and marks the invoice paid. The adjustment is logged in `invoice_payments` as an `is_adjustment` row for auditability. Threshold rule: `max($1.00, min(1% of expected USD, $50.00 cap))`.
 - Do not auto-settle residuals; owners must opt-in via the control.
 
 ## Testing

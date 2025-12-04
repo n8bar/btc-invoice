@@ -67,7 +67,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `InvoicePaymentDetector` + watcher refresh the outstanding balance after each detection so `partial` status, `paid_at`, and tolerance handling stay accurate everywhere.
     - Owners can record manual adjustments for significant discrepancies, and clients see over/under-payment alerts once the variance exceeds 15% (overpayment alert reminds them gratuities are default). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) for the full spec.
     - Proactive partial-payment alerts now warn clients (and notify owners) when multiple payment attempts are detected, and invoice emails/public views remind clients to send the full balance in one payment to avoid extra miner fees.
-    - Upcoming: display residuals exactly (no masking via sat tolerance) and add an explicit “Resolve small balance” control to log a credit adjustment for tiny residual USD amounts and mark the invoice paid; see updated partial payments spec.
+    - Display residuals exactly (no masking via sat tolerance) and expose a “Resolve small balance” control for tiny residuals (threshold = `max($1, min(1% of expected USD, $50))`) that logs a credit adjustment and marks the invoice paid; see updated partial payments spec.
 8. **Invoice Delivery & Auto Receipts (codex/invoice-delivery)**
     - `/invoices/{invoice}/deliver` gate-keeps on client email + public share, then queues `DeliverInvoiceMail` jobs that render `InvoiceReadyMail` with optional CC + note.
     - `invoice_deliveries` log table fuels the show page’s delivery log with status, CC, dispatch/sent timestamps, and surfaced errors.
