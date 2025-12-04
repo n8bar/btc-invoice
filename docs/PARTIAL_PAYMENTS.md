@@ -13,31 +13,36 @@
     - Index on (`invoice_id`, `txid`) to prevent duplicates.
 
 2. **Invoice columns**
-    - Keep `amount_btc` as the target.
-    - Add `status` enum entries: `draft`, `sent`, `partial`, `paid`, `void`.
-    - New computed columns/accessors:
-        - `paid_sats` (sum of confirmed + unconfirmed payments).
-        - `outstanding_sats = expected - paid`.
+    - `amount_usd` remains canonical. `amount_btc` is the initial display snapshot, but expected/outstanding are driven by USD.
+    - Add `status` enum entries: `draft`, `sent`, `pending`, `partial`, `paid`, `void`.
+    - New computed totals:
+        - `paid_usd` / `confirmed_usd`: sum of payment `fiat_amount` values (per-payment rate snapshots).
+        - `paid_sats` / `confirmed_sats`: sum of sats for logging and display.
+        - `outstanding_usd = expected_usd - confirmed_usd` (floats with each payment’s rate).
+        - `outstanding_btc`/`outstanding_sats` are derived from the current/latest available BTC/USD rate at view time (used for QR/BIP21), not locked at creation.
 
 ## Watcher Behavior
 - Increase tolerance to ±100 sats to ignore tiny rounding differences.
 - When detector finds a tx:
     1. Record (or update) a row in `invoice_payments`.
-    2. Recompute total sats received (including this tx).
+    2. Recompute totals:
+        - Sats received/confirmed (for history/logs).
+        - USD received/confirmed using each payment’s captured rate.
     3. Status transitions:
-        - `sent` → `partial` when total < expected.
-        - `partial` → `paid` when total ≥ expected (subject to confirmation threshold).
+        - `sent` → `pending` when unconfirmed payments exist but confirmed USD < expected.
+        - `sent`/`pending` → `partial` when confirmed USD > 0 but below expected.
+        - `partial`/`pending` → `paid` when confirmed USD ≥ expected (confirmation threshold enforced).
         - `draft` stays draft if we really want to block payments until “sent” — TBD.
-    4. `paid_at` stays the first detection timestamp once totals cross expected; confirmation timestamps update when block data arrives.
+    4. `paid_at` stays the first confirmed timestamp once confirmed USD crosses expected; confirmation timestamps update when block data arrives.
 - Handle multiple payments per tx/address pair gracefully (e.g., same tx sends two outputs to us) by summing `sats_received`.
 
 ## USD Snapshot
 - When we log each payment, capture the USD/BTC rate:
     - Use the cached rate if it’s fresh (< defined TTL), otherwise call `BtcRate::refresh`.
     - Store `usd_rate` and `fiat_amount = sats_received / 1e8 * usd_rate`.
-- Treat the original USD invoice total as canonical; each payment reduces the outstanding USD balance using its captured `usd_rate` so owners always see dollars knocked off at the moment funds arrived (BTC volatility never retroactively changes settled USD).
-- Owner/public summary boxes always present USD first (e.g., `Expected: $500.00 (0.0123 BTC)`, `Outstanding: $125.00 (0.0031 BTC)`). Received shows the settled USD total only, since BTC varies per payment.
-- QR/BIP21 requests target the *current outstanding USD balance*, converted to BTC using the latest available rate; once the balance hits zero, the QR omits the `amount` parameter altogether.
+- Treat the original USD invoice total as canonical; each payment reduces the outstanding USD balance using its captured `usd_rate` so owners always see dollars knocked off at the moment funds arrived (BTC volatility never retroactively changes settled USD). Multiple partials can carry different rates.
+- Owner/public summary boxes always present USD first (e.g., `Expected: $500.00 (0.0123 BTC)`, `Outstanding: $125.00 (~0.0031 BTC at current rate)`). Received/confirmed USD reflect the sum of per-payment fiat amounts, and outstanding displays the exact residual (no display-side tolerance masking).
+- QR/BIP21 requests target the *current outstanding USD balance*, converted to BTC using the latest available rate (or cached rate) at view time; once the balance hits zero, the QR omits the `amount` parameter altogether.
 
 ## UI / API
 1. **Invoice Show Page**
@@ -58,11 +63,16 @@
 - Receipt emails should enumerate the payments and total settled amount.
 - Delivery log should note whether auto-receipts fired after full payment or partial payment updates.
 
+## Small Balance Resolution
+- Outstanding USD/BTC should display the exact residual (no UI masking for dust). Status `paid` hinges solely on confirmed USD >= expected USD.
+- When the residual is below a small, configurable threshold, surface an explicit “Resolve small balance” control that records a manual credit adjustment for the remaining USD (at the latest available rate) and marks the invoice paid. The adjustment is logged in `invoice_payments` as an `is_adjustment` row for auditability.
+- Do not auto-settle residuals; owners must opt-in via the control.
+
 ## Testing
-- Unit tests for `Invoice` accessors (`paid_sats`, `outstanding_sats`, status transitions).
+- Unit tests for `Invoice` accessors (paid/confirmed USD and sats, outstanding USD/BTC, status transitions).
 - Watcher feature tests covering:
-    - First partial payment logged.
-    - Multiple partials summing to paid.
+    - First partial payment logged (USD reduced at payment’s rate).
+    - Multiple partials summing to paid across different rates.
     - Confirmations updating existing payment rows.
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
 - Blade tests / snapshots for the payment history table and public view.

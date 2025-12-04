@@ -12,6 +12,7 @@ Latest scope update (2025-11-16): partial payments, payment history UX, and invo
 2. **Multisig / Advanced Wallet Support**
    - Support xpub/zpub from multi-sig wallets (BIP48 or custom policies).
    - Allow per-invoice address derivation from multiple co-signers.
+   - Note: small-balance resolution (manual credit to close dust residuals) is now defined in the active PLAN/PARTIAL_PAYMENTS spec.
 
 ## Email & Notifications
 3. **Receipt PDFs for Paid Invoices**

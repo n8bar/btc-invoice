@@ -67,6 +67,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `InvoicePaymentDetector` + watcher refresh the outstanding balance after each detection so `partial` status, `paid_at`, and tolerance handling stay accurate everywhere.
     - Owners can record manual adjustments for significant discrepancies, and clients see over/under-payment alerts once the variance exceeds 15% (overpayment alert reminds them gratuities are default). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) for the full spec.
     - Proactive partial-payment alerts now warn clients (and notify owners) when multiple payment attempts are detected, and invoice emails/public views remind clients to send the full balance in one payment to avoid extra miner fees.
+    - Upcoming: display residuals exactly (no masking via sat tolerance) and add an explicit “Resolve small balance” control to log a credit adjustment for tiny residual USD amounts and mark the invoice paid; see updated partial payments spec.
 8. **Invoice Delivery & Auto Receipts (codex/invoice-delivery)**
     - `/invoices/{invoice}/deliver` gate-keeps on client email + public share, then queues `DeliverInvoiceMail` jobs that render `InvoiceReadyMail` with optional CC + note.
     - `invoice_deliveries` log table fuels the show page’s delivery log with status, CC, dispatch/sent timestamps, and surfaced errors.
@@ -90,7 +91,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 12. **Payment & Address Accuracy (bug fixes)**
     - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (current network: testnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
     - Audit (2025-12-01): 8 testnet invoices derived from the legacy branch `m/84'/1'/0'/index`; none matched the expected external chain. `wallet:reassign-invoice-addresses` now supports `--include-paid`, `--reset-payments`, and `--use-next-index`; applied to all 8 invoices (including paid/partial), moving them to fresh external-chain indexes, clearing payment logs, resetting statuses to sent, and advancing wallet `next_derivation_index`.
-    - Incoming: add confirmation-gated payment status (`pending` before confirmed paid), RBF-safe cleanup (drop/ignore missing unconfirmed txids), and paid transitions only after confirmation threshold (default 1; user-configurable post-RC). Update UI copy, tests, and docs; see [`docs/PAYMENT_CONFIRMATIONS.md`](PAYMENT_CONFIRMATIONS.md) for the strategy.
+    - Payment/confirmation docs clarified: USD stays canonical, each payment locks its own USD at detection, outstanding BTC floats using the latest rate, and statuses (`pending`/`partial`/`paid`) hinge on confirmed USD totals (confirmation threshold default 1; per-user post-RC). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) and [`docs/PAYMENT_CONFIRMATIONS.md`](PAYMENT_CONFIRMATIONS.md).
     - Verification: derivation audit (sample invoices vs xpub/network/path) plus watcher sanity run after fixes. _Next_: spot-check watcher against a corrected invoice.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
