@@ -17,6 +17,52 @@ class InvoicePaymentAdjustmentController extends Controller
     {
     }
 
+    public function resolve(Request $request, Invoice $invoice): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+
+        $rateInfo = BtcRate::current();
+        $rateUsd = $rateInfo['rate_usd'] ?? ($invoice->btc_rate ?: null);
+        if (!$rateUsd || $rateUsd <= 0) {
+            return back()->withErrors(['amount_usd' => 'Unable to determine BTC/USD rate. Refresh the rate and try again.']);
+        }
+
+        $summary = $invoice->paymentSummary($rateInfo);
+        $outstandingUsd = $summary['outstanding_usd'] ?? null;
+
+        if ($outstandingUsd === null || $outstandingUsd <= 0) {
+            return back()->with('status', 'No outstanding balance to resolve.');
+        }
+
+        if ($outstandingUsd > Invoice::SMALL_BALANCE_RESOLUTION_USD) {
+            return back()->withErrors(['amount_usd' => 'Outstanding balance exceeds the small-balance resolution threshold.']);
+        }
+
+        $usdAmount = round($outstandingUsd, 2);
+        $sats = (int) round(($usdAmount / $rateUsd) * Invoice::SATS_PER_BTC);
+        if ($sats <= 0) {
+            return back()->withErrors(['amount_usd' => 'Residual amount is too small to settle at the current rate.']);
+        }
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'manual-resolve-' . \Illuminate\Support\Str::uuid(),
+            'sats_received' => $sats,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => $rateUsd,
+            'fiat_amount' => $usdAmount,
+            'note' => 'Resolved small balance',
+            'is_adjustment' => true,
+        ]);
+
+        $invoice->refreshPaymentState();
+        $invoice->refresh();
+        $this->alerts->checkPaymentThresholds($invoice);
+
+        return back()->with('status', 'Small balance resolved and invoice marked paid.');
+    }
+
     public function store(Request $request, Invoice $invoice): RedirectResponse
     {
         $this->authorize('update', $invoice);
@@ -51,6 +97,7 @@ class InvoicePaymentAdjustmentController extends Controller
             'txid' => 'manual-' . Str::uuid(),
             'sats_received' => $sats,
             'detected_at' => now(),
+            'confirmed_at' => now(),
             'usd_rate' => $rateUsd,
             'fiat_amount' => round($usdAmount, 2),
             'note' => $data['note'] ?? null,

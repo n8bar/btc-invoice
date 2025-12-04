@@ -129,6 +129,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'txid' => 'tx-overpay',
             'sats_received' => $overpaySats,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
             'usd_rate' => 50_000,
             'fiat_amount' => 120.00,
         ]);
@@ -160,6 +161,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'txid' => 'tx-underpay',
             'sats_received' => $partialSats,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
             'usd_rate' => 40_000,
             'fiat_amount' => 120.00,
         ]);
@@ -245,6 +247,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'txid' => 'tx-partial-1',
             'sats_received' => 400_000,
             'detected_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'confirmed_at' => Carbon::parse('2025-01-04 10:15:00', 'UTC'),
             'usd_rate' => 38_000,
             'fiat_amount' => 152.00,
         ]);
@@ -262,6 +265,7 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('(0.01 BTC)', false);
         $response->assertSee('Received', false);
         $response->assertSee('$152.00', false);
+        $response->assertSee('Confirmed (counts toward status)', false);
         $response->assertSee('Outstanding balance', false);
         $response->assertSee('$348.00', false);
         $response->assertSee('(0.00696 BTC)', false);
@@ -296,6 +300,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'txid' => 'tx-partial-qr',
             'sats_received' => 200_000,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
             'usd_rate' => 40_000,
             'fiat_amount' => 80.00,
         ]);
@@ -337,6 +342,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'txid' => 'tx-tolerance',
             'sats_received' => $partialSats,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
             'usd_rate' => 45_000,
             'fiat_amount' => $fiatAmount,
         ]);
@@ -347,7 +353,8 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.show', $invoice->fresh('payments')));
 
-        $response->assertSeeInOrder(['Outstanding balance', '$0.00'], false);
+        $response->assertSeeInOrder(['Outstanding balance', '$0.02'], false);
+        $response->assertSee('Resolve small balance', false);
     }
 
     public function test_owner_can_update_payment_note(): void

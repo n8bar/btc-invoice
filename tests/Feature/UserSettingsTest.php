@@ -141,7 +141,7 @@ class UserSettingsTest extends TestCase
         return WalletSetting::create([
             'user_id' => $user->id,
             'network' => 'testnet',
-            'bip84_xpub' => 'vpub5YKwTqL37YBiHSzfXaVJKMMHoPVuLPekJPd3pSXL9x9yNfQKDd3PcDjMqwihtghTh6xgfjj8nDjfGDUy3PDnALp2ABpPnz4m8SdwTRcGKCw',
+            'bip84_xpub' => 'vpub-test-key',
             'next_derivation_index' => 0,
         ]);
     }

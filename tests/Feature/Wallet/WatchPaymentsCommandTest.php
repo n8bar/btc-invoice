@@ -3,6 +3,7 @@
 namespace Tests\Feature\Wallet;
 
 use App\Models\Client;
+use App\Models\InvoicePayment;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Services\BtcRate;
@@ -52,9 +53,9 @@ class WatchPaymentsCommandTest extends TestCase
             ->assertExitCode(0);
 
         $invoice->refresh();
-        $this->assertSame('paid', $invoice->status);
+        $this->assertSame('pending', $invoice->status);
         $this->assertSame('abc123', $invoice->txid);
-        $this->assertSame(1_000_000, $invoice->payment_amount_sat);
+        $this->assertSame(0, $invoice->payment_amount_sat);
         $this->assertNotNull($invoice->payment_detected_at);
         $this->assertNull($invoice->payment_confirmed_at);
         $this->assertDatabaseHas('invoice_payments', [
@@ -101,11 +102,11 @@ class WatchPaymentsCommandTest extends TestCase
             ->assertExitCode(0);
 
         $invoice->refresh();
-        $this->assertSame('paid', $invoice->status);
+        $this->assertSame('partial', $invoice->status);
         $this->assertSame('def456', $invoice->txid);
         $this->assertSame(1_000_000, $invoice->payment_amount_sat);
         $this->assertNotNull($invoice->payment_confirmed_at);
-        $this->assertNotNull($invoice->paid_at);
+        $this->assertNull($invoice->paid_at);
         $this->assertDatabaseHas('invoice_payments', [
             'invoice_id' => $invoice->id,
             'txid' => 'def456',
@@ -131,9 +132,9 @@ class WatchPaymentsCommandTest extends TestCase
                 [
                     'txid' => 'under123',
                     'status' => [
-                        'confirmed' => false,
-                        'block_height' => null,
-                        'block_time' => null,
+                        'confirmed' => true,
+                        'block_height' => 250010,
+                        'block_time' => Carbon::now()->subMinutes(4)->timestamp,
                     ],
                     'vout' => [
                         [
@@ -143,6 +144,7 @@ class WatchPaymentsCommandTest extends TestCase
                     ],
                 ],
             ], 200),
+            "{$base}/blocks/tip/height" => Http::response('250011', 200),
         ]);
 
         $this->artisan('wallet:watch-payments')
@@ -156,6 +158,38 @@ class WatchPaymentsCommandTest extends TestCase
             'txid' => 'under123',
             'sats_received' => 400_000,
         ]);
+    }
+
+    public function test_unconfirmed_payment_is_dropped_when_missing_from_mempool(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-03 18:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+        $base = config('blockchain.mempool.testnet_base');
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'stale-tx',
+            'sats_received' => 200_000,
+            'detected_at' => Carbon::now()->subHours(1),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 80.00,
+        ]);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $this->assertDatabaseMissing('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'stale-tx',
+        ]);
+
+        $invoice->refresh();
+        $this->assertSame('sent', $invoice->status);
+        $this->assertNull($invoice->txid);
+        $this->assertSame(0, $invoice->payment_amount_sat);
     }
 
     public function test_command_records_multiple_partial_transactions(): void
@@ -209,8 +243,8 @@ class WatchPaymentsCommandTest extends TestCase
             ->assertExitCode(0);
 
         $invoice->refresh();
-        $this->assertSame('paid', $invoice->status);
-        $this->assertSame(1_000_000, $invoice->payment_amount_sat);
+        $this->assertSame('partial', $invoice->status);
+        $this->assertSame(600_000, $invoice->payment_amount_sat);
 
         $this->assertDatabaseHas('invoice_payments', [
             'invoice_id' => $invoice->id,
@@ -274,7 +308,7 @@ class WatchPaymentsCommandTest extends TestCase
         $this->artisan('wallet:watch-payments')->assertExitCode(0);
 
         $invoice->refresh();
-        $this->assertSame('partial', $invoice->status);
+        $this->assertSame('pending', $invoice->status);
         $this->assertNotNull($invoice->last_partial_warning_sent_at);
 
         $this->assertDatabaseHas('invoice_deliveries', [

@@ -11,6 +11,8 @@
                 'expected_sats' => null,
                 'received_usd' => 0.0,
                 'received_sats' => null,
+                'confirmed_usd' => 0.0,
+                'confirmed_sats' => null,
                 'outstanding_usd' => null,
                 'outstanding_btc_formatted' => null,
                 'outstanding_btc_float' => null,
@@ -354,18 +356,58 @@
                                     </span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Received</span>
+                                    <span>Received (detected)</span>
                                     <span>{{ $currency($summary['received_usd']) }}</span>
                                 </div>
-                                <div class="flex justify-between font-semibold">
-                                    <span>Outstanding balance</span>
-                                    <span>
-                                        {{ $currency($summary['outstanding_usd']) }}
-                                        @if (!empty($summary['outstanding_btc_formatted']))
-                                            ({{ $summary['outstanding_btc_formatted'] }} BTC)
+                                <div class="flex justify-between">
+                                    <span>Confirmed (counts toward status)</span>
+                                    <span class="text-right">
+                                        {{ $currency($summary['confirmed_usd']) }}
+                                        @php
+                                            $confirmedBtc = !empty($summary['confirmed_sats'])
+                                                ? $invoice->formatBitcoinAmount($summary['confirmed_sats'] / \App\Models\Invoice::SATS_PER_BTC)
+                                                : null;
+                                        @endphp
+                                        @if ($confirmedBtc)
+                                            <div class="text-[11px] text-indigo-800">≈ {{ $confirmedBtc }} BTC</div>
                                         @endif
                                     </span>
                                 </div>
+                                <div class="flex justify-between font-semibold">
+                                    <span>Outstanding balance (confirmed)</span>
+                                    <span>
+                                        {{ $currency($summary['outstanding_usd']) }}
+                                @if (!empty($summary['outstanding_btc_formatted']))
+                                    ({{ $summary['outstanding_btc_formatted'] }} BTC)
+                                @endif
+                            </span>
+                        </div>
+                        @if (!empty($summary['outstanding_btc_formatted']))
+                            <p class="text-xs text-indigo-800">
+                                BTC target floats with the latest rate so QR codes always reflect the remaining USD balance.
+                            </p>
+                        @endif
+
+                        @php
+                            $smallBalanceThreshold = \App\Models\Invoice::SMALL_BALANCE_RESOLUTION_USD;
+                            $canResolveSmall = ($summary['outstanding_usd'] ?? 0) > 0
+                                && ($summary['outstanding_usd'] ?? 0) <= $smallBalanceThreshold
+                                && $invoice->status !== 'paid';
+                        @endphp
+                        @if ($canResolveSmall)
+                            <div class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-semibold">Resolve small balance</div>
+                                        <div class="text-xs text-emerald-800">Creates a manual credit for the remaining amount and marks the invoice paid.</div>
+                                    </div>
+                                    <form method="POST" action="{{ route('invoices.payments.adjustments.resolve', $invoice) }}">
+                                        @csrf
+                                        <x-primary-button class="text-sm">Resolve {{ $currency($summary['outstanding_usd']) }}</x-primary-button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
                             </div>
                         @endif
 

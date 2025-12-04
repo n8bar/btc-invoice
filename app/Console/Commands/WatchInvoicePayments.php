@@ -51,7 +51,12 @@ class WatchInvoicePayments extends Command
                 }
 
                 $results = $this->detector->detectPayments($invoice, $wallet->network);
-                if (empty($results)) {
+                $hasUnconfirmed = $invoice->payments()
+                    ->whereNull('confirmed_at')
+                    ->where('is_adjustment', false)
+                    ->exists();
+
+                if (empty($results) && !$hasUnconfirmed) {
                     continue;
                 }
 
@@ -68,9 +73,24 @@ class WatchInvoicePayments extends Command
 
     private function recordPayments(Invoice $invoice, array $results): void
     {
-        $logs = DB::transaction(function () use ($invoice, $results) {
+        $droppedCount = 0;
+        $logs = DB::transaction(function () use (&$droppedCount, $invoice, $results) {
             $logs = [];
             $latestReference = null;
+            $rate = BtcRate::current();
+            $usdRate = $rate['rate_usd'] ?? null;
+            if (!$usdRate && $invoice->btc_rate) {
+                $usdRate = (float) $invoice->btc_rate;
+            }
+            $requiredConfirmations = (int) config('blockchain.confirmations_required', 1);
+            $liveTxids = collect($results)->pluck('txid')->filter()->all();
+
+            $droppedCount = InvoicePayment::query()
+                ->where('invoice_id', $invoice->id)
+                ->whereNull('confirmed_at')
+                ->where('is_adjustment', false)
+                ->when(!empty($liveTxids), fn ($query) => $query->whereNotIn('txid', $liveTxids))
+                ->delete();
 
             foreach ($results as $result) {
                 $payment = InvoicePayment::firstOrNew([
@@ -78,25 +98,28 @@ class WatchInvoicePayments extends Command
                     'txid' => $result['txid'],
                 ]);
 
-                if (!$payment->exists) {
-                    $rate = BtcRate::current();
-                    $usdRate = $rate['rate_usd'] ?? null;
-                    $fiatAmount = $usdRate ? round(($result['sats'] / Invoice::SATS_PER_BTC) * (float) $usdRate, 2) : null;
+                $isConfirmed = ($result['confirmed'] ?? false)
+                    && (($result['confirmations'] ?? 0) >= $requiredConfirmations);
 
-                    $payment->fill([
-                        'sats_received' => $result['sats'],
-                        'detected_at' => $result['detected_at'],
-                        'usd_rate' => $usdRate,
-                        'fiat_amount' => $fiatAmount,
-                    ]);
-                } else {
-                    $payment->sats_received = $result['sats'];
-                    $payment->detected_at = $payment->detected_at ?: $result['detected_at'];
+                $payment->sats_received = $result['sats'];
+                $payment->detected_at = $payment->detected_at ?: $result['detected_at'];
+
+                if ($payment->usd_rate !== null) {
+                    $payment->fiat_amount = round(
+                        ($result['sats'] / Invoice::SATS_PER_BTC) * (float) $payment->usd_rate,
+                        2
+                    );
+                } elseif ($usdRate) {
+                    $payment->usd_rate = $usdRate;
+                    $payment->fiat_amount = round(
+                        ($result['sats'] / Invoice::SATS_PER_BTC) * (float) $usdRate,
+                        2
+                    );
                 }
 
                 $payment->block_height = $result['block_height'];
-                if ($result['confirmed'] && ($result['confirmed_at'] ?? null)) {
-                    $payment->confirmed_at = $result['confirmed_at'];
+                if ($isConfirmed && ($result['confirmed_at'] ?? null)) {
+                    $payment->confirmed_at = $payment->confirmed_at ?: $result['confirmed_at'];
                 }
 
                 $payment->save();
@@ -112,15 +135,32 @@ class WatchInvoicePayments extends Command
                 ];
             }
 
-            $invoice->payment_amount_sat = $invoice->payments()->sum('sats_received');
-            $lastResult = end($results) ?: null;
-            if ($lastResult) {
-                $invoice->txid = $lastResult['txid'];
-                $invoice->payment_confirmations = $lastResult['confirmations'];
-                $invoice->payment_confirmed_height = $lastResult['block_height'];
-                $invoice->payment_detected_at = $invoice->payment_detected_at ?: $lastResult['detected_at'];
-                if ($lastResult['confirmed'] && ($lastResult['confirmed_at'] ?? null)) {
-                    $invoice->payment_confirmed_at = $lastResult['confirmed_at'];
+            $invoice->load('payments');
+            $invoice->payment_amount_sat = $invoice->sumPaymentSats(true);
+
+            $latestConfirmed = $invoice->payments
+                ->filter(fn (InvoicePayment $payment) => $payment->confirmed_at !== null)
+                ->sortBy('confirmed_at')
+                ->last();
+
+            $latestDetected = $invoice->payments->sortBy('detected_at')->last();
+
+            if ($invoice->payments->isEmpty()) {
+                $invoice->txid = null;
+                $invoice->payment_confirmations = 0;
+                $invoice->payment_confirmed_height = null;
+                $invoice->payment_detected_at = null;
+                $invoice->payment_confirmed_at = null;
+            } else {
+                $invoice->txid = $latestConfirmed?->txid ?? $latestDetected?->txid ?? $invoice->txid;
+                $maxConfirmations = collect($results)->max('confirmations');
+                $invoice->payment_confirmations = $maxConfirmations !== null
+                    ? $maxConfirmations
+                    : ($invoice->payment_confirmations ?? 0);
+                $invoice->payment_confirmed_height = $latestConfirmed?->block_height;
+                $invoice->payment_detected_at = $invoice->payment_detected_at ?: $latestDetected?->detected_at;
+                if ($latestConfirmed?->confirmed_at) {
+                    $invoice->payment_confirmed_at = $latestConfirmed->confirmed_at;
                 }
             }
 
@@ -133,6 +173,13 @@ class WatchInvoicePayments extends Command
         $paidSats = $invoice->payment_amount_sat ?? 0;
         $status = strtoupper($invoice->status ?? 'sent');
         $outstanding = $invoice->outstanding_sats;
+
+        if ($droppedCount > 0) {
+            Log::info('invoice.payment.dropped', [
+                'invoice_id' => $invoice->id,
+                'count' => $droppedCount,
+            ]);
+        }
 
         foreach ($logs as $log) {
             $this->info("Invoice {$invoice->id} {$status}: {$log['txid']} ({$log['sats']} sats, total {$paidSats}).");

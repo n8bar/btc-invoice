@@ -16,7 +16,7 @@ class UserWalletAccountFactory extends Factory
             'user_id' => User::factory(),
             'label' => 'Wallet ' . fake()->unique()->word(),
             'network' => 'testnet',
-            'bip84_xpub' => 'vpub' . fake()->sha256(),
+            'bip84_xpub' => 'vpub' . fake()->regexify('[A-Za-z0-9]{10}'),
             'next_derivation_index' => 0,
             'active' => true,
         ];

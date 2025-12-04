@@ -53,6 +53,7 @@ class DashboardSnapshotTest extends TestCase
             'usd_rate' => 40_000,
             'fiat_amount' => 200.00,
             'detected_at' => Carbon::now()->subDays(2),
+            'confirmed_at' => Carbon::now()->subDays(2),
         ]);
 
         // Foreign data should be ignored
@@ -68,6 +69,7 @@ class DashboardSnapshotTest extends TestCase
             'sats_received' => 100_000_000,
             'usd_rate' => 30_000,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
         ]);
 
         $response = $this->actingAs($owner)->get(route('dashboard'));
@@ -107,6 +109,7 @@ class DashboardSnapshotTest extends TestCase
             'usd_rate' => 25_000,
             'detected_at' => null,
             'created_at' => Carbon::now()->subDays(1),
+            'confirmed_at' => Carbon::now()->subDays(1),
         ]);
 
         $openInvoice = $this->makeInvoice($owner, $client, [
@@ -123,6 +126,7 @@ class DashboardSnapshotTest extends TestCase
             'sats_received' => 100_000, // $50
             'usd_rate' => 50_000,
             'detected_at' => Carbon::now()->subDays(2),
+            'confirmed_at' => Carbon::now()->subDays(2),
         ]);
 
         $trashed = $this->makeInvoice($owner, $client, [
@@ -139,6 +143,7 @@ class DashboardSnapshotTest extends TestCase
             'sats_received' => 100_000,
             'usd_rate' => 30_000,
             'detected_at' => Carbon::now()->subDay(),
+            'confirmed_at' => Carbon::now()->subDay(),
         ]);
 
         $otherUser = User::factory()->create();
@@ -150,6 +155,7 @@ class DashboardSnapshotTest extends TestCase
             'sats_received' => 100_000,
             'usd_rate' => 10_000,
             'detected_at' => Carbon::now()->subDay(),
+            'confirmed_at' => Carbon::now()->subDay(),
         ]);
 
         $response = $this->actingAs($owner)->get(route('dashboard'));
@@ -184,6 +190,7 @@ class DashboardSnapshotTest extends TestCase
             'sats_received' => 100_000,
             'usd_rate' => 30_000,
             'detected_at' => Carbon::now()->subHour(),
+            'confirmed_at' => Carbon::now()->subHour(),
         ]);
 
         $responseB = $this->actingAs($ownerB)->get(route('dashboard'));
@@ -213,6 +220,7 @@ class DashboardSnapshotTest extends TestCase
                 'sats_received' => 10_000 + $i,
                 'usd_rate' => 30_000,
                 'detected_at' => Carbon::now()->subHours($i),
+                'confirmed_at' => Carbon::now()->subHours($i),
             ]);
         }
 

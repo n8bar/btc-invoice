@@ -67,6 +67,7 @@ class InvoiceNotificationTest extends TestCase
             'txid' => 'tx-overpay',
             'sats_received' => $overpaySats,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
         ]);
 
         $invoice->refresh()->refreshPaymentState();
@@ -97,6 +98,7 @@ class InvoiceNotificationTest extends TestCase
             'txid' => 'tx-underpay',
             'sats_received' => $partialSats,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
         ]);
 
         $invoice->refresh()->refreshPaymentState();

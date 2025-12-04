@@ -69,6 +69,8 @@
         'expected_sats' => null,
         'received_usd' => 0.0,
         'received_sats' => null,
+        'confirmed_usd' => 0.0,
+        'confirmed_sats' => null,
         'outstanding_usd' => null,
         'outstanding_btc_formatted' => null,
         'outstanding_btc_float' => null,
@@ -236,11 +238,25 @@
                     </strong>
                 </div>
                 <div style="display:flex; justify-content:space-between;">
-                    <span>Received</span>
+                    <span>Received (detected)</span>
                     <strong>{{ $currency($summary['received_usd']) }}</strong>
                 </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Confirmed (counts toward status)</span>
+                    <span style="text-align:right;">
+                        <strong>{{ $currency($summary['confirmed_usd']) }}</strong>
+                        @php
+                            $confirmedBtc = !empty($summary['confirmed_sats'])
+                                ? $invoice->formatBitcoinAmount($summary['confirmed_sats'] / \App\Models\Invoice::SATS_PER_BTC)
+                                : null;
+                        @endphp
+                        @if ($confirmedBtc)
+                            <div style="font-size:11px; color:#4338ca;">≈ {{ $confirmedBtc }} BTC</div>
+                        @endif
+                    </span>
+                </div>
                 <div style="display:flex; justify-content:space-between; font-weight:700;">
-                    <span>Outstanding balance</span>
+                    <span>Outstanding balance (confirmed)</span>
                     <span>
                         {{ $currency($summary['outstanding_usd']) }}
                         @if (!empty($summary['outstanding_btc_formatted']))
@@ -248,6 +264,11 @@
                         @endif
                     </span>
                 </div>
+                @if (!empty($summary['outstanding_btc_formatted']))
+                    <div style="margin-top:6px; font-size:11px; color:#4338ca;">
+                        BTC target floats with the latest rate so QR codes always reflect the remaining USD balance.
+                    </div>
+                @endif
             </div>
         @endif
 

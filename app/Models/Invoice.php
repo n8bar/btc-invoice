@@ -55,6 +55,7 @@ class Invoice extends Model
     public const UNDERPAY_USD_TOLERANCE = 10.0;
     public const UNDERPAY_PERCENT_TOLERANCE = 1.0;
     public const CLIENT_ALERT_PERCENT = 15.0;
+    public const SMALL_BALANCE_RESOLUTION_USD = 5.0;
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
@@ -148,10 +149,17 @@ class Invoice extends Model
     public function getPaidSatsAttribute(): int
     {
         if ($this->relationLoaded('payments')) {
-            return (int) $this->payments->sum('sats_received');
+            return (int) $this->payments
+                ->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment))
+                ->sum('sats_received');
         }
 
-        return (int) $this->payments()->sum('sats_received');
+        return (int) $this->payments()
+            ->where(function (Builder $query) {
+                $query->whereNotNull('confirmed_at')
+                    ->orWhere('is_adjustment', true);
+            })
+            ->sum('sats_received');
     }
 
     public function getOutstandingSatsAttribute(): ?int
@@ -166,74 +174,70 @@ class Invoice extends Model
 
     public function hasSignificantOverpayment(): bool
     {
-        $expected = $this->expectedPaymentSats();
-        if ($expected === null || $expected <= 0) {
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        if ($expectedUsd === null || $expectedUsd <= 0) {
             return false;
         }
 
-        $paid = $this->paid_sats;
-        if ($paid <= $expected) {
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        if ($confirmedUsd <= $expectedUsd) {
             return false;
         }
 
-        $surplus = $paid - $expected;
-        $usdRate = $this->btc_rate ?: null;
-        $surplusUsd = $usdRate ? ($surplus / self::SATS_PER_BTC) * (float) $usdRate : 0;
-        $percent = ($surplus / $expected) * 100;
+        $surplusUsd = $confirmedUsd - $expectedUsd;
+        $percent = ($surplusUsd / $expectedUsd) * 100;
 
         return $surplusUsd >= self::OVERPAY_USD_TOLERANCE || $percent >= self::OVERPAY_PERCENT_TOLERANCE;
     }
 
     public function hasSignificantUnderpayment(): bool
     {
-        $expected = $this->expectedPaymentSats();
-        if ($expected === null || $expected <= 0) {
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        if ($expectedUsd === null || $expectedUsd <= 0) {
             return false;
         }
 
-        $paid = $this->paid_sats;
-        if ($paid + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        if ($confirmedUsd + self::UNDERPAY_USD_TOLERANCE >= $expectedUsd) {
             return false;
         }
 
-        $deficit = max($expected - $paid, 0);
-        $usdRate = $this->btc_rate ?: null;
-        $deficitUsd = $usdRate ? ($deficit / self::SATS_PER_BTC) * (float) $usdRate : 0;
-        $percent = ($deficit / $expected) * 100;
+        $deficitUsd = max($expectedUsd - $confirmedUsd, 0);
+        $percent = ($deficitUsd / $expectedUsd) * 100;
 
         return $deficitUsd >= self::UNDERPAY_USD_TOLERANCE || $percent >= self::UNDERPAY_PERCENT_TOLERANCE;
     }
 
     public function overpaymentPercent(): ?float
     {
-        $expected = $this->expectedPaymentSats();
-        if ($expected === null || $expected <= 0) {
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        if ($expectedUsd === null || $expectedUsd <= 0) {
             return null;
         }
 
-        $paid = $this->paid_sats;
-        if ($paid <= $expected) {
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        if ($confirmedUsd <= $expectedUsd) {
             return null;
         }
 
-        $surplus = $paid - $expected;
-        return ($surplus / $expected) * 100;
+        $surplusUsd = $confirmedUsd - $expectedUsd;
+        return ($surplusUsd / $expectedUsd) * 100;
     }
 
     public function underpaymentPercent(): ?float
     {
-        $expected = $this->expectedPaymentSats();
-        if ($expected === null || $expected <= 0) {
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        if ($expectedUsd === null || $expectedUsd <= 0) {
             return null;
         }
 
-        $paid = $this->paid_sats;
-        if ($paid + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        if ($confirmedUsd + self::UNDERPAY_USD_TOLERANCE >= $expectedUsd) {
             return null;
         }
 
-        $deficit = max($expected - $paid, 0);
-        return ($deficit / $expected) * 100;
+        $deficitUsd = max($expectedUsd - $confirmedUsd, 0);
+        return ($deficitUsd / $expectedUsd) * 100;
     }
 
     public function requiresClientOverpayAlert(): bool
@@ -250,25 +254,32 @@ class Invoice extends Model
 
     public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void
     {
+        $this->loadMissing('payments');
         $originalStatus = $this->status;
         $becamePaid = false;
-        $paidSats = $this->payments()->sum('sats_received');
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+
+        $paidSats = $this->sumPaymentSats(true);
         $this->payment_amount_sat = $paidSats;
 
-        $expected = $this->expectedPaymentSats();
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        $hasUnconfirmed = $this->hasUnconfirmedPayments();
 
-        if ($expected !== null && $paidSats > 0) {
-            if ($paidSats + self::PAYMENT_SAT_TOLERANCE >= $expected) {
+        if ($expectedUsd !== null && $expectedUsd > 0) {
+            if ($confirmedUsd >= $expectedUsd) {
                 if ($this->status !== 'paid') {
                     $this->status = 'paid';
                     $becamePaid = true;
                 }
 
                 if (!$this->paid_at) {
-                    $this->paid_at = $reference ?? now();
+                    $firstConfirmed = $this->payments
+                        ->filter(fn (InvoicePayment $p) => $this->paymentIsConfirmed($p))
+                        ->min('confirmed_at');
+                    $this->paid_at = $reference ?? $firstConfirmed ?? now();
                 }
             } elseif (!in_array($this->status, ['draft','void'], true)) {
-                $this->status = 'partial';
+                $this->status = $confirmedUsd > 0 ? 'partial' : ($hasUnconfirmed ? 'pending' : $this->status);
             }
         }
 
@@ -356,18 +367,78 @@ class Invoice extends Model
         return $amount === null ? null : $this->formatBitcoinAmount($amount);
     }
 
-    public function expectedPaymentSats(): ?int
+    public function expectedPaymentSats(?float $rateUsd = null): ?int
     {
-        if ($this->amount_btc === null) {
-            return null;
+        $amountUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        $effectiveRate = $rateUsd ?? ($this->btc_rate !== null ? (float) $this->btc_rate : null);
+
+        if ($amountUsd !== null && $amountUsd > 0 && $effectiveRate && $effectiveRate > 0) {
+            $btc = $amountUsd / $effectiveRate;
+            return (int) round($btc * self::SATS_PER_BTC);
         }
 
-        $btc = (float) $this->amount_btc;
-        if ($btc <= 0) {
-            return null;
+        $btcSnapshot = $this->amount_btc !== null ? (float) $this->amount_btc : null;
+        if ($btcSnapshot !== null && $btcSnapshot > 0) {
+            return (int) round($btcSnapshot * self::SATS_PER_BTC);
         }
 
-        return (int) round($btc * self::SATS_PER_BTC);
+        return null;
+    }
+
+    public function paymentSummary(?array $rate = null, ?float $computedBtc = null): array
+    {
+        $this->loadMissing('payments');
+
+        $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
+
+        $expectedBtcFloat = $computedBtc ?? ($rateUsd && $expectedUsd
+            ? round($expectedUsd / $rateUsd, 8)
+            : ($this->amount_btc !== null ? (float) $this->amount_btc : null));
+
+        $expectedSats = $expectedBtcFloat !== null
+            ? (int) round($expectedBtcFloat * self::SATS_PER_BTC)
+            : $this->expectedPaymentSats();
+
+        $receivedUsd = $this->sumPaymentsUsd();
+        $confirmedUsd = $this->sumPaymentsUsd(true);
+        $receivedSats = $this->sumPaymentSats();
+        $confirmedSats = $this->sumPaymentSats(true);
+
+        $outstandingUsd = $expectedUsd !== null
+            ? max($expectedUsd - $confirmedUsd, 0.0)
+            : null;
+
+        $effectiveRate = $rateUsd ?? ($this->btc_rate ? (float) $this->btc_rate : null);
+        $outstandingBtcFloat = null;
+        if ($outstandingUsd !== null && $outstandingUsd > 0 && $effectiveRate && $effectiveRate > 0) {
+            $outstandingBtcFloat = round($outstandingUsd / $effectiveRate, 8);
+        }
+
+        $outstandingSats = $expectedSats !== null
+            ? max($expectedSats - $confirmedSats, 0)
+            : null;
+
+        $lastDetected = $this->payments->max('detected_at');
+        $lastConfirmed = $this->payments
+            ->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment))
+            ->max('confirmed_at');
+
+        return [
+            'expected_usd' => $expectedUsd,
+            'expected_btc_formatted' => $this->formatBitcoinAmount($expectedBtcFloat),
+            'expected_sats' => $expectedSats,
+            'received_usd' => round($receivedUsd, 2),
+            'received_sats' => $receivedSats,
+            'confirmed_usd' => round($confirmedUsd, 2),
+            'confirmed_sats' => $confirmedSats,
+            'outstanding_usd' => $outstandingUsd !== null ? round($outstandingUsd, 2) : null,
+            'outstanding_btc_formatted' => $this->formatBitcoinAmount($outstandingBtcFloat),
+            'outstanding_btc_float' => $outstandingBtcFloat,
+            'outstanding_sats' => $outstandingSats,
+            'last_payment_detected_at' => $lastDetected,
+            'last_payment_confirmed_at' => $lastConfirmed,
+        ];
     }
 
 // Generate a unique token
@@ -423,5 +494,65 @@ class Invoice extends Model
             : $this->payments()->get();
 
         return $payments->count() >= 2;
+    }
+
+    public function sumPaymentsUsd(bool $confirmedOnly = false): float
+    {
+        $payments = $this->relationLoaded('payments')
+            ? $this->payments
+            : $this->payments()->get();
+
+        if ($confirmedOnly) {
+            $payments = $payments->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment));
+        }
+
+        return $payments->sum(fn (InvoicePayment $payment) => $this->paymentFiatValue($payment));
+    }
+
+    public function sumPaymentSats(bool $confirmedOnly = false): int
+    {
+        $payments = $this->relationLoaded('payments')
+            ? $this->payments
+            : $this->payments()->get();
+
+        if ($confirmedOnly) {
+            $payments = $payments->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment));
+        }
+
+        return (int) $payments->sum('sats_received');
+    }
+
+    public function hasUnconfirmedPayments(): bool
+    {
+        if ($this->relationLoaded('payments')) {
+            return $this->payments->contains(fn (InvoicePayment $payment) => !$this->paymentIsConfirmed($payment));
+        }
+
+        return $this->payments()
+            ->whereNull('confirmed_at')
+            ->where('is_adjustment', false)
+            ->exists();
+    }
+
+    private function paymentFiatValue(InvoicePayment $payment): float
+    {
+        if ($payment->fiat_amount !== null) {
+            return (float) $payment->fiat_amount;
+        }
+
+        if ($payment->usd_rate !== null) {
+            return round(($payment->sats_received / self::SATS_PER_BTC) * (float) $payment->usd_rate, 2);
+        }
+
+        if ($this->btc_rate) {
+            return round(($payment->sats_received / self::SATS_PER_BTC) * (float) $this->btc_rate, 2);
+        }
+
+        return 0.0;
+    }
+
+    private function paymentIsConfirmed(InvoicePayment $payment): bool
+    {
+        return $payment->is_adjustment || $payment->confirmed_at !== null;
     }
 }

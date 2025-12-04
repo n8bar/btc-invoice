@@ -59,7 +59,17 @@ class DashboardSnapshot
     {
         $invoices = Invoice::query()
             ->with(['payments' => function ($query) {
-                $query->select('id', 'invoice_id', 'sats_received', 'usd_rate', 'fiat_amount', 'detected_at', 'created_at');
+                $query->select(
+                    'id',
+                    'invoice_id',
+                    'sats_received',
+                    'usd_rate',
+                    'fiat_amount',
+                    'detected_at',
+                    'confirmed_at',
+                    'is_adjustment',
+                    'created_at'
+                );
             }])
             ->ownedBy($user)
             ->whereIn('status', ['sent', 'partial', 'draft'])
@@ -76,7 +86,7 @@ class DashboardSnapshot
         $paymentsLast7dUsd = 0.0;
 
         foreach ($invoices as $invoice) {
-            $paidUsd = $this->paidUsd($invoice);
+            $paidUsd = $invoice->sumPaymentsUsd(true);
             $expectedUsd = $invoice->amount_usd !== null ? (float) $invoice->amount_usd : 0.0;
             $remaining = max($expectedUsd - $paidUsd, 0.0);
             $outstandingUsd += $remaining;
@@ -91,14 +101,17 @@ class DashboardSnapshot
 
             $expectedSats = $invoice->expectedPaymentSats();
             if ($expectedSats !== null) {
-                $outstandingSats += max($expectedSats - $invoice->paid_sats, 0);
+                $outstandingSats += max($expectedSats - $invoice->sumPaymentSats(true), 0);
             }
-
         }
 
         $paymentsLast7dUsd = InvoicePayment::query()
             ->forUserInvoices($user)
             ->recentBetween($today->copy()->subDays(7), $today->copy()->addDay())
+            ->where(function ($query) {
+                $query->whereNotNull('invoice_payments.confirmed_at')
+                    ->orWhere('invoice_payments.is_adjustment', true);
+            })
             ->with('invoice:id,user_id,btc_rate')
             ->get()
             ->sum(function (InvoicePayment $payment) {
@@ -142,17 +155,8 @@ class DashboardSnapshot
             $invoice = $payment->invoice;
             $detectedAt = $payment->detected_at ?? $payment->created_at;
             $amountUsd = $this->paymentUsdValue($invoice, $payment);
-            $isPartial = false;
-            if ($invoice) {
-                if ($invoice->status === 'partial') {
-                    $isPartial = true;
-                } else {
-                    $expected = $invoice->expectedPaymentSats();
-                    if ($expected !== null && $expected > 0) {
-                        $isPartial = $payment->sats_received + Invoice::PAYMENT_SAT_TOLERANCE < $expected;
-                    }
-                }
-            }
+            $outstandingSats = $invoice?->outstanding_sats;
+            $isPartial = $invoice && $outstandingSats !== null && $outstandingSats > 0;
 
             return [
                 'invoice_id' => $invoice?->id,
@@ -164,13 +168,6 @@ class DashboardSnapshot
                 'is_partial' => $isPartial,
             ];
         })->all();
-    }
-
-    private function paidUsd(Invoice $invoice): float
-    {
-        return $invoice->payments->sum(function ($payment) use ($invoice) {
-            return $this->paymentUsdValue($invoice, $payment);
-        });
     }
 
     private function paymentUsdValue(Invoice $invoice, InvoicePayment $payment): float

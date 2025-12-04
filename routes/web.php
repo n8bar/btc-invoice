@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.payments.note');
     Route::post('invoices/{invoice}/payments/adjustments', [InvoicePaymentAdjustmentController::class, 'store'])
         ->name('invoices.payments.adjustments.store');
+    Route::post('invoices/{invoice}/payments/resolve-small-balance', [InvoicePaymentAdjustmentController::class, 'resolve'])
+        ->name('invoices.payments.adjustments.resolve');
 
 
     // Standard CRUD

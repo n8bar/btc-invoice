@@ -91,6 +91,7 @@ class InvoiceDeliveryTest extends TestCase
             'txid' => 'tx-auto-receipt',
             'sats_received' => 500_000,
             'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
         ]);
 
         $invoice->refresh()->refreshPaymentState();

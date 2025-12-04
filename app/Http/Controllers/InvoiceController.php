@@ -146,7 +146,7 @@ class InvoiceController extends Controller
             'user',
         ]);
         $display = $this->formatInvoiceDisplay($invoice, $rate);
-        $summary = $this->buildPaymentSummary($invoice, $rate, $display['computedBtc'] ?? null);
+        $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
 
         $btcForUri = $summary['outstanding_btc_float'];
         $display['displayBitcoinUri'] = $invoice->bitcoinUriForAmount(
@@ -366,7 +366,7 @@ class InvoiceController extends Controller
         ]);
         $rate = BtcRate::current();
         $display = $this->formatInvoiceDisplay($invoice, $rate);
-        $summary = $this->buildPaymentSummary($invoice, $rate, $display['computedBtc'] ?? null);
+        $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
 
         $btcForUri = $summary['outstanding_btc_float'];
         $display['displayBitcoinUri'] = $invoice->bitcoinUriForAmount(
@@ -403,7 +403,7 @@ class InvoiceController extends Controller
             $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
             $asOf = $rate['as_of'] ?? now();
             $display = $this->formatInvoiceDisplay($invoice, $rate);
-            $summary = $this->buildPaymentSummary($invoice, $rate, $display['computedBtc'] ?? null);
+            $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
 
             $btcForUri = $summary['outstanding_btc_float'];
             $display['displayBitcoinUri'] = $invoice->bitcoinUriForAmount(
@@ -484,87 +484,6 @@ class InvoiceController extends Controller
             ->with('public_url', $invoice->public_enabled ? $invoice->public_url : null);
     }
 
-    private function buildPaymentSummary(Invoice $invoice, ?array $rate, ?float $computedBtc): array
-    {
-        $expectedUsd = $invoice->amount_usd !== null ? (float) $invoice->amount_usd : null;
-        $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
-
-        $expectedBtcFloat = $computedBtc ?? ($invoice->amount_btc !== null ? (float) $invoice->amount_btc : null);
-        $expectedSats = $expectedBtcFloat !== null
-            ? (int) round($expectedBtcFloat * Invoice::SATS_PER_BTC)
-            : $invoice->expectedPaymentSats();
-
-        $paidSats = (int) $invoice->payments->sum('sats_received');
-        $receivedUsd = $this->sumPaymentsUsd($invoice);
-
-        $outstandingUsd = $expectedUsd !== null
-            ? max($expectedUsd - $receivedUsd, 0.0)
-            : null;
-
-        $outstandingBtcFloat = null;
-        if ($outstandingUsd !== null && $outstandingUsd > 0) {
-            $sourceRate = $rateUsd ?? ($invoice->btc_rate ? (float) $invoice->btc_rate : null);
-            if ($sourceRate && $sourceRate > 0) {
-                $outstandingBtcFloat = round($outstandingUsd / $sourceRate, 8);
-            }
-        }
-
-        $outstandingSats = $expectedSats !== null
-            ? max($expectedSats - $paidSats, 0)
-            : null;
-
-        if ($expectedSats !== null && $paidSats >= $expectedSats - Invoice::PAYMENT_SAT_TOLERANCE) {
-            $outstandingSats = 0;
-            if ($outstandingUsd !== null) {
-                $outstandingUsd = 0.0;
-            }
-            if ($outstandingBtcFloat !== null) {
-                $outstandingBtcFloat = 0.0;
-            }
-        }
-
-        $lastDetected = $invoice->payments->max('detected_at');
-        $lastConfirmed = $invoice->payments->max('confirmed_at');
-
-        return [
-            'expected_usd' => $expectedUsd,
-            'expected_btc_formatted' => $invoice->formatBitcoinAmount($expectedBtcFloat),
-            'expected_sats' => $expectedSats,
-            'received_usd' => round($receivedUsd, 2),
-            'received_sats' => $paidSats,
-            'outstanding_usd' => $outstandingUsd !== null ? round($outstandingUsd, 2) : null,
-            'outstanding_btc_formatted' => $invoice->formatBitcoinAmount($outstandingBtcFloat),
-            'outstanding_btc_float' => $outstandingBtcFloat,
-            'outstanding_sats' => $outstandingSats,
-            'last_payment_detected_at' => $lastDetected,
-            'last_payment_confirmed_at' => $lastConfirmed,
-        ];
-    }
-
-    private function sumPaymentsUsd(Invoice $invoice): float
-    {
-        return $invoice->payments->sum(function ($payment) use ($invoice) {
-            return $this->paymentUsdValue($invoice, $payment);
-        });
-    }
-
-    private function paymentUsdValue(Invoice $invoice, $payment): float
-    {
-        $fiat = $payment->fiat_amount;
-        if ($fiat !== null) {
-            return (float) $fiat;
-        }
-
-        if ($payment->usd_rate !== null) {
-            return round(($payment->sats_received / Invoice::SATS_PER_BTC) * (float) $payment->usd_rate, 2);
-        }
-
-        if ($invoice->btc_rate) {
-            return round(($payment->sats_received / Invoice::SATS_PER_BTC) * (float) $invoice->btc_rate, 2);
-        }
-
-        return 0.0;
-    }
     /**
      * Fetch the current BTC/USD spot rate and compute amount BTC for a USD amount.
      * Returns [rateUsdPerBtc, amountBtc]. On failure, uses last known rate or 0.

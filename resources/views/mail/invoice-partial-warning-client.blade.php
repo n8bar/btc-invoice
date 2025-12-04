@@ -1,7 +1,7 @@
 @php
-    $paidFiat = $invoice->payments->sum('fiat_amount') ?? 0;
-    $outstandingUsd = max(($invoice->amount_usd ?? 0) - $paidFiat, 0);
-    $outstandingBtc = max(($invoice->amount_btc ?? 0) - (($invoice->payment_amount_sat ?? 0) / \App\Models\Invoice::SATS_PER_BTC), 0);
+    $summary = $invoice->paymentSummary(\App\Services\BtcRate::current());
+    $outstandingUsd = $summary['outstanding_usd'] ?? 0;
+    $outstandingBtc = $summary['outstanding_btc_formatted'] ?? null;
 @endphp
 
 @component('mail::message')
@@ -11,7 +11,7 @@ We noticed more than one payment attempt for this invoice. Splitting a single in
 
 @component('mail::panel')
 **Outstanding balance:** ${{ number_format($outstandingUsd, 2) }} USD  
-**BTC equivalent:** {{ number_format($outstandingBtc, 8) }} BTC  
+**BTC equivalent:** {{ $outstandingBtc ?? '—' }} BTC  
 **Due date:** {{ optional($invoice->due_date)->toFormattedDateString() ?? '—' }}
 @endcomponent
 
