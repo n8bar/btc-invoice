@@ -102,10 +102,10 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
     - Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
-14. **Mailer & Alerts Audit**
+14. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
-    - Backfill any missing specs/tests for mail/alert behavior and document operational runbooks for mail queue health; align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
+    - Backfill any missing specs/tests for mail/alert behavior, document operational runbooks for mail queue health, and review/refresh all customer-facing email copy (wording + tone); align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
     - Verification: one alias-off drill in a safe env (DKIM/SPF/DMARC + links) and observe queue/backoff/alerts.
 15. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
