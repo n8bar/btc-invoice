@@ -384,7 +384,7 @@
                         </div>
                         @if (!empty($summary['outstanding_btc_formatted']))
                             <p class="text-xs text-indigo-800">
-                                BTC target floats with the latest rate so QR codes always reflect the remaining USD balance.
+                                BTC target is updated using the latest rate and QR code also reflects the updated remaining balance.
                             </p>
                         @endif
 
