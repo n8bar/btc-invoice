@@ -256,7 +256,11 @@ class Invoice extends Model
 
     public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void
     {
-        $this->loadMissing('payments');
+        if ($this->relationLoaded('payments')) {
+            $this->load('payments');
+        } else {
+            $this->loadMissing('payments');
+        }
         $originalStatus = $this->status;
         $becamePaid = false;
         $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;

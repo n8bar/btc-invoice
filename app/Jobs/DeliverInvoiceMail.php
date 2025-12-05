@@ -34,7 +34,7 @@ class DeliverInvoiceMail implements ShouldQueue
     public function handle(MailAlias $mailAlias): void
     {
         $delivery = $this->delivery->fresh();
-        if (!$delivery) {
+        if (!$delivery || $delivery->status !== 'queued') {
             return;
         }
 
@@ -43,6 +43,14 @@ class DeliverInvoiceMail implements ShouldQueue
             $delivery->update([
                 'status' => 'failed',
                 'error_message' => 'Missing invoice/client context.',
+            ]);
+            return;
+        }
+
+        if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice)) {
+            $delivery->update([
+                'status' => 'skipped',
+                'error_message' => $skipReason,
             ]);
             return;
         }
@@ -92,5 +100,29 @@ class DeliverInvoiceMail implements ShouldQueue
             ]);
             throw $e;
         }
+    }
+
+    private function shouldSkipDelivery(InvoiceDelivery $delivery, \App\Models\Invoice $invoice): ?string
+    {
+        if ($delivery->status !== 'queued') {
+            return 'Delivery no longer queued.';
+        }
+
+        $underpayTypes = ['client_underpay_alert', 'owner_underpay_alert'];
+        if (in_array($delivery->type, $underpayTypes, true) && !$invoice->requiresClientUnderpayAlert()) {
+            return 'Underpayment resolved before send.';
+        }
+
+        $partialTypes = ['client_partial_warning', 'owner_partial_warning'];
+        if (in_array($delivery->type, $partialTypes, true) && !$invoice->shouldWarnAboutPartialPayments()) {
+            return 'Partial-payment warning no longer applicable.';
+        }
+
+        $pastDueTypes = ['past_due_owner', 'past_due_client'];
+        if (in_array($delivery->type, $pastDueTypes, true) && in_array($invoice->status, ['paid', 'void'], true)) {
+            return 'Invoice settled before past-due alert.';
+        }
+
+        return null;
     }
 }

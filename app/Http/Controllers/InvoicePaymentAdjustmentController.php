@@ -67,6 +67,19 @@ class InvoicePaymentAdjustmentController extends Controller
         $invoice->refresh();
         $this->alerts->checkPaymentThresholds($invoice);
 
+        $invoice->deliveries()
+            ->whereIn('type', [
+                'client_underpay_alert',
+                'owner_underpay_alert',
+                'client_partial_warning',
+                'owner_partial_warning',
+            ])
+            ->where('status', 'queued')
+            ->update([
+                'status' => 'skipped',
+                'error_message' => 'Skipped after small-balance resolution.',
+            ]);
+
         return back()->with('status', 'Small balance resolved and invoice marked paid.');
     }
 
