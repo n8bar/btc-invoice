@@ -42,6 +42,46 @@
         background-color: var(--color-surface);
         border-color: var(--color-border);
     }
+
+    .auth-card {
+        @apply rounded-2xl shadow-2xl;
+        padding: clamp(2rem, 3vw, 2.5rem) !important;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    .auth-input {
+        @apply rounded-lg border px-4 py-3 text-sm;
+        background: var(--input-bg);
+        border-color: var(--input-border);
+        color: var(--text-primary);
+    }
+
+    .auth-input::placeholder { color: var(--text-muted); }
+
+    .btn-primary {
+        background: var(--button-primary);
+        color: var(--button-primary-text);
+    }
+
+    .btn-secondary {
+        background: var(--button-secondary-bg);
+        border: 1px solid var(--button-secondary-border);
+        color: var(--text-primary);
+    }
+
+    .alert-success {
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+        color: var(--success-text);
+    }
+
+    .alert-error {
+        background: var(--error-bg);
+        border: 1px solid var(--error-border);
+        color: var(--error-text);
+    }
 }
 
 /* Light/dark overrides for common utility classes */
