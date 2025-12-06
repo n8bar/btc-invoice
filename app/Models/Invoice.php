@@ -421,9 +421,13 @@ class Invoice extends Model
             $outstandingBtcFloat = round($outstandingUsd / $effectiveRate, 8);
         }
 
-        $outstandingSats = $expectedSats !== null
-            ? max($expectedSats - $confirmedSats, 0)
-            : null;
+        if ($outstandingUsd !== null && $effectiveRate && $effectiveRate > 0) {
+            $outstandingSats = (int) round(max($outstandingUsd, 0) / $effectiveRate * self::SATS_PER_BTC);
+        } else {
+            $outstandingSats = $expectedSats !== null
+                ? max($expectedSats - $confirmedSats, 0)
+                : null;
+        }
 
         $lastDetected = $this->payments->max('detected_at');
         $lastConfirmed = $this->payments
