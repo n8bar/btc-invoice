@@ -12,6 +12,7 @@
 - If a request is highly ambiguous between “do it” vs. “explain it,” err on answering first and confirm before making changes; clear requests can be acted on directly.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
+- Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away.
 
 ## Handy Commands
 ```
@@ -21,7 +22,7 @@
 ./vendor/bin/sail artisan wallet:watch-payments
 ```
 
-## Environment Notes
+## Environment Notes (Do these without having to be reminded)
 - Wallet xpub onboarding lives at `/wallet/settings`; invoices expect a configured wallet or redirect there.
 - Node helper for BTC derivation lives in `node_scripts/derive-address.cjs` and is invoked via `App\Services\HdWallet`.
 - **Data hygiene:** As of 2025-11-16 the app only holds seed/test data—no real customers yet. Remove this note (and treat production emails accordingly) once live customer data exists.
@@ -30,7 +31,7 @@
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
-- Whenever `docs/**` changes, commit/push those updates right away (I review docs via GitHub’s UI).
+- Whenever `docs/**` changes, commit/push those updates right away.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
 ## Roles
