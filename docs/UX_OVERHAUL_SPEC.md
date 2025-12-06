@@ -30,11 +30,12 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Dark-themed CryptoZing hero with updated headline/copy, larger logos (brand badge + hero image), CTA/button states, and staggered feature cards (wallet-ready, client-friendly, accurate, on-chain aware, delivery-ready, public links).
 
 ## ToDo
-4. Login screen refresh
-   - Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark/light theme.
-   - Keep the page lean vs. the landing hero: single brand mark + short tagline, minimal background treatment, and no feature pills/marketing blocks.
-   - Layout: narrow form column with generous whitespace, clear error/success states, and a secondary link to register (if enabled) without competing CTAs.
-   - Theming: respect system `prefers-color-scheme` with dark fallback; use the same CSS-variable palette for light/dark applied via `data-theme`, and define an `auth-card` component (spacing, radius, border, shadow) centrally rather than inline.
+~~4. Login screen refresh~~
+   - ~~Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark/light theme.~~
+   - ~~Keep the page lean vs. the landing hero: single brand mark + short tagline, minimal background treatment, and no feature pills/marketing blocks.~~
+   - ~~Layout: narrow form column with generous whitespace, clear error/success states, and a secondary link to register (if enabled) without competing CTAs.~~
+   - ~~Theming: respect system `prefers-color-scheme` with dark fallback; use the same CSS-variable palette for light/dark applied via `data-theme`, and define an `auth-card` component (spacing, radius, border, shadow) centrally rather than inline.~~
+   - ~~Guest header tagline on auth pages: pick from a small approved list and keep it stable per session.~~
 5. Wallet UX improvements
    - Mainnet-first UI: hide network selection; network derives from config/env, with testnet available only via env for dev/testing.
    - Inline explainer for xpub formats per network (xpub/zpub), show network badge; derive-test feedback inline.
