@@ -86,13 +86,12 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Structured logs cover payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate).
     - Health probe added (DB + cache); external API timeouts enforced; 403/404/500 and public-print flows hardened to avoid leaks; Mailgun aliasing remains enforced in non-prod.
     - Wallet xpubs are validated on save via a derive test; invoice creation guards derivation failures with a friendly redirect to wallet settings.
+12. **Payment & Address Accuracy (main)**
+    - Legacy derivation mismatches corrected via `wallet:reassign-invoice-addresses` (supports `--include-paid --reset-payments --use-next-index`), moving all affected invoices to the proper external chain and advancing wallet indices.
+    - Verified on 2025-12-06: invoices 7/8/10 (testnet, indices 11/12/13) derive correctly from the stored xpub; watcher sanity runs (`wallet:watch-payments --invoice=7,8,10`) processed paid/partial states without derivation issues.
+    - Payment/confirmation behavior documented (USD canonical, per-payment rate locking, floating BTC outstanding) and outstanding sats now clamp to zero once USD is settled to avoid residual dust after adjustments.
 
 ## Roadmap to Release Candidate
-12. **Payment & Address Accuracy (bug fixes)**
-    - Ensure invoice payment addresses derive from the configured wallet (network/path) so funds land in the user’s wallet (current network: testnet). Trace a sample invoice address against the stored xpub and fix any derivation/network mismatches; validate watcher detection against the corrected derivation. Update docs/changelog after fix.
-    - Audit (2025-12-01): 8 testnet invoices derived from the legacy branch `m/84'/1'/0'/index`; none matched the expected external chain. `wallet:reassign-invoice-addresses` now supports `--include-paid`, `--reset-payments`, and `--use-next-index`; applied to all 8 invoices (including paid/partial), moving them to fresh external-chain indexes, clearing payment logs, resetting statuses to sent, and advancing wallet `next_derivation_index`.
-    - Payment/confirmation docs clarified: USD stays canonical, each payment locks its own USD at detection, outstanding BTC floats using the latest rate, and statuses (`pending`/`partial`/`paid`) hinge on confirmed USD totals (confirmation threshold default 1; per-user post-RC). See [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md) and [`docs/PAYMENT_CONFIRMATIONS.md`](PAYMENT_CONFIRMATIONS.md).
-    - Verification (2025-12-06): Derivation matches confirmed for invoices 7/8/10 (testnet, indices 11/12/13 from user 2 xpub) via `HdWallet::deriveAddress`. `wallet:watch-payments --invoice=7,8,10` processed correctly: 7=paid (single payment), 8=partial with two confirmed txs, 10=paid with prior manual resolve; no derivation/network mismatches observed.
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
     - Dashboard snapshot (done) and light/dark theme toggle (done) plus wallet UX improvements (xpub guidance, validation helpers).

@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-12-06 | MS12 moved to completed milestones | PLAN now lists Payment & Address Accuracy as completed, with verified derivation checks and watcher sanity runs on invoices 7/8/10; outstanding sats clamp documented. |
 | 2025-12-06 | MS12 payment/address verification | Verified corrected derivations on invoices 7/8/10 (testnet indices 11/12/13) and ran `wallet:watch-payments --invoice=7,8,10`; watcher processed paid/partial states as expected with no derivation mismatches. |
 | 2025-12-05 | Mailer & Alerts scope renamed | PLAN Item 14 is now “Mailer & Alerts Polish + Audit” and explicitly includes copy review/refresh for all outbound messages alongside the pipeline/queue audit. |
 | 2025-12-04 | Small-balance resolution spec | Documented exact outstanding display (no dust masking) and a manual “Resolve small balance” adjustment (threshold = `max($1, min(1% of expected USD, $50))`) to settle tiny residual USD and mark invoices paid; see PLAN and PARTIAL_PAYMENTS. |
