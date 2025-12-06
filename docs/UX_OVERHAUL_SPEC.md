@@ -31,7 +31,10 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 
 ## ToDo
 4. Login screen refresh
-   - Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark theme.
+   - Replace Laravel branding on auth/login with CryptoZing styling and logo; keep form copy concise and consistent with the new dark/light theme.
+   - Keep the page lean vs. the landing hero: single brand mark + short tagline, minimal background treatment, and no feature pills/marketing blocks.
+   - Layout: narrow form column with generous whitespace, clear error/success states, and a secondary link to register (if enabled) without competing CTAs.
+   - Theming: respect system `prefers-color-scheme` with dark fallback; use the same CSS-variable palette for light/dark applied via `data-theme`, and define an `auth-card` component (spacing, radius, border, shadow) centrally rather than inline.
 5. Wallet UX improvements
    - Mainnet-first UI: hide network selection; network derives from config/env, with testnet available only via env for dev/testing.
    - Inline explainer for xpub formats per network (xpub/zpub), show network badge; derive-test feedback inline.
