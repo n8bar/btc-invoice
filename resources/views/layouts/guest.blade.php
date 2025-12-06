@@ -101,7 +101,9 @@
             ];
             $authTagline = session('auth_tagline');
             if (!$authTagline) {
-                $authTagline = $taglines[array_rand($taglines)];
+                $sessionId = session()->getId() ?: (string) microtime(true);
+                $index = abs(crc32($sessionId)) % count($taglines);
+                $authTagline = $taglines[$index];
                 session(['auth_tagline' => $authTagline]);
             }
         @endphp
