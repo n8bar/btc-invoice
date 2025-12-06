@@ -58,6 +58,7 @@ Execute the full suite via Sail:
 - Onboarding walkthrough: [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](docs/get-live/ONBOARDING_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/RC_ROLLOUT_CHECKLIST.md`](docs/RC_ROLLOUT_CHECKLIST.md)
 - UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
+- Wallet/Xpub UX spec: [`docs/WALLET_XPUB_UX_SPEC.md`](docs/WALLET_XPUB_UX_SPEC.md)
 - Print/Public polish spec: [`docs/PRINT_PUBLIC_POLISH.md`](docs/PRINT_PUBLIC_POLISH.md)
 - Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
 - Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)

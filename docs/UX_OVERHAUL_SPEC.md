@@ -37,6 +37,7 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 
 ## ToDo
 5. Wallet UX improvements
+   - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
    - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.
    - Inline explainer for xpub formats per network (xpub/zpub) and derive-test feedback; badge/helper is conditional on testnet env.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.

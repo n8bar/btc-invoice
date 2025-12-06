@@ -94,6 +94,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
+    - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) guides ToDo #5 implementation.
     - [x] Dashboard snapshot and light/dark theme toggle plus wallet UX improvements (xpub guidance, validation helpers).
     - [ ] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
