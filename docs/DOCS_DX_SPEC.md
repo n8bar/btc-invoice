@@ -3,8 +3,8 @@
 Item 12 clarification for Release Candidate: what we will ship for developer docs and onboarding quality.
 
 ## Outputs
-- `docs/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
-- `docs/ONBOARDING_WALKTHROUGH.md`: end-to-end walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
+- `docs/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
+- `docs/get-live/ONBOARDING_WALKTHROUGH.md`: end-to-end walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
 - `docs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
 - `README.md` and `docs/PLAN.md` updated to link the above and keep RC scope vs. FuturePLAN clear.
 

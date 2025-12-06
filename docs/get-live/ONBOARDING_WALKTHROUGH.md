@@ -3,7 +3,7 @@
 End-to-end guide from fresh clone to first paid invoice.
 
 ## 1) Start from Quick Start
-- Follow `docs/QUICK_START.md` to bring up Sail, install deps, and migrate/seed.
+- Follow [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md) to bring up Sail, install deps, and migrate/seed.
 - Ensure `WALLET_NETWORK` matches your test network and mail aliasing is enabled for safety in pre-prod.
 
 ## 2) Connect a Wallet
