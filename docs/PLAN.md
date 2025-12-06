@@ -80,7 +80,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 10. **User Settings (main)**
     - Profile page now includes invoice memo + payment-term defaults so new invoices auto-fill description/due dates when owners leave those fields blank.
     - Wallet settings gained an “additional wallets” section to stash extra xpubs for the future multi-wallet selector; stored accounts aren’t active yet but keep DNS/Xpub data ready.
-    - Wallet settings are now mainnet-first: network derives from `WALLET_NETWORK` env, the selector is removed, and the UI shows the network badge while keeping additional wallets on the configured network.
+    - Wallet settings are now mainnet-first: network derives from `WALLET_NETWORK` env, the selector is removed, and the UI only surfaces a testnet badge/helper in non-mainnet stacks while keeping additional wallets on the configured network.
     - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 11. **Observability & Safety (main)**
     - Structured logs cover payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate).
