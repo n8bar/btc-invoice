@@ -91,15 +91,15 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Verified on 2025-12-06: invoices 7/8/10 (testnet, indices 11/12/13) derive correctly from the stored xpub; watcher sanity runs (`wallet:watch-payments --invoice=7,8,10`) processed paid/partial states without derivation issues.
     - Payment/confirmation behavior documented (USD canonical, per-payment rate locking, floating BTC outstanding) and outstanding sats now clamp to zero once USD is settled to avoid residual dust after adjustments.
 
-## Roadmap to Release Candidate
+## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
-    - Dashboard snapshot (done) and light/dark theme toggle (done) plus wallet UX improvements (xpub guidance, validation helpers).
-    - Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
-    - Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-    - Guided onboarding wizard: wallet setup → create invoice → deliver.
-    - User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
-    - Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
+    - [x] Dashboard snapshot and light/dark theme toggle plus wallet UX improvements (xpub guidance, validation helpers).
+    - [ ] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
+    - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
+    - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
+    - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
+    - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
 14. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
