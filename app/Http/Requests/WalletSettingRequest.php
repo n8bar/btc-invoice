@@ -21,15 +21,18 @@ class WalletSettingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $network = config('wallet.default_network', 'testnet');
+        $prefixes = $network === 'mainnet' ? 'xpub|ypub|zpub' : 'tpub|vpub';
+
         return [
-            'bip84_xpub' => ['required', 'string', 'max:256', 'regex:/^(vpub|zpub|xpub|tpub)[A-Za-z0-9]+$/'],
+            'bip84_xpub' => ['required', 'string', 'max:256', "regex:/^({$prefixes})[A-Za-z0-9]+$/"],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'bip84_xpub.regex' => 'Enter a valid BIP84 xpub/vpub.',
+            'bip84_xpub.regex' => 'Enter a valid BIP84 wallet key for the configured network.',
         ];
     }
 }

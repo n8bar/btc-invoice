@@ -6,13 +6,21 @@ use App\Models\Client;
 use App\Models\User;
 use App\Models\UserWalletAccount;
 use App\Models\WalletSetting;
+use App\Services\HdWallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class UserSettingsTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Config::set('wallet.default_network', 'testnet');
+    }
 
     public function test_invoice_store_applies_user_defaults(): void
     {
@@ -134,6 +142,68 @@ class UserSettingsTest extends TestCase
             ->actingAs($owner)
             ->delete(route('wallet.settings.accounts.destroy', $account))
             ->assertForbidden();
+    }
+
+    public function test_wallet_settings_shows_testnet_helper_when_not_mainnet(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Testnet (for testing only). Real payments require mainnet.', false);
+    }
+
+    public function test_wallet_settings_hides_network_helper_on_mainnet(): void
+    {
+        Config::set('wallet.default_network', 'mainnet');
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('Testnet (for testing only). Real payments require mainnet.', false);
+    }
+
+    public function test_mainnet_rejects_testnet_wallet_key(): void
+    {
+        Config::set('wallet.default_network', 'mainnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')->never();
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => 'tpub' . str_repeat('a', 20),
+            ]);
+
+        $response->assertSessionHasErrors('bip84_xpub');
+    }
+
+    public function test_testnet_rejects_mainnet_wallet_key(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')->never();
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => 'xpub' . str_repeat('a', 20),
+            ]);
+
+        $response->assertSessionHasErrors('bip84_xpub');
     }
 
     private function createWalletSetting(User $user): WalletSetting

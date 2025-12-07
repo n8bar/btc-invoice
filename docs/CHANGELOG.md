@@ -2,7 +2,8 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2025-12-07 | Wallet/Xpub UX breakout spec | Added `docs/WALLET_XPUB_UX_SPEC.md` for UX ToDo #5; linked UX Overhaul spec + PLAN to the detailed wallet flow/copy/validation guidance. |
+| 2025-12-07 | Wallet network helper + validation | Wallet settings now hide network UI on mainnet, show a testnet-only helper, and enforce network-specific xpub prefixes for primary and additional wallets. |
+| 2025-12-06 | Wallet/Xpub UX breakout spec | Added `docs/WALLET_XPUB_UX_SPEC.md` for UX ToDo #5; linked UX Overhaul spec + PLAN to the detailed wallet flow/copy/validation guidance. |
 | 2025-12-06 | Wallet UI testnet badge scope | PLAN and UX spec now clarify mainnet-default UI: env-driven network with no mainnet badge and a dev-only testnet badge/helper shown only when `WALLET_NETWORK` is testnet. |
 | 2025-12-06 | MS12 moved to completed milestones | PLAN now lists Payment & Address Accuracy as completed, with verified derivation checks and watcher sanity runs on invoices 7/8/10; outstanding sats clamp documented. |
 | 2025-12-06 | MS12 payment/address verification | Verified corrected derivations on invoices 7/8/10 (testnet indices 11/12/13) and ran `wallet:watch-payments --invoice=7,8,10`; watcher processed paid/partial states as expected with no derivation mismatches. |

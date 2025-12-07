@@ -28,14 +28,11 @@
                     @endphp
                     <form method="POST" action="{{ route('wallet.settings.update') }}" class="space-y-6">
                         @csrf
-                    @if ($defaultNetwork !== 'mainnet')
-                        <div class="flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2">
-                            <span class="text-sm font-semibold text-gray-800">Network</span>
-                            <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-                                Bitcoin Testnet
-                            </span>
-                        </div>
-                    @endif
+                        @if ($defaultNetwork !== 'mainnet')
+                            <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                                {{ __('Testnet (for testing only). Real payments require mainnet.') }}
+                            </div>
+                        @endif
 
                         <div>
                             <x-input-label for="bip84_xpub" :value="__('BIP84 xpub')" />
