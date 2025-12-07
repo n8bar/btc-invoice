@@ -13,7 +13,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## ToDo
 - Mainnet-first UI: remove network selector entirely, rely on `WALLET_NETWORK`, suppress any badge/copy on mainnet, and show a single “Testnet (for testing only)” helper above the field when not mainnet; ensure server-side validation also rejects mismatched networks.
-- Inline helper/accordion: implement the “Where do I find this?” accordion with the 4-step guidance, wallet badges (Ledger/Trezor/mobile), and seed-warning safety copy; keep the helper inline under the field and link to onboarding.
+- Inline helper/accordion: implement the “Where do I find this?” accordion with the 4-step guidance, wallet badges for common wallets (Ledger Live, Trezor Suite, Sparrow, BlueWallet, Nunchuk), and seed-warning safety copy; keep the helper inline under the field and link to onboarding.
 - Derive-test flow: on blur/save run derive once with a small inline spinner; success shows a green check plus sample address preview; invalid/parse failures show a single friendly error, preserve input, and refocus; provide a “Re-run validation” control without disabling the primary CTA.
 - Additional wallets: reuse the primary form component, inherit the configured network, block mixed-network submissions, and mirror helper/validation states (including success preview and error copy).
 - Tests: feature coverage for mainnet/testnet helper visibility, invalid-key errors preserving input + enabled submit, successful derive preview, and additional-wallet same-network enforcement; view tests/snapshots for accordion/helper presence.
