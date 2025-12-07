@@ -13,7 +13,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## ToDo
 - Mainnet-first UI: remove network selector entirely, rely on `WALLET_NETWORK`, suppress any badge/copy on mainnet, and show a single “Testnet (for testing only)” helper above the field when not mainnet; ensure server-side validation also rejects mismatched networks.
-- Inline helper/accordion: implement the “Where do I find this?” accordion with the 4-step guidance, wallet badges for common wallets (Ledger Live, Trezor Suite, Sparrow, BlueWallet, Nunchuk), and seed-warning safety copy; keep the helper inline under the field and link to onboarding.
+- Inline helper/accordion: implement the “Where do I find this?” accordion with the 4-step guidance, wallet badges for common wallets (Ledger Live, Trezor Suite, Sparrow) plus mobile-first badges (Blockstream Green iOS/Android, BlueWallet, Nunchuk), and seed-warning safety copy; keep the helper inline under the field and link to onboarding.
 - Derive-test flow: on blur/save run derive once with a small inline spinner; success shows a green check plus sample address preview; invalid/parse failures show a single friendly error, preserve input, and refocus; provide a “Re-run validation” control without disabling the primary CTA.
 - Additional wallets: reuse the primary form component, inherit the configured network, block mixed-network submissions, and mirror helper/validation states (including success preview and error copy).
 - Tests: feature coverage for mainnet/testnet helper visibility, invalid-key errors preserving input + enabled submit, successful derive preview, and additional-wallet same-network enforcement; view tests/snapshots for accordion/helper presence.
@@ -28,7 +28,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
     2) Go to Receive (or Account details) → Advanced/export.
     3) Copy the account public key (often labeled xpub/zpub/ypub/vpub/tpub). Do not copy a single address.
     4) Paste here. You can verify below before saving.
-  - Provide 2–3 wallet badges with concise notes, e.g., “Ledger Live: Account → … → Account extended public key” and “Trezor Suite: Accounts → Receive → Show public key.”
+  - Provide wallet badges with concise notes, e.g., “Ledger Live: Account → … → Account extended public key,” “Trezor Suite: Accounts → Receive → Show public key,” and mobile-friendly cues like “Blockstream Green (iOS/Android): Account → three dots → Export xpub” and “BlueWallet/Nunchuk (iOS/Android): Account → More/Manage → Export xpub.”
 - Testnet cue: if `WALLET_NETWORK` is not mainnet, show a small helper above the field: “Testnet (for testing only). Real payments require mainnet.” No badge/no copy on mainnet.
 - Additional wallets section mirrors the primary form (same helper, same validation) and inherits the configured network; disallow mixed networks.
 - CTA area: primary “Save wallet” button stays enabled after errors; secondary “Re-run validation” link/button near the helper for retry.
