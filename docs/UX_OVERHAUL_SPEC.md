@@ -36,36 +36,36 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Guest header tagline on auth pages: pick from a small approved list and keep it stable per session.
 
 ## ToDo
-5. Wallet UX improvements
+5. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
+   - Add accessible labels and pressed-state semantics to the light/dark/system buttons.
+   - Ensure visible keyboard focus rings and comfortable tap targets in both themes.
+6. Wallet UX improvements
    - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
    - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.
    - Inline explainer for xpub formats per network (xpub/zpub) and derive-test feedback; badge/helper is conditional on testnet env.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
-6. Invoices & Clients UI polish
+7. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
-7. Public/share refresh
+8. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
-8. Onboarding wizard
+9. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
-9. User settings & auth UX
+10. User settings & auth UX
    - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
    - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
    - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
-10. Editable email templates
+11. Editable email templates
    - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
    - Preview + reset-to-default; validation to prevent empty required tokens.
-11. Invoice Settings polish
+12. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
-12. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
-   - Add accessible labels and pressed-state semantics to the light/dark/system buttons.
-   - Ensure visible keyboard focus rings and comfortable tap targets in both themes.
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
