@@ -15,3 +15,13 @@ Project-specific non-negotiables:
 - No layout jump: reserve space for helper/error text; avoid page reflow when showing validation.
 - Mobile/accessibility: visible focus rings, keyboard navigability for accordions, adequate tap targets, readable on small screens.
 - Copy: plain language, avoid jargon, safety reminders (e.g., “receive-only key; never share your seed”), friendly errors.
+
+Videos for n8 to watch:
+- Nielsen’s 10 heuristics (NN/g, 2023): https://www.youtube.com/watch?v=cTtc90jCULU
+- WCAG 2.2 overview (Deque, 2024): https://www.youtube.com/watch?v=sVYZ7QM3UUM
+- GOV.UK forms talk (2023): https://www.youtube.com/watch?v=MMfqMSPKGj4
+- USWDS form patterns webinar (2023): https://www.youtube.com/watch?v=kP-9tJFm3Ag
+- Material Design text fields/validation (2023): https://www.youtube.com/watch?v=FeptggMEL8g
+- Apple HIG/iOS design (WWDC24 session): https://www.youtube.com/watch?v=HyQgpxX__-A
+- Stripe payment flow design (2024): https://www.youtube.com/watch?v=XSMfwiZBOvs
+- Heuristics + accessibility overlap (2023 webinar): https://www.youtube.com/watch?v=uJTAmaEx8Cw
