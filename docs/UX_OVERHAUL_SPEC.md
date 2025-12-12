@@ -63,6 +63,9 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Preview + reset-to-default; validation to prevent empty required tokens.
 11. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
+12. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
+   - Add accessible labels and pressed-state semantics to the light/dark/system buttons.
+   - Ensure visible keyboard focus rings and comfortable tap targets in both themes.
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
