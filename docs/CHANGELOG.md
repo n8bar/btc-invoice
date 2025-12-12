@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-12-12 | Theme toggle accessibility polish shipped | Added accessible labels/pressed-state semantics, visible focus rings, and larger tap targets to the light/dark/system header toggle; aligned with UX guardrails. |
 | 2025-12-12 | UX Overhaul ToDo priority updated | Moved theme-toggle accessibility polish ahead of wallet UX and renumbered UX Overhaul ToDos; updated wallet spec references accordingly. |
 | 2025-12-11 | UX guardrails reference added | Added `docs/UX_GUARDRAILS.md` (Nielsen/WCAG + form/accessibility guardrails) and linked it from AGENTS, PLAN Milestone 13, and README. |
 | 2025-12-07 | Wallet network helper + validation | Wallet settings now hide network UI on mainnet, show a testnet-only helper, and enforce network-specific xpub prefixes for primary and additional wallets. |

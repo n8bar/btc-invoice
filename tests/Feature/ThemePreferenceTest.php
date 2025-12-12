@@ -27,6 +27,10 @@ class ThemePreferenceTest extends TestCase
         $html = $this->actingAs($user->fresh())->get(route('dashboard'))->getContent();
         $this->assertStringContainsString('data-theme="dark"', $html);
         $this->assertStringContainsString('<html', $html);
+        $this->assertStringContainsString('aria-label="Light theme"', $html);
+        $this->assertStringContainsString('aria-label="Dark theme"', $html);
+        $this->assertStringContainsString('aria-label="System theme"', $html);
+        $this->assertMatchesRegularExpression('/data-theme-set="dark"[^>]*aria-pressed="true"/', $html);
     }
 
     public function test_invalid_theme_rejected(): void

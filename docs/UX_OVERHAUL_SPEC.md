@@ -34,11 +34,11 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Layout: narrow form column with generous whitespace, clear error/success states, and a secondary link to register (if enabled) without competing CTAs.
    - Theming: respect system `prefers-color-scheme` with dark fallback; use the same CSS-variable palette for light/dark applied via `data-theme`, and define an `auth-card` component (spacing, radius, border, shadow) centrally rather than inline.
    - Guest header tagline on auth pages: pick from a small approved list and keep it stable per session.
+5. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
+   - Added accessible labels and `aria-pressed` state to light/dark/system buttons.
+   - Increased tap targets and added visible focus rings; active state is clear in both themes.
 
 ## ToDo
-5. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
-   - Add accessible labels and pressed-state semantics to the light/dark/system buttons.
-   - Ensure visible keyboard focus rings and comfortable tap targets in both themes.
 6. Wallet UX improvements
    - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
    - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.

@@ -29,15 +29,30 @@
                 @php
                     $themePreference = auth()->user()?->theme ?? 'system';
                 @endphp
-                <div class="flex items-center gap-1" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
-                    <button type="button" data-theme-set="light" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        ☀️
+                <div class="flex items-center gap-1" role="group" aria-label="Theme" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
+                    <button type="button"
+                            data-theme-set="light"
+                            aria-label="Light theme"
+                            aria-pressed="{{ $themePreference === 'light' ? 'true' : 'false' }}"
+                            title="Light theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">☀️</span>
                     </button>
-                    <button type="button" data-theme-set="dark" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        🌙
+                    <button type="button"
+                            data-theme-set="dark"
+                            aria-label="Dark theme"
+                            aria-pressed="{{ $themePreference === 'dark' ? 'true' : 'false' }}"
+                            title="Dark theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">🌙</span>
                     </button>
-                    <button type="button" data-theme-set="system" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        🖥️
+                    <button type="button"
+                            data-theme-set="system"
+                            aria-label="System theme"
+                            aria-pressed="{{ $themePreference === 'system' ? 'true' : 'false' }}"
+                            title="System theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">🖥️</span>
                     </button>
                 </div>
                 <x-dropdown align="right" width="48">
@@ -107,15 +122,30 @@
                 @php
                     $themePreference = auth()->user()?->theme ?? 'system';
                 @endphp
-                <div class="flex items-center gap-2" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
-                    <button type="button" data-theme-set="light" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        ☀️
+                <div class="flex items-center gap-2" role="group" aria-label="Theme" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
+                    <button type="button"
+                            data-theme-set="light"
+                            aria-label="Light theme"
+                            aria-pressed="{{ $themePreference === 'light' ? 'true' : 'false' }}"
+                            title="Light theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">☀️</span>
                     </button>
-                    <button type="button" data-theme-set="dark" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        🌙
+                    <button type="button"
+                            data-theme-set="dark"
+                            aria-label="Dark theme"
+                            aria-pressed="{{ $themePreference === 'dark' ? 'true' : 'false' }}"
+                            title="Dark theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">🌙</span>
                     </button>
-                    <button type="button" data-theme-set="system" class="px-2 py-1 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                        🖥️
+                    <button type="button"
+                            data-theme-set="system"
+                            aria-label="System theme"
+                            aria-pressed="{{ $themePreference === 'system' ? 'true' : 'false' }}"
+                            title="System theme"
+                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                        <span aria-hidden="true">🖥️</span>
                     </button>
                 </div>
             </div>
@@ -194,8 +224,13 @@
                         const isActive = btn.getAttribute('data-theme-set') === theme;
                         btn.classList.toggle('border-indigo-500', isActive);
                         btn.classList.toggle('text-indigo-700', isActive);
+                        btn.classList.toggle('bg-indigo-50', isActive);
+                        btn.classList.toggle('dark:text-indigo-200', isActive);
+                        btn.classList.toggle('dark:bg-indigo-500/20', isActive);
                         btn.classList.toggle('border-gray-200', !isActive);
                         btn.classList.toggle('text-gray-700', !isActive);
+                        btn.classList.toggle('bg-white', !isActive);
+                        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
                     });
                 };
 
