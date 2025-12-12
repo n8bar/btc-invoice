@@ -35,7 +35,7 @@
                             aria-label="Light theme"
                             aria-pressed="{{ $themePreference === 'light' ? 'true' : 'false' }}"
                             title="Light theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">☀️</span>
                     </button>
                     <button type="button"
@@ -43,7 +43,7 @@
                             aria-label="Dark theme"
                             aria-pressed="{{ $themePreference === 'dark' ? 'true' : 'false' }}"
                             title="Dark theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">🌙</span>
                     </button>
                     <button type="button"
@@ -51,7 +51,7 @@
                             aria-label="System theme"
                             aria-pressed="{{ $themePreference === 'system' ? 'true' : 'false' }}"
                             title="System theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">🖥️</span>
                     </button>
                 </div>
@@ -128,7 +128,7 @@
                             aria-label="Light theme"
                             aria-pressed="{{ $themePreference === 'light' ? 'true' : 'false' }}"
                             title="Light theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">☀️</span>
                     </button>
                     <button type="button"
@@ -136,7 +136,7 @@
                             aria-label="Dark theme"
                             aria-pressed="{{ $themePreference === 'dark' ? 'true' : 'false' }}"
                             title="Dark theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">🌙</span>
                     </button>
                     <button type="button"
@@ -144,7 +144,7 @@
                             aria-label="System theme"
                             aria-pressed="{{ $themePreference === 'system' ? 'true' : 'false' }}"
                             title="System theme"
-                            class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:border-white/25 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
                         <span aria-hidden="true">🖥️</span>
                     </button>
                 </div>
