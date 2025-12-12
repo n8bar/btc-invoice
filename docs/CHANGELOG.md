@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-12-11 | UX guardrails reference added | Added `docs/UX_GUARDRAILS.md` (Nielsen/WCAG + form/accessibility guardrails) and linked it from AGENTS, PLAN Milestone 13, and README. |
 | 2025-12-07 | Wallet network helper + validation | Wallet settings now hide network UI on mainnet, show a testnet-only helper, and enforce network-specific xpub prefixes for primary and additional wallets. |
 | 2025-12-06 | Wallet/Xpub UX breakout spec | Added `docs/WALLET_XPUB_UX_SPEC.md` for UX ToDo #5; linked UX Overhaul spec + PLAN to the detailed wallet flow/copy/validation guidance. |
 | 2025-12-06 | Wallet UI testnet badge scope | PLAN and UX spec now clarify mainnet-default UI: env-driven network with no mainnet badge and a dev-only testnet badge/helper shown only when `WALLET_NETWORK` is testnet. |
