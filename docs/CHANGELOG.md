@@ -2,11 +2,12 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2025-12-12 | Theme toggle accessibility polish shipped | Added accessible labels/pressed-state semantics, visible focus rings, and larger tap targets to the light/dark/system header toggle; aligned with UX guardrails. |
-| 2025-12-12 | UX Overhaul ToDo priority updated | Moved theme-toggle accessibility polish ahead of wallet UX and renumbered UX Overhaul ToDos; updated wallet spec references accordingly. |
+| 2025-12-16 | UX Overhaul: Helpful Notes scoped | Added UX Overhaul ToDo #6 for a public “Helpful Notes” section (starting with xpub safety + why we ask), and renumbered wallet UX ToDo references. |
+| 2025-12-11 | Theme toggle accessibility polish shipped | Added accessible labels/pressed-state semantics, visible focus rings, and larger tap targets to the light/dark/system header toggle; aligned with UX guardrails. |
+| 2025-12-11 | UX Overhaul ToDo priority updated | Moved theme-toggle accessibility polish ahead of wallet UX and renumbered UX Overhaul ToDos; updated wallet spec references accordingly. |
 | 2025-12-11 | UX guardrails reference added | Added `docs/UX_GUARDRAILS.md` (Nielsen/WCAG + form/accessibility guardrails) and linked it from AGENTS, PLAN Milestone 13, and README. |
 | 2025-12-07 | Wallet network helper + validation | Wallet settings now hide network UI on mainnet, show a testnet-only helper, and enforce network-specific xpub prefixes for primary and additional wallets. |
-| 2025-12-06 | Wallet/Xpub UX breakout spec | Added `docs/WALLET_XPUB_UX_SPEC.md` for UX ToDo #6; linked UX Overhaul spec + PLAN to the detailed wallet flow/copy/validation guidance. |
+| 2025-12-06 | Wallet/Xpub UX breakout spec | Added `docs/WALLET_XPUB_UX_SPEC.md` for wallet UX scope; linked UX Overhaul spec + PLAN to the detailed wallet flow/copy/validation guidance. |
 | 2025-12-06 | Wallet UI testnet badge scope | PLAN and UX spec now clarify mainnet-default UI: env-driven network with no mainnet badge and a dev-only testnet badge/helper shown only when `WALLET_NETWORK` is testnet. |
 | 2025-12-06 | MS12 moved to completed milestones | PLAN now lists Payment & Address Accuracy as completed, with verified derivation checks and watcher sanity runs on invoices 7/8/10; outstanding sats clamp documented. |
 | 2025-12-06 | MS12 payment/address verification | Verified corrected derivations on invoices 7/8/10 (testnet indices 11/12/13) and ran `wallet:watch-payments --invoice=7,8,10`; watcher processed paid/partial states as expected with no derivation mismatches. |
