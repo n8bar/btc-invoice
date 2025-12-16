@@ -23,6 +23,7 @@ services:
             - sail
         depends_on:
             - mysql
+        restart: unless-stopped
     scheduler:
         build:
             context: './docker/8.4'
@@ -67,6 +68,7 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+        restart: unless-stopped
 networks:
     sail:
         driver: bridge
