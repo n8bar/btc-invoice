@@ -5,6 +5,7 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 ## Outputs
 - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
 - Wallet UX improvements (xpub guidance, network cues, validation helpers).
+- Public “Helpful Notes” section (short, plain-language explanations; starts with xpub safety + why we ask).
 - Invoices & Clients UI polish (CRUD surfaces, show/edit flows, print/public/share, delivery logs/actions).
 - Public/share layouts refresh to mirror updated show/print patterns.
 - Guided onboarding wizard (wallet setup → create invoice → deliver).
@@ -39,32 +40,37 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Increased tap targets and added visible focus rings; active state is clear in both themes.
 
 ## ToDo
-6. Wallet UX improvements
+6. Helpful Notes (public)
+   - Add a public “Helpful Notes” section (`/help`) that uses the site’s core layout/theme while remaining accessible without auth.
+   - Seed content: “Extended public keys (xpub/zpub): what they are, why we ask, what they can’t do (can’t spend), privacy implications, and “use a dedicated invoices account” guidance; explicitly state we never ask for seed phrases or private keys.
+   - Structure for growth: start with Wallet & Security, Invoices, Payments, and Privacy categories; include an FAQ subsection later if needed.
+   - Contextual integration: deep-link to specific notes from relevant screens (starting with Wallet Settings) and include “Back to …” affordances so users stay oriented.
+7. Wallet UX improvements
    - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
    - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.
    - Inline explainer for xpub formats per network (xpub/zpub) and derive-test feedback; badge/helper is conditional on testnet env.
    - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
-7. Invoices & Clients UI polish
+8. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
-8. Public/share refresh
+9. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
-9. Onboarding wizard
+10. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
-10. User settings & auth UX
+11. User settings & auth UX
    - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
    - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
    - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
-11. Editable email templates
+12. Editable email templates
    - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
    - Preview + reset-to-default; validation to prevent empty required tokens.
-12. Invoice Settings polish
+13. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
 
 ## Definition of Done

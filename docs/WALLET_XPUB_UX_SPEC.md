@@ -1,4 +1,4 @@
-# Wallet / XPUB UX Spec (MS13 — UX ToDo #6)
+# Wallet / XPUB UX Spec (MS13 — UX ToDo #7)
 
 Purpose: make wallet setup mainnet-first and approachable for non-technical users while keeping derivation safety intact. Applies to `/wallet/settings` primary wallet + additional wallets.
 
