@@ -2,7 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2025-12-16 | UX Overhaul: Helpful Notes scoped | Added UX Overhaul ToDo #6 for a public “Helpful Notes” section (starting with xpub safety + why we ask), and renumbered wallet UX ToDo references. |
+| 2025-12-15 | UX Overhaul: Helpful Notes scoped | Added UX Overhaul ToDo #6 for a public “Helpful Notes” section (starting with xpub safety + why we ask), and renumbered wallet UX ToDo references. |
 | 2025-12-11 | Theme toggle accessibility polish shipped | Added accessible labels/pressed-state semantics, visible focus rings, and larger tap targets to the light/dark/system header toggle; aligned with UX guardrails. |
 | 2025-12-11 | UX Overhaul ToDo priority updated | Moved theme-toggle accessibility polish ahead of wallet UX and renumbered UX Overhaul ToDos; updated wallet spec references accordingly. |
 | 2025-12-11 | UX guardrails reference added | Added `docs/UX_GUARDRAILS.md` (Nielsen/WCAG + form/accessibility guardrails) and linked it from AGENTS, PLAN Milestone 13, and README. |
