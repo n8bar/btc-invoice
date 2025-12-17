@@ -45,7 +45,7 @@
 	                        <div>
 	                            <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
 	                            <p class="mt-1 text-base text-gray-600 dark:text-slate-300">
-	                                CryptoZing asks for a BIP84 account extended public key (usually <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>) so it can generate a unique receiving address per invoice and watch for on-chain payments.
+	                                CryptoZing asks for a BIP84 account extended public key (usually <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>) so it can generate a unique receiving address per invoice and watch for on-chain payments.
 	                            </p>
 	                        </div>
                         @if (!empty($backLink))
@@ -110,7 +110,7 @@
 	                            <ol class="mt-2 list-decimal space-y-2 pl-5">
 	                                <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
 	                                <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
-	                                <li>Copy the extended public key (often starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>).</li>
+	                                <li>Copy the extended public key (often starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>).</li>
 	                                <li>Paste it into CryptoZing’s <span class="font-medium">Wallet Settings</span>.</li>
 	                            </ol>
 	                        </div>
