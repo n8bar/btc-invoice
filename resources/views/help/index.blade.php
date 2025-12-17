@@ -19,7 +19,7 @@
     </x-slot>
 
     <div class="py-10">
-        <div class="mx-auto max-w-4xl space-y-8 px-4 text-base sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl space-y-8 px-4 text-base sm:px-6 lg:px-8">
             <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
                 <p class="text-base text-gray-700 dark:text-slate-200">
                     These notes are meant to help you make safe choices and understand what CryptoZing can and can’t access.
