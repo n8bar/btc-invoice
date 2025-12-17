@@ -11,7 +11,7 @@
 
     <x-slot name="header">
         <div class="space-y-2">
-            <h1 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Helpful Notes</h1>
+            <h1 class="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl dark:text-slate-100">Helpful Notes</h1>
             <p class="text-base text-gray-600 dark:text-slate-300">
                 Plain-language explanations for common questions about wallets, invoices, payments, and privacy.
             </p>
@@ -28,7 +28,7 @@
             </div>
 
             <nav aria-label="On this page" class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                <h2 class="text-base font-semibold text-gray-900 dark:text-slate-100">On this page</h2>
+                <h2 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">On this page</h2>
                 <ul class="mt-3 grid gap-2 text-base text-gray-700 dark:text-slate-200 sm:grid-cols-2">
                     <li><a class="text-indigo-700 hover:text-indigo-900 underline-offset-2 hover:underline dark:text-indigo-300 dark:hover:text-indigo-200" href="#wallet-security">Wallet &amp; Security</a></li>
                     <li><a class="text-indigo-700 hover:text-indigo-900 underline-offset-2 hover:underline dark:text-indigo-300 dark:hover:text-indigo-200" href="#invoices">Invoices</a></li>
@@ -38,12 +38,12 @@
             </nav>
 
             <section id="wallet-security" class="scroll-mt-24 space-y-4">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Wallet &amp; Security</h2>
+                <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Wallet &amp; Security</h2>
 
                 <article id="xpub-safety" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 	                        <div>
-	                            <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
+	                            <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
 	                            <p class="mt-1 text-base text-gray-600 dark:text-slate-300">
 	                                CryptoZing asks for a BIP84 account extended public key (usually <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>) so it can generate a unique receiving address per invoice and watch for on-chain payments.
 	                            </p>
@@ -98,15 +98,15 @@
 	                </article>
 
 	                <article id="import-wallet-key" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>
+	                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        To connect a wallet to CryptoZing, you copy your wallet’s <span class="font-medium">account-level</span> extended public key and paste it into <span class="font-medium">Wallet Settings</span>.
 	                        This lets CryptoZing generate a unique receiving address per invoice.
 	                    </p>
 
-	                    <div class="mt-6 space-y-7 text-base text-gray-700 dark:text-slate-200">
+	                    <div class="mt-8 space-y-10 text-base text-gray-700 dark:text-slate-200">
 	                        <div>
-	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Recommended: BlueWallet</h4>
+	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Recommended: BlueWallet</h4>
 	                            <ol class="mt-2 list-decimal space-y-2 pl-5">
 	                                <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
 	                                <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
@@ -116,7 +116,7 @@
 	                        </div>
 
 	                        <div>
-	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Other wallets</h4>
+	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Other wallets</h4>
 	                            <ul class="mt-2 list-disc space-y-2 pl-5">
 	                                <li>Look for <span class="font-medium">Account details</span>, <span class="font-medium">Wallet details</span>, or <span class="font-medium">Advanced</span> → “<span class="font-medium">Extended public key</span>” / “<span class="font-medium">Master public key</span>”.</li>
 	                                <li>Make sure you’re exporting an <span class="font-medium">account key</span>, not a single receive address.</li>
@@ -125,7 +125,7 @@
 	                        </div>
 
 	                        <div>
-	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">After you get paid</h4>
+	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">After you get paid</h4>
 	                            <ul class="mt-2 list-disc space-y-2 pl-5">
 	                                <li>It’s normal to sweep funds to an exchange/off-ramp or cold storage to reduce volatility exposure.</li>
 	                                <li>CryptoZing never has custody and cannot send funds — any sweep/refund is a transaction you send from your wallet.</li>
@@ -133,7 +133,7 @@
 	                        </div>
 
 	                        <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase <small>(only if you insist on using an existing wallet and know what you're doing)</small></h4>
+                                <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase <small>(only if you insist on using an existing wallet and know what you're doing)</small></h4>
 	                            <p class="mt-2">
 	                                If you’re determined to keep a wallet that won’t export an xpub/zpub, you <span class="font-medium">can</span> import that wallet’s seed phrase into a wallet that can export one — but this is risky.
 	                                Importing a seed phrase gives that app full spending access. Only do this if you understand the security tradeoffs.
@@ -144,16 +144,16 @@
 	            </section>
 
             <section id="invoices" class="scroll-mt-24 space-y-4">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Invoices</h2>
+                <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Invoices</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Why invoices use unique addresses</h3>
+                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Why invoices use unique addresses</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Each invoice gets its own receiving address so payments are easier to match and you avoid reusing addresses.
                     </p>
                 </div>
 
                 <article id="rate-calculation" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">How the BTC rate is calculated</h3>
+                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">How the BTC rate is calculated</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         CryptoZing treats the invoice amount in USD as the source of truth and converts to BTC using a live BTC/USD spot rate.
                     </p>
@@ -170,16 +170,16 @@
 	            </section>
 
             <section id="payments" class="scroll-mt-24 space-y-4">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Payments</h2>
+                <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Payments</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Pending vs confirmed</h3>
+                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Pending vs confirmed</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Bitcoin payments may appear quickly but can take time to confirm. CryptoZing tracks what’s detected on-chain and updates invoice status once confirmations meet the configured threshold.
                     </p>
                 </div>
 
 	                <article id="partial-payments" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Partial payments</h3>
+	                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Partial payments</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        If a client pays in multiple transactions, CryptoZing records each payment and shows what’s still outstanding.
                     </p>
@@ -191,7 +191,7 @@
 	                </article>
 
 	                <article id="overpayments" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Overpayments</h3>
+	                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Overpayments</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        If a client sends more than the invoice amount, CryptoZing records the full amount received. The invoice will still be marked paid once the confirmed total meets or exceeds the invoice amount.
 	                    </p>
@@ -208,9 +208,9 @@
 	            </section>
 
             <section id="privacy" class="scroll-mt-24 space-y-4">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Privacy</h2>
+                <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Privacy</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Public invoice links</h3>
+                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Public invoice links</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Public invoice links are designed for sharing with a specific client. However, anyone with the link can view it — share thoughtfully.
                     </p>
