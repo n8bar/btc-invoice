@@ -38,12 +38,12 @@
             </nav>
 
             <section id="wallet-security" class="scroll-mt-24 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Wallet &amp; Security</h2>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Wallet &amp; Security</h2>
 
                 <article id="xpub-safety" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 	                        <div>
-	                            <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
+	                            <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
 	                            <p class="mt-1 text-base text-gray-600 dark:text-slate-300">
 	                                CryptoZing asks for a BIP84 account extended public key (usually <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>) so it can generate a unique receiving address per invoice and watch for on-chain payments.
 	                            </p>
@@ -98,7 +98,7 @@
 	                </article>
 
 	                <article id="import-wallet-key" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>
+	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        To connect a wallet to CryptoZing, you copy your wallet’s <span class="font-medium">account-level</span> extended public key and paste it into <span class="font-medium">Wallet Settings</span>.
 	                        This lets CryptoZing generate a unique receiving address per invoice.
@@ -144,16 +144,16 @@
 	            </section>
 
             <section id="invoices" class="scroll-mt-24 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Invoices</h2>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Invoices</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Why invoices use unique addresses</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Why invoices use unique addresses</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Each invoice gets its own receiving address so payments are easier to match and you avoid reusing addresses.
                     </p>
                 </div>
 
                 <article id="rate-calculation" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">How the BTC rate is calculated</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">How the BTC rate is calculated</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         CryptoZing treats the invoice amount in USD as the source of truth and converts to BTC using a live BTC/USD spot rate.
                     </p>
@@ -170,16 +170,16 @@
 	            </section>
 
             <section id="payments" class="scroll-mt-24 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Payments</h2>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Payments</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Pending vs confirmed</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Pending vs confirmed</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Bitcoin payments may appear quickly but can take time to confirm. CryptoZing tracks what’s detected on-chain and updates invoice status once confirmations meet the configured threshold.
                     </p>
                 </div>
 
 	                <article id="partial-payments" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Partial payments</h3>
+	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Partial payments</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        If a client pays in multiple transactions, CryptoZing records each payment and shows what’s still outstanding.
                     </p>
@@ -191,7 +191,7 @@
 	                </article>
 
 	                <article id="overpayments" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-	                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Overpayments</h3>
+	                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Overpayments</h3>
 	                    <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
 	                        If a client sends more than the invoice amount, CryptoZing records the full amount received. The invoice will still be marked paid once the confirmed total meets or exceeds the invoice amount.
 	                    </p>
@@ -208,9 +208,9 @@
 	            </section>
 
             <section id="privacy" class="scroll-mt-24 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Privacy</h2>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-slate-100">Privacy</h2>
                 <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Public invoice links</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Public invoice links</h3>
                     <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
                         Public invoice links are designed for sharing with a specific client. However, anyone with the link can view it — share thoughtfully.
                     </p>
