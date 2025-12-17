@@ -3,7 +3,7 @@
 Purpose: make wallet setup mainnet-first and approachable for non-technical users while keeping derivation safety intact. Applies to `/wallet/settings` primary wallet + additional wallets.
 
 ## Goals
-- One-step setup: network derives from `WALLET_NETWORK`; user only pastes a wallet account key (BIP84 xpub/zpub/ypub/vpub/tpub).
+- One-step setup: network derives from `WALLET_NETWORK`; user only pastes a wallet account key (BIP84 xpub/zpub/vpub/tpub).
 - Clear, confidence-building guidance with inline “show me how” steps and wallet-specific hints.
 - Fast, calm validation that preserves user input and avoids layout jumps.
 - Friendly error recovery and explicit testnet-only cues when relevant; no network noise on mainnet.
@@ -24,13 +24,13 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## UI & Interaction
 - Layout: keep the primary wallet form above the fold on laptop screens; reserve space under the field for helper/validation so the layout does not shift.
-- Field: label as “Wallet account key (xpub/zpub/ypub/vpub)” with a sub-label “Paste the account-level public key from your wallet. Never paste a seed phrase.”
+- Field: label as “Wallet account key (xpub/zpub/vpub/tpub)” with a sub-label “Paste the account-level public key from your wallet. Never paste a seed phrase.”
 - Helper links:
   - Inline link: “Where do I find this?” opens a small accordion.
   - Accordion content (bullet steps, max 4 steps):
     1) Open your wallet and choose the account you want payments to land in.
     2) Go to Receive (or Account details) → Advanced/export.
-    3) Copy the account public key (often labeled xpub/zpub/ypub/vpub/tpub). Do not copy a single address.
+    3) Copy the account public key (often labeled xpub/zpub/vpub/tpub). Do not copy a single address.
     4) Paste here. You can verify below before saving.
   - Provide wallet badges with concise notes, e.g., “Ledger Live: Account → … → Account extended public key,” “Trezor Suite: Accounts → Receive → Show public key,” and mobile-friendly cues like “Blockstream Green (iOS/Android): Account → three dots → Export xpub” and “BlueWallet/Nunchuk (iOS/Android): Account → More/Manage → Export xpub.”
 - Testnet cue: if `WALLET_NETWORK` is not mainnet, show a small helper above the field: “Testnet (for testing only). Real payments require mainnet.” No badge/no copy on mainnet.

@@ -42,12 +42,12 @@
 
                 <article id="xpub-safety" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-slate-300">
-                                CryptoZing asks for a BIP84 account xpub so it can generate a unique receiving address per invoice and watch for on-chain payments.
-                            </p>
-                        </div>
+	                        <div>
+	                            <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Extended public keys (xpub / zpub): what they are and how we use them</h3>
+	                            <p class="mt-1 text-sm text-gray-600 dark:text-slate-300">
+	                                CryptoZing asks for a BIP84 account extended public key (usually <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>) so it can generate a unique receiving address per invoice and watch for on-chain payments.
+	                            </p>
+	                        </div>
                         @if (!empty($backLink))
                             <div class="shrink-0">
                                 <a href="{{ $backLink['url'] }}" class="inline-flex items-center text-sm font-medium text-indigo-700 hover:text-indigo-900 underline-offset-2 hover:underline dark:text-indigo-300 dark:hover:text-indigo-200">
@@ -82,16 +82,49 @@
                                 Anyone who has this key can derive and monitor the addresses in that account. Treat it like sensitive data: don’t share it, and avoid posting screenshots or logs that include it.
                             </dd>
                         </div>
-                        <div>
-                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Best practice</dt>
-                            <dd class="mt-1">
-                                Use a dedicated “Invoices” account in your wallet and share only that account’s xpub. This keeps your invoicing activity separate from personal holdings and reduces address-linking exposure.
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="font-semibold text-gray-900 dark:text-slate-100">What we will never ask for</dt>
-                            <dd class="mt-1">
-                                CryptoZing will never ask for your seed phrase, private keys, wallet file, or for you to “send a test transaction” to unlock anything.
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Best practice (recommended)</dt>
+	                            <dd class="mt-1">
+	                                Use a dedicated “Invoices” wallet or account for CryptoZing and share only that account’s xpub/zpub. This keeps invoicing activity separate from personal holdings, reduces address-linking exposure, and makes it easy to sweep funds to an exchange/off-ramp or cold storage.
+	                            </dd>
+	                        </div>
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">BlueWallet (recommended): how to find your zpub/xpub</dt>
+	                            <dd class="mt-1">
+	                                <ol class="mt-2 list-decimal space-y-2 pl-5">
+	                                    <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
+	                                    <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
+	                                    <li>Copy the extended public key. Prefer the one that starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> (native SegWit / BIP84), but an <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code> export can also work if it’s for a BIP84 account.</li>
+	                                    <li>Paste it into CryptoZing’s <span class="font-medium">Wallet Settings</span>.</li>
+	                                </ol>
+	                                <p class="mt-3 text-xs text-gray-600 dark:text-slate-300">
+	                                    Tip: your invoice receiving addresses should look like native SegWit (mainnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">bc1…</code>, testnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">tb1…</code>).
+	                                    If CryptoZing is configured for testnet, you’ll need a testnet extended public key (often <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">vpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">tpub</code>).
+	                                </p>
+	                            </dd>
+	                        </div>
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Other wallets: what to look for</dt>
+	                            <dd class="mt-1">
+	                                <ul class="mt-2 list-disc space-y-2 pl-5">
+	                                    <li>Look for <span class="font-medium">Wallet details</span>, <span class="font-medium">Account details</span>, or <span class="font-medium">Advanced</span> → “<span class="font-medium">Extended public key</span>” / “<span class="font-medium">Master public key</span>”.</li>
+	                                    <li>Make sure it’s for a <span class="font-medium">Bitcoin</span> account that uses native SegWit receive addresses (mainnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">bc1…</code>).</li>
+	                                    <li>If your wallet supports multiple accounts, create a dedicated <span class="font-medium">Invoices</span> account and export the key for that account.</li>
+	                                    <li>If your wallet can’t export an extended public key, a common approach is to use a dedicated invoice wallet (like BlueWallet) and sweep funds out as you receive them.</li>
+	                                </ul>
+	                            </dd>
+	                        </div>
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase (last resort)</dt>
+	                            <dd class="mt-1">
+	                                If you’re determined to keep a wallet that won’t export an xpub/zpub, you <span class="font-medium">can</span> import that wallet’s seed phrase into a wallet that can export a zpub/xpub — but this is risky. Importing a seed phrase gives that app full spending access.
+	                                Only do this if you understand the security tradeoffs, and consider sweeping funds to a new wallet afterward.
+	                            </dd>
+	                        </div>
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">What we will never ask for</dt>
+	                            <dd class="mt-1">
+	                                CryptoZing will never ask for your seed phrase, private keys, wallet file, or for you to “send a test transaction” to unlock anything.
                             </dd>
                         </div>
                     </dl>

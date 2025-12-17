@@ -16,7 +16,7 @@ class WalletAccountRequest extends FormRequest
     public function rules(): array
     {
         $network = config('wallet.default_network', 'testnet');
-        $prefixes = $network === 'mainnet' ? 'xpub|ypub|zpub' : 'tpub|vpub';
+        $prefixes = $network === 'mainnet' ? 'xpub|zpub' : 'tpub|vpub';
 
         return [
             'label' => ['required','string','max:64'],

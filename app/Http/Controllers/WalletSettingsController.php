@@ -42,8 +42,9 @@ class WalletSettingsController extends Controller
                 $payload['network']
             );
         } catch (\Throwable $e) {
+            $expected = $payload['network'] === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return back()
-                ->withErrors(['bip84_xpub' => 'Invalid BIP84 xpub/vpub for ' . $payload['network'] . '.'])
+                ->withErrors(['bip84_xpub' => "Invalid BIP84 wallet key for {$payload['network']}. Expected {$expected}."])
                 ->withInput();
         }
 

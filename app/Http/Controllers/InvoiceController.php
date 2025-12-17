@@ -115,9 +115,10 @@ class InvoiceController extends Controller
                 return $invoice;
             });
         } catch (\Throwable $e) {
+            $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return redirect()
                 ->route('wallet.settings.edit')
-                ->withErrors(['bip84_xpub' => 'Unable to derive a payment address. Please verify your wallet xpub/vpub.'])
+                ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
                 ->withInput();
         }
 

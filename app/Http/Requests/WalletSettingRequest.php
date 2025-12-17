@@ -22,7 +22,7 @@ class WalletSettingRequest extends FormRequest
     public function rules(): array
     {
         $network = config('wallet.default_network', 'testnet');
-        $prefixes = $network === 'mainnet' ? 'xpub|ypub|zpub' : 'tpub|vpub';
+        $prefixes = $network === 'mainnet' ? 'xpub|zpub' : 'tpub|vpub';
 
         return [
             'bip84_xpub' => ['required', 'string', 'max:256', "regex:/^({$prefixes})[A-Za-z0-9]+$/"],

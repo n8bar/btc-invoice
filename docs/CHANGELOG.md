@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-12-17 | Helpful Notes: wallet key guide | Added BlueWallet-first “find your zpub/xpub” steps, clarified testnet key prefixes (vpub/tpub), and aligned Wallet Settings labels/errors with the supported formats. |
 | 2025-12-16 | Future: Help CMS deferred | Logged a CMS-style, non-dev editable Help Center as a post-MVP item in `docs/FuturePLAN.md`; RC ships `/help` as a static SEO surface for now. |
 | 2025-12-16 | Helpful Notes shipped | Added public `/help` with xpub/zpub safety guidance and seeded categories; deep-linked from Wallet Settings, linked from landing, and set up as an indexable SEO surface (canonical + description). |
 | 2025-12-15 | UX Overhaul: Helpful Notes scoped | Added UX Overhaul ToDo #6 for a public “Helpful Notes” section (starting with xpub safety + why we ask), and renumbered wallet UX ToDo references. |
