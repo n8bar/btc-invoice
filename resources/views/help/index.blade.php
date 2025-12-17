@@ -104,10 +104,10 @@
 	                        This lets CryptoZing generate a unique receiving address per invoice.
 	                    </p>
 
-	                    <div class="mt-8 space-y-10 text-base text-gray-700 dark:text-slate-200">
+	                    <div class="mt-8 text-base text-gray-700 dark:text-slate-200">
 	                        <div>
 	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Recommended: BlueWallet</h4>
-	                            <ol class="mt-2 list-decimal space-y-2 pl-5">
+	                            <ol class="mt-4 list-decimal space-y-2 pl-5">
 	                                <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
 	                                <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
 	                                <li>Copy the extended public key (often starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-sm font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>).</li>
@@ -115,26 +115,26 @@
 	                            </ol>
 	                        </div>
 
-	                        <div>
+	                        <div class="mt-8">
 	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Other wallets</h4>
-	                            <ul class="mt-2 list-disc space-y-2 pl-5">
+	                            <ul class="mt-4 list-disc space-y-2 pl-5">
 	                                <li>Look for <span class="font-medium">Account details</span>, <span class="font-medium">Wallet details</span>, or <span class="font-medium">Advanced</span> → “<span class="font-medium">Extended public key</span>” / “<span class="font-medium">Master public key</span>”.</li>
 	                                <li>Make sure you’re exporting an <span class="font-medium">account key</span>, not a single receive address.</li>
 	                                <li>If your wallet supports multiple accounts, create a dedicated <span class="font-medium">Invoices</span> account and export the key for that account.</li>
 	                            </ul>
 	                        </div>
 
-	                        <div>
+	                        <div class="mt-8">
 	                            <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">After you get paid</h4>
-	                            <ul class="mt-2 list-disc space-y-2 pl-5">
+	                            <ul class="mt-4 list-disc space-y-2 pl-5">
 	                                <li>It’s normal to sweep funds to an exchange/off-ramp or cold storage to reduce volatility exposure.</li>
 	                                <li>CryptoZing never has custody and cannot send funds — any sweep/refund is a transaction you send from your wallet.</li>
 	                            </ul>
 	                        </div>
 
-	                        <div>
+	                        <div class="mt-8">
                                 <h4 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase <small>(only if you insist on using an existing wallet and know what you're doing)</small></h4>
-	                            <p class="mt-2">
+	                            <p class="mt-4">
 	                                If you’re determined to keep a wallet that won’t export an xpub/zpub, you <span class="font-medium">can</span> import that wallet’s seed phrase into a wallet that can export one — but this is risky.
 	                                Importing a seed phrase gives that app full spending access. Only do this if you understand the security tradeoffs.
 	                            </p>
