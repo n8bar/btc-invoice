@@ -104,7 +104,7 @@
 	                        This lets CryptoZing generate a unique receiving address per invoice.
 	                    </p>
 
-	                    <div class="mt-4 space-y-5 text-base text-gray-700 dark:text-slate-200">
+	                    <div class="mt-6 space-y-7 text-base text-gray-700 dark:text-slate-200">
 	                        <div>
 	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Recommended: BlueWallet</h4>
 	                            <ol class="mt-2 list-decimal space-y-2 pl-5">
