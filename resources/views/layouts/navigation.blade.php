@@ -1,35 +1,41 @@
-<nav x-data="{ open: false }" class="sticky top-0 z-30 bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="sticky top-0 z-30 bg-white border-b border-gray-100 dark:bg-slate-900 dark:border-white/10">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ auth()->check() ? route('dashboard') : url('/') }}">
                         <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="block h-20 w-auto">
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
-                        Clients
-                    </x-nav-link>
-                    <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
-                        Invoices
-                    </x-nav-link>
-                </div>
-            </div>
+	                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        @auth
+	                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+	                            {{ __('Dashboard') }}
+	                        </x-nav-link>
+	                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+	                            Clients
+	                        </x-nav-link>
+	                        <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+	                            Invoices
+	                        </x-nav-link>
+                        @endauth
+	                    <x-nav-link :href="route('help')" :active="request()->routeIs('help')">
+	                        Helpful Notes
+	                    </x-nav-link>
+	                </div>
+	            </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
                 @php
                     $themePreference = auth()->user()?->theme ?? 'system';
+                    $themeEndpoint = auth()->check() ? route('theme.update') : '';
                 @endphp
-                <div class="flex items-center gap-1" role="group" aria-label="Theme" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
+                <div class="flex items-center gap-1" role="group" aria-label="Theme" data-theme-endpoint="{{ $themeEndpoint }}" data-theme-initial="{{ $themePreference }}">
                     <button type="button"
                             data-theme-set="light"
                             aria-label="Light theme"
@@ -55,42 +61,53 @@
                         <span aria-hidden="true">🖥️</span>
                     </button>
                 </div>
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                @auth
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
+                                <div>{{ Auth::user()->name }}</div>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                                <div class="ms-1">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('settings.invoice.edit')">
-                            {{ __('Invoice Settings') }}
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('wallet.settings.edit')">
-                            {{ __('Wallet Settings') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('profile.edit')">
+                                {{ __('Profile') }}
                             </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                            <x-dropdown-link :href="route('settings.invoice.edit')">
+                                {{ __('Invoice Settings') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('wallet.settings.edit')">
+                                {{ __('Wallet Settings') }}
+                            </x-dropdown-link>
+
+                            <!-- Authentication -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+
+                                <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                @endauth
+
+                @guest
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}"
+                           class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100 transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10 dark:focus-visible:ring-offset-slate-900">
+                            Log in
+                        </a>
+                    @endif
+                @endguest
             </div>
 
             <!-- Hamburger -->
@@ -107,22 +124,36 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
-                Clients
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
-                Invoices
-            </x-responsive-nav-link>
+	        <div class="pt-2 pb-3 space-y-1">
+                @auth
+	                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+	                    {{ __('Dashboard') }}
+	                </x-responsive-nav-link>
+	                <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+	                    Clients
+	                </x-responsive-nav-link>
+	                <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+	                    Invoices
+	                </x-responsive-nav-link>
+                @endauth
+	            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')">
+	                Helpful Notes
+	            </x-responsive-nav-link>
 
-            <div class="px-4">
-                @php
-                    $themePreference = auth()->user()?->theme ?? 'system';
+                @guest
+                    @if (Route::has('login'))
+                        <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                            Log in
+                        </x-responsive-nav-link>
+                    @endif
+                @endguest
+
+	            <div class="px-4">
+	                @php
+	                    $themePreference = auth()->user()?->theme ?? 'system';
+                        $themeEndpoint = auth()->check() ? route('theme.update') : '';
                 @endphp
-                <div class="flex items-center gap-2" role="group" aria-label="Theme" data-theme-endpoint="{{ route('theme.update') }}" data-theme-initial="{{ $themePreference }}">
+                <div class="flex items-center gap-2" role="group" aria-label="Theme" data-theme-endpoint="{{ $themeEndpoint }}" data-theme-initial="{{ $themePreference }}">
                     <button type="button"
                             data-theme-set="light"
                             aria-label="Light theme"
@@ -153,35 +184,37 @@
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
+        @auth
+            <div class="pt-4 pb-1 border-t border-gray-200 dark:border-white/10">
+                <div class="px-4">
+                    <div class="font-medium text-base text-gray-800 dark:text-slate-100">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500 dark:text-slate-300">{{ Auth::user()->email }}</div>
+                </div>
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('settings.invoice.edit')" :active="request()->routeIs('settings.invoice.*')">
-                    {{ __('Invoice Settings') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('wallet.settings.edit')" :active="request()->routeIs('wallet.settings.*')">
-                    {{ __('Wallet Settings') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                <div class="mt-3 space-y-1">
+                    <x-responsive-nav-link :href="route('profile.edit')">
+                        {{ __('Profile') }}
                     </x-responsive-nav-link>
-                </form>
+                    <x-responsive-nav-link :href="route('settings.invoice.edit')" :active="request()->routeIs('settings.invoice.*')">
+                        {{ __('Invoice Settings') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('wallet.settings.edit')" :active="request()->routeIs('wallet.settings.*')">
+                        {{ __('Wallet Settings') }}
+                    </x-responsive-nav-link>
+
+                    <!-- Authentication -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <x-responsive-nav-link :href="route('logout')"
+                                onclick="event.preventDefault();
+                                            this.closest('form').submit();">
+                            {{ __('Log Out') }}
+                        </x-responsive-nav-link>
+                    </form>
+                </div>
             </div>
-        </div>
+        @endauth
     </div>
 </nav>
 <script>

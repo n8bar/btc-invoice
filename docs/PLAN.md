@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-12-01_
+_Last updated: 2025-12-16_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -97,7 +97,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) guides ToDo #7 implementation.
     - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
     - [x] Dashboard snapshot and light/dark theme toggle.
-    - [ ] Helpful Notes: public, context-linked explanations (starting with xpub safety + why we ask).
+    - [x] Helpful Notes: public, context-linked explanations (`/help`, starting with xpub safety + why we ask; treat as an SEO surface and link it from landing).
     - [ ] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [ ] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.

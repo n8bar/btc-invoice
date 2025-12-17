@@ -38,13 +38,15 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 5. Theme toggle accessibility polish (guardrail follow‑up on Completed Task #2)
    - Added accessible labels and `aria-pressed` state to light/dark/system buttons.
    - Increased tap targets and added visible focus rings; active state is clear in both themes.
+6. Helpful Notes (public)
+   - Added `/help` (no auth) using the core layout/theme; intended to be indexable (SEO surface) with a canonical URL and meta description.
+   - Seeded Wallet & Security note explaining extended public keys (xpub/zpub): what they are, why we ask, what they can’t do (can’t spend), and privacy implications; explicitly states we never ask for seed phrases or private keys.
+   - Structured page for growth with Wallet & Security, Invoices, Payments, and Privacy categories.
+   - Context link added on Wallet Settings (xpub guidance) that deep-links into `/help#xpub-safety` and shows a “Back to Wallet Settings” affordance when linked from that screen.
+   - SEO note: keep titles/descriptions/copy/heading structure polished over time; `/help?from=…` should canonicalize to `/help` to avoid duplicate indexing.
+   - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
 
 ## ToDo
-6. Helpful Notes (public)
-   - Add a public “Helpful Notes” section (`/help`) that uses the site’s core layout/theme while remaining accessible without auth.
-   - Seed content: “Extended public keys (xpub/zpub): what they are, why we ask, what they can’t do (can’t spend), privacy implications, and “use a dedicated invoices account” guidance; explicitly state we never ask for seed phrases or private keys.
-   - Structure for growth: start with Wallet & Security, Invoices, Payments, and Privacy categories; include an FAQ subsection later if needed.
-   - Contextual integration: deep-link to specific notes from relevant screens (starting with Wallet Settings) and include “Back to …” affordances so users stay oriented.
 7. Wallet UX improvements
    - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
    - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.

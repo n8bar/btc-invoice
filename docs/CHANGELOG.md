@@ -2,6 +2,8 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2025-12-16 | Future: Help CMS deferred | Logged a CMS-style, non-dev editable Help Center as a post-MVP item in `docs/FuturePLAN.md`; RC ships `/help` as a static SEO surface for now. |
+| 2025-12-16 | Helpful Notes shipped | Added public `/help` with xpub/zpub safety guidance and seeded categories; deep-linked from Wallet Settings, linked from landing, and set up as an indexable SEO surface (canonical + description). |
 | 2025-12-15 | UX Overhaul: Helpful Notes scoped | Added UX Overhaul ToDo #6 for a public “Helpful Notes” section (starting with xpub safety + why we ask), and renumbered wallet UX ToDo references. |
 | 2025-12-11 | Theme toggle accessibility polish shipped | Added accessible labels/pressed-state semantics, visible focus rings, and larger tap targets to the light/dark/system header toggle; aligned with UX guardrails. |
 | 2025-12-11 | UX Overhaul ToDo priority updated | Moved theme-toggle accessibility polish ahead of wallet UX and renumbered UX Overhaul ToDos; updated wallet spec references accordingly. |

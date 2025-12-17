@@ -19,11 +19,19 @@
             @if (Route::has('login'))
                 <div class="flex justify-end mb-10">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-white/20 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                            Dashboard
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('help') }}" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-white/20 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                Helpful Notes
+                            </a>
+                            <a href="{{ url('/dashboard') }}" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-white/20 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                Dashboard
+                            </a>
+                        </div>
                     @else
                         <div class="flex items-center gap-3">
+                            <a href="{{ route('help') }}" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-white/20 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                Helpful Notes
+                            </a>
                             <a href="{{ route('login') }}" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-white/20 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400">
                                 Log in
                             </a>

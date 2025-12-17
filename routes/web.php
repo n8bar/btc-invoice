@@ -11,6 +11,7 @@ use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
 use App\Http\Controllers\InvoicePaymentAdjustmentController;
 use App\Http\Controllers\ThemePreferenceController;
+use App\Http\Controllers\HelpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,9 @@ Route::get('/', fn () => view('welcome'));
 // Public, tokenized print view (no auth)
 Route::get('p/{token}', [InvoiceController::class, 'publicPrint'])
     ->name('invoices.public-print');
+
+// Public Helpful Notes (no auth)
+Route::get('/help', HelpController::class)->name('help');
 
 /*
 |--------------------------------------------------------------------------

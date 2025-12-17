@@ -46,3 +46,10 @@ Latest scope update (2025-11-16): partial payments, payment history UX, and invo
 10. **Manual Payment Adjustments**
     - Admin tooling to edit or annotate logged payments (fix tx metadata, override amounts, or reconcile disputes) outside the automated watcher flows.
     - Build atop the `invoice_payments` ledger + owner notes so adjustments stay auditable and raw tx rows remain untouched.
+
+# Content & SEO
+11. **CMS-style Help Center (public)**
+   - Move `/help` content out of Blade into editable entries (prefer Markdown) with safe rendering and stable section slugs/anchors.
+   - Add an internal editor UI with preview, draft/publish, and basic revision history so non-devs can update copy without deployments.
+   - Store per-wallet “find your extended public key” guides as data so tabs are config-driven (easy to add/remove wallets).
+   - Keep SEO hygiene: canonical URLs, meta descriptions/OG, and avoid indexing duplicate `?from=` variants.
