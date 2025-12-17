@@ -89,47 +89,59 @@
 	                            </dd>
 	                        </div>
 	                        <div>
-	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">BlueWallet (recommended): how to find your zpub/xpub</dt>
-	                            <dd class="mt-1">
-	                                <ol class="mt-2 list-decimal space-y-2 pl-5">
-	                                    <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
-	                                    <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
-	                                    <li>Copy the extended public key. Prefer the one that starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> (native SegWit / BIP84), but an <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code> export can also work if it’s for a BIP84 account.</li>
-	                                    <li>Paste it into CryptoZing’s <span class="font-medium">Wallet Settings</span>.</li>
-	                                </ol>
-	                                <p class="mt-3 text-xs text-gray-600 dark:text-slate-300">
-	                                    Tip: your invoice receiving addresses should look like native SegWit (mainnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">bc1…</code>, testnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">tb1…</code>).
-	                                    If CryptoZing is configured for testnet, you’ll need a testnet extended public key (often <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">vpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">tpub</code>).
-	                                </p>
-	                            </dd>
-	                        </div>
-	                        <div>
-	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Other wallets: what to look for</dt>
-	                            <dd class="mt-1">
-	                                <ul class="mt-2 list-disc space-y-2 pl-5">
-	                                    <li>Look for <span class="font-medium">Wallet details</span>, <span class="font-medium">Account details</span>, or <span class="font-medium">Advanced</span> → “<span class="font-medium">Extended public key</span>” / “<span class="font-medium">Master public key</span>”.</li>
-	                                    <li>Make sure it’s for a <span class="font-medium">Bitcoin</span> account that uses native SegWit receive addresses (mainnet <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">bc1…</code>).</li>
-	                                    <li>If your wallet supports multiple accounts, create a dedicated <span class="font-medium">Invoices</span> account and export the key for that account.</li>
-	                                    <li>If your wallet can’t export an extended public key, a common approach is to use a dedicated invoice wallet (like BlueWallet) and sweep funds out as you receive them.</li>
-	                                </ul>
-	                            </dd>
-	                        </div>
-	                        <div>
-	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase (last resort)</dt>
-	                            <dd class="mt-1">
-	                                If you’re determined to keep a wallet that won’t export an xpub/zpub, you <span class="font-medium">can</span> import that wallet’s seed phrase into a wallet that can export a zpub/xpub — but this is risky. Importing a seed phrase gives that app full spending access.
-	                                Only do this if you understand the security tradeoffs, and consider sweeping funds to a new wallet afterward.
-	                            </dd>
-	                        </div>
-	                        <div>
 	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">What we will never ask for</dt>
 	                            <dd class="mt-1">
 	                                CryptoZing will never ask for your seed phrase, private keys, wallet file, or for you to “send a test transaction” to unlock anything.
-                            </dd>
-                        </div>
-                    </dl>
-                </article>
-            </section>
+	                            </dd>
+	                        </div>
+	                    </dl>
+	                </article>
+
+	                <article id="import-wallet-key" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
+	                    <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>
+	                    <p class="mt-1 text-sm text-gray-700 dark:text-slate-200">
+	                        To connect a wallet to CryptoZing, you copy your wallet’s <span class="font-medium">account-level</span> extended public key and paste it into <span class="font-medium">Wallet Settings</span>.
+	                        This lets CryptoZing generate a unique receiving address per invoice.
+	                    </p>
+
+	                    <div class="mt-4 space-y-5 text-sm text-gray-700 dark:text-slate-200">
+	                        <div>
+	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Recommended: BlueWallet</h4>
+	                            <ol class="mt-2 list-decimal space-y-2 pl-5">
+	                                <li>Create a new <span class="font-medium">Bitcoin</span> wallet (recommended: name it “CryptoZing Invoices”).</li>
+	                                <li>Open that wallet, tap the menu (<span class="font-medium">⋯</span>), then choose <span class="font-medium">Backup/Export</span>.</li>
+	                                <li>Copy the extended public key (often starts with <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">zpub</code> or <code class="rounded bg-gray-100 px-1 py-0.5 text-xs font-medium text-gray-900 dark:bg-white/10 dark:text-slate-100">xpub</code>).</li>
+	                                <li>Paste it into CryptoZing’s <span class="font-medium">Wallet Settings</span>.</li>
+	                            </ol>
+	                        </div>
+
+	                        <div>
+	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Other wallets</h4>
+	                            <ul class="mt-2 list-disc space-y-2 pl-5">
+	                                <li>Look for <span class="font-medium">Account details</span>, <span class="font-medium">Wallet details</span>, or <span class="font-medium">Advanced</span> → “<span class="font-medium">Extended public key</span>” / “<span class="font-medium">Master public key</span>”.</li>
+	                                <li>Make sure you’re exporting an <span class="font-medium">account key</span>, not a single receive address.</li>
+	                                <li>If your wallet supports multiple accounts, create a dedicated <span class="font-medium">Invoices</span> account and export the key for that account.</li>
+	                            </ul>
+	                        </div>
+
+	                        <div>
+	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">After you get paid</h4>
+	                            <ul class="mt-2 list-disc space-y-2 pl-5">
+	                                <li>It’s normal to sweep funds to an exchange/off-ramp or cold storage to reduce volatility exposure.</li>
+	                                <li>CryptoZing never has custody and cannot send funds — any sweep/refund is a transaction you send from your wallet.</li>
+	                            </ul>
+	                        </div>
+
+	                        <div>
+	                            <h4 class="font-semibold text-gray-900 dark:text-slate-100">Advanced: importing a seed phrase (last resort)</h4>
+	                            <p class="mt-2">
+	                                If you’re determined to keep a wallet that won’t export an xpub/zpub, you <span class="font-medium">can</span> import that wallet’s seed phrase into a wallet that can export one — but this is risky.
+	                                Importing a seed phrase gives that app full spending access. Only do this if you understand the security tradeoffs.
+	                            </p>
+	                        </div>
+	                    </div>
+	                </article>
+	            </section>
 
             <section id="invoices" class="scroll-mt-24 space-y-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Invoices</h2>

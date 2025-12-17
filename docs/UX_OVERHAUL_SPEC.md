@@ -41,8 +41,9 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 6. Helpful Notes (public)
    - Added `/help` (no auth) using the core layout/theme; intended to be indexable (SEO surface) with a canonical URL and meta description.
    - Seeded Wallet & Security note explaining extended public keys (xpub/zpub): what they are, why we ask, what they can’t do (can’t spend), and privacy implications; explicitly states we never ask for seed phrases or private keys.
+   - Added an “Importing your wallet account key (xpub / zpub)” note with BlueWallet-first steps, general guidance, post-payment sweeping guidance, and a seed-import warning as a last resort.
    - Structured page for growth with Wallet & Security, Invoices, Payments, and Privacy categories.
-   - Context link added on Wallet Settings (xpub guidance) that deep-links into `/help#xpub-safety` and shows a “Back to Wallet Settings” affordance when linked from that screen.
+   - Context link added on Wallet Settings (xpub guidance) that deep-links into `/help#import-wallet-key` and shows a “Back to Wallet Settings” affordance when linked from that screen.
    - SEO note: keep titles/descriptions/copy/heading structure polished over time; `/help?from=…` should canonicalize to `/help` to avoid duplicate indexing.
    - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
 

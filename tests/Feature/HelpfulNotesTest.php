@@ -47,6 +47,6 @@ class HelpfulNotesTest extends TestCase
             ->get(route('wallet.settings.edit'));
 
         $response->assertOk();
-        $response->assertSee('href="' . route('help', ['from' => 'wallet-settings']) . '#xpub-safety"', false);
+        $response->assertSee('href="' . route('help', ['from' => 'wallet-settings']) . '#import-wallet-key"', false);
     }
 }

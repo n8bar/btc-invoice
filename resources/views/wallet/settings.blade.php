@@ -16,11 +16,11 @@
 	                            {{ __('Privacy note: an xpub/zpub lets anyone derive and monitor all addresses for this account. Keep it private and avoid sharing screenshots/logs.') }}
 	                        </div>
 	                        <div>
-                            <a href="{{ route('help', ['from' => 'wallet-settings']) }}#xpub-safety"
-                               class="inline-flex items-center text-sm font-medium text-indigo-700 hover:text-indigo-900 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
-                                Helpful notes: xpub safety and why we ask
-                            </a>
-                        </div>
+	                            <a href="{{ route('help', ['from' => 'wallet-settings']) }}#import-wallet-key"
+	                               class="inline-flex items-center text-sm font-medium text-indigo-700 hover:text-indigo-900 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
+	                                Helpful notes: how to find and import your wallet key
+	                            </a>
+	                        </div>
                     </div>
 
                     @if (session('status'))
