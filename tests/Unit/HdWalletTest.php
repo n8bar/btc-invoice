@@ -25,6 +25,20 @@ class HdWalletTest extends TestCase
         );
     }
 
+    public function test_accepts_testnet3_and_testnet4_aliases(): void
+    {
+        $wallet = new HdWallet();
+
+        $this->assertSame(
+            'tb1qnj02g6mvfs8ttcra7v4ze03f98lj8qrxp7hl5s',
+            $wallet->deriveAddress(self::TESTNET_VPUB, 0, 'testnet4')
+        );
+        $this->assertSame(
+            'tb1qnj02g6mvfs8ttcra7v4ze03f98lj8qrxp7hl5s',
+            $wallet->deriveAddress(self::TESTNET_VPUB, 0, 'testnet3')
+        );
+    }
+
     public function test_derives_mainnet_zpub_on_external_chain(): void
     {
         $wallet = new HdWallet();

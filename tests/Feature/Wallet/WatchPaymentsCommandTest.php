@@ -17,6 +17,106 @@ class WatchPaymentsCommandTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_command_uses_testnet4_base_when_wallet_network_is_testnet4(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        $invoice = $this->makeInvoiceWithNetwork('testnet4');
+
+        config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet/api');
+        config()->set('blockchain.mempool.testnet4_base', 'https://mempool.example/testnet4/api');
+
+        $base = config('blockchain.mempool.testnet4_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'abc123',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')
+            ->assertExitCode(0);
+
+        $invoice->refresh();
+        $this->assertSame('pending', $invoice->status);
+        $this->assertSame('abc123', $invoice->txid);
+        $this->assertSame(0, $invoice->payment_amount_sat);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'abc123',
+            'sats_received' => 1_000_000,
+        ]);
+    }
+
+    public function test_command_uses_testnet3_base_when_wallet_network_is_testnet3(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        $invoice = $this->makeInvoiceWithNetwork('testnet3');
+
+        config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet4/api');
+        config()->set('blockchain.mempool.testnet3_base', 'https://mempool.example/testnet3/api');
+
+        $base = config('blockchain.mempool.testnet3_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'abc123',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')
+            ->assertExitCode(0);
+
+        $invoice->refresh();
+        $this->assertSame('pending', $invoice->status);
+        $this->assertSame('abc123', $invoice->txid);
+        $this->assertSame(0, $invoice->payment_amount_sat);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'abc123',
+            'sats_received' => 1_000_000,
+        ]);
+    }
+
     public function test_command_marks_invoice_paid_when_unconfirmed_payment_detected(): void
     {
         Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
@@ -379,9 +479,14 @@ class WatchPaymentsCommandTest extends TestCase
 
     private function makeInvoice(): Invoice
     {
+        return $this->makeInvoiceWithNetwork('testnet');
+    }
+
+    private function makeInvoiceWithNetwork(string $network): Invoice
+    {
         $user = User::factory()->create();
         $user->walletSetting()->create([
-            'network' => 'testnet',
+            'network' => $network,
             'bip84_xpub' => 'tpubD6Nz...',
             'next_derivation_index' => 0,
         ]);

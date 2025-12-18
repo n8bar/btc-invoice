@@ -8,8 +8,8 @@ End-to-end guide from fresh clone to first paid invoice.
 
 ## 2) Connect a Wallet
 - Visit `/wallet/settings`.
-- Paste a BIP84 xpub for the configured network (e.g., testnet4); use the derive test to confirm the sample address.
-- Note the network badge (mainnet/testnet) and fix errors inline before saving.
+- Paste a BIP84 xpub for the configured network (e.g., `WALLET_NETWORK=testnet4`); use the derive test to confirm the sample address.
+- Note the testnet helper (if shown) and fix errors inline before saving.
 - (Screenshot: wallet settings with network badge + derive test.)
 
 ## 3) Create an Invoice
