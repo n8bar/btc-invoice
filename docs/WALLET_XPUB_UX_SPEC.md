@@ -3,7 +3,7 @@
 Purpose: make wallet setup mainnet-first and approachable for non-technical users while keeping derivation safety intact. Applies to `/wallet/settings` primary wallet + additional wallets.
 
 ## Goals
-- One-step setup: network derives from `WALLET_NETWORK`; user only pastes a wallet account key (BIP84 xpub/zpub/vpub/tpub).
+- One-step setup: network derives from `WALLET_NETWORK` (`mainnet`, `testnet4`, or `testnet3`); user only pastes a wallet account key (BIP84 xpub/zpub/vpub/tpub).
 - Clear, confidence-building guidance with inline “show me how” steps and wallet-specific hints.
 - Fast, calm validation that preserves user input and avoids layout jumps.
 - Friendly error recovery and explicit testnet-only cues when relevant; no network noise on mainnet.

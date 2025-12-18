@@ -62,7 +62,20 @@ class MempoolClient
 
     private function baseUrl(string $network): string
     {
-        $key = strtolower($network) . '_base';
+        $network = strtolower(trim($network));
+
+        $key = match ($network) {
+            'mainnet' => 'mainnet_base',
+            'testnet' => 'testnet_base',
+            'testnet3' => 'testnet3_base',
+            'testnet4' => 'testnet4_base',
+            default => null,
+        };
+
+        if (!$key) {
+            throw new \InvalidArgumentException("Unknown mempool base for network {$network}");
+        }
+
         $base = $this->config['mempool'][$key] ?? null;
 
         if (!$base) {

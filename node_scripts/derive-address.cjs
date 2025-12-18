@@ -46,13 +46,30 @@ const versionEntry = (version) => {
   );
 };
 
+const NETWORK_ALIASES = {
+  mainnet: 'mainnet',
+  testnet: 'testnet',
+  testnet3: 'testnet',
+  testnet4: 'testnet',
+};
+
 const normalizeNetwork = (requested, derived) => {
-  const normalized = (requested || derived).toLowerCase();
+  const requestedRaw = (requested ?? '').toString().trim().toLowerCase();
+  const derivedRaw = (derived ?? '').toString().trim().toLowerCase();
+
+  const requestedNormalized = requestedRaw
+    ? (NETWORK_ALIASES[requestedRaw] || requestedRaw)
+    : '';
+  const derivedNormalized = derivedRaw
+    ? (NETWORK_ALIASES[derivedRaw] || derivedRaw)
+    : '';
+
+  const normalized = requestedNormalized || derivedNormalized || 'testnet';
   if (!['mainnet', 'testnet'].includes(normalized)) {
-    throw new Error(`Unknown network: ${normalized}`);
+    throw new Error(`Unknown network: ${requestedRaw || derivedRaw || normalized}`);
   }
-  if (derived && normalized !== derived) {
-    throw new Error(`Network mismatch: key is ${derived}, requested ${normalized}`);
+  if (derivedNormalized && normalized !== derivedNormalized) {
+    throw new Error(`Network mismatch: key is ${derivedRaw}, requested ${requestedRaw || normalized}`);
   }
   return normalized;
 };

@@ -15,7 +15,7 @@ Fast path to run the app locally with Laravel Sail.
    - `APP_URL` / `APP_PUBLIC_URL` for links (localhost in dev).
    - Mail: `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_*`.
    - Aliasing for pre-prod safety: `MAIL_ALIAS_ENABLED=true`, `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`.
-   - Wallet network: `WALLET_NETWORK=mainnet` or `testnet4` to match your mempool network.
+   - Wallet network: `WALLET_NETWORK=mainnet` (real payments) or `testnet4`/`testnet3` (testing; matches the watcher’s mempool endpoint).
 2. Start Sail and install dependencies:
    ```bash
    ./vendor/bin/sail up -d
@@ -38,7 +38,7 @@ Fast path to run the app locally with Laravel Sail.
 | Key | Purpose | Typical dev value |
 | --- | --- | --- |
 | APP_URL / APP_PUBLIC_URL | Base URLs for app/public links | http://localhost |
-| WALLET_NETWORK | Derivation + mempool network | mainnet (or testnet4) |
+| WALLET_NETWORK | Derivation + mempool network | mainnet / testnet4 / testnet3 |
 | MAIL_MAILER / HOST / PORT / USERNAME / PASSWORD | SMTP settings | mailgun sandbox creds |
 | MAIL_FROM_ADDRESS / MAIL_FROM_NAME | Default sender | no-reply@cryptozing.app / CryptoZing |
 | MAIL_ALIAS_ENABLED / MAIL_ALIAS_DOMAIN | Catch-all rewrite during pre-prod | true / mailer.cryptozing.app |

@@ -57,7 +57,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - `/wallet/settings` collects a BIP84 xpub per user (testnet/mainnet); invoice creation now derives a unique Bech32 address via `node_scripts/derive-address.cjs`.
     - Legacy invoices can be backfilled with the `wallet:assign-invoice-addresses` command, restoring QR/BIP21 output everywhere.
 6. **Blockchain Payment Detection (codex/blockchain-watcher)**
-    - Sail command `wallet:watch-payments` polls mempool.space (testnet4/mainnet) for each invoice address, stores tx metadata, logs partials, and auto-marks invoices paid once confirmations hit the threshold.
+    - Sail command `wallet:watch-payments` polls mempool.space (testnet3/testnet4/mainnet) for each invoice address, stores tx metadata, logs partials, and auto-marks invoices paid once confirmations hit the threshold.
     - `MempoolClient` caches tip height lookups while `InvoicePaymentDetector` enforces sat tolerance + confirmation thresholds for all invoices with wallet settings.
     - Scheduler runs `wallet:watch-payments` every minute without overlapping so invoices update continuously in the background.
     - Docker Compose ships a dedicated `scheduler` service that runs `php artisan schedule:work`, so local/dev stacks keep the watcher alive automatically (2025-11-14).
