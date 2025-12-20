@@ -61,6 +61,7 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
 10. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
+   - If no wallet is configured on login, redirect to wallet setup (or the wizard once it exists); until then route to `/wallet/settings`.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
 11. User settings & auth UX
