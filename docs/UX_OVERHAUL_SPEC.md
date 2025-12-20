@@ -46,13 +46,10 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Context link added on Wallet Settings (xpub guidance) that deep-links into `/help#import-wallet-key` and shows a “Back to Wallet Settings” affordance when linked from that screen.
    - SEO note: keep titles/descriptions/copy/heading structure polished over time; `/help?from=…` should canonicalize to `/help` to avoid duplicate indexing.
    - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
+7. Wallet UX improvements
+   - Wallet settings now include inline guidance, derive validation preview, and additional wallet parity with mainnet-first network cues.
 
 ## ToDo
-7. Wallet UX improvements
-   - Detailed scope in [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md); follow that spec for layout/copy/states.
-   - Mainnet-first UI: hide network selection; network derives from config/env, with no badge on mainnet and a small “Testnet (dev only)” helper shown only when the env is testnet.
-   - Inline explainer for xpub formats per network (xpub/zpub) and derive-test feedback; badge/helper is conditional on testnet env.
-   - Clear error states on invalid xpub/derivation failure; minimal scrolling for key fields.
 8. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.

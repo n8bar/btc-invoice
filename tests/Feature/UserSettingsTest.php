@@ -83,6 +83,12 @@ class UserSettingsTest extends TestCase
     {
         $owner = User::factory()->create();
 
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
         $this
             ->actingAs($owner)
             ->post(route('wallet.settings.accounts.store'), [
@@ -204,6 +210,97 @@ class UserSettingsTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors('bip84_xpub');
+    }
+
+    public function test_wallet_settings_shows_wallet_key_helper_content(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Where do I find this?', false);
+        $response->assertSee('Ledger Live', false);
+        $response->assertSee('Trezor Suite', false);
+    }
+
+    public function test_wallet_key_validation_endpoint_returns_preview_address(): void
+    {
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qpreviewaddress0000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->postJson(route('wallet.settings.validate'), [
+                'bip84_xpub' => 'vpub' . str_repeat('a', 20),
+            ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'address' => 'tb1qpreviewaddress0000000000000000000000',
+        ]);
+    }
+
+    public function test_wallet_key_validation_endpoint_rejects_invalid_key(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->postJson(route('wallet.settings.validate'), [
+                'bip84_xpub' => 'not-a-key',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['bip84_xpub']);
+    }
+
+    public function test_wallet_settings_preserves_input_on_invalid_key(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('wallet.settings.edit'))
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => 'not-a-key',
+                'form_context' => 'primary',
+            ]);
+
+        $response->assertRedirect(route('wallet.settings.edit'));
+        $response->assertSessionHasErrors('bip84_xpub');
+        $response->assertSessionHasInput('bip84_xpub', 'not-a-key');
+    }
+
+    public function test_additional_wallet_rejects_wrong_network_key(): void
+    {
+        Config::set('wallet.default_network', 'mainnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')->never();
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.accounts.store'), [
+                'label' => 'Treasury',
+                'bip84_xpub' => 'tpub' . str_repeat('a', 20),
+                'form_context' => 'additional',
+            ]);
+
+        $response->assertSessionHasErrors(['bip84_xpub'], null, 'walletAccount');
+        $this->assertDatabaseMissing('user_wallet_accounts', [
+            'user_id' => $owner->id,
+            'label' => 'Treasury',
+        ]);
     }
 
     private function createWalletSetting(User $user): WalletSetting

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\WalletAccountRequest;
+use App\Http\Requests\WalletKeyPreviewRequest;
 use App\Http\Requests\WalletSettingRequest;
 use App\Models\UserWalletAccount;
+use App\Services\HdWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
@@ -26,6 +28,28 @@ class WalletSettingsController extends Controller
         ]);
     }
 
+    public function validateKey(WalletKeyPreviewRequest $request)
+    {
+        $network = Config::get('wallet.default_network', 'testnet');
+        $xpub = $request->validated()['bip84_xpub'];
+
+        try {
+            $address = app(HdWallet::class)->deriveAddress(
+                $xpub,
+                0,
+                $network
+            );
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'We could not read that key. Confirm it matches the configured network and try again.',
+            ], 422);
+        }
+
+        return response()->json([
+            'address' => $address,
+        ]);
+    }
+
     public function update(WalletSettingRequest $request)
     {
         $user = $request->user();
@@ -36,15 +60,14 @@ class WalletSettingsController extends Controller
 
         // Validate the xpub by deriving a single address to catch bad keys early.
         try {
-            app(\App\Services\HdWallet::class)->deriveAddress(
+            app(HdWallet::class)->deriveAddress(
                 $payload['bip84_xpub'],
                 0,
                 $payload['network']
             );
         } catch (\Throwable $e) {
-            $expected = $payload['network'] === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return back()
-                ->withErrors(['bip84_xpub' => "Invalid BIP84 wallet key for {$payload['network']}. Expected {$expected}."])
+                ->withErrors(['bip84_xpub' => 'We could not read that key. Confirm it matches the configured network and try again.'])
                 ->withInput();
         }
 
@@ -70,12 +93,24 @@ class WalletSettingsController extends Controller
 
         if ($user->walletAccounts()->count() >= self::MAX_ADDITIONAL_ACCOUNTS) {
             return back()
-                ->withErrors(['label' => 'You have reached the additional wallet limit.'])
+                ->withErrors(['label' => 'You have reached the additional wallet limit.'], 'walletAccount')
                 ->withInput();
         }
 
         $payload = $request->validated();
         $payload['network'] = $network;
+
+        try {
+            app(HdWallet::class)->deriveAddress(
+                $payload['bip84_xpub'],
+                0,
+                $payload['network']
+            );
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['bip84_xpub' => 'We could not read that key. Confirm it matches the configured network and try again.'], 'walletAccount')
+                ->withInput();
+        }
 
         $user->walletAccounts()->create($payload);
 

@@ -13,6 +13,17 @@ class WalletAccountRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $value = $this->input('bip84_xpub');
+
+        if (is_string($value)) {
+            $this->merge([
+                'bip84_xpub' => preg_replace('/\s+/', '', $value),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         $network = config('wallet.default_network', 'testnet');
@@ -27,7 +38,8 @@ class WalletAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'bip84_xpub.regex' => 'Enter a valid BIP84 wallet key for the configured network.',
+            'bip84_xpub.required' => 'Please paste your wallet account key.',
+            'bip84_xpub.regex' => 'That key does not look right. Check you copied the full account public key (no spaces or line breaks).',
         ];
     }
 }
