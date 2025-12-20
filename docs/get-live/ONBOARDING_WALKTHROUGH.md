@@ -7,7 +7,7 @@ End-to-end guide from fresh clone to first paid invoice.
 - Ensure `WALLET_NETWORK` matches your test network and mail aliasing is enabled for safety in pre-prod.
 
 ## 2) Connect a Wallet
-- Current behavior: login does not auto-redirect; users are redirected to `/wallet/settings` only when creating an invoice without a wallet.
+- Current behavior: logging in without a wallet redirects to `/wallet/settings` so setup happens before creating invoices.
 - Visit `/wallet/settings`.
 - Paste a BIP84 xpub for the configured network (e.g., `WALLET_NETWORK=testnet4`); use the derive test to confirm the sample address.
 - Note the testnet helper (if shown) and fix errors inline before saving.

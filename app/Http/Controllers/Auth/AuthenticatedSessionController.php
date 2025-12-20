@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = $request->user();
+        if ($user && ! $user->walletSetting) {
+            return redirect()->route('wallet.settings.edit');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

@@ -2,7 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2025-12-20 | Onboarding redirect scope noted | Documented current wallet redirect behavior and added spec/PLAN note to redirect to `/wallet/settings` on login when no wallet is configured. |
+| 2025-12-20 | Login redirect to wallet setup | Logging in without a configured wallet now redirects to `/wallet/settings` so wallet setup happens before invoicing. |
 | 2025-12-20 | Wallet UX improvements shipped | Wallet settings now include inline key guidance, derive validation preview with friendly errors, and additional wallet UI parity; validation endpoint and tests updated. |
 | 2025-12-17 | Wallet network: testnet3/testnet4 aliases | `WALLET_NETWORK` now accepts `testnet3`/`testnet4` so dev envs can stay explicit while derivation + watcher map to the correct networks. |
 | 2025-12-17 | Helpful Notes: wallet key guide | Split xpub safety vs. “import your wallet key” steps, added BlueWallet-first instructions + sweeping guidance, and aligned Wallet Settings labels/errors with the supported formats. |

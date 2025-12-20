@@ -102,7 +102,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [ ] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore).
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
-    - [ ] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
+    - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
     - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.

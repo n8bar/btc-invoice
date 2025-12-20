@@ -48,30 +48,31 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
 7. Wallet UX improvements
    - Wallet settings now include inline guidance, derive validation preview, and additional wallet parity with mainnet-first network cues.
+8. Login redirect to wallet setup
+   - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
 
 ## ToDo
-8. Invoices & Clients UI polish
+9. Invoices & Clients UI polish
    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
-9. Public/share refresh
+10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
-10. Onboarding wizard
+11. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
-   - If no wallet is configured on login, redirect to wallet setup (or the wizard once it exists); until then route to `/wallet/settings`.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
-11. User settings & auth UX
+12. User settings & auth UX
    - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
    - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
    - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
-12. Editable email templates
+13. Editable email templates
    - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
    - Preview + reset-to-default; validation to prevent empty required tokens.
-13. Invoice Settings polish
+14. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
 
 ## Definition of Done
