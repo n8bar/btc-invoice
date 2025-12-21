@@ -56,18 +56,19 @@
                                 <p class="mt-1 text-xs text-gray-500">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
-                                <x-text-input id="bip84_xpub" name="bip84_xpub" type="text"
-                                              class="mt-2 block w-full bg-gray-50 dark:bg-slate-900/70 dark:border-slate-600"
-                                              :value="$xpubValue"
-                                              autocomplete="off"
-                                              autocapitalize="none"
-                                              autocorrect="off"
-                                              spellcheck="false"
-                                              @if ($errors->has('bip84_xpub')) autofocus @endif
-                                              x-ref="input"
-                                              x-model="value"
-                                              @input="handleInput"
-                                              @blur="handleBlur" />
+                                <input id="bip84_xpub" name="bip84_xpub" type="text"
+                                       class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100"
+                                       value="{{ $xpubValue }}"
+                                       autocomplete="off"
+                                       autocapitalize="none"
+                                       autocorrect="off"
+                                       spellcheck="false"
+                                       required
+                                       @if ($errors->has('bip84_xpub')) autofocus @endif
+                                       x-ref="input"
+                                       x-model="value"
+                                       @input="handleInput"
+                                       @blur="handleBlur" />
                                 <div class="mt-2 min-h-[4.5rem] space-y-2 text-xs" aria-live="polite">
                                     <div class="flex flex-wrap items-center gap-2 text-slate-600 dark:text-slate-300">
                                         <span>Expected format: <span class="font-medium text-slate-900 dark:text-slate-100">{{ $expectedPrefix }}</span></span>
