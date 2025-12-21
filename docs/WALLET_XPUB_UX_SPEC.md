@@ -1,6 +1,6 @@
 # Wallet / XPUB UX Spec (MS13 — UX ToDo #7)
 
-Purpose: make wallet setup mainnet-first and approachable for non-technical users while keeping derivation safety intact. Applies to `/wallet/settings` primary wallet + additional wallets.
+Purpose: make wallet setup mainnet-first and approachable for non-technical users while keeping derivation safety intact. Applies to the primary wallet on `/wallet/settings`; additional wallets UI is deferred to post-RC until multi-wallet selection is in scope.
 
 ## Goals
 - One-step setup: network derives from `WALLET_NETWORK` (`mainnet`, `testnet4`, or `testnet3`); user only pastes a wallet account key (BIP84 xpub/zpub/vpub/tpub).
@@ -19,13 +19,14 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
    - Added the "Where do I find this?" accordion with 4-step guidance, wallet badges, and seed-warning copy.
 4. Derive-test flow:
    - Blur/save validation with inline spinner, success check + sample address preview, friendly error copy, and a re-run control.
-5. Additional wallets:
-   - Additional wallets surface the same helper/validation states and inherit the configured network; mixed-network keys are rejected.
-6. Tests:
-   - Coverage for helper visibility, validation preview endpoint, invalid-key errors preserving input, and additional-wallet network enforcement.
+5. Tests:
+   - Coverage for helper visibility, validation preview endpoint, and invalid-key errors preserving input.
 
 ## ToDo
 - None.
+
+## Deferred (post-RC)
+- Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/FuturePLAN.md`.
 
 ## UI & Interaction
 - Layout: keep the primary wallet form above the fold on laptop screens; reserve space under the field for helper/validation so the layout does not shift.
@@ -39,7 +40,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
     4) Paste here. You can verify below before saving.
   - Provide wallet badges with concise notes, e.g., “Ledger Live: Account → … → Account extended public key,” “Trezor Suite: Accounts → Receive → Show public key,” and mobile-friendly cues like “Blockstream Green (iOS/Android): Account → three dots → Export xpub” and “BlueWallet/Nunchuk (iOS/Android): Account → More/Manage → Export xpub.”
 - Testnet cue: if `WALLET_NETWORK` is not mainnet, show a small helper above the field: “Testnet (for testing only). Real payments require mainnet.” No badge/no copy on mainnet.
-- Additional wallets section mirrors the primary form (same helper, same validation) and inherits the configured network; disallow mixed networks.
+- Additional wallets UI is deferred post-RC; when re-enabled, mirror the primary form (same helper/validation) and disallow mixed networks.
 - CTA area: primary “Save wallet” button stays enabled after errors; secondary “Re-run validation” link/button near the helper for retry.
 
 ## Validation & States
@@ -66,7 +67,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - Testnet: helper text renders; network is not selectable.
   - Invalid xpub: inline error appears, input preserved, submit stays enabled.
   - Successful validation: success message + sample address render.
-  - Additional wallet form mirrors behavior and rejects mixed-network adds.
+- Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.
 
 ## Definition of Done

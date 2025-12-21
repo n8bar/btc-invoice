@@ -47,7 +47,7 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
    - SEO note: keep titles/descriptions/copy/heading structure polished over time; `/help?from=…` should canonicalize to `/help` to avoid duplicate indexing.
    - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
 7. Wallet UX improvements
-   - Wallet settings now include inline guidance, derive validation preview, and additional wallet parity with mainnet-first network cues.
+   - Wallet settings now include inline guidance and derive validation preview; additional wallets UI is deferred to post-RC.
 8. Login redirect to wallet setup
    - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
 

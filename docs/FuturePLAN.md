@@ -53,3 +53,8 @@ Latest scope update (2025-11-16): partial payments, payment history UX, and invo
    - Add an internal editor UI with preview, draft/publish, and basic revision history so non-devs can update copy without deployments.
    - Store per-wallet “find your extended public key” guides as data so tabs are config-driven (easy to add/remove wallets).
    - Keep SEO hygiene: canonical URLs, meta descriptions/OG, and avoid indexing duplicate `?from=` variants.
+
+# Product UX
+12. **Multi-wallet selection + additional wallets UI**
+   - Re-enable the Additional wallets UI in `/wallet/settings` once multi-wallet selection is in scope.
+   - Add an invoice-level wallet selector and migration guidance for existing invoices.
