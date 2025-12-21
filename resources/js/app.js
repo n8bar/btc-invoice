@@ -17,6 +17,12 @@ Alpine.data('walletValidation', (config = {}) => ({
     lastValidatedValue: null,
 
     init() {
+        if (this.$refs.input) {
+            const existingValue = this.$refs.input.value;
+            if (existingValue && !this.value) {
+                this.value = existingValue;
+            }
+        }
         if (this.hasServerError) {
             this.$nextTick(() => this.focusInput());
         }
