@@ -7,7 +7,8 @@
     </x-slot>
 
     @php
-        $xpubValue = old('bip84_xpub', optional($wallet)->bip84_xpub ?? '');
+        $oldXpub = old('bip84_xpub');
+        $xpubValue = ($oldXpub !== null && $oldXpub !== '') ? $oldXpub : (optional($wallet)->bip84_xpub ?? '');
         $expectedPrefix = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
         $isTestnet = $defaultNetwork !== 'mainnet';
     @endphp
