@@ -176,6 +176,25 @@ class UserSettingsTest extends TestCase
         $response->assertDontSee('Testnet (for testing only). Real payments require mainnet.', false);
     }
 
+    public function test_wallet_settings_prefills_existing_wallet_key(): void
+    {
+        $owner = User::factory()->create();
+        WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub' . str_repeat('a', 20),
+            'next_derivation_index' => 0,
+            'onboarded_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('value="vpub' . str_repeat('a', 20) . '"', false);
+    }
+
     public function test_mainnet_rejects_testnet_wallet_key(): void
     {
         Config::set('wallet.default_network', 'mainnet');
