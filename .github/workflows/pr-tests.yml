@@ -1,0 +1,78 @@
+name: PR Tests
+
+on:
+  push:
+    branches:
+      - codex/**
+      - feat/**
+      - feature/**
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: true
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+      MAIL_MAILER: array
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, bcmath, gmp, pdo_mysql
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Migrate database
+        run: php artisan migrate --force
+
+      - name: Run tests
+        run: php artisan test
