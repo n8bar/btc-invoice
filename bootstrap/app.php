@@ -14,6 +14,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -69,5 +71,24 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return $renderForbidden($request, $exception->getMessage());
+        });
+
+        $exceptions->render(function (TokenMismatchException $exception, Request $request) {
+            if (! $request->routeIs('logout') && ! $request->is('logout')) {
+                return null;
+            }
+
+            Auth::guard('web')->logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            if ($request->expectsJson()) {
+                return response()->noContent();
+            }
+
+            return redirect('/');
         });
     })->create();
