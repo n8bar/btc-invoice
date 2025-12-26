@@ -61,23 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 403);
         };
 
-        $exceptions->render(function (AuthorizationException $exception, Request $request) use ($renderForbidden) {
-            return $renderForbidden($request, $exception->getMessage());
-        });
-
-        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($renderForbidden) {
-            if ($exception->getStatusCode() !== 403) {
-                return null;
-            }
-
-            return $renderForbidden($request, $exception->getMessage());
-        });
-
-        $exceptions->render(function (TokenMismatchException $exception, Request $request) {
-            if (! $request->routeIs('logout') && ! $request->is('logout')) {
-                return null;
-            }
-
+        $renderLogoutRedirect = function (Request $request) {
             Auth::guard('web')->logout();
 
             if ($request->hasSession()) {
@@ -90,5 +74,29 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return redirect('/');
+        };
+
+        $exceptions->render(function (AuthorizationException $exception, Request $request) use ($renderForbidden) {
+            return $renderForbidden($request, $exception->getMessage());
+        });
+
+        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($renderForbidden, $renderLogoutRedirect) {
+            if ($exception->getStatusCode() === 419 && ($request->routeIs('logout') || $request->is('logout'))) {
+                return $renderLogoutRedirect($request);
+            }
+
+            if ($exception->getStatusCode() !== 403) {
+                return null;
+            }
+
+            return $renderForbidden($request, $exception->getMessage());
+        });
+
+        $exceptions->render(function (TokenMismatchException $exception, Request $request) use ($renderLogoutRedirect) {
+            if (! $request->routeIs('logout') && ! $request->is('logout')) {
+                return null;
+            }
+
+            return $renderLogoutRedirect($request);
         });
     })->create();
