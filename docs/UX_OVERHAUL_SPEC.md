@@ -1,6 +1,6 @@
 # UX Overhaul Spec (RC)
 
-Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows before RC.
+Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows before RC.
 
 ## Outputs
 - Dashboard snapshot redesign that surfaces invoice/client health at a glance.
@@ -53,8 +53,9 @@ Scope and Definition of Done for PLAN Item 12. Focus: tighten core UX flows befo
 
 ## ToDo
 9. Invoices & Clients UI polish
-   - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
-   - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
+    - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
+    - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
+    - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.

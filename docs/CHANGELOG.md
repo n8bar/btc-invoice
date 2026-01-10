@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-01-10 | UX Overhaul spec alignment | Clarified UX Overhaul as PLAN Item 13 and allowed client detail to route to edit until a dedicated show view is needed. |
 | 2025-12-26 | Logout handles expired sessions | Token mismatches on logout now clear auth state and redirect instead of showing a 419; logout links now submit via buttons so GET `/logout` is never triggered. |
 | 2025-12-20 | Additional wallets UI deferred | Hid the Additional wallets section, improved wallet input contrast in dark mode, and logged the deferral in `docs/FuturePLAN.md`. |
 | 2025-12-20 | Login redirect to wallet setup | Logging in without a configured wallet now redirects to `/wallet/settings` so wallet setup happens before invoicing. |
