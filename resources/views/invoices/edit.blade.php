@@ -188,6 +188,18 @@
                     <x-primary-button>Save</x-primary-button>
                 </div>
             </form>
+
+            <div class="mt-8 rounded-md border border-red-200 bg-red-50 p-4">
+                <h3 class="text-sm font-semibold text-red-700">Delete invoice</h3>
+                <p class="mt-1 text-xs text-red-600">This moves the invoice to trash. You can restore it later.</p>
+                <form method="POST" action="{{ route('invoices.destroy', $invoice) }}"
+                      onsubmit="return confirm('Delete invoice {{ $invoice->number }}?');"
+                      class="mt-3">
+                    @csrf
+                    @method('DELETE')
+                    <x-danger-button type="submit">Delete invoice</x-danger-button>
+                </form>
+            </div>
         </div>
     </div>
 

@@ -85,6 +85,11 @@
                         </form>
                     @endif
 
+                    <a href="{{ route('invoices.edit', $invoice) }}"
+                       class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                        Edit
+                    </a>
+
                     <a href="{{ route('invoices.print', $invoice) }}"
                        target="_blank" rel="noopener"
                        class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">

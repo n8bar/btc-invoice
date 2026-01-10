@@ -56,7 +56,11 @@ class ClientController extends Controller
      */
     public function show(Request $request, Client $client)
     {
-        return response()->json($client);
+        if ($request->wantsJson()) {
+            return response()->json($client);
+        }
+
+        return redirect()->route('clients.edit', $client);
     }
 
     /**
