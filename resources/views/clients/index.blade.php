@@ -36,7 +36,9 @@
                     @forelse ($clients as $client)
                         <tr>
                             <td class="whitespace-nowrap px-0 py-4 text-sm text-gray-900">
-                                {{ $client->name }}
+                                <a href="{{ route('clients.show', $client) }}" class="text-indigo-600 hover:underline">
+                                    {{ $client->name }}
+                                </a>
                             </td>
                             <td class="whitespace-nowrap px-2 py-4 text-sm">
                                 @if ($client->email)
