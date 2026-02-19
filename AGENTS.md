@@ -6,6 +6,7 @@
 - Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift. When adding changes, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
+- Use `.cybercreek/Agents.comm` as the internal chat log for agent-to-agent coordination (Agent#1, Agent#2, etc.).
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
