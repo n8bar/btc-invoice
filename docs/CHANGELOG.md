@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-19 | UX checklist documented in spec | Added the concrete 10-point human-eyes QA checklist for UX Overhaul Task 9 to `docs/UX_OVERHAUL_SPEC.md`, including completed items and remaining manual sweeps (mobile + dark-mode pass). |
 | 2026-02-19 | Mailer cooldown + explicit follow-up note | PLAN Item 14 now calls for suppressing duplicate sends of the same invoice notice within a configurable threshold unless the sender explicitly selects a distinct follow-up class (for example, “Second notice”); mirrored in FuturePLAN email notes. |
 | 2026-02-18 | Future: client balance tracking + credits | Added a post-MVP FuturePLAN item for per-client credit balances and net outstanding totals (open balances less unspent credits), with an auditable credit ledger. |
 | 2026-01-10 | UX Overhaul spec alignment | Clarified UX Overhaul as PLAN Item 13 and allowed client detail to route to edit until a dedicated show view is needed. |

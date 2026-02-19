@@ -56,9 +56,20 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
     - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
     - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
     - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
-   - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
-   - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
-   - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
+    - Verify forms (clients + invoices) have clear validation, inline errors, and layout consistency; titles/labels/buttons align with nav ordering and CTA patterns.
+    - Revisit invoice show/edit behavior (Edit button on show, return to show after save), billing/payment summary layout, and alerts for public/print/share states.
+    - Check related utilities: trash/restore/force-delete flows, share enable/disable/rotate, and delivery send/receipt toggles retain UX polish and authorization cues.
+    - Human-eyes QA checklist (2026-02-19 working set):
+      - [x] Status pills on invoice show are readable in light/dark (`SENT` light-blue with dark text; `PARTIAL` cyan with dark text; `VOID` remains readable in dark mode).
+      - [x] Colored cards use matching border/text color treatment (`border-color: currentColor`) on invoice/client/settings surfaces.
+      - [x] Draft warning logic only appears for draft invoices with real on-chain payments (not manual-adjustment-only cases).
+      - [x] Draft warning CTA uses text-link `Mark sent` and successfully updates status.
+      - [x] Invoice show section order is: Payment QR -> Delivery log -> Payment history -> Public link.
+      - [x] Public link `Open`/copy actions use the configured host for dev (`http://192.168.68.25/...` when `APP_PUBLIC_URL` is set accordingly).
+      - [x] Edit-page public notice copy/link pattern: `Or open invoice details.` with only `open invoice details` linked.
+      - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
+      - [ ] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
+      - [ ] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
 10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
