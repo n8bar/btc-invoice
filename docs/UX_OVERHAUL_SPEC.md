@@ -69,7 +69,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
       - [x] Edit-page public notice copy/link pattern: `Or open invoice details.` with only `open invoice details` linked.
       - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
       - [ ] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
-      - [ ] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
+      - [x] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
 10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
