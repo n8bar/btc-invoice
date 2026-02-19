@@ -15,6 +15,8 @@ Latest scope update (2025-11-16): partial payments, payment history UX, and invo
    - Note: small-balance resolution (manual credit to close dust residuals) is now defined in the active PLAN/PARTIAL_PAYMENTS spec.
 
 ## Email & Notifications
+_Carry-forward guardrail from active PLAN Item 14: suppress duplicate sends for the same invoice + notice class inside a configurable cooldown window unless an explicit follow-up class (for example, “Second notice”) is selected._
+
 3. **Receipt PDFs for Paid Invoices**
    - Once payments auto-mark invoices as paid, generate immutable PDF receipts (rate + tx snapshot).
    - Email customers/owners with attachments + status history.

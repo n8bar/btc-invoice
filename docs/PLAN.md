@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2025-12-20_
+_Last updated: 2026-02-19_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -108,6 +108,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Note: keep docs/quick start in sync after UX changes land.
 14. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
+    - Add a per-invoice notice cooldown guard: do not send the same notice content/class for the same invoice within a configurable threshold unless the sender explicitly chooses a follow-up class (for example, “Second notice”).
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
     - Backfill any missing specs/tests for mail/alert behavior, document operational runbooks for mail queue health, and review/refresh all customer-facing email copy (wording + tone); align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
     - Verification: one alias-off drill in a safe env (DKIM/SPF/DMARC + links) and observe queue/backoff/alerts.
