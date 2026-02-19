@@ -58,3 +58,8 @@ Latest scope update (2025-11-16): partial payments, payment history UX, and invo
 12. **Multi-wallet selection + additional wallets UI**
    - Re-enable the Additional wallets UI in `/wallet/settings` once multi-wallet selection is in scope.
    - Add an invoice-level wallet selector and migration guidance for existing invoices.
+
+13. **Client balance tracking + credits**
+   - Track per-client credit balances that can be issued manually (refunds, overpayments, goodwill adjustments) and applied to future invoices.
+   - Show each client’s net outstanding balance as: total open invoice balances minus unspent credit balance.
+   - Surface an owner-facing ledger so credit issuance, application, reversal, and remaining credit are auditable over time.
