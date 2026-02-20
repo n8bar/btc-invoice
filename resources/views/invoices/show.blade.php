@@ -767,7 +767,16 @@
                             </a>
                         </div>
                         @if ($invoice->public_expires_at)
-                            <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
+                            @if ($invoice->public_expires_at->isPast())
+                                <p class="mt-2 text-xs font-semibold text-red-700" data-public-link-expired="true">
+                                    Expired {{ $invoice->public_expires_at->toDayDateTimeString() }}
+                                </p>
+                                <p class="mt-1 text-xs text-red-700" data-public-link-reactivation-help="true">
+                                    To unexpire the public link, first disable it, set the expiry options, and enable the public link again.
+                                </p>
+                            @else
+                                <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
+                            @endif
                         @endif
                         <p class="mt-2 text-xs text-amber-700">
                             Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.

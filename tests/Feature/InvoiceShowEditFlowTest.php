@@ -278,4 +278,46 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('data-void-button="true"', false);
         $response->assertSee('data-void-disabled="true"', false);
     }
+
+    public function test_expired_public_link_shows_expired_label_and_reactivation_steps(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-5001',
+            'description' => 'Expired link check',
+            'amount_usd' => 175,
+            'btc_rate' => 45_000,
+            'amount_btc' => 0.00388889,
+            'payment_address' => 'tb1qq0example8',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $invoice->forceFill([
+            'public_enabled' => true,
+            'public_token' => 'tok-expired-copy-check',
+            'public_expires_at' => now()->subDay(),
+        ])->save();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('data-public-link-expired="true"', false);
+        $response->assertSee('Expired', false);
+        $response->assertSee('data-public-link-reactivation-help="true"', false);
+        $response->assertSee(
+            'To unexpire the public link, first disable it, set the expiry options, and enable the public link again.',
+            false
+        );
+    }
 }
