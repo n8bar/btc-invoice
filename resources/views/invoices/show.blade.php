@@ -766,8 +766,11 @@
                                 Open
                             </a>
                         </div>
+                        @php
+                            $isPublicLinkExpired = $invoice->public_expires_at && $invoice->public_expires_at->isPast();
+                        @endphp
                         @if ($invoice->public_expires_at)
-                            @if ($invoice->public_expires_at->isPast())
+                            @if ($isPublicLinkExpired)
                                 <p class="mt-2 text-xs font-semibold text-red-700" data-public-link-expired="true">
                                     Expired {{ $invoice->public_expires_at->toDayDateTimeString() }}
                                 </p>
@@ -778,7 +781,7 @@
                                 <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
                             @endif
                         @endif
-                        <p class="mt-2 text-xs text-amber-700">
+                        <p class="{{ $isPublicLinkExpired ? 'mt-5' : 'mt-2' }} text-xs text-amber-700">
                             Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
                             Splitting the payment often increases miner fees.
                         </p>
