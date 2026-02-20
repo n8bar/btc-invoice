@@ -95,6 +95,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
+    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for UX Task 11.
     - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) captures the shipped wallet UX scope.
     - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
     - [x] Dashboard snapshot and light/dark theme toggle.
@@ -104,6 +105,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
       - Execution lock: follow the Task 10 implementation + acceptance checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (single-template public/print rendering, explicit active vs disabled/expired states, public-safe controls only).
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
+      - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
     - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.

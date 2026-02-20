@@ -58,6 +58,7 @@ Execute the full suite via Sail:
 - Onboarding walkthrough: [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](docs/get-live/ONBOARDING_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/RC_ROLLOUT_CHECKLIST.md`](docs/RC_ROLLOUT_CHECKLIST.md)
 - UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
+- Onboarding wizard spec: [`docs/ONBOARD_SPEC.md`](docs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/WALLET_XPUB_UX_SPEC.md`](docs/WALLET_XPUB_UX_SPEC.md)
 - UX guardrails reference: [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md)
 - Print/Public polish spec: [`docs/PRINT_PUBLIC_POLISH.md`](docs/PRINT_PUBLIC_POLISH.md)

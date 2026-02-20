@@ -91,6 +91,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      - Add parity assertions in `tests/Feature/InvoicePaymentDisplayTest.php` for shared heading/section wording used in print/public outputs.
      - Manual QA pass: active public invoice, disabled/expired state, and browser print preview spacing/QR legibility.
 11. Onboarding wizard
+   - Spec: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the source of truth for implementation scope and acceptance criteria.
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
