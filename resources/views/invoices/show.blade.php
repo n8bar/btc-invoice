@@ -27,15 +27,28 @@
                 {{ $billingDetails['heading'] }}
             </p>
         @endif
+        @php
+            $statusBadgeStyle = null;
+            if (in_array($st, ['sent', 'pending'], true)) {
+                $statusBadgeStyle = 'background-color:#e0e7ff !important; color:#0f172a !important;';
+            } elseif ($st === 'partial') {
+                $statusBadgeStyle = 'background-color:#cffafe !important; color:#164e63 !important;';
+            } elseif ($st === 'void') {
+                $statusBadgeStyle = 'background-color:#fef3c7 !important; color:#713f12 !important;';
+            }
+        @endphp
         <h2 class="text-xl font-semibold leading-tight">
             Invoice <span class="text-gray-500">#{{ $invoice->number }}</span>
             <span class="ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
       @switch($st)
         @case('paid') bg-green-100 text-green-800 @break
-        @case('sent') bg-blue-100 text-blue-800 @break
-        @case('void') bg-yellow-100 text-yellow-800 @break
+        @case('sent') bg-blue-100 text-slate-900 @break
+        @case('partial') bg-cyan-100 text-cyan-900 @break
+        @case('pending') bg-blue-100 text-slate-900 @break
+        @case('void') bg-yellow-100 text-yellow-900 @break
         @default bg-gray-100 text-gray-800
-      @endswitch">
+      @endswitch"
+                  @if ($statusBadgeStyle) style="{{ $statusBadgeStyle }}" @endif>
       {{ strtoupper($st) }}
             </span>
         </h2>
@@ -51,15 +64,48 @@
                 </div>
             @endif
 
-            <div class="flex items-center justify-between">
+            @if (session('error'))
+                <div class="rounded-md border bg-red-50 p-4 text-sm text-red-700" style="border-color: currentColor;">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @php
+                $hasDraftOnChainPayments = ($invoice->status ?? 'draft') === 'draft'
+                    && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment);
+            @endphp
+
+            @if ($hasDraftOnChainPayments)
+                <div class="rounded-lg border bg-red-50 p-4 text-sm text-red-900" style="border-color: currentColor;" data-draft-onchain-warning="true">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <p class="font-semibold">On-chain payments detected while this invoice is still Draft.</p>
+                            <p class="mt-1">Mark it sent so the status matches payment activity.</p>
+                        </div>
+                        <form method="POST" action="{{ route('invoices.set-status', ['invoice' => $invoice, 'action' => 'sent']) }}" class="inline">
+                            @csrf
+                            @method('PATCH')
+                            <a href="#"
+                               data-draft-onchain-mark-sent-link="true"
+                               class="text-sm font-semibold text-red-700 underline hover:text-red-800"
+                               onclick="event.preventDefault(); this.closest('form').submit();">
+                                Mark sent
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:underline">← Back to Invoices</a>
                 @php
                     $st = $invoice->status ?? 'draft';
                     $canMarkSent = !in_array($st, ['sent','paid','void']);
-                    $canVoid     = $st !== 'void';
+                    $canVoid     = !in_array($st, ['void', 'paid'], true);
+                    $canResetToDraft = $st !== 'paid';
                 @endphp
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     {{-- Mark sent --}}
                     <form method="POST" action="{{ route('invoices.set-status', ['invoice'=>$invoice,'action'=>'sent']) }}" class="inline">
                         @csrf @method('PATCH')
@@ -74,14 +120,26 @@
                           class="inline"
                           onsubmit="return confirm('Void invoice {{ $invoice->number }}? ');">
                         @csrf @method('PATCH')
-                        <x-danger-button type="submit" :disabled="!$canVoid">Void</x-danger-button>
+                        <x-danger-button
+                            type="submit"
+                            :disabled="!$canVoid"
+                            data-void-button="true"
+                            data-void-disabled="{{ $canVoid ? 'false' : 'true' }}">
+                            Void
+                        </x-danger-button>
                     </form>
 
                     {{-- Reset to draft (undo) --}}
                     @if ($st !== 'draft')
                         <form method="POST" action="{{ route('invoices.set-status', ['invoice'=>$invoice,'action'=>'draft']) }}" class="inline">
                             @csrf @method('PATCH')
-                            <x-secondary-button type="submit" >Reset to draft</x-secondary-button>
+                            <x-secondary-button
+                                type="submit"
+                                :disabled="!$canResetToDraft"
+                                data-reset-draft-button="true"
+                                data-reset-draft-disabled="{{ $canResetToDraft ? 'false' : 'true' }}">
+                                Reset to draft
+                            </x-secondary-button>
                         </form>
                     @endif
 
@@ -90,6 +148,15 @@
                         Edit
                     </a>
 
+                    <form method="POST"
+                          action="{{ route('invoices.destroy', $invoice) }}"
+                          class="inline"
+                          onsubmit="return confirm('Delete invoice {{ $invoice->number }}? This moves it to trash.');">
+                        @csrf
+                        @method('DELETE')
+                        <x-danger-button type="submit">Delete</x-danger-button>
+                    </form>
+
                     <a href="{{ route('invoices.print', $invoice) }}"
                        target="_blank" rel="noopener"
                        class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
@@ -97,79 +164,6 @@
                     </a>
 
                 </div>
-
-                @if ($invoice->payments->isNotEmpty())
-                    <div class="p-6 border-t">
-                        <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                                    <tr>
-                                        <th class="px-2 py-2 text-left">Detected</th>
-                                        <th class="px-2 py-2 text-left">TXID</th>
-                                        <th class="px-2 py-2 text-right">BTC</th>
-                                        <th class="px-2 py-2 text-right">USD</th>
-                                        <th class="px-2 py-2 text-left">Status</th>
-                                        <th class="px-2 py-2 text-left">Note</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    @foreach ($invoice->payments as $payment)
-                                        <tr>
-                                            <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
-                                            <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
-                                            <td class="px-2 py-2 text-right">
-                                                {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
-                                            </td>
-                                            <td class="px-2 py-2 text-right">
-                                                @if ($payment->fiat_amount !== null)
-                                                    <div>${{ number_format($payment->fiat_amount, 2) }}</div>
-                                                    @if ($payment->usd_rate !== null)
-                                                        <div class="text-xs text-gray-500">
-                                                            @ ${{ number_format((float) $payment->usd_rate, 2) }} USD/BTC
-                                                        </div>
-                                                    @endif
-                                                @else
-                                                    —
-                                                @endif
-                                            </td>
-                                            <td class="px-2 py-2">
-                                                @if ($payment->is_adjustment)
-                                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                                                        {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
-                                                    </span>
-                                                @else
-                                                    {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
-                                                @endif
-                                            </td>
-                                            <td class="px-2 py-2 align-top">
-                                                <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
-                                                <form method="POST"
-                                                      action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                      class="mt-2 space-y-2">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
-                                                    <textarea name="note" rows="2"
-                                                              class="w-full rounded border-gray-300 text-sm"
-                                                              placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
-                                                    @if ($errors->has('note') && old('source_payment_id') == $payment->id)
-                                                        <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
-                                                    @endif
-                                                    <div class="flex justify-end">
-                                                        <x-secondary-button type="submit" class="text-xs px-3 py-1">
-                                                            Save
-                                                        </x-secondary-button>
-                                                    </div>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                @endif
 
             </div>
 
@@ -180,7 +174,7 @@
                 </div>
             @endif
 
-            <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2">
+            <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2" style="border-color: currentColor;">
                 <p>Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.</p>
                 <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter a manual adjustment near the bottom of the screen so the ledger stays accurate without touching the original chain data.</p>
             </div>
@@ -216,84 +210,6 @@
                     </div>
                 </form>
             </div>
-
-            @if ($invoice->deliveries->isNotEmpty())
-                @php $deliveryCount = $invoice->deliveries->count(); @endphp
-                <style>
-                    details.delivery-log[open] .show-label { display: none; }
-                    details.delivery-log:not([open]) .hide-label { display: none; }
-                    summary.delivery-log-summary { cursor: pointer; }
-                </style>
-                <div class="rounded-lg bg-white shadow">
-                    <details class="delivery-log" open>
-                        <summary class="delivery-log-summary flex select-none items-center justify-between px-6 py-4">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-700">Delivery log</h3>
-                                <p class="text-xs text-gray-500">{{ $deliveryCount }} entr{{ $deliveryCount === 1 ? 'y' : 'ies' }}</p>
-                            </div>
-                            <span class="text-xs text-indigo-600 show-label">Show</span>
-                            <span class="text-xs text-gray-500 hide-label">Hide</span>
-                        </summary>
-                        <div class="border-t border-gray-100 px-6 pb-6">
-                            <div class="overflow-y-auto overflow-x-auto rounded border border-gray-100" style="max-height: 24rem;">
-                                <table class="min-w-full divide-y divide-gray-200 text-sm">
-                                    <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                                        <tr>
-                                            <th class="px-2 py-2 text-left">Type</th>
-                                            <th class="px-2 py-2 text-left">Recipient</th>
-                                            <th class="px-2 py-2 text-left">Status</th>
-                                            <th class="px-2 py-2 text-left">Queued</th>
-                                            <th class="px-2 py-2 text-left">Sent</th>
-                                            <th class="px-2 py-2 text-left">Error</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        @foreach ($invoice->deliveries as $delivery)
-                                            <tr>
-                                                <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
-                                                <td class="px-2 py-2">
-                                                    {{ $delivery->recipient }}
-                                                    @if ($delivery->cc)
-                                                        <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
-                                                    @endif
-                                                </td>
-                                                <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
-                                                @php
-                                                    $queued = $delivery->dispatched_at;
-                                                    $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
-                                                    $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
-                                                    $sent = $delivery->sent_at;
-                                                    $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
-                                                    $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
-                                                @endphp
-                                                <td class="px-2 py-2 text-sm text-gray-600">
-                                                    @if ($queuedIso)
-                                                        <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
-                                                    @else
-                                                        —
-                                                    @endif
-                                                </td>
-                                                <td class="px-2 py-2 text-sm text-gray-600">
-                                                    @if ($sentIso)
-                                                        <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
-                                                    @else
-                                                        —
-                                                    @endif
-                                                </td>
-                                                <td class="px-2 py-2 text-sm text-red-600">
-                                                    {{ $delivery->error_message ?: 'None' }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            @endif
-
-
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
                 <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
@@ -350,7 +266,7 @@
                         @endphp
 
                         @if (!is_null($summary['expected_usd']))
-                            <div class="mt-4 rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 space-y-2">
+                            <div class="mt-4 rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 space-y-2" style="border-color: currentColor;">
                                 <div class="flex justify-between">
                                     <span>Expected</span>
                                     <span>
@@ -401,7 +317,7 @@
                                 && $invoice->status !== 'paid';
                         @endphp
                         @if ($canResolveSmall)
-                            <div class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                            <div class="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900" style="border-color: currentColor;">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <div class="font-semibold">Resolve small balance</div>
@@ -433,23 +349,23 @@
                         @endif
 
                         @if ($invoice->hasSignificantOverpayment())
-                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900">
+                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900" style="border-color: currentColor;">
                                 Tip detected — this invoice has received more BTC than requested. Consider crediting or refunding the surplus.
                             </div>
                         @endif
 
                         @if ($invoice->hasSignificantUnderpayment())
-                            <div class="mt-3 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900">
+                            <div class="mt-3 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900" style="border-color: currentColor;">
                                 Underpayment detected — the outstanding balance exceeds the tolerance. Follow up with the client or record a manual adjustment.
                             </div>
                         @endif
 
                         @if ($invoice->requiresClientOverpayAlert())
-                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900">
+                            <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900" style="border-color: currentColor;">
                                 Client alert will show on the public invoice (overpayment ~{{ number_format($invoice->overpaymentPercent(), 1) }}%). Overpayments are gratuities unless you manually adjust.
                             </div>
                         @elseif ($invoice->requiresClientUnderpayAlert())
-                            <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+                            <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900" style="border-color: currentColor;">
                                 Client alert will show on the public invoice (underpayment ~{{ number_format($invoice->underpaymentPercent(), 1) }}%). Follow up with the client or adjust the balance.
                             </div>
                         @endif
@@ -609,7 +525,7 @@
                                         BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
                                         refresh right before sending payment; printed copies may be stale.
                                     </p>
-                                    <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900">
+                                    <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900" style="border-color: currentColor;">
                                         <strong>Send one payment:</strong> please send the entire outstanding balance in a single transaction.
                                         Splitting the invoice across multiple payments usually adds miner fees and can delay settlement.
                                     </div>
@@ -647,8 +563,171 @@
 
             </div>
 
-            {{-- Public link (shareable print view) --}}
-            <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+            <div class="space-y-6">
+                @if ($invoice->deliveries->isNotEmpty())
+                    @php $deliveryCount = $invoice->deliveries->count(); @endphp
+                    <style>
+                        details.delivery-log[open] .show-label { display: none; }
+                        details.delivery-log:not([open]) .hide-label { display: none; }
+                        summary.delivery-log-summary { cursor: pointer; }
+                    </style>
+                    <div class="rounded-lg bg-white shadow">
+                        <details class="delivery-log" open>
+                            <summary class="delivery-log-summary flex select-none items-center justify-between px-6 py-4">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-700">Delivery log</h3>
+                                    <p class="text-xs text-gray-500">{{ $deliveryCount }} entr{{ $deliveryCount === 1 ? 'y' : 'ies' }}</p>
+                                </div>
+                                <span class="text-xs text-indigo-600 show-label">Show</span>
+                                <span class="text-xs text-gray-500 hide-label">Hide</span>
+                            </summary>
+                            <div class="border-t border-gray-100 px-6 pb-6">
+                                <div class="overflow-y-auto overflow-x-auto rounded border border-gray-100" style="max-height: 24rem;">
+                                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                        <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                            <tr>
+                                                <th class="px-2 py-2 text-left">Type</th>
+                                                <th class="px-2 py-2 text-left">Recipient</th>
+                                                <th class="px-2 py-2 text-left">Status</th>
+                                                <th class="px-2 py-2 text-left">Queued</th>
+                                                <th class="px-2 py-2 text-left">Sent</th>
+                                                <th class="px-2 py-2 text-left">Error</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100">
+                                            @foreach ($invoice->deliveries as $delivery)
+                                                <tr>
+                                                    <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
+                                                    <td class="px-2 py-2">
+                                                        {{ $delivery->recipient }}
+                                                        @if ($delivery->cc)
+                                                            <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
+                                                    @php
+                                                        $queued = $delivery->dispatched_at;
+                                                        $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
+                                                        $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                        $sent = $delivery->sent_at;
+                                                        $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
+                                                        $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                    @endphp
+                                                    <td class="px-2 py-2 text-sm text-gray-600">
+                                                        @if ($queuedIso)
+                                                            <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-2 py-2 text-sm text-gray-600">
+                                                        @if ($sentIso)
+                                                            <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-2 py-2 text-sm text-red-600">
+                                                        {{ $delivery->error_message ?: 'None' }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                @else
+                    <div class="rounded-lg bg-white p-6 shadow">
+                        <h3 class="text-sm font-semibold text-gray-700">Delivery log</h3>
+                        <p class="mt-2 text-sm text-gray-500">
+                            No delivery attempts yet. Enable the public link and send the invoice to create the first log entry.
+                        </p>
+                    </div>
+                @endif
+
+                @if ($invoice->payments->isNotEmpty())
+                    <div class="rounded-lg bg-white shadow">
+                        <div class="p-6">
+                            <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left">Detected</th>
+                                            <th class="px-2 py-2 text-left">TXID</th>
+                                            <th class="px-2 py-2 text-right">BTC</th>
+                                            <th class="px-2 py-2 text-right">USD</th>
+                                            <th class="px-2 py-2 text-left">Status</th>
+                                            <th class="px-2 py-2 text-left">Note</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach ($invoice->payments as $payment)
+                                            <tr>
+                                                <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
+                                                <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                                                <td class="px-2 py-2 text-right">
+                                                    {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
+                                                </td>
+                                                <td class="px-2 py-2 text-right">
+                                                    @if ($payment->fiat_amount !== null)
+                                                        <div>${{ number_format($payment->fiat_amount, 2) }}</div>
+                                                        @if ($payment->usd_rate !== null)
+                                                            <div class="text-xs text-gray-500">
+                                                                @ ${{ number_format((float) $payment->usd_rate, 2) }} USD/BTC
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2">
+                                                    @if ($payment->is_adjustment)
+                                                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                                            {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
+                                                        </span>
+                                                    @else
+                                                        {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2 align-top">
+                                                    <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
+                                                    <form method="POST"
+                                                          action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
+                                                          class="mt-2 space-y-2">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
+                                                        <textarea name="note" rows="2"
+                                                                  class="w-full rounded border-gray-300 text-sm"
+                                                                  placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                        @if ($errors->has('note') && old('source_payment_id') == $payment->id)
+                                                            <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
+                                                        @endif
+                                                        <div class="flex justify-end">
+                                                            <x-secondary-button type="submit" class="text-xs px-3 py-1">
+                                                                Save
+                                                            </x-secondary-button>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="rounded-lg bg-white p-6 shadow text-sm text-gray-500">
+                        No payments detected yet. Share the public link with your client to start tracking on-chain activity.
+                    </div>
+                @endif
+
+                {{-- Public link (shareable print view) --}}
+                <div class="rounded-lg border border-gray-200 bg-white p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-700">Public link</h3>
                     @if ($invoice->public_enabled && $invoice->public_url)
@@ -678,25 +757,23 @@
                 @endif
 
                 @if ($invoice->public_enabled && $invoice->public_url)
-                    <p>
-                        <div class="mt-3">
-                            <div class="flex items-center gap-2">
-                                <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
-                                <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
-                                <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
-                                   class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                                    Open
-                                </a>
-                            </div>
-                            @if ($invoice->public_expires_at)
-                                <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
-                            @endif
-                            <p class="mt-2 text-xs text-amber-700">
-                                Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
-                                Splitting the payment often increases miner fees.
-                            </p>
+                    <div class="mt-3">
+                        <div class="flex items-center gap-2">
+                            <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
+                            <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
+                            <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Open
+                            </a>
                         </div>
-                    </p>
+                        @if ($invoice->public_expires_at)
+                            <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
+                        @endif
+                        <p class="mt-2 text-xs text-amber-700">
+                            Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
+                            Splitting the payment often increases miner fees.
+                        </p>
+                    </div>
                 @else
                     <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
                         @csrf @method('PATCH')
@@ -729,17 +806,19 @@
 
                 @if($invoice->public_enabled)
                     <br />
-                    <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
-                        <p>
-                            This invoice is currently public. To edit, first
+                    <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800" style="border-color: currentColor;">
+                        <div class="flex flex-wrap items-center gap-1">
+                            <span>This invoice is currently public. To edit, first</span>
                             <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
                                   onsubmit="return confirm('Disable the public link?');">
                                 @csrf @method('PATCH')
                                 <button type="submit" class="underline text-red-600 hover:text-red-700">disable the public link</button>
-                            </form>.
-                        </p>
+                            </form>
+                            <span>.</span>
+                        </div>
                     </div>
                 @endif
+            </div>
             </div>
 
             <div class="mt-6 rounded-lg bg-white p-6 shadow">

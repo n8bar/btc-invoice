@@ -19,13 +19,13 @@
                 <div class="p-6 space-y-6 text-gray-900">
                     <div class="space-y-2 text-sm text-gray-600">
                         <p>{{ __('Connect a wallet account key so CryptoZing can generate a unique Bitcoin address for every invoice.') }}</p>
-                        <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+                        <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800" style="border-color: currentColor;">
                             {{ __('Privacy note: this key lets anyone derive and monitor addresses for that account. Keep it private and avoid sharing screenshots or logs.') }}
                         </div>
                     </div>
 
                     @if (session('status'))
-                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
                             {{ session('status') }}
                         </div>
                     @endif
@@ -47,7 +47,7 @@
                             @csrf
 
                             @if ($isTestnet)
-                                <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                                <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800" style="border-color: currentColor;">
                                     {{ __('Testnet (for testing only). Real payments require mainnet.') }}
                                 </div>
                             @endif

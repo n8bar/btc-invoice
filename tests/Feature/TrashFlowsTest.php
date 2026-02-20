@@ -76,6 +76,21 @@ class TrashFlowsTest extends TestCase
             ->assertSee("Sorry, you don't have permission.", false);
     }
 
+    public function test_owner_can_force_delete_trashed_client(): void
+    {
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, ['name' => 'Delete Me']);
+        $client->delete();
+
+        $response = $this
+            ->actingAs($owner)
+            ->delete(route('clients.force-destroy', ['clientId' => $client->id]));
+
+        $response->assertRedirect(route('clients.trash'));
+        $response->assertSessionHas('status', 'Client permanently deleted.');
+        $this->assertDatabaseMissing('clients', ['id' => $client->id]);
+    }
+
     public function test_invoice_force_delete_is_restricted_to_owner(): void
     {
         $owner = User::factory()->create();
@@ -87,6 +102,21 @@ class TrashFlowsTest extends TestCase
             ->delete(route('invoices.force-destroy', ['invoiceId' => $invoice->id]))
             ->assertForbidden()
             ->assertSee("Sorry, you don't have permission.", false);
+    }
+
+    public function test_owner_can_force_delete_trashed_invoice(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, ['number' => 'INV-DELETE-ME']);
+        $invoice->delete();
+
+        $response = $this
+            ->actingAs($owner)
+            ->delete(route('invoices.force-destroy', ['invoiceId' => $invoice->id]));
+
+        $response->assertRedirect(route('invoices.trash'));
+        $response->assertSessionHas('status', 'Invoice permanently deleted.');
+        $this->assertDatabaseMissing('invoices', ['id' => $invoice->id]);
     }
 
     private function makeClient(User $owner, array $overrides = []): Client

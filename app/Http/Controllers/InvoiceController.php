@@ -224,7 +224,7 @@ class InvoiceController extends Controller
         $invoice->update($data);
 
         if ($request->wantsJson()) return response()->json($invoice->fresh('client'));
-        return redirect()->route('invoices.index')->with('status','Invoice updated.');
+        return redirect()->route('invoices.show', $invoice)->with('status','Invoice updated.');
     }
 
 
@@ -315,6 +315,18 @@ class InvoiceController extends Controller
 
         $allowed = ['draft','sent','void'];
         abort_unless(in_array($action, $allowed, true), 404);
+
+        if (in_array($action, ['draft', 'void'], true) && $invoice->status === 'paid') {
+            $message = $action === 'draft'
+                ? "Paid invoices can't be reset to draft."
+                : "Paid invoices can't be voided.";
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $message], 422);
+            }
+
+            return back()->with('error', $message);
+        }
 
         $updates = [
             'status' => $action,

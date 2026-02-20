@@ -10,11 +10,14 @@ use App\Services\HdWallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class UserSettingsTest extends TestCase
 {
     use RefreshDatabase;
+
+    private const REALISTIC_TESTNET_TPUB = 'tpubDCMX5n5xeyKFQ1R98FTjQ21An9e2SgN8gF5pa4DJNfQd8B5CYCqkkWXEmH4YrxRAEDzFSv25yineuGfvFAg9tWJcGakvm7Ft5e41jQZ2bHk';
 
     protected function setUp(): void
     {
@@ -195,6 +198,32 @@ class UserSettingsTest extends TestCase
         $response->assertSee('value="vpub' . str_repeat('a', 20) . '"', false);
     }
 
+    public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+        $raw = DB::table('wallet_settings')->where('id', $wallet->id)->value('bip84_xpub');
+
+        $this->assertSame(self::REALISTIC_TESTNET_TPUB, $wallet->bip84_xpub);
+        $this->assertNotSame(self::REALISTIC_TESTNET_TPUB, $raw);
+        $this->assertGreaterThan(255, strlen($raw));
+    }
+
     public function test_mainnet_rejects_testnet_wallet_key(): void
     {
         Config::set('wallet.default_network', 'mainnet');
@@ -320,6 +349,33 @@ class UserSettingsTest extends TestCase
             'user_id' => $owner->id,
             'label' => 'Treasury',
         ]);
+    }
+
+    public function test_additional_wallet_accepts_realistic_testnet_wallet_key_length(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.accounts.store'), [
+                'label' => 'Recovered account',
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $account = UserWalletAccount::where('user_id', $owner->id)->firstOrFail();
+        $raw = DB::table('user_wallet_accounts')->where('id', $account->id)->value('bip84_xpub');
+
+        $this->assertSame(self::REALISTIC_TESTNET_TPUB, $account->bip84_xpub);
+        $this->assertNotSame(self::REALISTIC_TESTNET_TPUB, $raw);
+        $this->assertGreaterThan(255, strlen($raw));
     }
 
     private function createWalletSetting(User $user): WalletSetting

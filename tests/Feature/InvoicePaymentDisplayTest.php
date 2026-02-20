@@ -228,6 +228,63 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Send BTC only to this address.', false);
     }
 
+    public function test_draft_with_on_chain_payments_shows_warning_with_mark_sent_link(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'draft',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-draft-warning-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => null,
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+            'is_adjustment' => false,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertSee('data-draft-onchain-warning="true"', false);
+        $response->assertSee('On-chain payments detected while this invoice is still Draft.', false);
+        $response->assertSee('Mark it sent so the status matches payment activity.', false);
+        $response->assertSee('data-draft-onchain-mark-sent-link="true"', false);
+    }
+
+    public function test_draft_warning_does_not_show_for_manual_adjustments_only(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'draft',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'manual-adjustment-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+            'is_adjustment' => true,
+            'note' => 'Manual credit',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertDontSee('data-draft-onchain-warning="true"', false);
+        $response->assertDontSee('On-chain payments detected while this invoice is still Draft.', false);
+    }
+
     public function test_partial_invoice_displays_payment_history_and_outstanding(): void
     {
         $owner = User::factory()->create();
@@ -277,6 +334,7 @@ class InvoicePaymentDisplayTest extends TestCase
             ->toDayDateTimeString();
         $response->assertSee('Last payment detected', false);
         $response->assertSee($detectedDisplay, false);
+        $response->assertSeeInOrder(['Payment QR', 'Delivery log', 'Payment history', 'Public link'], false);
     }
 
     public function test_bitcoin_uri_targets_outstanding_balance(): void
