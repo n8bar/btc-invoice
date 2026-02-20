@@ -50,9 +50,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Wallet settings now include inline guidance and derive validation preview; additional wallets UI is deferred to post-RC.
 8. Login redirect to wallet setup
    - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
-
-## ToDo
-9. [x] Invoices & Clients UI polish
+9. Invoices & Clients UI polish
     - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
     - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
     - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
@@ -70,6 +68,8 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
       - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
       - [x] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
       - [x] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
+
+## ToDo
 10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
