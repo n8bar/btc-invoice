@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-19 | Task 10 public/share refresh implementation pass | Refactored print/public rendering to a single-template + partial-block structure, added explicit public states (`active` / `disabled_or_expired`), kept public noindex/print behavior, and added coverage in `PublicShareTest` + `InvoicePaymentDisplayTest` for disabled-state safety and public/private section parity. Mobile sanity sweep remains open in the Task 10 checklist. |
 | 2026-02-19 | `.cybercreek` made local-only | Added `/.cybercreek/` to `.gitignore`, removed `.cybercreek/Agents.comm` from version control, and updated `AGENTS.md` guidance to keep coordination/recovery files untracked. |
 | 2026-02-19 | UX Task 9 moved to Completed Tasks | Updated `docs/UX_OVERHAUL_SPEC.md` so “Invoices & Clients UI polish” now lives under Completed Tasks instead of ToDo, matching PLAN status before Task 10 implementation begins. |
 | 2026-02-19 | UX Task 10 strategy documented | Expanded `docs/UX_OVERHAUL_SPEC.md` Task 10 with implementation lock, acceptance checklist, and verification plan; mirrored PLAN Item 13 Task 10 with an explicit pointer to the locked checklist before code implementation. |
