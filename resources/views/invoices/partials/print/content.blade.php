@@ -167,10 +167,11 @@
 
 <section class="box section-gap">
     <h3 style="margin:0 0 8px; font-size:14px;">Payment</h3>
-    <table>
+    <div class="payment-table-wrap">
+        <table class="payment-table">
         <tr>
             <th>BTC address</th>
-            <td class="mono">{{ $invoice->payment_address ?: '-' }}</td>
+            <td class="mono payment-address-value">{{ $invoice->payment_address ?: '-' }}</td>
         </tr>
         <tr>
             <th>TXID</th>
@@ -221,20 +222,22 @@
             </td>
         </tr>
 
-        @php $bitcoinUri = $displayBitcoinUri ?? $invoice->bitcoin_uri; @endphp
+        @php
+            $bitcoinUri = $displayBitcoinUri ?? $invoice->bitcoin_uri;
+            $qrRateNote = 'BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees, refresh right before sending payment; printed copies may be stale.';
+        @endphp
 
         @if ($bitcoinUri)
             <tr>
-                <th>Payment QR</th>
+                <th>
+                    <div>Payment QR</div>
+                    <div class="payment-qr-rate-note payment-qr-rate-note-mobile">{{ $qrRateNote }}</div>
+                </th>
                 <td>
                     <div class="payment-qr-wrap">
-                        <div>
+                        <div class="payment-qr-block">
                             {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(180)->margin(0)->generate($bitcoinUri) !!}
                             <div class="muted" style="font-size:12px; margin-top:6px;">Scan with any Bitcoin wallet.</div>
-                            <div class="muted" style="font-size:11px; margin-top:4px; line-height:1.3;">
-                                BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
-                                refresh right before sending payment; printed copies may be stale.
-                            </div>
                         </div>
 
                         <div class="thank-you-block">
@@ -243,11 +246,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="payment-qr-rate-note payment-qr-rate-note-desktop">{{ $qrRateNote }}</div>
                 </td>
             </tr>
         @endif
 
-    </table>
+        </table>
+    </div>
 
     <div style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid #fed7aa; background:#fff7ed; font-size:13px; line-height:1.4;">
         <strong>Send one payment:</strong> To avoid extra miner fees and processing delays, please send the full outstanding balance in a single Bitcoin transaction. Splitting the invoice across multiple payments can increase costs.

@@ -88,6 +88,18 @@
             margin-bottom:16px;
         }
         .table-wrap { width: 100%; overflow-x: auto; }
+        .payment-table-wrap { width: 100%; overflow-x: auto; }
+        .payment-table th {
+            width: 11rem;
+            min-width: 11rem;
+            white-space: nowrap;
+        }
+        .payment-table td { min-width: 0; }
+        .payment-address-value {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-all;
+        }
         .history-table { min-width: 620px; }
         .payment-qr-wrap {
             display:flex;
@@ -95,6 +107,33 @@
             justify-content:space-between;
             gap:16px;
             flex-wrap: wrap;
+        }
+        .payment-qr-block {
+            flex: 0 0 auto;
+            width: 180px;
+        }
+        .payment-qr-block svg {
+            display: block;
+            width: 180px;
+            height: 180px;
+        }
+        .payment-qr-rate-note {
+            color: var(--gray);
+            font-size: 11px;
+            line-height: 1.4;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .payment-qr-rate-note-desktop {
+            margin-top: 10px;
+            display: block;
+        }
+        .payment-qr-rate-note-mobile {
+            display: none;
         }
         .thank-you-block {
             flex: 1;
@@ -131,6 +170,13 @@
             .thank-you-block {
                 min-width: 100%;
                 text-align: left;
+            }
+            .payment-qr-rate-note-desktop {
+                display: none;
+            }
+            .payment-qr-rate-note-mobile {
+                display: block;
+                margin-top: 24px;
             }
         }
 
