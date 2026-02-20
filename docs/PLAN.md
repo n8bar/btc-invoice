@@ -102,6 +102,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
+      - Execution lock: follow the Task 10 implementation + acceptance checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (single-template public/print rendering, explicit active vs disabled/expired states, public-safe controls only).
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
     - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.

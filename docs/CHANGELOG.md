@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-19 | UX Task 10 strategy documented | Expanded `docs/UX_OVERHAUL_SPEC.md` Task 10 with implementation lock, acceptance checklist, and verification plan; mirrored PLAN Item 13 Task 10 with an explicit pointer to the locked checklist before code implementation. |
 | 2026-02-19 | UX Task 9 checked off | Completed the invoices/clients mobile sanity sweep (no horizontal overflow + action wrapping) and applied a universal 4px base `<main>` gutter (`px-1`) across app/public/guest layouts; marked UX Overhaul Task 9 complete in PLAN/spec docs. |
 | 2026-02-19 | Wallet key storage length hotfix | Added migration `2026_02_19_192045_widen_wallet_xpub_columns` to widen `wallet_settings.bip84_xpub` + `user_wallet_accounts.bip84_xpub` to `TEXT` so encrypted wallet keys are saved without truncation; added regression coverage in `tests/Feature/UserSettingsTest.php` for realistic-length testnet keys on both primary and additional wallet flows. |
 | 2026-02-19 | UX checklist dark-mode sweep checked off | Marked the Task 9 human-eyes dark-mode readability sweep as complete in `docs/UX_OVERHAUL_SPEC.md`; mobile sanity sweep remains open. |

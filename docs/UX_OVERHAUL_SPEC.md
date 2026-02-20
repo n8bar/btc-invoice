@@ -73,6 +73,23 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
+   - Implementation strategy (2026-02-19 lock):
+     - Keep a single template entrypoint for both routes (`resources/views/invoices/print.blade.php`) and refactor into shared partial blocks to prevent drift.
+     - Keep one shared controller data contract for `print()` and `publicPrint()` so status, amount summaries, and QR/payment sections are computed identically for active links.
+     - Use explicit public state rendering (`active` vs `disabled_or_expired`) so unavailable links always render a safe contact-first message.
+     - Preserve behavior decisions: public pages keep a Print button and keep invoice number visible when disabled/expired.
+     - Preserve SEO/privacy guardrails: public response keeps `X-Robots-Tag` + robots meta, and never exposes owner-only controls/actions.
+   - Acceptance checklist:
+     - [ ] Active public link mirrors print/show section language (header, summary, amounts, payment, history, footer) with no contradictory copy.
+     - [ ] Disabled/expired public link renders a friendly unavailable state with owner contact details and invoice number.
+     - [ ] Disabled/expired public link does not show payment details (amount breakdown, QR, URI, tx/payment history).
+     - [ ] Public view never renders owner-only controls (edit/delete/share rotate/disable/delivery/manual adjustments).
+     - [ ] Public view keeps Print action and retains noindex/noarchive metadata/headers.
+     - [ ] Mobile sanity for public/share at 320px/360px/390px: no horizontal overflow and action row wraps cleanly.
+   - Verification plan:
+     - Extend `tests/Feature/PublicShareTest.php` for active/disabled states, noindex headers/meta, and owner-control absence checks.
+     - Add parity assertions in `tests/Feature/InvoicePaymentDisplayTest.php` for shared heading/section wording used in print/public outputs.
+     - Manual QA pass: active public invoice, disabled/expired state, and browser print preview spacing/QR legibility.
 11. Onboarding wizard
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
