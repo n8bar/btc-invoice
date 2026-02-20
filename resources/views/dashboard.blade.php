@@ -1,25 +1,34 @@
 <x-emoji-favicon symbol="📊" bg="#E0F2FE" />
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Dashboard') }}
                 </h2>
                 <p class="text-sm text-gray-500">At-a-glance invoice and payment health.</p>
             </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('clients.index') }}" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap shrink-0">
-                    Clients
+            <div class="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-3">
+                @php
+                    $newClientButtonClasses = ($hasClients ?? false)
+                        ? 'inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto'
+                        : 'inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto';
+                @endphp
+                <a href="{{ route('clients.create') }}" class="{{ $newClientButtonClasses }}">
+                    <span aria-hidden="true" class="mr-1">👤</span>
+                    <span>New client</span>
                 </a>
-                <a href="{{ route('clients.create') }}" class="inline-flex items-center rounded-md bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700 shadow-sm ring-1 ring-indigo-200 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap shrink-0">
-                    New client
+                <a href="{{ route('invoices.create') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                    <span aria-hidden="true" class="mr-1">🧾</span>
+                    <span>New invoice</span>
                 </a>
-                <a href="{{ route('invoices.index') }}" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap shrink-0">
-                    Invoices
+                <a href="{{ route('clients.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                    <span aria-hidden="true" class="mr-1">👥</span>
+                    <span>Clients</span>
                 </a>
-                <a href="{{ route('invoices.create') }}" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap shrink-0">
-                    Create invoice
+                <a href="{{ route('invoices.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                    <span aria-hidden="true" class="mr-1">📄</span>
+                    <span>Invoices</span>
                 </a>
             </div>
         </div>

@@ -80,17 +80,18 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      - Preserve behavior decisions: public pages keep a Print button and keep invoice number visible when disabled/expired.
      - Preserve SEO/privacy guardrails: public response keeps `X-Robots-Tag` + robots meta, and never exposes owner-only controls/actions.
    - Acceptance checklist:
-     - [ ] Active public link mirrors print/show section language (header, summary, amounts, payment, history, footer) with no contradictory copy.
-     - [ ] Disabled/expired public link renders a friendly unavailable state with owner contact details and invoice number.
-     - [ ] Disabled/expired public link does not show payment details (amount breakdown, QR, URI, tx/payment history).
-     - [ ] Public view never renders owner-only controls (edit/delete/share rotate/disable/delivery/manual adjustments).
-     - [ ] Public view keeps Print action and retains noindex/noarchive metadata/headers.
+     - [x] Active public link mirrors print/show section language (header, summary, amounts, payment, history, footer) with no contradictory copy.
+     - [x] Disabled/expired public link renders a friendly unavailable state with owner contact details and invoice number.
+     - [x] Disabled/expired public link does not show payment details (amount breakdown, QR, URI, tx/payment history).
+     - [x] Public view never renders owner-only controls (edit/delete/share rotate/disable/delivery/manual adjustments).
+     - [x] Public view keeps Print action and retains noindex/noarchive metadata/headers.
      - [ ] Mobile sanity for public/share at 320px/360px/390px: no horizontal overflow and action row wraps cleanly.
    - Verification plan:
      - Extend `tests/Feature/PublicShareTest.php` for active/disabled states, noindex headers/meta, and owner-control absence checks.
      - Add parity assertions in `tests/Feature/InvoicePaymentDisplayTest.php` for shared heading/section wording used in print/public outputs.
      - Manual QA pass: active public invoice, disabled/expired state, and browser print preview spacing/QR legibility.
 11. Onboarding wizard
+   - Spec: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the source of truth for implementation scope and acceptance criteria.
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
