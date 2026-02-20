@@ -52,7 +52,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
 
 ## ToDo
-9. Invoices & Clients UI polish
+9. [x] Invoices & Clients UI polish
     - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
     - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
     - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
@@ -68,7 +68,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
       - [x] Public link `Open`/copy actions use the configured host for dev (`http://192.168.68.25/...` when `APP_PUBLIC_URL` is set accordingly).
       - [x] Edit-page public notice copy/link pattern: `Or open invoice details.` with only `open invoice details` linked.
       - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
-      - [ ] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
+      - [x] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
       - [x] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
 10. Public/share refresh
    - Public and print views share visual language (headings, notes, footer).

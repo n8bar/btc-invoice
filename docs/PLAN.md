@@ -81,6 +81,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Profile page now includes invoice memo + payment-term defaults so new invoices auto-fill description/due dates when owners leave those fields blank.
     - Additional wallet storage remains in the backend, but the UI is deferred to post-RC until multi-wallet selection is in scope (see [`docs/FuturePLAN.md`](FuturePLAN.md)).
     - Wallet settings are now mainnet-first: network derives from `WALLET_NETWORK` env, the selector is removed, and the UI only surfaces a testnet badge/helper in non-mainnet stacks while keeping additional wallets on the configured network.
+    - Wallet key columns (`wallet_settings.bip84_xpub`, `user_wallet_accounts.bip84_xpub`) now use `TEXT` so encrypted xpub payloads fit without truncation failures.
     - Invoice creation applies the defaults server-side, and new Feature tests cover both the defaults + multi-wallet storage flow.
 11. **Observability & Safety (main)**
     - Structured logs cover payment detection, rate fetches, mail queueing/delivery failures, and public link access (invoice/user IDs + IP where appropriate).
@@ -99,7 +100,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Dashboard snapshot and light/dark theme toggle.
     - [x] Helpful Notes: public, context-linked explanations (`/help`, starting with xpub safety + why we ask; treat as an SEO surface and link it from landing).
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
-    - [ ] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
+    - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).

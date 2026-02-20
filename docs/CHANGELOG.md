@@ -2,6 +2,8 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-19 | UX Task 9 checked off | Completed the invoices/clients mobile sanity sweep (no horizontal overflow + action wrapping) and applied a universal 4px base `<main>` gutter (`px-1`) across app/public/guest layouts; marked UX Overhaul Task 9 complete in PLAN/spec docs. |
+| 2026-02-19 | Wallet key storage length hotfix | Added migration `2026_02_19_192045_widen_wallet_xpub_columns` to widen `wallet_settings.bip84_xpub` + `user_wallet_accounts.bip84_xpub` to `TEXT` so encrypted wallet keys are saved without truncation; added regression coverage in `tests/Feature/UserSettingsTest.php` for realistic-length testnet keys on both primary and additional wallet flows. |
 | 2026-02-19 | UX checklist dark-mode sweep checked off | Marked the Task 9 human-eyes dark-mode readability sweep as complete in `docs/UX_OVERHAUL_SPEC.md`; mobile sanity sweep remains open. |
 | 2026-02-19 | UX checklist documented in spec | Added the concrete 10-point human-eyes QA checklist for UX Overhaul Task 9 to `docs/UX_OVERHAUL_SPEC.md`, including completed items and remaining manual sweeps (mobile + dark-mode pass). |
 | 2026-02-19 | Mailer cooldown + explicit follow-up note | PLAN Item 14 now calls for suppressing duplicate sends of the same invoice notice within a configurable threshold unless the sender explicitly selects a distinct follow-up class (for example, “Second notice”); mirrored in FuturePLAN email notes. |
