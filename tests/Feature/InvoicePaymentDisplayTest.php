@@ -10,6 +10,7 @@ use App\Services\BtcRate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class InvoicePaymentDisplayTest extends TestCase
@@ -486,6 +487,51 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Payment history', false);
         $response->assertSee('tx-print-1', false);
         $response->assertSee('tx-print-2', false);
+    }
+
+    public function test_public_and_private_print_share_core_section_wording(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-05 15:00:00', 'UTC'));
+        Cache::forget(BtcRate::CACHE_KEY);
+
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '43000.00'],
+            ], 200),
+        ]);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'public_enabled' => true,
+            'public_token' => 'tok-section-parity',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-parity-1',
+            'sats_received' => 120_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 43_000,
+            'fiat_amount' => 51.60,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $private = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice->fresh('payments')));
+
+        $public = $this->get(route('invoices.public-print', ['token' => 'tok-section-parity']));
+
+        foreach (['Summary', 'Bill To', 'Bill From', 'Description', 'Amounts', 'Payment', 'Payment history'] as $label) {
+            $private->assertSee($label, false);
+            $public->assertSee($label, false);
+        }
+
+        $public->assertSee('data-public-state="active"', false);
+        $public->assertDontSee('data-public-unavailable="true"', false);
     }
 
     private function makeInvoice(User $owner, array $overrides = []): Invoice

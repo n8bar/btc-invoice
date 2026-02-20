@@ -372,50 +372,65 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        $invoice = $invoice->load([
-            'client',
-            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
-            'user',
-        ]);
+        $invoice = $this->loadInvoiceForPrint($invoice);
         $rate = BtcRate::current();
-        $display = $this->formatInvoiceDisplay($invoice, $rate);
-        $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
 
-        $btcForUri = $summary['outstanding_btc_float'];
-        $display['displayBitcoinUri'] = $invoice->bitcoinUriForAmount(
-            $btcForUri,
-            allowFallback: $btcForUri !== null
-        );
-
-        return view('invoices.print', [
-            'invoice' => $invoice,
-            'rate_as_of' => $rate['as_of'] ?? null,
-            'public' => false,
-            'paymentSummary' => $summary,
-        ] + $display);
+        return view('invoices.print', $this->buildPrintViewData(
+            invoice: $invoice,
+            rate: $rate,
+            publicMode: false,
+            publicState: 'active'
+        ));
     }
 
 
     public function publicPrint(\Illuminate\Http\Request $request, string $token)
     {
-        $invoice = \App\Models\Invoice::with(['client','user','payments'])
-            ->where('public_token', $token)
-            ->firstOrFail();
+        $invoice = \App\Models\Invoice::where('public_token', $token)->firstOrFail();
+        $invoice = $this->loadInvoiceForPrint($invoice);
 
-        $linkActive = $invoice->public_enabled
+        $publicState = $invoice->public_enabled
             && (empty($invoice->public_expires_at) || $invoice->public_expires_at->isFuture());
+        $publicState = $publicState ? 'active' : 'disabled_or_expired';
 
         \Log::info('invoice.public_print', [
             'invoice_id' => $invoice->id,
             'token_hash' => sha1($token),
-            'link_active' => $linkActive,
+            'public_state' => $publicState,
             'ip' => $request->ip(),
         ]);
 
-        if ($linkActive) {
-            $rate = \App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current();
-            $asOf = $rate['as_of'] ?? now();
-            $display = $this->formatInvoiceDisplay($invoice, $rate);
+        $rate = $publicState === 'active'
+            ? (\App\Services\BtcRate::fresh() ?? \App\Services\BtcRate::current())
+            : null;
+
+        $viewData = $this->buildPrintViewData(
+            invoice: $invoice,
+            rate: $rate,
+            publicMode: true,
+            publicState: $publicState
+        );
+
+        return response()
+            ->view('invoices.print', $viewData)
+            ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    }
+
+    private function loadInvoiceForPrint(Invoice $invoice): Invoice
+    {
+        return $invoice->load([
+            'client',
+            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'user',
+        ]);
+    }
+
+    private function buildPrintViewData(Invoice $invoice, ?array $rate, bool $publicMode, string $publicState): array
+    {
+        $display = $this->formatInvoiceDisplay($invoice, $rate);
+        $summary = null;
+
+        if ($publicState === 'active') {
             $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
 
             $btcForUri = $summary['outstanding_btc_float'];
@@ -423,28 +438,16 @@ class InvoiceController extends Controller
                 $btcForUri,
                 allowFallback: $btcForUri !== null
             );
-
-            $viewData = [
-                'invoice'       => $invoice,
-                'rate_as_of'    => $asOf,
-                'public'        => true,
-                'paymentSummary'=> $summary,
-                'link_active'   => true,
-            ] + $display;
-        } else {
-            $display = $this->formatInvoiceDisplay($invoice, null);
-            $viewData = [
-                'invoice'       => $invoice,
-                'rate_as_of'    => null,
-                'public'        => true,
-                'paymentSummary'=> null,
-                'link_active'   => false,
-            ] + $display;
         }
 
-        return response()
-            ->view('invoices.print', $viewData)
-            ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');
+        return [
+            'invoice' => $invoice,
+            'rate_as_of' => $rate['as_of'] ?? null,
+            'public' => $publicMode,
+            'public_state' => $publicState,
+            'link_active' => $publicState === 'active',
+            'paymentSummary' => $summary,
+        ] + $display;
     }
 
     public function enableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
