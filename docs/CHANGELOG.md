@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-19 | `.cybercreek` made local-only | Added `/.cybercreek/` to `.gitignore`, removed `.cybercreek/Agents.comm` from version control, and updated `AGENTS.md` guidance to keep coordination/recovery files untracked. |
 | 2026-02-19 | UX Task 9 moved to Completed Tasks | Updated `docs/UX_OVERHAUL_SPEC.md` so “Invoices & Clients UI polish” now lives under Completed Tasks instead of ToDo, matching PLAN status before Task 10 implementation begins. |
 | 2026-02-19 | UX Task 10 strategy documented | Expanded `docs/UX_OVERHAUL_SPEC.md` Task 10 with implementation lock, acceptance checklist, and verification plan; mirrored PLAN Item 13 Task 10 with an explicit pointer to the locked checklist before code implementation. |
 | 2026-02-19 | UX Task 9 checked off | Completed the invoices/clients mobile sanity sweep (no horizontal overflow + action wrapping) and applied a universal 4px base `<main>` gutter (`px-1`) across app/public/guest layouts; marked UX Overhaul Task 9 complete in PLAN/spec docs. |
