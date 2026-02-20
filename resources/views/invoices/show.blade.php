@@ -781,10 +781,19 @@
                                 <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
                             @endif
                         @endif
-                        <p class="{{ $isPublicLinkExpired ? 'mt-5' : 'mt-2' }} text-xs text-amber-700">
-                            Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
-                            Splitting the payment often increases miner fees.
-                        </p>
+                        @if ($isPublicLinkExpired)
+                            <div class="mt-4">
+                                <p class="text-xs text-amber-700">
+                                    Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
+                                    Splitting the payment often increases miner fees.
+                                </p>
+                            </div>
+                        @else
+                            <p class="mt-2 text-xs text-amber-700">
+                                Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
+                                Splitting the payment often increases miner fees.
+                            </p>
+                        @endif
                     </div>
                 @else
                     <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
