@@ -85,7 +85,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      - [x] Disabled/expired public link does not show payment details (amount breakdown, QR, URI, tx/payment history).
      - [x] Public view never renders owner-only controls (edit/delete/share rotate/disable/delivery/manual adjustments).
      - [x] Public view keeps Print action and retains noindex/noarchive metadata/headers.
-     - [ ] Mobile sanity for public/share at 320px/360px/390px: no horizontal overflow and action row wraps cleanly.
+     - [ ] Mobile sanity for public/share on narrower screens: no horizontal overflow and action row wraps cleanly.
    - Verification plan:
      - Extend `tests/Feature/PublicShareTest.php` for active/disabled states, noindex headers/meta, and owner-control absence checks.
      - Add parity assertions in `tests/Feature/InvoicePaymentDisplayTest.php` for shared heading/section wording used in print/public outputs.
