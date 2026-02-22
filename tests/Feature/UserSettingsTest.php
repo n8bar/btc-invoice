@@ -182,10 +182,11 @@ class UserSettingsTest extends TestCase
     public function test_wallet_settings_prefills_existing_wallet_key(): void
     {
         $owner = User::factory()->create();
+        $storedKey = 'vpub' . str_repeat('a', 20);
         WalletSetting::create([
             'user_id' => $owner->id,
             'network' => 'testnet',
-            'bip84_xpub' => 'vpub' . str_repeat('a', 20),
+            'bip84_xpub' => $storedKey,
             'next_derivation_index' => 0,
             'onboarded_at' => now(),
         ]);
@@ -195,7 +196,12 @@ class UserSettingsTest extends TestCase
             ->get(route('wallet.settings.edit'));
 
         $response->assertOk();
-        $response->assertSee('value="vpub' . str_repeat('a', 20) . '"', false);
+        $content = $response->getContent();
+        $this->assertIsString($content);
+        $this->assertMatchesRegularExpression(
+            '/<textarea[^>]*id="bip84_xpub"[^>]*rows="3"[^>]*>\s*' . preg_quote($storedKey, '/') . '\s*<\/textarea>/s',
+            $content
+        );
     }
 
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
