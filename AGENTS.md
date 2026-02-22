@@ -24,7 +24,7 @@
 - Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
 - Keep agent coordination logs local-only and untracked; use `Agents.comm` in the untracked `.cybercreek/` area for agent-to-agent notes/checkouts/checkins.
 - Checkout/checkin in `Agents.comm` is optional but recommended for high-conflict files; include agent, file paths, purpose, and lease/expiry so stale claims are obvious.
-- If you checkout files in `Agents.comm`, you must check them back in when done (or mark them released/abandoned) before ending your session.
+- If you checkout files in `Agents.comm`, check them back in before any wait state (before asking the user a clarifying question, when blocked/waiting, before switching tasks, and before ending your session).
 - On checkin, leave a short handoff note: what changed, what remains, and any risks/tests to run.
 
 ## Handy Commands

@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-21 | AGENTS “when done” checkout rule clarified | Refined multi-agent checkout behavior to require check-in before any wait state (before user clarification questions, while blocked/waiting, before task switches, and at session end) so idle agents do not hold file checkouts. |
 | 2026-02-21 | AGENTS checkout/checkin closeout requirement | Updated `AGENTS.md` multi-agent guidance to explicitly require checking files back in (or marking them released/abandoned) in `.cybercreek/Agents.comm` before ending a session whenever checkout was used. |
 | 2026-02-21 | AGENTS multi-agent coordination guardrails | Added a dedicated `Multi-Agent Coordination` section in `AGENTS.md` to treat secondary agents as role-based (not capability-limited), allow normal dirty-worktree collaboration, require path-scoped commits, and define optional checkout/checkin notes via untracked `.cybercreek/Agents.comm`. |
 | 2026-02-21 | Contributor walkthrough rename + link sync | Renamed `docs/get-live/ONBOARDING_WALKTHROUGH.md` to `docs/get-live/CONTRIBUTOR_WALKTHROUGH.md` to clarify it is a contributor/dev runbook (not the user onboarding wizard), and updated references in README, PLAN, Docs/DX spec, and wallet UX spec wording. |
