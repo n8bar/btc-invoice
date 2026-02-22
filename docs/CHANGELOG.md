@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-21 | AGENTS checkout/checkin closeout requirement | Updated `AGENTS.md` multi-agent guidance to explicitly require checking files back in (or marking them released/abandoned) in `.cybercreek/Agents.comm` before ending a session whenever checkout was used. |
 | 2026-02-21 | AGENTS multi-agent coordination guardrails | Added a dedicated `Multi-Agent Coordination` section in `AGENTS.md` to treat secondary agents as role-based (not capability-limited), allow normal dirty-worktree collaboration, require path-scoped commits, and define optional checkout/checkin notes via untracked `.cybercreek/Agents.comm`. |
 | 2026-02-21 | Contributor walkthrough rename + link sync | Renamed `docs/get-live/ONBOARDING_WALKTHROUGH.md` to `docs/get-live/CONTRIBUTOR_WALKTHROUGH.md` to clarify it is a contributor/dev runbook (not the user onboarding wizard), and updated references in README, PLAN, Docs/DX spec, and wallet UX spec wording. |
 | 2026-02-21 | UX Task 9 split into Completed + ToDo tracking | Updated `docs/UX_OVERHAUL_SPEC.md` to track Task 9 as both Completed and ToDo (with an explicit merge-back rule once carryover polish is done); kept Task 10 in ToDo with completed checklist items preserved, and gated final Task 10 acceptance on Task 9 ToDo completion. Synced PLAN/FuturePLAN wording to match. |
