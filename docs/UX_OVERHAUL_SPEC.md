@@ -68,15 +68,11 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
       - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
       - [x] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
       - [x] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
+    - Follow-up closure (2026-02-21): authenticated invoice/client narrower-screen action-row sweep complete; temporary Task 9 ToDo split merged back into this completed task.
 
 ## ToDo
-9. Invoices & Clients UI polish (ToDo)
-   - Finish follow-up UX polish items on authenticated invoices/clients surfaces only (exclude public/share, which remains Task 10 scope).
-   - Carryover checklist:
-     - [ ] Narrower-screen sanity sweep for authenticated invoice/client action rows (no horizontal overflow; controls wrap cleanly).
-   - Merge rule: when this ToDo entry is complete, merge it back into Completed Task 9 and remove this duplicate ToDo entry.
 10. Public/share refresh
-   - Sequencing note (2026-02-21): Task 10 implementation progress is retained here, but final Task 10 acceptance is gated on completing Task 9 (ToDo) first.
+   - Sequencing note (2026-02-21): Task 9 carryover is closed; Task 10 remains in progress until its own narrower-screen public/share acceptance item is complete.
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
    - Scope boundary: all public/share narrower-screen verification lives in Task 10 (not Task 9).

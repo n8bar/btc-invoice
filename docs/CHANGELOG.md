@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-21 | UX Task 9 carryover closed and merged | Marked Task 9 follow-up complete and merged the temporary Task 9 ToDo split back into a single completed Task 9 entry in `docs/UX_OVERHAUL_SPEC.md`; updated `docs/PLAN.md` and `docs/FuturePLAN.md` so Task 10 is no longer gated on Task 9 and remains open only for its own public/share narrower-screen checklist item. |
 | 2026-02-21 | UX Task 9/10 boundary clarified | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` so Task 9 (ToDo) now covers authenticated invoice/client surfaces only, while public/share narrower-screen verification is explicitly tracked under Task 10. |
 | 2026-02-21 | AGENTS “when done” checkout rule clarified | Refined multi-agent checkout behavior to require check-in before any wait state (before user clarification questions, while blocked/waiting, before task switches, and at session end) so idle agents do not hold file checkouts. |
 | 2026-02-21 | AGENTS checkout/checkin closeout requirement | Updated `AGENTS.md` multi-agent guidance to explicitly require checking files back in (or marking them released/abandoned) in `.cybercreek/Agents.comm` before ending a session whenever checkout was used. |
