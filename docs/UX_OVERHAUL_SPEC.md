@@ -71,14 +71,15 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 
 ## ToDo
 9. Invoices & Clients UI polish (ToDo)
-   - Finish follow-up UX polish items discovered during Task 10 implementation that belong to the broader invoices/clients quality baseline.
+   - Finish follow-up UX polish items on authenticated invoices/clients surfaces only (exclude public/share, which remains Task 10 scope).
    - Carryover checklist:
-     - [ ] Narrower-screen sanity sweep for public/share and related invoice/client action rows (no horizontal overflow; controls wrap cleanly).
+     - [ ] Narrower-screen sanity sweep for authenticated invoice/client action rows (no horizontal overflow; controls wrap cleanly).
    - Merge rule: when this ToDo entry is complete, merge it back into Completed Task 9 and remove this duplicate ToDo entry.
 10. Public/share refresh
    - Sequencing note (2026-02-21): Task 10 implementation progress is retained here, but final Task 10 acceptance is gated on completing Task 9 (ToDo) first.
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
+   - Scope boundary: all public/share narrower-screen verification lives in Task 10 (not Task 9).
    - Implementation strategy (2026-02-19 lock):
      - Keep a single template entrypoint for both routes (`resources/views/invoices/print.blade.php`) and refactor into shared partial blocks to prevent drift.
      - Keep one shared controller data contract for `print()` and `publicPrint()` so status, amount summaries, and QR/payment sections are computed identically for active links.
