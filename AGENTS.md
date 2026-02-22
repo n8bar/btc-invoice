@@ -17,6 +17,15 @@
 - Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
 
+## Multi-Agent Coordination
+- Primary and secondary agents are role-based, not capability-limited: secondaries can work docs, code, tests, or modules within their stated task.
+- Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
+- Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
+- Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
+- Keep agent coordination logs local-only and untracked; use `Agents.comm` in the untracked `.cybercreek/` area for agent-to-agent notes/checkouts/checkins.
+- Checkout/checkin in `Agents.comm` is optional but recommended for high-conflict files; include agent, file paths, purpose, and lease/expiry so stale claims are obvious.
+- On checkin, leave a short handoff note: what changed, what remains, and any risks/tests to run.
+
 ## Handy Commands
 ```
 ./vendor/bin/sail up -d

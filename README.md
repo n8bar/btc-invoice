@@ -55,7 +55,7 @@ Execute the full suite via Sail:
 - Future backlog: [`docs/FuturePLAN.md`](docs/FuturePLAN.md)
 - Docs & DX spec: [`docs/DOCS_DX_SPEC.md`](docs/DOCS_DX_SPEC.md)
 - Quick start: [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md)
-- Onboarding walkthrough: [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](docs/get-live/ONBOARDING_WALKTHROUGH.md)
+- Contributor walkthrough: [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/get-live/CONTRIBUTOR_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/RC_ROLLOUT_CHECKLIST.md`](docs/RC_ROLLOUT_CHECKLIST.md)
 - UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
 - Onboarding wizard spec: [`docs/ONBOARD_SPEC.md`](docs/ONBOARD_SPEC.md)
