@@ -2,7 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
-| 2026-02-22 | UX Task 9 split into Completed + ToDo tracking | Updated `docs/UX_OVERHAUL_SPEC.md` to track Task 9 as both Completed and ToDo (with an explicit merge-back rule once carryover polish is done); kept Task 10 in ToDo with completed checklist items preserved, and gated final Task 10 acceptance on Task 9 ToDo completion. Synced PLAN/FuturePLAN wording to match. |
+| 2026-02-21 | UX Task 9 split into Completed + ToDo tracking | Updated `docs/UX_OVERHAUL_SPEC.md` to track Task 9 as both Completed and ToDo (with an explicit merge-back rule once carryover polish is done); kept Task 10 in ToDo with completed checklist items preserved, and gated final Task 10 acceptance on Task 9 ToDo completion. Synced PLAN/FuturePLAN wording to match. |
 | 2026-02-19 | Onboarding spec doc added + linked | Added `docs/ONBOARD_SPEC.md` as the planning source for UX Task 11, linked Task 11 in `docs/UX_OVERHAUL_SPEC.md`, and synced README + PLAN references (no product implementation yet). |
 | 2026-02-19 | Task 10 public/share refresh implementation pass | Refactored print/public rendering to a single-template + partial-block structure, added explicit public states (`active` / `disabled_or_expired`), kept public noindex/print behavior, and added coverage in `PublicShareTest` + `InvoicePaymentDisplayTest` for disabled-state safety and public/private section parity. Mobile sanity sweep remains open in the Task 10 checklist. |
 | 2026-02-19 | `.cybercreek` made local-only | Added `/.cybercreek/` to `.gitignore`, removed `.cybercreek/Agents.comm` from version control, and updated `AGENTS.md` guidance to keep coordination/recovery files untracked. |

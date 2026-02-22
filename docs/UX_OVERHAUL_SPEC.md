@@ -76,7 +76,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      - [ ] Narrower-screen sanity sweep for public/share and related invoice/client action rows (no horizontal overflow; controls wrap cleanly).
    - Merge rule: when this ToDo entry is complete, merge it back into Completed Task 9 and remove this duplicate ToDo entry.
 10. Public/share refresh
-   - Sequencing note (2026-02-22): Task 10 implementation progress is retained here, but final Task 10 acceptance is gated on completing Task 9 (ToDo) first.
+   - Sequencing note (2026-02-21): Task 10 implementation progress is retained here, but final Task 10 acceptance is gated on completing Task 9 (ToDo) first.
    - Public and print views share visual language (headings, notes, footer).
    - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
    - Implementation strategy (2026-02-19 lock):

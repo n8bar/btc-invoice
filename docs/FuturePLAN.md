@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-02-22): no post-MVP backlog changes in this pass; active-plan UX tracking now splits Task 9 into Completed + ToDo until carryover polish is closed, and Task 10 acceptance remains gated in the active PLAN/spec docs.
+Latest scope update (2026-02-21): no post-MVP backlog changes in this pass; active-plan UX tracking now splits Task 9 into Completed + ToDo until carryover polish is closed, and Task 10 acceptance remains gated in the active PLAN/spec docs.
 
 ## Infrastructure & Payments
 1. **Self-Hosted Bitcoin Node + Watcher**
