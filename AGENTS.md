@@ -3,7 +3,8 @@
 ## Working Style
 - Always run artisan/composer/npm commands through Sail (`./vendor/bin/sail ...`).
 - Keep `docs/PLAN.md` and `docs/FuturePLAN.md` in sync with every merge or scope change.
-- Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift. When adding changes, use the date from the system you're running on.
+- Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift.
+- Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
 - Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs or local recovery files.
