@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec state wording simplified to “two ways to be done” | Rewrote the getting-started state model section in `docs/ONBOARD_SPEC.md` to frame auto-prompt behavior as two done states (completed or dismissed), added a simple auto-show rule, and removed precedence-heavy wording. |
 | 2026-02-23 | Onboarding spec state storage simplified for getting-started | `docs/ONBOARD_SPEC.md` now defines a minimal v1 flow-state model: derived step progress plus only `getting_started_completed_at` and `getting_started_dismissed` on `users`, and simplifies deliver-step resume to `?invoice={id}` or latest user invoice (no persisted last-invoice pointer). |
 | 2026-02-23 | Onboarding spec route namespace renamed to getting-started | Updated `docs/ONBOARD_SPEC.md` to lock the canonical documented route paths and route names to `getting-started` (`/getting-started`, `/getting-started/{step}`, `getting-started.*`) and removed `wizard` wording from the route-shape section prose. |
 | 2026-02-23 | Onboarding spec route/URL + wrapper-step behavior drafted | `docs/ONBOARD_SPEC.md` now locks the onboarding route namespace (`/onboarding`, `/onboarding/{step}`, dismiss/reopen), skip-ahead/resume guard rules, and a hybrid implementation model (lightweight onboarding step shells that hand off to existing wallet/invoice pages instead of duplicating forms). |
