@@ -77,18 +77,21 @@ If any step proves too broad during implementation, split it into explicit subst
 - Persisted user fields for the flow (minimal v1):
   - `getting_started_completed_at` (`timestamp`, nullable)
   - `getting_started_dismissed` (`boolean`, default `false`)
-- "Done" states for auto-prompting (two ways to be done):
-  - Completed: `getting_started_completed_at != null`
-  - Dismissed: `getting_started_dismissed = true`
+- "Done" for auto-prompting (two completion paths):
+  - The flow is considered done when `getting_started_completed_at != null`.
+  - `getting_started_dismissed` records how it was completed:
+    - `false` = completed by finishing the steps
+    - `true` = completed by dismissing the flow
 - Auto-show rule:
-  - Auto-show getting-started only when neither done state is true.
+  - Auto-show getting-started only when `getting_started_completed_at == null`.
 - State update rules (keep behavior predictable):
   - Completion sets `getting_started_completed_at` and clears `getting_started_dismissed` to `false`.
-  - Dismiss sets `getting_started_dismissed` to `true` and does not erase progress/completion history.
-  - Reopen clears `getting_started_dismissed` and does not clear `getting_started_completed_at`.
+  - Dismiss sets `getting_started_completed_at` and sets `getting_started_dismissed` to `true`.
+  - Reopen clears both `getting_started_completed_at` and `getting_started_dismissed`.
 - Why this stays intentionally simple:
   - No per-step state storage to backfill or reconcile.
   - No "last invoice" pointer persisted in v1; deliver-step resume uses `?invoice={id}` or falls back to the user's latest invoice.
+  - Auto-show logic checks one field (`getting_started_completed_at`) while `getting_started_dismissed` remains useful metadata about how the flow was completed.
   - If product needs richer analytics/re-entry behavior later, expand from this baseline instead of starting with a generalized flow-state table.
 
 ## Current Clarifications (2026-02-19)
