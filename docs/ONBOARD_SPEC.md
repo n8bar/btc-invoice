@@ -6,7 +6,6 @@
 - Remove this `Draft Metadata` section once the spec is implementation-ready.
 - Keep Step 3 criteria intentionally flexible in this draft; finalize strict gating only in later implementation-ready spec passes.
 - Open items to spec next:
-  - Exact empty-state placement on dashboard/invoices and mobile behavior.
   - Accessibility details (focus order, status announcements, keyboard flow).
 
 Purpose: define the guided onboarding flow that helps a signed-in owner reach first invoice delivery without bypassing existing auth/policy checks.
