@@ -6,7 +6,7 @@
 - Remove this `Draft Metadata` section once the spec is implementation-ready.
 - Keep Step 3 criteria intentionally flexible in this draft; finalize strict gating only in later implementation-ready spec passes.
 - Open items to spec next:
-  - Dismissed/completed state storage model and copy for user prompts.
+  - Prompt copy for dismiss/reopen/completion states.
   - Exact empty-state placement on dashboard/invoices and mobile behavior.
   - Accessibility details (focus order, status announcements, keyboard flow).
 
@@ -56,15 +56,36 @@ If any step proves too broad during implementation, split it into explicit subst
     - Deliver step -> `/invoices/{invoice}`
   - When a user reaches one of those pages from getting-started, show a compact progress strip with the current step, success criteria, and a “Back to getting started” link.
 - Deliver step target invoice (resume behavior):
-  - `deliver` needs an invoice context. The flow may persist the most recent invoice created during getting-started for continuity.
-  - `GET /getting-started/deliver` should prefer that stored invoice when it still exists, is owned by the authenticated user, and is not trashed.
-  - Fallback: use the user's most recently created non-trashed invoice.
+  - `deliver` needs an invoice context.
+  - `GET /getting-started/deliver` should prefer a valid user-owned `?invoice={id}` override when provided.
+  - Otherwise, use the user's most recently created non-trashed invoice.
   - If no invoice exists, redirect to `/getting-started/invoice`.
-  - Support `?invoice={id}` as an explicit target override, but only if the invoice is user-owned; otherwise ignore it and resolve using the rules above.
+  - Ignore invalid/foreign/trashed `?invoice={id}` values and resolve using the fallback rules above.
 - Success redirects while getting-started is active:
   - Wallet saved successfully -> redirect to `GET /getting-started` (resolver advances to the next step).
   - Invoice created successfully -> redirect to `GET /getting-started/deliver?invoice={id}` so the flow resumes with the created invoice context.
   - Delivery attempt logged on a public-enabled invoice -> redirect to `GET /getting-started` so completion is evaluated consistently in one place.
+
+## Getting-Started State Storage Model (Draft Decision, 2026-02-23)
+- Purpose of this model:
+  - Store only user intent/state that cannot be safely derived from existing business data.
+  - Derive step progress from real app data so the flow stays truthful even if users complete steps outside the getting-started entry point.
+- Step progress is derived (not stored as step booleans):
+  - Step 1 complete when the authenticated user has a wallet setting.
+  - Step 2 complete when the authenticated user has at least one non-trashed invoice.
+  - Step 3 complete when at least one user-owned invoice has `public_enabled=true` and at least one delivery log attempt.
+- Persisted user fields for the flow (minimal v1):
+  - `getting_started_completed_at` (`timestamp`, nullable)
+  - `getting_started_dismissed` (`boolean`, default `false`)
+- State precedence / behavior rules:
+  - `getting_started_completed_at != null` means the flow is completed for auto-prompt/auto-redirect decisions.
+  - Completion should set `getting_started_completed_at` and clear `getting_started_dismissed` to `false`.
+  - Dismiss only changes `getting_started_dismissed`; it does not erase progress or completion history.
+  - Reopen clears `getting_started_dismissed`; it does not clear `getting_started_completed_at`.
+- Why this stays intentionally simple:
+  - No per-step state storage to backfill or reconcile.
+  - No "last invoice" pointer persisted in v1; deliver-step resume uses `?invoice={id}` or falls back to the user's latest invoice.
+  - If product needs richer analytics/re-entry behavior later, expand from this baseline instead of starting with a generalized flow-state table.
 
 ## Current Clarifications (2026-02-19)
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.

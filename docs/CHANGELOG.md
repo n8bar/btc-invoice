@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec state storage simplified for getting-started | `docs/ONBOARD_SPEC.md` now defines a minimal v1 flow-state model: derived step progress plus only `getting_started_completed_at` and `getting_started_dismissed` on `users`, and simplifies deliver-step resume to `?invoice={id}` or latest user invoice (no persisted last-invoice pointer). |
 | 2026-02-23 | Onboarding spec route namespace renamed to getting-started | Updated `docs/ONBOARD_SPEC.md` to lock the canonical documented route paths and route names to `getting-started` (`/getting-started`, `/getting-started/{step}`, `getting-started.*`) and removed `wizard` wording from the route-shape section prose. |
 | 2026-02-23 | Onboarding spec route/URL + wrapper-step behavior drafted | `docs/ONBOARD_SPEC.md` now locks the onboarding route namespace (`/onboarding`, `/onboarding/{step}`, dismiss/reopen), skip-ahead/resume guard rules, and a hybrid implementation model (lightweight onboarding step shells that hand off to existing wallet/invoice pages instead of duplicating forms). |
 | 2026-02-23 | UX Task 10 completed and moved to Completed Tasks | Marked the Task 10 public/share refresh acceptance checklist complete (including narrower-screen public/share sanity verification), moved Task 10 from ToDo into Completed Tasks in `docs/UX_OVERHAUL_SPEC.md`, and synced `docs/PLAN.md`/`docs/FuturePLAN.md` status wording. |
