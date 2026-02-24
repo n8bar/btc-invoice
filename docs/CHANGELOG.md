@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec route/URL + wrapper-step behavior drafted | `docs/ONBOARD_SPEC.md` now locks the onboarding route namespace (`/onboarding`, `/onboarding/{step}`, dismiss/reopen), skip-ahead/resume guard rules, and a hybrid implementation model (lightweight onboarding step shells that hand off to existing wallet/invoice pages instead of duplicating forms). |
 | 2026-02-23 | UX Task 10 completed and moved to Completed Tasks | Marked the Task 10 public/share refresh acceptance checklist complete (including narrower-screen public/share sanity verification), moved Task 10 from ToDo into Completed Tasks in `docs/UX_OVERHAUL_SPEC.md`, and synced `docs/PLAN.md`/`docs/FuturePLAN.md` status wording. |
 | 2026-02-21 | UX Task 9 carryover closed and merged | Marked Task 9 follow-up complete and merged the temporary Task 9 ToDo split back into a single completed Task 9 entry in `docs/UX_OVERHAUL_SPEC.md`; updated `docs/PLAN.md` and `docs/FuturePLAN.md` so Task 10 is no longer gated on Task 9 and remains open only for its own public/share narrower-screen checklist item. |
 | 2026-02-21 | UX Task 9/10 boundary clarified | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` so Task 9 (ToDo) now covers authenticated invoice/client surfaces only, while public/share narrower-screen verification is explicitly tracked under Task 10. |
