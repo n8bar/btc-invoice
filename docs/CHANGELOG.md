@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec heading labels simplified (no parentheticals) | Removed parenthetical qualifiers from `docs/ONBOARD_SPEC.md` headings (including the title, Scope, route/state sections, Copy Examples, and Accessibility Details) to keep Task 11 spec headings shorter and cleaner. |
 | 2026-02-23 | Onboarding spec metadata/date heading cleanup | Removed the `Draft Metadata` section from `docs/ONBOARD_SPEC.md` and stripped date suffixes from section headings to keep the Task 11 spec cleaner now that the draft decisions are filled in. |
 | 2026-02-23 | Onboarding spec accessibility details drafted (simple-first) | Added a concise accessibility section to `docs/ONBOARD_SPEC.md` covering focus order, keyboard flow, status announcements, and a simple-first interaction rule for the getting-started step shells and linked pages; cleared the last Task 11 open-item entry in the draft metadata list. |
 | 2026-02-23 | Onboarding spec dropped empty-state placement as an open item | Removed "exact empty-state placement/mobile behavior" from `docs/ONBOARD_SPEC.md` open items so Task 11 stays implementation-light; the spec still requires clear empty-state CTAs into getting-started without locking placement. |
