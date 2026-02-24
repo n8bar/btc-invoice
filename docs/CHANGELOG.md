@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec prompt copy drafted as suggestions (not requirements) | Added a non-binding prompt-copy section to `docs/ONBOARD_SPEC.md` with suggested wording/tone for dismiss confirmation, dismiss success, reopen actions, and completion messages; removed prompt copy from the remaining hard open-item list. |
 | 2026-02-23 | Onboarding spec: dismiss now counts as a completion path | Simplified `docs/ONBOARD_SPEC.md` getting-started state semantics so `getting_started_completed_at` is the single "done" marker (set by either completing steps or dismissing), `getting_started_dismissed` records completion mode, and reopen clears both fields. |
 | 2026-02-23 | Onboarding spec state wording simplified to “two ways to be done” | Rewrote the getting-started state model section in `docs/ONBOARD_SPEC.md` to frame auto-prompt behavior as two done states (completed or dismissed), added a simple auto-show rule, and removed precedence-heavy wording. |
 | 2026-02-23 | Onboarding spec state storage simplified for getting-started | `docs/ONBOARD_SPEC.md` now defines a minimal v1 flow-state model: derived step progress plus only `getting_started_completed_at` and `getting_started_dismissed` on `users`, and simplifies deliver-step resume to `?invoice={id}` or latest user invoice (no persisted last-invoice pointer). |
