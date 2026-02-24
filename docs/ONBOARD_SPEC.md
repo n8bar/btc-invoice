@@ -1,13 +1,5 @@
 # Onboarding Wizard Spec (MS13 - UX ToDo #11)
 
-## Draft Metadata
-- Status: Draft (planning only, no implementation yet).
-- This doc pass is spec-only (no controller/view/database implementation and no migration/test work).
-- Remove this `Draft Metadata` section once the spec is implementation-ready.
-- Keep Step 3 criteria intentionally flexible in this draft; finalize strict gating only in later implementation-ready spec passes.
-- Open items to spec next:
-  - None currently (implementation should still follow [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)).
-
 Purpose: define the guided onboarding flow that helps a signed-in owner reach first invoice delivery without bypassing existing auth/policy checks.
 
 ## Scope (from UX Overhaul Task 11)
@@ -36,7 +28,7 @@ Purpose: define the guided onboarding flow that helps a signed-in owner reach fi
 
 If any step proves too broad during implementation, split it into explicit substeps without changing these completion outcomes.
 
-## Route / URL Shape + Step Page Behavior (Draft Decision, 2026-02-23)
+## Route / URL Shape + Step Page Behavior (Draft Decision)
 - Canonical authenticated routes for the getting-started flow:
   - `GET /getting-started` (`getting-started.start`) resolves current progress and redirects to the first incomplete step.
   - `GET /getting-started/{step}` (`getting-started.step`) where `{step}` is one of `wallet`, `invoice`, or `deliver`.
@@ -64,7 +56,7 @@ If any step proves too broad during implementation, split it into explicit subst
   - Invoice created successfully -> redirect to `GET /getting-started/deliver?invoice={id}` so the flow resumes with the created invoice context.
   - Delivery attempt logged on a public-enabled invoice -> redirect to `GET /getting-started` so completion is evaluated consistently in one place.
 
-## Getting-Started State Storage Model (Draft Decision, 2026-02-23)
+## Getting-Started State Storage Model (Draft Decision)
 - Purpose of this model:
   - Store only user intent/state that cannot be safely derived from existing business data.
   - Derive step progress from real app data so the flow stays truthful even if users complete steps outside the getting-started entry point.
@@ -92,7 +84,7 @@ If any step proves too broad during implementation, split it into explicit subst
   - Auto-show logic checks one field (`getting_started_completed_at`) while `getting_started_dismissed` remains useful metadata about how the flow was completed.
   - If product needs richer analytics/re-entry behavior later, expand from this baseline instead of starting with a generalized flow-state table.
 
-## Copy Examples (Non-Binding Draft, 2026-02-23)
+## Copy Examples (Non-Binding Draft)
 - Examples only (not requirements). Implementation may shorten/refine.
 - Dismiss dialog:
   - Title: `Hide getting started?`
@@ -117,7 +109,7 @@ If any step proves too broad during implementation, split it into explicit subst
   - Deliver body: `Enable the public link, then send the invoice email.`
   - Deliver CTA: `Open invoice`
 
-## Accessibility Details (Simple-First Draft, 2026-02-23)
+## Accessibility Details (Simple-First Draft)
 - Keep the getting-started flow simple:
   - Prefer standard links, buttons, forms, and full-page navigation over custom widgets.
   - Avoid custom keyboard shortcuts; all actions should work with normal keyboard navigation.
@@ -143,7 +135,7 @@ If any step proves too broad during implementation, split it into explicit subst
 - Practical rule for this task:
   - If a fancier interaction makes accessibility harder, use the simpler interaction.
 
-## Current Clarifications (2026-02-19)
+## Current Clarifications
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.
 - If onboarding is dismissed, it should stay dismissed until the user intentionally reopens it.
 - Reopen entry point should be available from the authenticated user dropdown.

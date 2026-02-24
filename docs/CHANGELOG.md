@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec metadata/date heading cleanup | Removed the `Draft Metadata` section from `docs/ONBOARD_SPEC.md` and stripped date suffixes from section headings to keep the Task 11 spec cleaner now that the draft decisions are filled in. |
 | 2026-02-23 | Onboarding spec accessibility details drafted (simple-first) | Added a concise accessibility section to `docs/ONBOARD_SPEC.md` covering focus order, keyboard flow, status announcements, and a simple-first interaction rule for the getting-started step shells and linked pages; cleared the last Task 11 open-item entry in the draft metadata list. |
 | 2026-02-23 | Onboarding spec dropped empty-state placement as an open item | Removed "exact empty-state placement/mobile behavior" from `docs/ONBOARD_SPEC.md` open items so Task 11 stays implementation-light; the spec still requires clear empty-state CTAs into getting-started without locking placement. |
 | 2026-02-23 | Onboarding spec copy section simplified to example strings | Replaced the wordier prompt-copy guidance in `docs/ONBOARD_SPEC.md` with a compact non-binding `Copy Examples` section that lists concrete dismiss/reopen/completion strings plus example step-shell titles/bodies/CTAs for wallet, invoice, and deliver. |
