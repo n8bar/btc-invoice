@@ -39,32 +39,32 @@ Purpose: define the guided onboarding flow that helps a signed-in owner reach fi
 If any step proves too broad during implementation, split it into explicit substeps without changing these completion outcomes.
 
 ## Route / URL Shape + Step Page Behavior (Draft Decision, 2026-02-23)
-- Canonical authenticated onboarding routes:
-  - `GET /onboarding` (`onboarding.start`) resolves current progress and redirects to the first incomplete step.
-  - `GET /onboarding/{step}` (`onboarding.step`) where `{step}` is one of `wallet`, `invoice`, or `deliver`.
-  - `POST /onboarding/dismiss` (`onboarding.dismiss`) dismisses onboarding until the user explicitly reopens it.
-  - `POST /onboarding/reopen` (`onboarding.reopen`) clears the dismissed state and restarts via `GET /onboarding`.
+- Canonical authenticated routes for the getting-started flow:
+  - `GET /getting-started` (`getting-started.start`) resolves current progress and redirects to the first incomplete step.
+  - `GET /getting-started/{step}` (`getting-started.step`) where `{step}` is one of `wallet`, `invoice`, or `deliver`.
+  - `POST /getting-started/dismiss` (`getting-started.dismiss`) dismisses getting-started until the user explicitly reopens it.
+  - `POST /getting-started/reopen` (`getting-started.reopen`) clears the dismissed state and restarts via `GET /getting-started`.
 - Route guard/resume rules:
   - Users cannot skip ahead. Direct requests to later steps redirect to the earliest incomplete step.
-  - If onboarding is already completed, `GET /onboarding` redirects to `/dashboard` with a completion status message.
-  - If onboarding is dismissed, normal app entry points should not auto-redirect into onboarding until the user reopens it.
+  - If getting-started is already completed, `GET /getting-started` redirects to `/dashboard` with a completion status message.
+  - If getting-started is dismissed, normal app entry points should not auto-redirect into getting-started until the user reopens it.
 - Step page model (hybrid wrapper approach):
-  - `GET /onboarding/{step}` renders a lightweight onboarding shell (progress, what to do next, primary CTA), not a duplicate of the underlying form or invoice UI.
+  - `GET /getting-started/{step}` renders a lightweight getting-started shell (progress, what to do next, primary CTA), not a duplicate of the underlying form or invoice UI.
   - Existing pages remain the source of truth for the actual work:
     - Wallet step -> `/wallet/settings`
     - Invoice step -> `/invoices/create`
     - Deliver step -> `/invoices/{invoice}`
-  - When a user reaches one of those pages from onboarding, show a compact onboarding progress strip with the current step, success criteria, and a “Back to onboarding” link.
+  - When a user reaches one of those pages from getting-started, show a compact progress strip with the current step, success criteria, and a “Back to getting started” link.
 - Deliver step target invoice (resume behavior):
-  - `deliver` needs an invoice context. The wizard may persist the most recent onboarding-created invoice ID for continuity.
-  - `GET /onboarding/deliver` should prefer that stored invoice when it still exists, is owned by the authenticated user, and is not trashed.
+  - `deliver` needs an invoice context. The flow may persist the most recent invoice created during getting-started for continuity.
+  - `GET /getting-started/deliver` should prefer that stored invoice when it still exists, is owned by the authenticated user, and is not trashed.
   - Fallback: use the user's most recently created non-trashed invoice.
-  - If no invoice exists, redirect to `/onboarding/invoice`.
+  - If no invoice exists, redirect to `/getting-started/invoice`.
   - Support `?invoice={id}` as an explicit target override, but only if the invoice is user-owned; otherwise ignore it and resolve using the rules above.
-- Success redirects while onboarding is active:
-  - Wallet saved successfully -> redirect to `GET /onboarding` (resolver advances to the next step).
-  - Invoice created successfully -> redirect to `GET /onboarding/deliver?invoice={id}` so the wizard resumes with the created invoice context.
-  - Delivery attempt logged on a public-enabled invoice -> redirect to `GET /onboarding` so completion is evaluated consistently in one place.
+- Success redirects while getting-started is active:
+  - Wallet saved successfully -> redirect to `GET /getting-started` (resolver advances to the next step).
+  - Invoice created successfully -> redirect to `GET /getting-started/deliver?invoice={id}` so the flow resumes with the created invoice context.
+  - Delivery attempt logged on a public-enabled invoice -> redirect to `GET /getting-started` so completion is evaluated consistently in one place.
 
 ## Current Clarifications (2026-02-19)
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.
