@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec restored hierarchy parentheticals in title/scope | Re-added parentheticals to the `docs/ONBOARD_SPEC.md` title (`MS13 - UX ToDo #11`) and Scope heading (`from UX Overhaul Task 11`) so the spec keeps its hierarchy/context links while other headings remain simplified. |
 | 2026-02-23 | Onboarding spec heading labels simplified (no parentheticals) | Removed parenthetical qualifiers from `docs/ONBOARD_SPEC.md` headings (including the title, Scope, route/state sections, Copy Examples, and Accessibility Details) to keep Task 11 spec headings shorter and cleaner. |
 | 2026-02-23 | Onboarding spec metadata/date heading cleanup | Removed the `Draft Metadata` section from `docs/ONBOARD_SPEC.md` and stripped date suffixes from section headings to keep the Task 11 spec cleaner now that the draft decisions are filled in. |
 | 2026-02-23 | Onboarding spec accessibility details drafted (simple-first) | Added a concise accessibility section to `docs/ONBOARD_SPEC.md` covering focus order, keyboard flow, status announcements, and a simple-first interaction rule for the getting-started step shells and linked pages; cleared the last Task 11 open-item entry in the draft metadata list. |

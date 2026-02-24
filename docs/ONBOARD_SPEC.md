@@ -1,8 +1,8 @@
-# Onboarding Wizard Spec
+# Onboarding Wizard Spec (MS13 - UX ToDo #11)
 
 Purpose: define the guided onboarding flow that helps a signed-in owner reach first invoice delivery without bypassing existing auth/policy checks.
 
-## Scope
+## Scope (from UX Overhaul Task 11)
 - Guide users through: connect wallet -> create invoice -> enable share + deliver.
 - The flow links into existing wallet/invoice pages; it does not replace policy checks or controller authorization.
 - The wizard can be dismissed or completed.
