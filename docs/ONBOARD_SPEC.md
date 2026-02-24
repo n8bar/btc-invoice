@@ -6,7 +6,7 @@
 - Remove this `Draft Metadata` section once the spec is implementation-ready.
 - Keep Step 3 criteria intentionally flexible in this draft; finalize strict gating only in later implementation-ready spec passes.
 - Open items to spec next:
-  - Accessibility details (focus order, status announcements, keyboard flow).
+  - None currently (implementation should still follow [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)).
 
 Purpose: define the guided onboarding flow that helps a signed-in owner reach first invoice delivery without bypassing existing auth/policy checks.
 
@@ -116,6 +116,32 @@ If any step proves too broad during implementation, split it into explicit subst
   - Deliver title: `Share and send your invoice`
   - Deliver body: `Enable the public link, then send the invoice email.`
   - Deliver CTA: `Open invoice`
+
+## Accessibility Details (Simple-First Draft, 2026-02-23)
+- Keep the getting-started flow simple:
+  - Prefer standard links, buttons, forms, and full-page navigation over custom widgets.
+  - Avoid custom keyboard shortcuts; all actions should work with normal keyboard navigation.
+- Step shell page structure (applies to `GET /getting-started/{step}`):
+  - One clear page heading.
+  - Visible text progress (for example, `Step 2 of 3`) and current step name.
+  - Primary CTA and dismiss action in a logical reading/tab order.
+  - Do not rely on color alone to indicate the current step or status.
+- Focus order:
+  - Keep DOM order aligned with visual order.
+  - Do not steal focus on load unless needed for error handling.
+  - When validation fails on underlying wallet/invoice pages, preserve existing form behavior (focus first error, preserve input) per `docs/UX_GUARDRAILS.md`.
+  - If a custom dismiss dialog is used, move focus into the dialog, keep focus inside while open, and return focus to the trigger when closed.
+- Keyboard flow:
+  - Every getting-started action (open step CTA, dismiss, resume, back-to-getting-started link) must be keyboard reachable.
+  - Interactive controls must have visible focus styles.
+  - The progress strip on wallet/invoice/invoice-show pages must not block or trap keyboard navigation for the underlying page.
+- Status announcements:
+  - Dismiss success, completion success, and similar non-error updates should be rendered in a status region announced politely (for example `role="status"` / `aria-live="polite"`).
+  - Errors should use error/alert semantics (for example `role="alert"` where appropriate).
+  - Keep status messages near the top of the main content so they are easy to notice visually and via screen readers.
+  - Do not duplicate validation messages in both the step shell and the underlying form; the form remains the source of truth for field-level errors.
+- Practical rule for this task:
+  - If a fancier interaction makes accessibility harder, use the simpler interaction.
 
 ## Current Clarifications (2026-02-19)
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.
