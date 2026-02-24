@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-02-21_
+_Last updated: 2026-02-23_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -102,9 +102,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Helpful Notes: public, context-linked explanations (`/help`, starting with xpub safety + why we ask; treat as an SEO surface and link it from landing).
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
-    - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-      - Sequencing note (2026-02-21): Task 9 carryover is closed/merged; Task 10 implementation subitems remain tracked in ToDo with completed checks preserved until the public/share narrower-screen verification is complete.
-      - Execution lock: follow the Task 10 implementation + acceptance checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (single-template public/print rendering, explicit active vs disabled/expired states, public-safe controls only).
+    - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
+      - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
       - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
