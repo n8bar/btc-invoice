@@ -153,4 +153,44 @@ class InvoiceDeliveryTest extends TestCase
                 && $mail->hasCc('owner.gmail.com@cryptozing.app');
         });
     }
+
+    public function test_non_owner_cannot_queue_invoice_email(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-4001',
+            'amount_usd' => 100,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.0025,
+            'payment_address' => 'tb1qq0example4',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $this
+            ->actingAs($otherUser)
+            ->post(route('invoices.deliver', $invoice), [
+                'message' => 'Attempted unauthorized send',
+                'cc_self' => false,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+        ]);
+    }
+
 }

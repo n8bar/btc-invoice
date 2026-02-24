@@ -74,4 +74,4 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Wallet settings implements the above layout, helper copy, validation states, and testnet-only cue.
 - Additional wallets share the same UX patterns and respect the configured network.
 - No network selector remains; env-driven network is authoritative.
-- Docs updated: onboarding walkthrough/quick start screenshots later; PLAN/CHANGELOG/UX spec link updated with this spec reference.
+- Docs updated: contributor walkthrough/quick start screenshots later; PLAN/CHANGELOG/UX spec link updated with this spec reference.

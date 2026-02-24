@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2025-11-16): partial payments, payment history UX, and invoice delivery + auto receipts are live; backlog below covers post-MVP bets.
+Latest scope update (2026-02-23): no post-MVP backlog changes in this pass; active-plan UX tracking now has Task 9 and Task 10 both marked complete, with UX work continuing on Task 11+ in the active PLAN/spec docs.
 
 ## Infrastructure & Payments
 1. **Self-Hosted Bitcoin Node + Watcher**

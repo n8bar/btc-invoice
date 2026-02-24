@@ -2,8 +2,10 @@
 @php
     $themePreference = auth()->user()?->theme ?? 'system';
     $isDark = $themePreference === 'dark';
+    $brand = 'CryptoZing';
     $providedTitle = trim((string) $attributes->get('title'));
-    $pageTitle = $providedTitle !== '' ? $providedTitle . ' · ' . config('app.name', 'CryptoZing') : config('app.name', 'CryptoZing');
+    $pageTitle = $providedTitle !== '' ? $providedTitle : \App\Support\PageTitle::resolve(request());
+    $documentTitle = $pageTitle !== '' ? $brand . ' - ' . $pageTitle : $brand;
 @endphp
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ $themePreference }}" class="{{ $isDark ? 'dark' : '' }}">
     <head>
@@ -11,7 +13,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ $pageTitle }}</title>
+        <title>{{ $documentTitle }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -36,7 +38,7 @@
                 </header>
             @endisset
 
-            <main>
+            <main class="px-1">
                 {{ $slot }}
             </main>
         </div>

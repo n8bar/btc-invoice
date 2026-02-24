@@ -154,3 +154,43 @@ Alpine.data('walletValidation', (config = {}) => ({
 }));
 
 Alpine.start();
+
+const initHorizontalScrollFades = () => {
+    const wrappers = document.querySelectorAll('[data-scroll-fade-wrapper]');
+
+    wrappers.forEach((wrapper) => {
+        const container = wrapper.querySelector('[data-scroll-fade-container]');
+        const fade = wrapper.querySelector('[data-scroll-fade]');
+
+        if (!container || !fade) {
+            return;
+        }
+
+        const sync = () => {
+            const hasOverflow = container.scrollWidth > (container.clientWidth + 1);
+            fade.classList.toggle('hidden', !hasOverflow);
+        };
+
+        sync();
+
+        if ('ResizeObserver' in window) {
+            const observer = new ResizeObserver(sync);
+            observer.observe(container);
+
+            const table = container.querySelector('table');
+            if (table) {
+                observer.observe(table);
+            }
+        }
+
+        container.addEventListener('scroll', sync, { passive: true });
+        window.addEventListener('resize', sync);
+        window.addEventListener('orientationchange', sync);
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHorizontalScrollFades, { once: true });
+} else {
+    initHorizontalScrollFades();
+}

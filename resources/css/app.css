@@ -106,6 +106,18 @@
     color: var(--color-muted) !important;
 }
 
+/* Keep colored card borders aligned with their text color */
+.border[class*="bg-red-"][class*="text-red-"],
+.border[class*="bg-yellow-"][class*="text-yellow-"],
+.border[class*="bg-amber-"][class*="text-amber-"],
+.border[class*="bg-green-"][class*="text-green-"],
+.border[class*="bg-emerald-"][class*="text-emerald-"],
+.border[class*="bg-blue-"][class*="text-blue-"],
+.border[class*="bg-sky-"][class*="text-sky-"],
+.border[class*="bg-indigo-"][class*="text-indigo-"] {
+    border-color: currentColor !important;
+}
+
 .dark .bg-green-50 { background-color: #011511 !important; }
 .dark .text-green-700 { color: #d1fae5 !important; }
 .dark .text-green-900 { color: #bbf7d0 !important; }

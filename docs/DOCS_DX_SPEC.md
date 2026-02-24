@@ -1,10 +1,10 @@
 # Docs & DX Spec (RC)
 
-Item 12 clarification for Release Candidate: what we will ship for developer docs and onboarding quality.
+Item 12 clarification for Release Candidate: what we will ship for developer docs and contributor onboarding quality.
 
 ## Outputs
 - `docs/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
-- `docs/get-live/ONBOARDING_WALKTHROUGH.md`: end-to-end walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
+- `docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`: end-to-end contributor walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
 - `docs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
 - `README.md` and `docs/PLAN.md` updated to link the above and keep RC scope vs. FuturePLAN clear.
 
@@ -15,7 +15,7 @@ Audience: new contributors running the stack locally with Sail.
 - Env reference: table of required keys for dev/test with short descriptions (public URL for links, mail aliasing notes, database defaults).
 - Smoke check: confirm login with seeded user, visit `/wallet/settings`, create a test invoice, and render a public link without errors; remind that the scheduler container keeps `wallet:watch-payments` running.
 
-## Onboarding Walkthrough
+## Contributor Walkthrough
 Goal: show the first successful invoice lifecycle with minimal branching.
 - Start from a fresh clone + seeded DB (link to quick start).
 - Configure wallet: add a testnet BIP84 xpub under `/wallet/settings`; note expected address format and derive test feedback.
@@ -30,6 +30,6 @@ Goal: show the first successful invoice lifecycle with minimal branching.
 - Note any gaps and whether they are deferred to FuturePLAN; align copy guidelines with the spec.
 
 ## Definition of Done
-- Quick start and onboarding walkthrough docs exist, are linked from README and PLAN, and match current UX/commands.
+- Quick start and contributor walkthrough docs exist, are linked from README and PLAN, and match current UX/commands.
 - Notification coverage is documented with live vs. stub status and test pointers in `docs/NOTIFICATIONS.md`.
 - PLAN keeps RC scope for docs/DX; anything deferred is explicitly routed to `docs/FuturePLAN.md`.

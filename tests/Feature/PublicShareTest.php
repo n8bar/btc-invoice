@@ -138,6 +138,7 @@ class PublicShareTest extends TestCase
         $response->assertHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
         $response->assertSee($invoice->number);
         $response->assertSee('<meta name="robots" content="noindex,nofollow,noarchive">', false);
+        $response->assertSee('data-public-state="active"', false);
 
         Carbon::setTestNow();
     }
@@ -171,10 +172,20 @@ class PublicShareTest extends TestCase
 
         $this->get(route('invoices.public-print', ['token' => 'tok_expired']))
             ->assertOk()
-            ->assertSee('This invoice is no longer available')
+            ->assertSee('data-public-state="disabled_or_expired"', false)
+            ->assertSee('data-public-unavailable="true"', false)
+            ->assertSee('This public payment link is no longer active')
+            ->assertSee('Invoice')
+            ->assertSee($invoice->number)
             ->assertSee('CryptoZing LLC')
             ->assertSee('billing@cryptozing.app')
-            ->assertSee('555-1234');
+            ->assertSee('555-1234')
+            ->assertSee('Print')
+            ->assertDontSee('Payment history')
+            ->assertDontSee('BTC address')
+            ->assertDontSee('Payment QR')
+            ->assertDontSee('Send one payment:')
+            ->assertDontSee('<svg', false);
     }
 
     public function test_public_print_displays_branding_details_when_active(): void
@@ -209,6 +220,37 @@ class PublicShareTest extends TestCase
             ->assertSee('Studio LLC', false)
             ->assertSee('studio@example.com', false)
             ->assertSee('555-0100', false);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_public_print_does_not_render_owner_only_controls(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        Cache::forget(BtcRate::CACHE_KEY);
+
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '41000.00'],
+            ], 200),
+        ]);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'public_enabled' => true,
+            'public_token' => 'tok_owner_controls',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        $this->get(route('invoices.public-print', ['token' => 'tok_owner_controls']))
+            ->assertOk()
+            ->assertSee('data-public-state="active"', false)
+            ->assertSee('Print')
+            ->assertDontSee('Back')
+            ->assertDontSee('Rotate link')
+            ->assertDontSee('Disable')
+            ->assertDontSee('Send invoice email')
+            ->assertDontSee('Manual adjustments');
 
         Carbon::setTestNow();
     }

@@ -19,13 +19,13 @@
                 <div class="p-6 space-y-6 text-gray-900">
                     <div class="space-y-2 text-sm text-gray-600">
                         <p>{{ __('Connect a wallet account key so CryptoZing can generate a unique Bitcoin address for every invoice.') }}</p>
-                        <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+                        <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800" style="border-color: currentColor;">
                             {{ __('Privacy note: this key lets anyone derive and monitor addresses for that account. Keep it private and avoid sharing screenshots or logs.') }}
                         </div>
                     </div>
 
                     @if (session('status'))
-                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
                             {{ session('status') }}
                         </div>
                     @endif
@@ -47,7 +47,7 @@
                             @csrf
 
                             @if ($isTestnet)
-                                <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                                <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800" style="border-color: currentColor;">
                                     {{ __('Testnet (for testing only). Real payments require mainnet.') }}
                                 </div>
                             @endif
@@ -57,19 +57,19 @@
                                 <p class="mt-1 text-xs text-gray-500">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
-                                <input id="bip84_xpub" name="bip84_xpub" type="text"
-                                       class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100"
-                                       value="{{ $xpubValue }}"
-                                       autocomplete="off"
-                                       autocapitalize="none"
-                                       autocorrect="off"
-                                       spellcheck="false"
-                                       required
-                                       @if ($errors->has('bip84_xpub')) autofocus @endif
-                                       x-ref="input"
-                                       x-model="value"
-                                       @input="handleInput"
-                                       @blur="handleBlur" />
+                                <textarea id="bip84_xpub" name="bip84_xpub"
+                                          rows="3"
+                                          class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100"
+                                          autocomplete="off"
+                                          autocapitalize="none"
+                                          autocorrect="off"
+                                          spellcheck="false"
+                                          required
+                                          @if ($errors->has('bip84_xpub')) autofocus @endif
+                                          x-ref="input"
+                                          x-model="value"
+                                          @input="handleInput"
+                                          @blur="handleBlur">{{ $xpubValue }}</textarea>
                                 <div class="mt-2 min-h-[4.5rem] space-y-2 text-xs" aria-live="polite">
                                     <div class="flex flex-wrap items-center gap-2 text-slate-600 dark:text-slate-300">
                                         <span>Expected format: <span class="font-medium text-slate-900 dark:text-slate-100">{{ $expectedPrefix }}</span></span>

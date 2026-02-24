@@ -1,6 +1,9 @@
-# Onboarding Walkthrough
+# Contributor Walkthrough
 
 End-to-end guide from fresh clone to first paid invoice.
+
+Audience: contributors/maintainers validating the current product flow in local/dev.
+This is not the end-user onboarding wizard spec (see `docs/ONBOARD_SPEC.md`).
 
 ## 1) Start from Quick Start
 - Follow [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md) to bring up Sail, install deps, and migrate/seed.

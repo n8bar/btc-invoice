@@ -11,7 +11,7 @@
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
                 <div class="p-6">
                     @if (session('status') === 'invoice-settings-updated')
-                        <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+                        <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
                             Saved invoice settings.
                         </div>
                     @endif

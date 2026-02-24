@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-02-19_
+_Last updated: 2026-02-23_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -95,15 +95,17 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
+    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for UX Task 11.
     - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) captures the shipped wallet UX scope.
     - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
     - [x] Dashboard snapshot and light/dark theme toggle.
     - [x] Helpful Notes: public, context-linked explanations (`/help`, starting with xpub safety + why we ask; treat as an SEO surface and link it from landing).
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
-    - [ ] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-      - Execution lock: follow the Task 10 implementation + acceptance checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (single-template public/print rendering, explicit active vs disabled/expired states, public-safe controls only).
+    - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
+      - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
+      - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
     - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
@@ -116,11 +118,11 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Verification: one alias-off drill in a safe env (DKIM/SPF/DMARC + links) and observe queue/backoff/alerts.
 15. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
-    - Sail-first quick start and onboarding docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/ONBOARDING_WALKTHROUGH.md`](get-live/ONBOARDING_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
-    - Add any future onboarding polish (screenshots, new flows) in those docs and keep env references current.
+    - Sail-first quick start and contributor walkthrough docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](get-live/CONTRIBUTOR_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
+    - Add any future contributor walkthrough polish (screenshots, new flows) in those docs and keep env references current.
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
-    - Definition of Done: the quick start + onboarding docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
+    - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
 16. **Mainnet Cutover Preparation**
     - Plan and execute the switch from testnet to mainnet once UX/mail audits are stable. Define env flips, wallet/xpub validation on mainnet, and a pilot send on mainnet before general availability.
     - Create a backout plan and audit steps to ensure existing testnet invoices remain intact or are clearly segregated.

@@ -16,6 +16,7 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertStatus(200);
+        $response->assertSee('CryptoZing - Login', false);
     }
 
     public function test_users_without_wallet_are_redirected_to_wallet_settings_on_login(): void

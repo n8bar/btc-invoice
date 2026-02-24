@@ -50,7 +50,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Wallet settings now include inline guidance and derive validation preview; additional wallets UI is deferred to post-RC.
 8. Login redirect to wallet setup
    - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
-9. Invoices & Clients UI polish
+9. Invoices & Clients UI polish (Completed)
     - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
     - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
     - Ensure show views expose edit/delete/restore actions with consistent placement and confirmations; empty states are helpful and guide to next steps.
@@ -68,29 +68,17 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
       - [x] Delete cards have visible red borders in light mode on both invoice edit and client edit screens.
       - [x] Mobile sanity sweep: no horizontal overflow and action bars/buttons wrap cleanly across invoice/client pages.
       - [x] Dark-mode readability sweep: spot-check all major invoice/client states and notices after recent style changes.
+    - Follow-up closure (2026-02-21): authenticated invoice/client narrower-screen action-row sweep complete; temporary Task 9 ToDo split merged back into this completed task.
+10. Public/share refresh (Completed)
+    - Public and print views now share a single template entrypoint and common partial blocks to keep wording/layout in sync.
+    - Explicit public states (`active` vs `disabled_or_expired`) render safe unavailable messaging with owner contact details while hiding payment details and owner-only controls when links are not active.
+    - Public view preserves Print + noindex/noarchive behavior and mirrors print/show section language for active links.
+    - Task 10 acceptance checklist is fully complete, including narrower-screen public/share sanity verification (2026-02-23).
+    - Coverage includes `PublicShareTest` (active/disabled states, noindex, owner-control exclusions) and `InvoicePaymentDisplayTest` parity checks.
 
 ## ToDo
-10. Public/share refresh
-   - Public and print views share visual language (headings, notes, footer).
-   - Disabled/expired states stay friendly with contact info; no owner-only controls exposed.
-   - Implementation strategy (2026-02-19 lock):
-     - Keep a single template entrypoint for both routes (`resources/views/invoices/print.blade.php`) and refactor into shared partial blocks to prevent drift.
-     - Keep one shared controller data contract for `print()` and `publicPrint()` so status, amount summaries, and QR/payment sections are computed identically for active links.
-     - Use explicit public state rendering (`active` vs `disabled_or_expired`) so unavailable links always render a safe contact-first message.
-     - Preserve behavior decisions: public pages keep a Print button and keep invoice number visible when disabled/expired.
-     - Preserve SEO/privacy guardrails: public response keeps `X-Robots-Tag` + robots meta, and never exposes owner-only controls/actions.
-   - Acceptance checklist:
-     - [ ] Active public link mirrors print/show section language (header, summary, amounts, payment, history, footer) with no contradictory copy.
-     - [ ] Disabled/expired public link renders a friendly unavailable state with owner contact details and invoice number.
-     - [ ] Disabled/expired public link does not show payment details (amount breakdown, QR, URI, tx/payment history).
-     - [ ] Public view never renders owner-only controls (edit/delete/share rotate/disable/delivery/manual adjustments).
-     - [ ] Public view keeps Print action and retains noindex/noarchive metadata/headers.
-     - [ ] Mobile sanity for public/share at 320px/360px/390px: no horizontal overflow and action row wraps cleanly.
-   - Verification plan:
-     - Extend `tests/Feature/PublicShareTest.php` for active/disabled states, noindex headers/meta, and owner-control absence checks.
-     - Add parity assertions in `tests/Feature/InvoicePaymentDisplayTest.php` for shared heading/section wording used in print/public outputs.
-     - Manual QA pass: active public invoice, disabled/expired state, and browser print preview spacing/QR legibility.
 11. Onboarding wizard
+   - Spec: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the source of truth for implementation scope and acceptance criteria.
    - Guides: connect wallet → create invoice → enable share/deliver.
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.

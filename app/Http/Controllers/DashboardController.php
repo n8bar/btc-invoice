@@ -9,10 +9,12 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request, DashboardSnapshot $snapshot)
     {
-        $data = $snapshot->forUser($request->user());
+        $user = $request->user();
+        $data = $snapshot->forUser($user);
 
         return view('dashboard', [
             'snapshot' => $data,
+            'hasClients' => $user->clients()->exists(),
         ]);
     }
 }

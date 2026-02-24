@@ -80,7 +80,7 @@ class ClientController extends Controller
             return response()->json($client->fresh());
         }
 
-        return redirect()->route('clients.index')->with('status', 'Client updated.');
+        return redirect()->route('clients.edit', $client)->with('status', 'Client updated.');
     }
     /**
      * Soft-delete a client owned by the authenticated user.

@@ -3,7 +3,8 @@
 ## Working Style
 - Always run artisan/composer/npm commands through Sail (`./vendor/bin/sail ...`).
 - Keep `docs/PLAN.md` and `docs/FuturePLAN.md` in sync with every merge or scope change.
-- Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift. When adding changes, use the date from the system you're running on.
+- Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift.
+- Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
 - Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs or local recovery files.
@@ -16,6 +17,16 @@
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
 - Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
+
+## Multi-Agent Coordination
+- Primary and secondary agents are role-based, not capability-limited: secondaries can work docs, code, tests, or modules within their stated task.
+- Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
+- Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
+- Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
+- Keep agent coordination logs local-only and untracked; use `Agents.comm` in the untracked `.cybercreek/` area for agent-to-agent notes/checkouts/checkins.
+- Checkout/checkin in `Agents.comm` is optional but recommended for high-conflict files; include agent, file paths, purpose, and lease/expiry so stale claims are obvious.
+- If you checkout files in `Agents.comm`, check them back in before any wait state (before asking the user a clarifying question, when blocked/waiting, before switching tasks, and before ending your session).
+- On checkin, leave a short handoff note: what changed, what remains, and any risks/tests to run.
 
 ## Handy Commands
 ```

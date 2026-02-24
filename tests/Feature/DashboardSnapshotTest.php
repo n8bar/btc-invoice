@@ -76,6 +76,7 @@ class DashboardSnapshotTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Outstanding (USD)', false);
+        $response->assertSee('CryptoZing - Dashboard', false);
         $response->assertSee('$700.00', false); // 500 + (400-200)
         $response->assertSee('Open invoices', false);
         $response->assertSee('2', false);
@@ -263,6 +264,33 @@ class DashboardSnapshotTest extends TestCase
         $responseFresh->assertSee('$125.00', false); // 50 + 75 outstanding
 
         Carbon::setTestNow();
+    }
+
+    public function test_dashboard_new_client_button_is_primary_when_user_has_no_clients(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee(
+            'href="' . route('clients.create') . '" class="inline-flex w-full items-center justify-center rounded-md bg-indigo-600',
+            false
+        );
+    }
+
+    public function test_dashboard_new_client_button_matches_secondary_buttons_when_clients_exist(): void
+    {
+        $owner = User::factory()->create();
+        $this->makeClient($owner, 'Existing Client');
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee(
+            'href="' . route('clients.create') . '" class="inline-flex w-full items-center justify-center rounded-md bg-white',
+            false
+        );
     }
 
     private int $invoiceSequence = 0;

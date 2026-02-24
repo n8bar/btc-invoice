@@ -89,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-900">
+                <div class="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-900" style="border-color: currentColor;">
                     Payment addresses are generated from your wallet settings for every invoice.
                     <a href="{{ route('wallet.settings.edit') }}" class="underline">Manage wallet settings</a>.
                 </div>

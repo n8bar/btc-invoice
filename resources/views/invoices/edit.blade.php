@@ -6,13 +6,14 @@
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
 
             @if($invoice->public_enabled)
-                <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
+                <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800" style="border-color: currentColor;">
                     This invoice is currently public. To edit, first
                     <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
                           onsubmit="return confirm('Disable the public link?');">
                         @csrf @method('PATCH')
                         <button type="submit" class="underline text-red-600 hover:text-red-700">disable the public link</button>
                     </form>.
+                    Or <a href="{{ route('invoices.show', $invoice) }}" class="underline text-yellow-900 hover:text-yellow-950">open invoice details</a>.
                 </div>
             @endif
 
@@ -184,13 +185,13 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('invoices.index') }}" class="text-gray-600 hover:underline">Cancel</a>
+                    <a href="{{ route('invoices.show', $invoice) }}" class="text-gray-600 hover:underline">Cancel</a>
                     <x-primary-button>Save</x-primary-button>
                 </div>
             </form>
 
-            <div class="mt-8 rounded-md border border-red-200 bg-red-50 p-4">
-                <h3 class="text-sm font-semibold text-red-700">Delete invoice</h3>
+            <div class="mt-8 rounded-md border border-red-200 bg-red-50 p-4 text-red-700" style="border-color: currentColor;">
+                <h3 class="text-sm font-semibold">Delete invoice</h3>
                 <p class="mt-1 text-xs text-red-600">This moves the invoice to trash. You can restore it later.</p>
                 <form method="POST" action="{{ route('invoices.destroy', $invoice) }}"
                       onsubmit="return confirm('Delete invoice {{ $invoice->number }}?');"
