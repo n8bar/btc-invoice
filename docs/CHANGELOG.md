@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-23 | Onboarding spec copy section simplified to example strings | Replaced the wordier prompt-copy guidance in `docs/ONBOARD_SPEC.md` with a compact non-binding `Copy Examples` section that lists concrete dismiss/reopen/completion strings plus example step-shell titles/bodies/CTAs for wallet, invoice, and deliver. |
 | 2026-02-23 | Onboarding spec prompt copy drafted as suggestions (not requirements) | Added a non-binding prompt-copy section to `docs/ONBOARD_SPEC.md` with suggested wording/tone for dismiss confirmation, dismiss success, reopen actions, and completion messages; removed prompt copy from the remaining hard open-item list. |
 | 2026-02-23 | Onboarding spec: dismiss now counts as a completion path | Simplified `docs/ONBOARD_SPEC.md` getting-started state semantics so `getting_started_completed_at` is the single "done" marker (set by either completing steps or dismissing), `getting_started_dismissed` records completion mode, and reopen clears both fields. |
 | 2026-02-23 | Onboarding spec state wording simplified to “two ways to be done” | Rewrote the getting-started state model section in `docs/ONBOARD_SPEC.md` to frame auto-prompt behavior as two done states (completed or dismissed), added a simple auto-show rule, and removed precedence-heavy wording. |

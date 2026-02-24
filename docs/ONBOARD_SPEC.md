@@ -93,31 +93,30 @@ If any step proves too broad during implementation, split it into explicit subst
   - Auto-show logic checks one field (`getting_started_completed_at`) while `getting_started_dismissed` remains useful metadata about how the flow was completed.
   - If product needs richer analytics/re-entry behavior later, expand from this baseline instead of starting with a generalized flow-state table.
 
-## Prompt Copy Suggestions (Non-Binding Draft, 2026-02-23)
-- Purpose:
-  - These are suggested strings and tone guidelines for dismiss/reopen/completion states.
-  - They are not hard requirements; implementation may refine wording as long as the meaning stays clear.
-- Tone guidance (suggested):
-  - Keep wording short, calm, and non-judgmental.
-  - Do not imply dismissal is destructive or irreversible.
-  - When dismissing, mention that getting-started can be reopened from the account menu.
-- Dismiss confirmation prompt (suggested):
+## Copy Examples (Non-Binding Draft, 2026-02-23)
+- Examples only (not requirements). Implementation may shorten/refine.
+- Dismiss dialog:
   - Title: `Hide getting started?`
-  - Body: `You can reopen getting started anytime from the account menu.`
+  - Body: `You can reopen it from the account menu.`
   - Primary action: `Hide for now`
-  - Secondary action: `Keep going`
-- Dismiss success message (suggested):
-  - `Getting started hidden. You can reopen it anytime from the account menu.`
-- Reopen entry / action copy (suggested):
+  - Secondary action: `Continue`
+- Dismiss success:
+  - `Getting started hidden.`
+- Reopen / menu:
   - User menu item: `Getting started`
-  - Reopen CTA/button: `Reopen getting started`
-  - Alternative CTA/button (if "reopen" feels too technical in UI): `Resume getting started`
-- Completion-by-steps success message (suggested):
+  - CTA/button: `Resume getting started`
+- Completion success:
   - `Getting started complete.`
-  - Alternative (more outcome-focused): `You're set up and ready to send your first invoice.`
-- Revisit/completed state copy (suggested, if needed):
-  - `Getting started is already complete.`
-  - CTA to review flow: `Review getting started`
+- Step shell examples (what the getting-started page shows):
+  - Wallet title: `Connect your wallet`
+  - Wallet body: `Add your wallet account key so CryptoZing can generate a payment address for each invoice.`
+  - Wallet CTA: `Open wallet settings`
+  - Invoice title: `Create your first invoice`
+  - Invoice body: `Create an invoice to continue getting started.`
+  - Invoice CTA: `Create invoice`
+  - Deliver title: `Share and send your invoice`
+  - Deliver body: `Enable the public link, then send the invoice email.`
+  - Deliver CTA: `Open invoice`
 
 ## Current Clarifications (2026-02-19)
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.
