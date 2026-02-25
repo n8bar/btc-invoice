@@ -99,4 +99,4 @@ This document is a temporary working strategy. It is not a source of truth like 
 - Constraints:
   - Never render both forms as active primary actions on the same screen at the same time.
   - Keep the zero-client state focused and instructional, not modal-heavy.
-  - This finding does not assume clientless invoices, auto-created self-clients, or popup flows.
+  - This finding does not currently recommend clientless invoices, auto-created self-clients, or popup flows.
