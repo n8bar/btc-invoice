@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-25 | UX Task 12 scoped as lightweight profile-toggle + polish pass | Refined `docs/UX_OVERHAUL_SPEC.md` Task 12 to keep it implementation-light: place the overpayment note and QR refresh reminder toggles on Profile using the existing toggle pattern, treat settings/auth work as a polish/consistency pass (not a redesign/new auth flow), and keep branding-heavy Invoice Settings cleanup explicitly in Task 14. |
 | 2026-02-23 | Onboarding spec restored hierarchy parentheticals in title/scope | Re-added parentheticals to the `docs/ONBOARD_SPEC.md` title (`MS13 - UX ToDo #11`) and Scope heading (`from UX Overhaul Task 11`) so the spec keeps its hierarchy/context links while other headings remain simplified. |
 | 2026-02-23 | Onboarding spec heading labels simplified (no parentheticals) | Removed parenthetical qualifiers from `docs/ONBOARD_SPEC.md` headings (including the title, Scope, route/state sections, Copy Examples, and Accessibility Details) to keep Task 11 spec headings shorter and cleaner. |
 | 2026-02-23 | Onboarding spec metadata/date heading cleanup | Removed the `Draft Metadata` section from `docs/ONBOARD_SPEC.md` and stripped date suffixes from section headings to keep the Task 11 spec cleaner now that the draft decisions are filled in. |

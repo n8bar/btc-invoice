@@ -83,14 +83,14 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
    - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
 12. User settings & auth UX
-   - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
-   - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
-   - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
+   - Keep this task implementation-light: add the overpayment note and QR refresh reminder as user-level toggles on **Profile** (reuse the existing profile toggle pattern), persist per user, and drive conditional copy in show/public/print.
+   - Polish pass only for Profile, Invoice Settings, and Wallet Settings: clear grouping, validation/error states, helper text, visible focus, and consistent action buttons (no major page redesign in this task).
+   - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear (polish/consistency pass, not a new auth flow).
 13. Editable email templates
    - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
    - Preview + reset-to-default; validation to prevent empty required tokens.
 14. Invoice Settings polish
-   - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
+   - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides (kept separate from Task 12’s lightweight toggle/polish scope).
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
