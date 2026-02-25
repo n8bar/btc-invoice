@@ -6,10 +6,12 @@ use App\Models\Client;
 use App\Models\User;
 use App\Models\UserWalletAccount;
 use App\Models\WalletSetting;
+use App\Services\BtcRate;
 use App\Services\HdWallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -80,6 +82,26 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Consulting retainer', false);
         $expectedDue = now()->addDays(7)->toDateString();
         $response->assertSee('value="' . $expectedDue . '"', false);
+    }
+
+    public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 64_946.955,
+            'as_of' => now(),
+            'source' => 'coinbase:spot',
+        ], BtcRate::TTL);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('value="64946.96"', false);
+        $response->assertDontSee('value="64946.955"', false);
     }
 
     public function test_invoice_store_redirects_to_getting_started_deliver_step_when_context_flag_present(): void

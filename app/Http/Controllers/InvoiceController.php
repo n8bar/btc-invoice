@@ -266,7 +266,9 @@ class InvoiceController extends Controller
         $suggestedNumber = \App\Models\Invoice::nextNumberForUser($request->user()->id);
 
         $r = BtcRate::current();
-        $prefillRate = $r['rate_usd'] ?? null;
+        $prefillRate = isset($r['rate_usd'])
+            ? number_format((float) $r['rate_usd'], 2, '.', '')
+            : null;
 
         $today = now()->toDateString(); // ✅ for invoice_date default
         $brandingDefaults = $this->brandingDefaults($request->user());
