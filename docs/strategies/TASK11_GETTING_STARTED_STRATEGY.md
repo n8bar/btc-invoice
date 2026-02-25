@@ -118,6 +118,27 @@ This document is a temporary working plan. It is not a source of truth like `doc
   - Try onboarding with no clients and confirm whether step 2 is still understandable/actionable.
   - If it feels blocking/confusing, log it as a Task 11 follow-up (or Task 12 polish item) rather than expanding the scope mid-pass.
 
+## Pass 2 (Running Browser-QA Findings)
+- Purpose: collect browser-QA findings and address them in a focused Task 11 Pass 2 polish round.
+- This section is intentionally incremental; add findings as they are discovered.
+- Internal naming is allowed for design/implementation discussion (for example `Orientation Step 0`), but do not expose those labels in the user-facing UI copy.
+
+### Finding 1: Missing orientation before first wallet CTA
+- Observation:
+  - On first login as a new/incomplete user, `/getting-started/wallet` leads visually with the CTA (`Open Wallet Settings`) before clearly explaining what CryptoZing is, what the flow will do, and how long it will take.
+  - The page feels dense and guessy for a first-time user, even if technically competent.
+- Pass 2 direction:
+  - Add an internal-only `Orientation Step 0` layer at the top of the first onboarding screen (wallet step) that introduces the flow before the step action.
+  - Do not mention or label this as “Step 0” to the user.
+- User-facing outcome we want:
+  - A short welcome + expectation-setting message (what CryptoZing is / what onboarding accomplishes).
+  - A clear 3-step framing and rough time estimate (phrased as an estimate, not a guarantee).
+  - A clean transition into the wallet step action (“what to do now”).
+- Constraints:
+  - Keep the intro concise and no-nonsense.
+  - Do not add feature marketing blocks or heavy product explanation.
+  - Preserve the existing step shell flow and routing; this is primarily copy/information hierarchy work.
+
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
 - Avoid global middleware interception in v1 to prevent route allowlist drift and redirect loops.
