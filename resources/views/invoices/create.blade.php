@@ -82,7 +82,7 @@
                     <p class="mt-1 text-xs text-gray-500">This rate is just for display—each payment uses the USD/BTC rate captured at the moment funds arrive.</p>
                     <button type="button"
                             id="useCurrentRate"
-                            class="mt-2 inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                            class="mt-2 inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-center text-sm font-semibold leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60">
                         Use current rate
                     </button>
                     <small id="rateStamp" class="ml-2 text-xs text-gray-500"></small>
