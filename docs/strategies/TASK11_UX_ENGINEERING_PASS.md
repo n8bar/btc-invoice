@@ -51,21 +51,7 @@ This document is a temporary working strategy. It is not a source of truth like 
   - Keep label text short and scannable.
   - Do not imply a destination that does not actually exist for that page/context.
 
-### Finding 3: Dark-mode contrast issues in onboarding labels (including indigo-on-slate)
-- Observation:
-  - The wallet-page onboarding label text (`Step 1 of 3: Connect wallet`) has poor contrast in dark mode (observed as indigo-on-slate / dark-on-dark).
-  - Similar contrast issues may exist in other onboarding labels across the step shell and progress strips.
-- Direction:
-  - Fix the wallet-page label contrast regression.
-  - Perform a small audit of onboarding labels in dark mode for dark-on-dark combinations generally, with explicit attention to indigo-on-slate pairings.
-- Scope targets:
-  - Getting-started step shell labels and progress indicators.
-  - Progress-strip labels on Wallet Settings / New Invoice / Invoice Show.
-- Constraints:
-  - Preserve visual hierarchy (current step vs completed vs upcoming).
-  - Favor readable contrast over subtle color styling.
-
-### Finding 4: Wallet key helper discoverability in onboarding context (collapsed + emphasized variant)
+### Finding 3: Wallet key helper discoverability in onboarding context (collapsed + emphasized variant)
 - Observation:
   - On Wallet Settings during getting-started, the `Where do I find this?` helper is easy to miss even though it is highly relevant to first-time users.
   - The current placement/collapsed presentation is fine for returning users, but onboarding users need a stronger cue.
