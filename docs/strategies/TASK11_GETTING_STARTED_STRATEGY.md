@@ -118,7 +118,7 @@ This document is a temporary working plan. It is not a source of truth like `doc
   - Try onboarding with no clients and confirm whether step 2 is still understandable/actionable.
   - If it feels blocking/confusing, log it as a Task 11 follow-up (or Task 12 polish item) rather than expanding the scope mid-pass.
 
-## Pass 2 (Running Browser-QA Findings)
+## UX Engineering Pass (Task 11)
 - Purpose: collect browser-QA findings and address them in a focused Task 11 Pass 2 polish round.
 - This section is intentionally incremental; add findings as they are discovered.
 - Internal naming is allowed for design/implementation discussion (for example `Orientation Step 0`), but do not expose those labels in the user-facing UI copy.
