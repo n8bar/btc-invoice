@@ -18,7 +18,9 @@
                 @endphp
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Client</label>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Client <span class="text-red-600" aria-hidden="true">*</span>
+                    </label>
                     <select name="client_id" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Select…</option>
@@ -40,7 +42,9 @@
                         @error('number')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Invoice date</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Invoice date <span class="text-red-600" aria-hidden="true">*</span>
+                        </label>
                         <input type="date" name="invoice_date" value="{{ old('invoice_date', $today) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('invoice_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -67,13 +71,17 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Amount (USD) <span class="text-red-600" aria-hidden="true">*</span>
+                        </label>
                         <input type="number" step="0.01" min="0" name="amount_usd" id="amount_usd" value="{{ old('amount_usd') }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('amount_usd')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">BTC rate (USD/BTC)</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            BTC rate (USD/BTC) <span class="text-red-600" aria-hidden="true">*</span>
+                        </label>
                         <input type="number" step="0.01" min="0" name="btc_rate" id="btc_rate"
                                value="{{ old('btc_rate', $prefillRate) }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
