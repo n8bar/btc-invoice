@@ -43,6 +43,12 @@ class InvoiceDeliveryController extends Controller
 
         DeliverInvoiceMail::dispatch($delivery);
 
+        if ($request->boolean('getting_started')) {
+            return redirect()
+                ->route('getting-started.start')
+                ->with('status', 'Invoice email queued.');
+        }
+
         return back()->with('status', 'Invoice email queued.');
     }
 }

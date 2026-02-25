@@ -6,6 +6,7 @@ use App\Http\Requests\WalletAccountRequest;
 use App\Http\Requests\WalletKeyPreviewRequest;
 use App\Http\Requests\WalletSettingRequest;
 use App\Models\UserWalletAccount;
+use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -14,7 +15,7 @@ class WalletSettingsController extends Controller
 {
     private const MAX_ADDITIONAL_ACCOUNTS = 3;
 
-    public function edit(Request $request)
+    public function edit(Request $request, GettingStartedFlow $gettingStartedFlow)
     {
         $network = Config::get('wallet.default_network', 'testnet');
 
@@ -25,6 +26,9 @@ class WalletSettingsController extends Controller
                 ->get(),
             'maxAdditionalWallets' => self::MAX_ADDITIONAL_ACCOUNTS,
             'defaultNetwork' => $network,
+            'gettingStartedStrip' => $request->boolean('getting_started')
+                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_WALLET)
+                : null,
         ]);
     }
 
@@ -80,6 +84,11 @@ class WalletSettingsController extends Controller
         if ($wallet->wasRecentlyCreated || $wallet->wasChanged('bip84_xpub')) {
             $wallet->next_derivation_index = 0;
             $wallet->save();
+        }
+
+        if ($request->boolean('getting_started')) {
+            return redirect()->route('getting-started.start')
+                ->with('status', 'Wallet settings saved.');
         }
 
         return redirect()->route('wallet.settings.edit')

@@ -3,9 +3,16 @@
     <x-slot name="header"><h2 class="text-xl font-semibold leading-tight">New Invoice</h2></x-slot>
 
     <div class="py-8">
-        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl space-y-4 sm:px-6 lg:px-8">
+            @isset($gettingStartedStrip)
+                @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
+            @endisset
+
             <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
                 @csrf
+                @if (request()->boolean('getting_started'))
+                    <input type="hidden" name="getting_started" value="1">
+                @endif
                 @php
                     $invoiceDefaults = $invoiceDefaults ?? ['description'=>null,'due_date'=>null,'terms_days'=>null];
                 @endphp

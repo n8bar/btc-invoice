@@ -57,6 +57,11 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
+            @php $gettingStartedContext = request()->boolean('getting_started'); @endphp
+
+            @isset($gettingStartedStrip)
+                @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
+            @endisset
 
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-700">
@@ -197,6 +202,9 @@
                 </div>
                 <form method="POST" action="{{ route('invoices.deliver', $invoice) }}" class="mt-3 space-y-3">
                     @csrf
+                    @if ($gettingStartedContext)
+                        <input type="hidden" name="getting_started" value="1">
+                    @endif
                     <textarea name="message" rows="2" class="w-full rounded border-gray-300 text-sm"
                               placeholder="Optional note to include in the email">{{ old('message') }}</textarea>
                     @error('message')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -735,12 +743,18 @@
                             <form action="{{ route('invoices.share.rotate', $invoice) }}" method="POST"
                                   onsubmit="return confirm('Regenerate public link? Old URL will stop working.');">
                                 @csrf @method('PATCH')
+                                @if ($gettingStartedContext)
+                                    <input type="hidden" name="getting_started" value="1">
+                                @endif
                                 <x-secondary-button type="submit">Rotate link</x-secondary-button>
                             </form>
 
                             <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST"
                                   onsubmit="return confirm('Disable public link?');">
                                 @csrf @method('PATCH')
+                                @if ($gettingStartedContext)
+                                    <input type="hidden" name="getting_started" value="1">
+                                @endif
                                 <x-danger-button>Disable</x-danger-button>
                             </form>
                         </div>
@@ -798,6 +812,9 @@
                 @else
                     <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
                         @csrf @method('PATCH')
+                        @if ($gettingStartedContext)
+                            <input type="hidden" name="getting_started" value="1">
+                        @endif
 
                         <div>
                             <label class="block text-xs font-medium text-gray-600">Expiry preset</label>
@@ -833,6 +850,9 @@
                             <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
                                   onsubmit="return confirm('Disable the public link?');">
                                 @csrf @method('PATCH')
+                                @if ($gettingStartedContext)
+                                    <input type="hidden" name="getting_started" value="1">
+                                @endif
                                 <button type="submit" class="underline text-red-600 hover:text-red-700">disable the public link</button>
                             </form>
                             <span>.</span>

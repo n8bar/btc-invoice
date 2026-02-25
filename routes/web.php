@@ -12,6 +12,7 @@ use App\Http\Controllers\InvoiceDeliveryController;
 use App\Http\Controllers\InvoicePaymentAdjustmentController;
 use App\Http\Controllers\ThemePreferenceController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\GettingStartedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,12 @@ Route::middleware(['auth'])->group(function () {
     // Breeze dashboard
     Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
     Route::patch('/theme', ThemePreferenceController::class)->name('theme.update');
+    Route::get('/getting-started', [GettingStartedController::class, 'start'])->name('getting-started.start');
+    Route::post('/getting-started/dismiss', [GettingStartedController::class, 'dismiss'])->name('getting-started.dismiss');
+    Route::post('/getting-started/reopen', [GettingStartedController::class, 'reopen'])->name('getting-started.reopen');
+    Route::get('/getting-started/{step}', [GettingStartedController::class, 'step'])
+        ->where('step', 'wallet|invoice|deliver')
+        ->name('getting-started.step');
 
     // Breeze profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

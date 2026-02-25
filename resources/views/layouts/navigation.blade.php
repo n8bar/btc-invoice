@@ -85,6 +85,19 @@
                             <x-dropdown-link :href="route('wallet.settings.edit')">
                                 {{ __('Wallet Settings') }}
                             </x-dropdown-link>
+                            @if (Auth::user()->gettingStartedIsDone())
+                                <form method="POST" action="{{ route('getting-started.reopen') }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
+                                        {{ __('Getting started') }}
+                                    </button>
+                                </form>
+                            @else
+                                <x-dropdown-link :href="route('getting-started.start')">
+                                    {{ __('Getting started') }}
+                                </x-dropdown-link>
+                            @endif
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
@@ -200,6 +213,19 @@
                     <x-responsive-nav-link :href="route('wallet.settings.edit')" :active="request()->routeIs('wallet.settings.*')">
                         {{ __('Wallet Settings') }}
                     </x-responsive-nav-link>
+                    @if (Auth::user()->gettingStartedIsDone())
+                        <form method="POST" action="{{ route('getting-started.reopen') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                                {{ __('Getting started') }}
+                            </button>
+                        </form>
+                    @else
+                        <x-responsive-nav-link :href="route('getting-started.start')" :active="request()->routeIs('getting-started.*')">
+                            {{ __('Getting started') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">

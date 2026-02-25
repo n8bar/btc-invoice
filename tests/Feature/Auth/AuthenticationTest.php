@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
         $response->assertSee('CryptoZing - Login', false);
     }
 
-    public function test_users_without_wallet_are_redirected_to_wallet_settings_on_login(): void
+    public function test_incomplete_users_are_redirected_to_getting_started_on_login(): void
     {
         $user = User::factory()->create();
 
@@ -29,10 +29,10 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('wallet.settings.edit'));
+        $response->assertRedirect(route('getting-started.start'));
     }
 
-    public function test_users_with_wallet_are_redirected_to_dashboard_on_login(): void
+    public function test_users_with_wallet_but_incomplete_onboarding_are_redirected_to_getting_started_on_login(): void
     {
         $user = User::factory()->create();
         WalletSetting::create([
@@ -41,6 +41,22 @@ class AuthenticationTest extends TestCase
             'bip84_xpub' => 'vpub-test-key',
             'next_derivation_index' => 0,
             'onboarded_at' => now(),
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('getting-started.start'));
+    }
+
+    public function test_completed_users_are_redirected_to_dashboard_on_login(): void
+    {
+        $user = User::factory()->create([
+            'getting_started_completed_at' => now(),
+            'getting_started_dismissed' => false,
         ]);
 
         $response = $this->post('/login', [

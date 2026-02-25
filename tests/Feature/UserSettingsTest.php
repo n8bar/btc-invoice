@@ -82,6 +82,45 @@ class UserSettingsTest extends TestCase
         $response->assertSee('value="' . $expectedDue . '"', false);
     }
 
+    public function test_invoice_store_redirects_to_getting_started_deliver_step_when_context_flag_present(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(\App\Services\HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-GS-1',
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+
+        $response->assertRedirect(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $invoice->id,
+        ]));
+        $response->assertSessionHas('status', 'Invoice created.');
+    }
+
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void
     {
         $owner = User::factory()->create();
@@ -204,6 +243,19 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_shows_getting_started_progress_strip_when_context_flag_present(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit', ['getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('Back to getting started', false);
+        $response->assertSee(route('getting-started.step', ['step' => 'wallet']), false);
+    }
+
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
     {
         Config::set('wallet.default_network', 'testnet');
@@ -228,6 +280,28 @@ class UserSettingsTest extends TestCase
         $this->assertSame(self::REALISTIC_TESTNET_TPUB, $wallet->bip84_xpub);
         $this->assertNotSame(self::REALISTIC_TESTNET_TPUB, $raw);
         $this->assertGreaterThan(255, strlen($raw));
+    }
+
+    public function test_wallet_settings_update_redirects_to_getting_started_when_context_flag_present(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+                'getting_started' => 1,
+            ]);
+
+        $response->assertRedirect(route('getting-started.start'));
+        $response->assertSessionHas('status', 'Wallet settings saved.');
     }
 
     public function test_mainnet_rejects_testnet_wallet_key(): void

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
+use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
 
 class InvoiceController extends Controller
@@ -126,13 +127,20 @@ class InvoiceController extends Controller
             return response()->json($invoice->load('client'), 201);
         }
 
+        if ($request->boolean('getting_started')) {
+            return redirect()->route('getting-started.step', [
+                'step' => GettingStartedFlow::STEP_DELIVER,
+                'invoice' => $invoice->id,
+            ])->with('status', 'Invoice created.');
+        }
+
         return redirect()->route('invoices.index')->with('status', 'Invoice created.');
     }
 
     /**
      * Show one invoice owned by the authenticated user.
      */
-    public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice, GettingStartedFlow $gettingStartedFlow)
     {
         $rate = BtcRate::current();
 
@@ -159,6 +167,9 @@ class InvoiceController extends Controller
             'invoice'           => $invoice,
             'rate'              => $rate,
             'paymentSummary'    => $summary,
+            'gettingStartedStrip' => $request->boolean('getting_started')
+                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_DELIVER, $invoice)
+                : null,
         ] + $display);
     }
 
@@ -243,7 +254,7 @@ class InvoiceController extends Controller
     }
 
 
-    public function create(\Illuminate\Http\Request $request)
+    public function create(\Illuminate\Http\Request $request, GettingStartedFlow $gettingStartedFlow)
     {
         if (!$request->user()->walletSetting) {
             return redirect()->route('wallet.settings.edit')
@@ -261,7 +272,18 @@ class InvoiceController extends Controller
         $brandingDefaults = $this->brandingDefaults($request->user());
         $invoiceDefaults = $this->invoiceDefaults($request->user(), $today);
 
-        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today','brandingDefaults','invoiceDefaults'));
+        return view('invoices.create', compact(
+            'clients',
+            'suggestedNumber',
+            'prefillRate',
+            'today',
+            'brandingDefaults',
+            'invoiceDefaults'
+        ) + [
+            'gettingStartedStrip' => $request->boolean('getting_started')
+                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_INVOICE)
+                : null,
+        ]);
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
