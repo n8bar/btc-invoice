@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-02-23_
+_Last updated: 2026-02-24_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -104,9 +104,10 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
       - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
-    - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
-      - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
-    - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
+    - [x] Guided onboarding wizard: wallet setup → create invoice → deliver.
+      - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
+      - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
+    - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
     - [ ] User-level toggles (overpayment note, QR refresh reminder).
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
