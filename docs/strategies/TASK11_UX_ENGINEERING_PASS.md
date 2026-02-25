@@ -73,8 +73,12 @@ This document is a temporary working strategy. It is not a source of truth like 
   - The dashboard getting-started CTA box is a soft prompt, but it currently has no inline way to dismiss/hide the prompt from that surface.
   - Users must re-enter the getting-started flow to access dismiss, which makes a “soft” prompt feel more forceful than intended.
 - Direction:
-  - Add a secondary dismiss action directly on the dashboard prompt (for example `Hide for now`) while keeping the primary resume CTA.
-  - Dismiss should use the existing getting-started dismiss behavior (`POST /getting-started/dismiss`) and remain reversible from the user menu.
+  - Add two distinct affordances on the dashboard prompt while keeping the primary resume CTA:
+    - a top-right `X` close control that hides the prompt temporarily (client-side only; returns on next page reload)
+    - a persistent `Hide for now` action that uses the existing getting-started dismiss behavior
+  - `Hide for now` should confirm before submitting `POST /getting-started/dismiss` and remain reversible from the user menu.
 - Constraints:
-  - Keep the dismiss affordance visually secondary to the resume CTA.
-  - Avoid cluttering the prompt; prioritize a clear primary action and a lightweight secondary action.
+  - Keep `Resume getting started` as the clear primary CTA.
+  - Keep `Hide for now` visually secondary.
+  - Make the `X` control clearly temporary (not a persistent dismiss).
+  - Avoid cluttering the prompt; maintain simple hierarchy despite adding two secondary controls.
