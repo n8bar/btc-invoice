@@ -80,7 +80,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">
-                            BTC rate (USD/BTC) <span class="text-red-600" aria-hidden="true">*</span>
+                            BTC rate (USD/BTC)
                         </label>
                         <input type="number" step="0.01" min="0" name="btc_rate" id="btc_rate"
                                value="{{ old('btc_rate', $prefillRate) }}" required
