@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Models\UserWalletAccount;
 use App\Models\WalletSetting;
@@ -177,6 +178,65 @@ class UserSettingsTest extends TestCase
 
         $response->assertRedirect(route('wallet.settings.edit', ['getting_started' => 1]));
         $response->assertSessionHasErrors('bip84_xpub');
+    }
+
+    public function test_invoice_store_global_number_collision_returns_number_error_not_wallet_error(): void
+    {
+        $existingOwner = User::factory()->create();
+        $existingClient = Client::create([
+            'user_id' => $existingOwner->id,
+            'name' => 'Existing Client',
+            'email' => 'existing@acme.test',
+        ]);
+
+        Invoice::create([
+            'user_id' => $existingOwner->id,
+            'client_id' => $existingClient->id,
+            'number' => 'INV-0001',
+            'description' => 'Existing invoice',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qexistinginvoice0000000000000000000',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('invoices.create', ['getting_started' => 1]))
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $response->assertRedirect(route('invoices.create', ['getting_started' => 1]));
+        $response->assertSessionHasErrors('number');
+        $response->assertSessionDoesntHaveErrors('bip84_xpub');
+        $response->assertSessionHasInput('getting_started', 1);
+
+        $this->assertDatabaseCount('invoices', 1);
     }
 
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void

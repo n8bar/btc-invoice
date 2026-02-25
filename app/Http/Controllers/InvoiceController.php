@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -101,13 +102,21 @@ class InvoiceController extends Controller
         $data = $this->applyInvoiceDefaults($request->user(), $data);
 
         try {
-            $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
-                $address = app(HdWallet::class)->deriveAddress(
-                    $wallet->bip84_xpub,
-                    $wallet->next_derivation_index,
-                    $wallet->network
-                );
+            $address = app(HdWallet::class)->deriveAddress(
+                $wallet->bip84_xpub,
+                $wallet->next_derivation_index,
+                $wallet->network
+            );
+        } catch (\Throwable $e) {
+            $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
+            return redirect()
+                ->route('wallet.settings.edit', $walletSettingsRouteParams)
+                ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
+                ->withInput();
+        }
 
+        try {
+            $invoice = DB::transaction(function () use ($data, $wallet, $userId, $address) {
                 $invoice = Invoice::create($data + [
                     'user_id' => $userId,
                     'payment_address' => $address,
@@ -118,11 +127,23 @@ class InvoiceController extends Controller
 
                 return $invoice;
             });
+        } catch (QueryException $e) {
+            if ($this->isInvoiceNumberUniqueViolation($e)) {
+                return back()
+                    ->withErrors(['number' => 'That invoice number is unavailable. Try a different number.'])
+                    ->withInput();
+            }
+
+            report($e);
+
+            return back()
+                ->with('error', 'We could not save the invoice. Please try again.')
+                ->withInput();
         } catch (\Throwable $e) {
-            $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
-            return redirect()
-                ->route('wallet.settings.edit', $walletSettingsRouteParams)
-                ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
+            report($e);
+
+            return back()
+                ->with('error', 'We could not save the invoice. Please try again.')
                 ->withInput();
         }
 
@@ -668,5 +689,20 @@ class InvoiceController extends Controller
         }
 
         return $data;
+    }
+
+    private function isInvoiceNumberUniqueViolation(QueryException $e): bool
+    {
+        $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
+        $message = strtolower($e->getMessage());
+
+        if (!in_array($sqlState, ['23000', '23505'], true)) {
+            return false;
+        }
+
+        return str_contains($message, 'invoices_number_unique')
+            || str_contains($message, 'invoices_user_id_number_unique')
+            || str_contains($message, 'unique constraint failed: invoices.number')
+            || str_contains($message, 'unique constraint failed: invoices.user_id, invoices.number');
     }
 }
