@@ -70,6 +70,54 @@ This document is a temporary working plan. It is not a source of truth like `doc
   - delivery attempt redirect/completion in onboarding context
   - progress strip visibility on wallet/create/show pages
 
+7. Browser QA (manual owner pass, efficient but thorough)
+- Goal: verify real browser flow UX, not just server behavior.
+- Recommended order:
+  - run the Core path first (high confidence / fastest signal)
+  - run Edge/guard checks second (catch regressions without a full matrix)
+
+### Core path (must-run)
+- Happy-path onboarding with an account that already has at least one client:
+  - Log in as an incomplete user -> confirm redirect to `/getting-started` (resolver) and first step shell.
+  - Step 1 (`wallet`): CTA opens Wallet Settings with progress strip + “Back to getting started”.
+  - Save wallet from getting-started context -> confirm redirect back to wizard/resolver (advances to step 2).
+  - Step 2 (`invoice`): CTA opens New Invoice with progress strip.
+  - Create invoice from getting-started context -> confirm redirect to deliver step with the created invoice context.
+  - Step 3 (`deliver`): CTA opens the invoice show page with progress strip.
+  - Enable public link, then send invoice email -> confirm redirect to resolver and final completion redirect to dashboard.
+  - Confirm completion status message appears on dashboard and onboarding prompt is no longer shown.
+- Normal navigation after completion:
+  - Open Wallet Settings / Invoices Create / Invoice Show normally (not from wizard) -> progress strip should not appear.
+
+### Edge / guard checks (high-value, short)
+- Skip-ahead guard:
+  - Manually visit `/getting-started/deliver` on a fresh/incomplete account -> confirm redirect to earliest incomplete step.
+- Dismiss / reopen:
+  - Use “Hide getting started” on a step shell -> confirm dashboard status and no forced re-entry.
+  - Log out + log back in -> confirm no auto-redirect while dismissed.
+  - Reopen from user menu -> confirm flow restarts/resumes via `/getting-started`.
+- Deliver-step resume selection:
+  - With multiple invoices, visit `/getting-started/deliver?invoice={id}` for a valid owned invoice -> confirm that invoice is opened.
+  - Try an invalid/stale `?invoice=` value -> confirm fallback behavior (latest valid owned invoice or invoice step if none).
+- Partial-progress resume:
+  - Complete wallet + invoice steps only, then leave the flow.
+  - Return via menu/dashboard CTA -> confirm resolver lands on deliver step (not wallet/invoice).
+
+### UX / accessibility quick checks (short)
+- Keyboard-only smoke test on step shell:
+  - Tab order reaches progress/CTA/dismiss controls in a sensible order.
+  - Visible focus styles are present on CTA, dismiss, and back links.
+- Narrow-screen sanity (mobile width):
+  - Step shell content and progress cards do not cause page-level horizontal overflow.
+  - Progress strip wraps cleanly on wallet/invoice pages.
+- Status messaging:
+  - Wallet save / invoice create / delivery completion messages are visible near top of content and easy to notice.
+
+### Optional gap-finder (if time permits)
+- No-client onboarding path:
+  - Try onboarding with no clients and confirm whether step 2 is still understandable/actionable.
+  - If it feels blocking/confusing, log it as a Task 11 follow-up (or Task 12 polish item) rather than expanding the scope mid-pass.
+
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
 - Avoid global middleware interception in v1 to prevent route allowlist drift and redirect loops.
