@@ -67,3 +67,14 @@ This document is a temporary working strategy. It is not a source of truth like 
   - One-time/subtle attention cue only (no constant looping animation).
   - Respect `prefers-reduced-motion`.
   - Avoid drawing attention away from the primary form controls once the page has settled.
+
+### Finding 4: Dashboard getting-started prompt lacks inline dismiss affordance
+- Observation:
+  - The dashboard getting-started CTA box is a soft prompt, but it currently has no inline way to dismiss/hide the prompt from that surface.
+  - Users must re-enter the getting-started flow to access dismiss, which makes a “soft” prompt feel more forceful than intended.
+- Direction:
+  - Add a secondary dismiss action directly on the dashboard prompt (for example `Hide for now`) while keeping the primary resume CTA.
+  - Dismiss should use the existing getting-started dismiss behavior (`POST /getting-started/dismiss`) and remain reversible from the user menu.
+- Constraints:
+  - Keep the dismiss affordance visually secondary to the resume CTA.
+  - Avoid cluttering the prompt; prioritize a clear primary action and a lightweight secondary action.
