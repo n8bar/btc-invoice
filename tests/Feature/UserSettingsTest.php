@@ -143,6 +143,42 @@ class UserSettingsTest extends TestCase
         $response->assertSessionHas('status', 'Invoice created.');
     }
 
+    public function test_invoice_store_derive_failure_preserves_getting_started_context_on_wallet_redirect(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andThrow(new \RuntimeException('derive failed'));
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('invoices.create', ['getting_started' => 1]))
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-GS-FAIL-1',
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $response->assertRedirect(route('wallet.settings.edit', ['getting_started' => 1]));
+        $response->assertSessionHasErrors('bip84_xpub');
+    }
+
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void
     {
         $owner = User::factory()->create();

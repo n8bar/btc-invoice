@@ -47,6 +47,9 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $userId = $request->user()->id;
+        $walletSettingsRouteParams = $request->boolean('getting_started')
+            ? ['getting_started' => 1]
+            : [];
 
         if (!$request->filled('number')) {
             $request->merge(['number' => \App\Models\Invoice::nextNumberForUser($userId)]);
@@ -91,7 +94,7 @@ class InvoiceController extends Controller
 
         $wallet = $request->user()->walletSetting;
         if (!$wallet) {
-            return redirect()->route('wallet.settings.edit')
+            return redirect()->route('wallet.settings.edit', $walletSettingsRouteParams)
                 ->with('status', 'Connect a wallet before creating invoices.');
         }
 
@@ -118,7 +121,7 @@ class InvoiceController extends Controller
         } catch (\Throwable $e) {
             $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return redirect()
-                ->route('wallet.settings.edit')
+                ->route('wallet.settings.edit', $walletSettingsRouteParams)
                 ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
                 ->withInput();
         }
@@ -257,7 +260,7 @@ class InvoiceController extends Controller
     public function create(\Illuminate\Http\Request $request, GettingStartedFlow $gettingStartedFlow)
     {
         if (!$request->user()->walletSetting) {
-            return redirect()->route('wallet.settings.edit')
+            return redirect()->route('wallet.settings.edit', $request->boolean('getting_started') ? ['getting_started' => 1] : [])
                 ->with('status', 'Connect a wallet before creating invoices.');
         }
 
