@@ -17,18 +17,22 @@ This document is a temporary working strategy. It is not a source of truth like 
 
 ## Findings
 
-### Finding 1: Missing orientation before first wallet CTA
+### Finding 1: Missing orientation screen/state before first wallet action (internal `Orientation Step 0`)
 - Observation:
   - On first login as a new/incomplete user, `/getting-started/wallet` leads visually with the CTA (`Open Wallet Settings`) before clearly explaining what CryptoZing is, what the flow will do, and how long it will take.
   - The page feels dense and guessy for a first-time user, even if technically competent.
 - Direction:
-  - Add an internal-only `Orientation Step 0` layer at the top of the first onboarding screen (wallet step) that introduces the flow before the step action.
+  - Add an internal-only `Orientation Step 0` as a dedicated welcome page/route before the wallet step.
   - Do not mention or label this as “Step 0” to the user.
+- Pass shape (locked for this finding):
+  - Use a dedicated route/page for the welcome experience (not an in-page panel inside `/getting-started/wallet`).
+  - Keep the welcome page intentionally minimal with no UI clutter or extra explanatory copy that distracts from the next action.
 - User-facing outcome we want:
   - A short welcome + expectation-setting message (what CryptoZing is / what onboarding accomplishes).
-  - A clear 3-step framing and rough time estimate (phrased as an estimate, not a guarantee).
-  - A clean transition into the wallet step action (“what to do now”).
+  - A clear 3-step framing.
+  - A very rough time expectation (for example: “You could be sending your first invoice in minutes.”).
+  - A clean, obvious transition into the wallet step action (“what to do now”).
 - Constraints:
   - Keep the intro concise and no-nonsense.
   - Do not add feature marketing blocks or heavy product explanation.
-  - Preserve the existing step shell flow and routing; this is primarily copy/information hierarchy work.
+  - Favor a focused welcome page over dense step-shell content on the first screen.
