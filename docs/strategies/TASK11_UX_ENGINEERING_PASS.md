@@ -82,3 +82,21 @@ This document is a temporary working strategy. It is not a source of truth like 
   - Keep `Hide for now` visually secondary.
   - Make the `X` control clearly temporary (not a persistent dismiss).
   - Avoid cluttering the prompt; maintain simple hierarchy despite adding two secondary controls.
+
+### Finding 5: Invoice create has a hidden client prerequisite for zero-client users
+- Observation:
+  - After wallet setup (including getting-started Step 2 handoff), users can be sent to `/invoices/create` with no clients in the system.
+  - The invoice form starts with the `Client` field, but there is no clear guidance or inline path for users who have not created a client yet.
+  - This is both a general UX gap (invoice create) and a getting-started UX gap (Step 2 implies invoice creation is immediately actionable).
+- Direction (preferred shape):
+  - When the client list is empty, gate the invoice-create page and show a focused inline `Create client` experience with a short explanation.
+  - Do not show the invoice form and client-create form at the same time.
+  - After client creation, redirect back to `/invoices/create` (preserving onboarding context such as `getting_started=1` when present), then show the invoice form.
+- Reuse / implementation guidance:
+  - Reuse the existing `clients.store` action and validation path (no duplicate client business logic).
+  - Extract shared client form fields into a reusable partial/component so `clients/create` and the invoice zero-client gate UI share markup.
+  - Support a safe return target (for example, a validated internal `return_to` value) so client creation can return users to invoice create without open-redirect risk.
+- Constraints:
+  - Never render both forms as active primary actions on the same screen at the same time.
+  - Keep the zero-client state focused and instructional, not modal-heavy.
+  - This finding does not assume clientless invoices, auto-created self-clients, or popup flows.
