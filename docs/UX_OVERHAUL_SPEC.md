@@ -86,15 +86,12 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Keep this task implementation-light: add the overpayment note and QR refresh reminder as user-level toggles on **Profile** (reuse the existing profile toggle pattern), persist per user, and drive conditional copy in show/public/print.
    - Polish pass only for Profile, Invoice Settings, and Wallet Settings: clear grouping, validation/error states, helper text, visible focus, and consistent action buttons (no major page redesign in this task).
    - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear (polish/consistency pass, not a new auth flow).
-13. Editable email templates
-   - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
-   - Preview + reset-to-default; validation to prevent empty required tokens.
-14. Invoice Settings polish
-   - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides (kept separate from Task 12’s lightweight toggle/polish scope).
+13. Invoice Settings polish
+   - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
 - UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
-- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles and editable templates behave as specified.
+- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles behave as specified.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.

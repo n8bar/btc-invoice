@@ -107,11 +107,12 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
       - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
     - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
-    - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
+    - [ ] User-level toggles (overpayment note, QR refresh reminder).
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
 14. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
+    - Add per-user editable email templates (invoice send, reminders/alerts) with safe variables, preview + reset-to-default, and validation; verify/test them during or late in MS14 alongside the mailer audit.
     - Add a per-invoice notice cooldown guard: do not send the same notice content/class for the same invoice within a configurable threshold unless the sender explicitly chooses a follow-up class (for example, “Second notice”).
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
     - Backfill any missing specs/tests for mail/alert behavior, document operational runbooks for mail queue health, and review/refresh all customer-facing email copy (wording + tone); align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.

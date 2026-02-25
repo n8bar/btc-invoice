@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-02-25 | UX scope split: email templates moved from MS13 Task 13 to MS14 | Simplified `docs/UX_OVERHAUL_SPEC.md` by removing the editable email templates item from MS13, renumbering Invoice Settings polish to Task 13, and dropping the Task 14 separation note; synced `docs/PLAN.md` by splitting the combined MS13 toggles/templates checkbox and moving editable email templates into MS14 mailer/audit scope with verification timing called out for during/late MS14. |
 | 2026-02-25 | UX Task 12 scoped as lightweight profile-toggle + polish pass | Refined `docs/UX_OVERHAUL_SPEC.md` Task 12 to keep it implementation-light: place the overpayment note and QR refresh reminder toggles on Profile using the existing toggle pattern, treat settings/auth work as a polish/consistency pass (not a redesign/new auth flow), and keep branding-heavy Invoice Settings cleanup explicitly in Task 14. |
 | 2026-02-23 | Onboarding spec restored hierarchy parentheticals in title/scope | Re-added parentheticals to the `docs/ONBOARD_SPEC.md` title (`MS13 - UX ToDo #11`) and Scope heading (`from UX Overhaul Task 11`) so the spec keeps its hierarchy/context links while other headings remain simplified. |
 | 2026-02-23 | Onboarding spec heading labels simplified (no parentheticals) | Removed parenthetical qualifiers from `docs/ONBOARD_SPEC.md` headings (including the title, Scope, route/state sections, Copy Examples, and Accessibility Details) to keep Task 11 spec headings shorter and cleaner. |
