@@ -41,14 +41,14 @@ Using the same account xpub in other apps/wallet workflows can cause address reu
 
 - On-chain payment detection remains a fundamental feature of CryptoZing.
 - CryptoZing will require/support the expectation of a dedicated account xpub for reliable automatic payment attribution.
-- Users may technically use the same account in other wallet apps, but they should not actively use that account for other purposes if they want reliable invoice tracking.
+- Users may technically view the same account in other wallet apps and spend/send funds from it, but they should not use that same account for additional receives/address generation outside CryptoZing if they want reliable invoice tracking.
 
 ## Mitigation Direction
 
 1. Wallet Settings page UX/copy:
    - Add clear guidance that the connected account must be dedicated to CryptoZing for reliable auto-tracking.
    - Explain that reusing the same account elsewhere can cause false invoice payment detection.
-   - Clarify that the account can still be viewed/managed in other wallet apps, but should not be used for other receives/payments.
+   - Clarify that the account can still be viewed/managed in other wallet apps and used to send/spend funds, but should not be used for other receives/address generation.
 
 2. Recovery/correction tooling for stubborn/shared-account usage:
    - Add a way to void/ignore wrongly attributed on-chain payments.

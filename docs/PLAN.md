@@ -114,7 +114,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 14. **On-Chain Payment Attribution Hardening**
     - Source finding: [`docs/qa/Finding1.md`](qa/Finding1.md) documents the shared account xpub collision issue (new invoices falsely inheriting unrelated on-chain payments).
     - Lock in reliable on-chain payment detection as a core feature by requiring a dedicated account xpub/derivation namespace for automatic attribution.
-    - Update Wallet Settings guidance to explain the dedicated-account requirement, the shared-account collision risk, and that viewing the account in other wallets is fine but actively using it is not.
+    - Update Wallet Settings guidance to explain the dedicated-account requirement, the shared-account collision risk, and that viewing/spending from the account in other wallets is fine, but using that same account for additional receives/address generation outside CryptoZing is not.
     - Add corrective tooling to void/ignore wrongly attributed on-chain payments for shared-account mistakes, with strong warning copy (escape hatch, not the recommended workflow).
     - Review onboarding/wallet flows for where to acknowledge or reinforce the dedicated-account requirement.
     - Verification: reproduce the shared-account false-paid scenario in QA, confirm the guidance is clear, and confirm correction tooling can recover invoice state safely.
