@@ -180,7 +180,7 @@ class UserSettingsTest extends TestCase
         $response->assertSessionHasErrors('bip84_xpub');
     }
 
-    public function test_invoice_store_global_number_collision_returns_number_error_not_wallet_error(): void
+    public function test_invoice_store_global_number_collision_during_onboarding_redirects_to_deliver_after_db_fix(): void
     {
         $existingOwner = User::factory()->create();
         $existingClient = Client::create([
@@ -231,12 +231,79 @@ class UserSettingsTest extends TestCase
                 'getting_started' => 1,
             ]);
 
-        $response->assertRedirect(route('invoices.create', ['getting_started' => 1]));
-        $response->assertSessionHasErrors('number');
-        $response->assertSessionDoesntHaveErrors('bip84_xpub');
-        $response->assertSessionHasInput('getting_started', 1);
+        $newInvoice = $owner->invoices()->latest('id')->firstOrFail();
 
-        $this->assertDatabaseCount('invoices', 1);
+        $response->assertRedirect(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $newInvoice->id,
+        ]));
+        $response->assertSessionHas('status', 'Invoice created.');
+        $response->assertSessionDoesntHaveErrors();
+
+        $this->assertDatabaseHas('invoices', [
+            'user_id' => $owner->id,
+            'number' => 'INV-0001',
+        ]);
+        $this->assertDatabaseCount('invoices', 2);
+    }
+
+    public function test_invoice_store_allows_same_invoice_number_for_different_users(): void
+    {
+        $existingOwner = User::factory()->create();
+        $existingClient = Client::create([
+            'user_id' => $existingOwner->id,
+            'name' => 'Existing Client',
+            'email' => 'existing@acme.test',
+        ]);
+
+        Invoice::create([
+            'user_id' => $existingOwner->id,
+            'client_id' => $existingClient->id,
+            'number' => 'INV-0001',
+            'description' => 'Existing invoice',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qexistinginvoice0000000000000000000',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'number' => 'INV-0001',
+                'client_id' => $client->id,
+                'description' => 'Second user invoice',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+            ]);
+
+        $response->assertRedirect(route('invoices.index'));
+        $response->assertSessionHas('status', 'Invoice created.');
+
+        $this->assertDatabaseHas('invoices', [
+            'user_id' => $owner->id,
+            'number' => 'INV-0001',
+        ]);
     }
 
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void
