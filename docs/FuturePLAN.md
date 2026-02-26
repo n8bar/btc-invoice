@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-02-24): no post-MVP backlog changes in this pass; active-plan UX tracking now has Task 9, Task 10, and Task 11 marked complete, with UX work continuing on Task 12+ in the active PLAN/spec docs.
+Latest scope update (2026-02-25): no post-MVP backlog changes in this pass; active PLAN inserted a new post-UX milestone for on-chain payment attribution hardening (from `docs/qa/Finding1.md`) before mailer/audit work, and UX work continues on Task 12+ in the active PLAN/spec docs.
 
 ## Infrastructure & Payments
 1. **Self-Hosted Bitcoin Node + Watcher**
@@ -15,7 +15,7 @@ Latest scope update (2026-02-24): no post-MVP backlog changes in this pass; acti
    - Note: small-balance resolution (manual credit to close dust residuals) is now defined in the active PLAN/PARTIAL_PAYMENTS spec.
 
 ## Email & Notifications
-_Carry-forward guardrail from active PLAN Item 14: suppress duplicate sends for the same invoice + notice class inside a configurable cooldown window unless an explicit follow-up class (for example, “Second notice”) is selected._
+_Carry-forward guardrail from active PLAN Item 15: suppress duplicate sends for the same invoice + notice class inside a configurable cooldown window unless an explicit follow-up class (for example, “Second notice”) is selected._
 
 3. **Receipt PDFs for Paid Invoices**
    - Once payments auto-mark invoices as paid, generate immutable PDF receipts (rate + tx snapshot).
