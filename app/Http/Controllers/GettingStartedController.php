@@ -84,12 +84,15 @@ class GettingStartedController extends Controller
         }
 
         $deliverInvoice = null;
+        $deliverInvoiceOptions = collect();
         if ($step === GettingStartedFlow::STEP_DELIVER) {
             $deliverInvoice = $flow->resolveDeliverInvoice($user, $request->query('invoice'));
 
             if (! $deliverInvoice) {
                 return redirect()->route('getting-started.step', ['step' => GettingStartedFlow::STEP_INVOICE]);
             }
+
+            $deliverInvoiceOptions = $flow->deliverInvoiceOptions($user);
         }
 
         $steps = $snapshot['steps'];
@@ -114,6 +117,7 @@ class GettingStartedController extends Controller
             'stepCount' => count($steps),
             'actionUrl' => $actionUrl,
             'deliverInvoice' => $deliverInvoice,
+            'deliverInvoiceOptions' => $deliverInvoiceOptions,
             'earliestIncompleteStep' => $earliestIncomplete,
             'backUrl' => $backUrl,
         ]);

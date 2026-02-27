@@ -44,7 +44,44 @@
 
                         @if ($currentStepKey === 'deliver' && $deliverInvoice)
                             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-200">
-                                <p class="font-semibold text-gray-900 dark:text-slate-100">Target invoice</p>
+                                <div class="flex flex-wrap items-start justify-between gap-3">
+                                    <p class="font-semibold text-gray-900 dark:text-slate-100">Target invoice</p>
+                                    @if (($deliverInvoiceOptions ?? collect())->count() > 1)
+                                        <details class="text-xs">
+                                            <summary class="cursor-pointer text-indigo-600 hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
+                                                Change
+                                            </summary>
+                                            <form method="GET" action="{{ route('getting-started.step', ['step' => 'deliver']) }}" class="mt-2 space-y-2">
+                                                <label for="getting_started_invoice" class="block text-xs font-medium text-gray-700 dark:text-slate-200">
+                                                    Choose draft invoice
+                                                </label>
+                                                <select id="getting_started_invoice" name="invoice"
+                                                        class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                    @foreach ($deliverInvoiceOptions as $option)
+                                                        <option value="{{ $option->id }}" @selected($option->id === $deliverInvoice->id)>
+                                                            {{ $option->number }}@if($option->client) — {{ $option->client->name }}@endif
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="flex flex-wrap items-center gap-3">
+                                                    <button type="submit"
+                                                            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                        Use selected invoice
+                                                    </button>
+                                                    <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
+                                                       class="text-xs text-gray-600 hover:underline dark:text-slate-300 dark:hover:text-slate-100">
+                                                        Create new invoice instead
+                                                    </a>
+                                                </div>
+                                            </form>
+                                        </details>
+                                    @else
+                                        <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
+                                           class="text-xs text-indigo-600 hover:text-indigo-500 hover:underline dark:text-indigo-300 dark:hover:text-indigo-200">
+                                            Create new invoice instead
+                                        </a>
+                                    @endif
+                                </div>
                                 <p class="mt-1">
                                     <span class="font-medium">#{{ $deliverInvoice->number }}</span>
                                     @if ($deliverInvoice->client)

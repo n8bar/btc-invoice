@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class GettingStartedFlow
 {
@@ -119,14 +121,15 @@ class GettingStartedFlow
 
     public function resolveDeliverInvoice(User $user, mixed $requestedInvoiceId = null): ?Invoice
     {
+        $query = $this->deliverInvoiceQuery($user);
+
         if ($requestedInvoiceId !== null) {
             $invoiceId = filter_var($requestedInvoiceId, FILTER_VALIDATE_INT, [
                 'options' => ['min_range' => 1],
             ]);
 
             if ($invoiceId !== false) {
-                $override = Invoice::query()
-                    ->ownedBy($user)
+                $override = (clone $query)
                     ->whereKey($invoiceId)
                     ->first();
 
@@ -136,10 +139,18 @@ class GettingStartedFlow
             }
         }
 
-        return Invoice::query()
-            ->ownedBy($user)
+        return (clone $query)->latest('id')->first();
+    }
+
+    /**
+     * @return Collection<int, Invoice>
+     */
+    public function deliverInvoiceOptions(User $user): Collection
+    {
+        return $this->deliverInvoiceQuery($user)
+            ->with('client:id,name')
             ->latest('id')
-            ->first();
+            ->get(['id', 'client_id', 'number', 'status']);
     }
 
     public function markCompleted(User $user): void
@@ -212,5 +223,12 @@ class GettingStartedFlow
             'earliest_incomplete_step' => $snapshot['first_incomplete_step'],
             'back_url' => route('getting-started.step', $backRouteParams),
         ];
+    }
+
+    private function deliverInvoiceQuery(User $user): Builder
+    {
+        return Invoice::query()
+            ->ownedBy($user)
+            ->where('status', 'draft');
     }
 }

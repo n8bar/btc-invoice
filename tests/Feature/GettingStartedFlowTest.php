@@ -48,8 +48,8 @@ class GettingStartedFlowTest extends TestCase
         $this->createWallet($owner);
 
         $client = $this->createClient($owner);
-        $olderInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-1001']);
-        $latestInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-1002']);
+        $olderInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-1001', 'status' => 'draft']);
+        $latestInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-1002', 'status' => 'draft']);
 
         $this->actingAs($owner)
             ->get(route('getting-started.start'))
@@ -68,11 +68,13 @@ class GettingStartedFlowTest extends TestCase
         $this->createWallet($owner);
 
         $client = $this->createClient($owner);
-        $fallbackInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2001']);
-        $preferredInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2002']);
+        $fallbackInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2001', 'status' => 'draft']);
+        $preferredInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2002', 'status' => 'draft']);
+        $sentInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2003', 'status' => 'sent']);
+        $voidInvoice = $this->createInvoice($owner, $client, ['number' => 'INV-2004', 'status' => 'void']);
 
         $otherClient = $this->createClient($otherUser);
-        $foreignInvoice = $this->createInvoice($otherUser, $otherClient, ['number' => 'INV-9001']);
+        $foreignInvoice = $this->createInvoice($otherUser, $otherClient, ['number' => 'INV-9001', 'status' => 'draft']);
 
         $response = $this->actingAs($owner)->get(route('getting-started.step', [
             'step' => 'deliver',
@@ -94,7 +96,27 @@ class GettingStartedFlowTest extends TestCase
             'getting_started' => 1,
         ]), false);
 
-        $trashed = $this->createInvoice($owner, $client, ['number' => 'INV-2003']);
+        $sentResponse = $this->actingAs($owner)->get(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $sentInvoice->id,
+        ]));
+        $sentResponse->assertOk();
+        $sentResponse->assertSee(route('invoices.show', [
+            'invoice' => $preferredInvoice,
+            'getting_started' => 1,
+        ]), false);
+
+        $voidResponse = $this->actingAs($owner)->get(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $voidInvoice->id,
+        ]));
+        $voidResponse->assertOk();
+        $voidResponse->assertSee(route('invoices.show', [
+            'invoice' => $preferredInvoice,
+            'getting_started' => 1,
+        ]), false);
+
+        $trashed = $this->createInvoice($owner, $client, ['number' => 'INV-2005', 'status' => 'draft']);
         $trashed->delete();
 
         $trashedResponse = $this->actingAs($owner)->get(route('getting-started.step', [
@@ -115,6 +137,34 @@ class GettingStartedFlowTest extends TestCase
         ]), false);
 
         $this->assertNotSame($fallbackInvoice->id, $preferredInvoice->id);
+    }
+
+    public function test_deliver_step_shows_change_controls_with_draft_invoice_options(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+
+        $client = $this->createClient($owner);
+        $olderDraft = $this->createInvoice($owner, $client, ['number' => 'INV-3101', 'status' => 'draft']);
+        $latestDraft = $this->createInvoice($owner, $client, ['number' => 'INV-3102', 'status' => 'draft']);
+        $this->createInvoice($owner, $client, ['number' => 'INV-3103', 'status' => 'sent']);
+        $this->createInvoice($owner, $client, ['number' => 'INV-3104', 'status' => 'void']);
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $latestDraft->id,
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Target invoice', false);
+        $response->assertSee('Change', false);
+        $response->assertSee('Create new invoice instead', false);
+        $response->assertSee('INV-3101', false);
+        $response->assertSee('INV-3102', false);
+        $response->assertDontSee('INV-3103', false);
+        $response->assertDontSee('INV-3104', false);
+
+        $this->assertNotSame($olderDraft->id, $latestDraft->id);
     }
 
     public function test_deliver_step_redirects_to_invoice_step_when_no_invoice_exists(): void
