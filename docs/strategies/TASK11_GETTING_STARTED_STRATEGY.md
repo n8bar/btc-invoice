@@ -113,11 +113,6 @@ This document is a temporary working plan. It is not a source of truth like `doc
 - Status messaging:
   - Wallet save / invoice create / delivery completion messages are visible near top of content and easy to notice.
 
-### Optional gap-finder (if time permits)
-- No-client onboarding path:
-  - Try onboarding with no clients and confirm whether step 2 is still understandable/actionable.
-  - If it feels blocking/confusing, log it as a Task 11 follow-up (or Task 12 polish item) rather than expanding the scope mid-pass.
-
 ## UX Engineering Pass (Task 11)
 - Browser-QA findings and follow-up UX refinement items now live in:
   - `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`
