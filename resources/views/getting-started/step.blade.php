@@ -56,6 +56,7 @@
                                                     Choose draft invoice
                                                 </label>
                                                 <select id="getting_started_invoice" name="invoice"
+                                                        onchange="this.form.submit()"
                                                         class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                                     @foreach ($deliverInvoiceOptions as $option)
                                                         <option value="{{ $option->id }}" @selected($option->id === $deliverInvoice->id)>
@@ -63,16 +64,10 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <div class="flex flex-wrap items-center gap-3">
-                                                    <button type="submit"
-                                                            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        Use selected invoice
-                                                    </button>
-                                                    <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
-                                                       class="text-xs text-gray-600 hover:underline dark:text-slate-300 dark:hover:text-slate-100">
-                                                        Create new invoice instead
-                                                    </a>
-                                                </div>
+                                                <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
+                                                   class="inline-flex items-center text-xs text-gray-600 hover:underline dark:text-slate-300 dark:hover:text-slate-100">
+                                                    Create new invoice instead
+                                                </a>
                                             </form>
                                         </details>
                                     @else
