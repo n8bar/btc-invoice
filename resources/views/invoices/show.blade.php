@@ -193,6 +193,7 @@
                     <div>
                         <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
                         <p class="text-xs text-gray-500">Emails include the public share link, summary, and optional note.</p>
+                        <p class="mt-1 text-xs font-medium text-gray-700">To: {{ $invoice->client->email }}</p>
                     </div>
                     @if (!$invoice->public_enabled)
                         <span class="text-xs text-red-600">Enable public link first</span>
