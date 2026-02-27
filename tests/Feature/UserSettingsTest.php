@@ -3,13 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Models\UserWalletAccount;
 use App\Models\WalletSetting;
+use App\Services\BtcRate;
 use App\Services\HdWallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -80,6 +83,227 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Consulting retainer', false);
         $expectedDue = now()->addDays(7)->toDateString();
         $response->assertSee('value="' . $expectedDue . '"', false);
+    }
+
+    public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 64_946.955,
+            'as_of' => now(),
+            'source' => 'coinbase:spot',
+        ], BtcRate::TTL);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('value="64946.96"', false);
+        $response->assertDontSee('value="64946.955"', false);
+    }
+
+    public function test_invoice_store_redirects_to_getting_started_deliver_step_when_context_flag_present(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(\App\Services\HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-GS-1',
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+
+        $response->assertRedirect(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $invoice->id,
+        ]));
+        $response->assertSessionHas('status', 'Invoice created.');
+    }
+
+    public function test_invoice_store_derive_failure_preserves_getting_started_context_on_wallet_redirect(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andThrow(new \RuntimeException('derive failed'));
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('invoices.create', ['getting_started' => 1]))
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-GS-FAIL-1',
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $response->assertRedirect(route('wallet.settings.edit', ['getting_started' => 1]));
+        $response->assertSessionHasErrors('bip84_xpub');
+    }
+
+    public function test_invoice_store_global_number_collision_during_onboarding_redirects_to_deliver_after_db_fix(): void
+    {
+        $existingOwner = User::factory()->create();
+        $existingClient = Client::create([
+            'user_id' => $existingOwner->id,
+            'name' => 'Existing Client',
+            'email' => 'existing@acme.test',
+        ]);
+
+        Invoice::create([
+            'user_id' => $existingOwner->id,
+            'client_id' => $existingClient->id,
+            'number' => 'INV-0001',
+            'description' => 'Existing invoice',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qexistinginvoice0000000000000000000',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('invoices.create', ['getting_started' => 1]))
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'description' => 'First run',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+                'getting_started' => 1,
+            ]);
+
+        $newInvoice = $owner->invoices()->latest('id')->firstOrFail();
+
+        $response->assertRedirect(route('getting-started.step', [
+            'step' => 'deliver',
+            'invoice' => $newInvoice->id,
+        ]));
+        $response->assertSessionHas('status', 'Invoice created.');
+        $response->assertSessionDoesntHaveErrors();
+
+        $this->assertDatabaseHas('invoices', [
+            'user_id' => $owner->id,
+            'number' => 'INV-0001',
+        ]);
+        $this->assertDatabaseCount('invoices', 2);
+    }
+
+    public function test_invoice_store_allows_same_invoice_number_for_different_users(): void
+    {
+        $existingOwner = User::factory()->create();
+        $existingClient = Client::create([
+            'user_id' => $existingOwner->id,
+            'name' => 'Existing Client',
+            'email' => 'existing@acme.test',
+        ]);
+
+        Invoice::create([
+            'user_id' => $existingOwner->id,
+            'client_id' => $existingClient->id,
+            'number' => 'INV-0001',
+            'description' => 'Existing invoice',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qexistinginvoice0000000000000000000',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'number' => 'INV-0001',
+                'client_id' => $client->id,
+                'description' => 'Second user invoice',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+            ]);
+
+        $response->assertRedirect(route('invoices.index'));
+        $response->assertSessionHas('status', 'Invoice created.');
+
+        $this->assertDatabaseHas('invoices', [
+            'user_id' => $owner->id,
+            'number' => 'INV-0001',
+        ]);
     }
 
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void
@@ -204,6 +428,19 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_shows_getting_started_progress_strip_when_context_flag_present(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit', ['getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('Back to getting started', false);
+        $response->assertSee(route('getting-started.step', ['step' => 'wallet']), false);
+    }
+
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
     {
         Config::set('wallet.default_network', 'testnet');
@@ -228,6 +465,28 @@ class UserSettingsTest extends TestCase
         $this->assertSame(self::REALISTIC_TESTNET_TPUB, $wallet->bip84_xpub);
         $this->assertNotSame(self::REALISTIC_TESTNET_TPUB, $raw);
         $this->assertGreaterThan(255, strlen($raw));
+    }
+
+    public function test_wallet_settings_update_redirects_to_getting_started_when_context_flag_present(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+                'getting_started' => 1,
+            ]);
+
+        $response->assertRedirect(route('getting-started.start'));
+        $response->assertSessionHas('status', 'Wallet settings saved.');
     }
 
     public function test_mainnet_rejects_testnet_wallet_key(): void

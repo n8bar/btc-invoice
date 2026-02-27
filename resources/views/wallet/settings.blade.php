@@ -15,6 +15,10 @@
 
     <div class="py-10">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8 space-y-6">
+            @isset($gettingStartedStrip)
+                @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
+            @endisset
+
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 space-y-6 text-gray-900">
                     <div class="space-y-2 text-sm text-gray-600">
@@ -45,6 +49,9 @@
                               x-init="init()"
                               @submit.prevent="handleSubmit($event)">
                             @csrf
+                            @if (request()->boolean('getting_started'))
+                                <input type="hidden" name="getting_started" value="1">
+                            @endif
 
                             @if ($isTestnet)
                                 <div class="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800" style="border-color: currentColor;">
@@ -102,13 +109,14 @@
                                     <div x-show="status === 'error'" class="text-red-600" role="alert" x-text="message"></div>
                                     <x-input-error class="text-xs text-red-600" :messages="$errors->get('bip84_xpub')" />
                                 </div>
-                                <div class="mt-3">
-                                    @include('wallet.partials.key-helper')
-                                </div>
                             </div>
 
                             <div class="flex items-center gap-4">
                                 <x-primary-button>Save wallet</x-primary-button>
+                            </div>
+
+                            <div>
+                                @include('wallet.partials.key-helper')
                             </div>
                         </form>
                     </div>

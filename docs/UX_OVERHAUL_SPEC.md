@@ -48,8 +48,9 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
 7. Wallet UX improvements
    - Wallet settings now include inline guidance and derive validation preview; additional wallets UI is deferred to post-RC.
-8. Login redirect to wallet setup
-   - Logging in without a wallet now redirects to `/wallet/settings` until the onboarding wizard owns the flow.
+8. Login redirect to wallet setup (interim bridge)
+   - Temporary pre-wizard bridge shipped before Task 11: logging in without a wallet redirected to `/wallet/settings`.
+   - Superseded by the Task 11 getting-started flow, which now owns login entry for incomplete users.
 9. Invoices & Clients UI polish (Completed)
     - Cover core CRUD surfaces: clients index/detail/create/edit, invoices index/show/create/edit/print/public/share, and delivery/receipt flows.
     - Client detail can temporarily route to edit (no separate show screen) as long as navigation stays obvious.
@@ -75,26 +76,24 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
     - Public view preserves Print + noindex/noarchive behavior and mirrors print/show section language for active links.
     - Task 10 acceptance checklist is fully complete, including narrower-screen public/share sanity verification (2026-02-23).
     - Coverage includes `PublicShareTest` (active/disabled states, noindex, owner-control exclusions) and `InvoicePaymentDisplayTest` parity checks.
+11. Onboarding wizard (Completed)
+   - `GET /getting-started` and `GET /getting-started/{step}` (`wallet`, `invoice`, `deliver`) now provide a lightweight step shell with dismiss/reopen support and no skip-ahead routing.
+   - Progress is derived from real app data (wallet setting, invoices, public-enabled invoice + delivery log) with minimal persisted user state (`getting_started_completed_at`, `getting_started_dismissed`).
+   - Existing pages remain the source of truth for the actual work; wallet settings, invoice create, and invoice show render a compact getting-started progress strip when reached from the flow.
+   - Context-aware success redirects resume the flow after wallet save, invoice create, and invoice delivery; v1 auto-show behavior is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception).
+   - Coverage includes `GettingStartedFlowTest` and integration assertions in auth/wallet/invoice delivery/show test suites.
 
 ## ToDo
-11. Onboarding wizard
-   - Spec: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the source of truth for implementation scope and acceptance criteria.
-   - Guides: connect wallet → create invoice → enable share/deliver.
-   - Can be dismissed/completed; links into existing forms; no bypass of auth/policies.
-   - Provides the empty-state prompts (no wallet or no invoices) that link into the wizard where appropriate; surface “connect wallet/create first invoice” calls to action.
 12. User settings & auth UX
-   - Overpayment note and QR refresh reminder toggles live under profile/settings; persist per user and drive conditional copy in show/public/print.
-   - Polish Profile, Invoice Settings, and Wallet Settings pages: clear grouping, validation/error states, helper text, and consistent action buttons.
-   - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear.
-13. Editable email templates
-   - Per-user editable subject/body for client-facing emails (invoice send, reminders/alerts) with safe variables.
-   - Preview + reset-to-default; validation to prevent empty required tokens.
-14. Invoice Settings polish
+   - Keep this task implementation-light: add the overpayment note and QR refresh reminder as user-level toggles on **Profile** (reuse the existing profile toggle pattern), persist per user, and drive conditional copy in show/public/print.
+   - Polish pass only for Profile, Invoice Settings, and Wallet Settings: clear grouping, validation/error states, helper text, visible focus, and consistent action buttons (no major page redesign in this task).
+   - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear (polish/consistency pass, not a new auth flow).
+13. Invoice Settings polish
    - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
 
 ## Definition of Done
 - All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
 - UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
-- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles and editable templates behave as specified.
+- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles behave as specified.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.

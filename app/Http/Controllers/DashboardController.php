@@ -15,6 +15,8 @@ class DashboardController extends Controller
         return view('dashboard', [
             'snapshot' => $data,
             'hasClients' => $user->clients()->exists(),
+            'showGettingStartedPrompt' => $user->gettingStartedNeedsAutoShow(),
+            'gettingStartedUrl' => route('getting-started.start'),
         ]);
     }
 }

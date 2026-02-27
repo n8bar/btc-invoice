@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-02-23_
+_Last updated: 2026-02-25_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -104,30 +104,39 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
       - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
-    - [ ] Guided onboarding wizard: wallet setup → create invoice → deliver.
-      - Build/acceptance details tracked in [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md).
-    - [x] Redirect on login to `/wallet/settings` when no wallet is configured (until wizard owns the flow).
-    - [ ] User-level toggles (overpayment note, QR refresh reminder) and per-user editable email templates.
+    - [x] Guided onboarding wizard: wallet setup → create invoice → deliver.
+      - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
+      - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
+    - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
+    - [ ] User-level toggles (overpayment note, QR refresh reminder).
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
     - Note: keep docs/quick start in sync after UX changes land.
-14. **Mailer & Alerts Polish + Audit**
+14. **On-Chain Payment Attribution Hardening**
+    - Source finding: [`docs/qa/Finding1.md`](qa/Finding1.md) documents the shared account xpub collision issue (new invoices falsely inheriting unrelated on-chain payments).
+    - Lock in reliable on-chain payment detection as a core feature by requiring a dedicated account xpub/derivation namespace for automatic attribution.
+    - Update Wallet Settings guidance to explain the dedicated-account requirement, the shared-account collision risk, and that viewing/spending from the account in other wallets is fine, but using that same account for additional receives/address generation outside CryptoZing is not.
+    - Add corrective tooling to void/ignore wrongly attributed on-chain payments for shared-account mistakes, with strong warning copy (escape hatch, not the recommended workflow).
+    - Review onboarding/wallet flows for where to acknowledge or reinforce the dedicated-account requirement.
+    - Verification: reproduce the shared-account false-paid scenario in QA, confirm the guidance is clear, and confirm correction tooling can recover invoice state safely.
+15. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
+    - Add per-user editable email templates (invoice send, reminders/alerts) with safe variables, preview + reset-to-default, and validation; verify/test them during or late in MS15 alongside the mailer audit.
     - Add a per-invoice notice cooldown guard: do not send the same notice content/class for the same invoice within a configurable threshold unless the sender explicitly chooses a follow-up class (for example, “Second notice”).
     - Validate queue worker configuration, delivery logs, and error handling; tighten safeguards to prevent runaway enqueues and confirm aliasing/production modes.
     - Backfill any missing specs/tests for mail/alert behavior, document operational runbooks for mail queue health, and review/refresh all customer-facing email copy (wording + tone); align with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md) and update it as needed.
     - Verification: one alias-off drill in a safe env (DKIM/SPF/DMARC + links) and observe queue/backoff/alerts.
-15. **Docs & DX**
+16. **Docs & DX**
     - Spec: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md) defines the deliverables and Definition of Done.
     - Sail-first quick start and contributor walkthrough docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](get-live/CONTRIBUTOR_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
     - Add any future contributor walkthrough polish (screenshots, new flows) in those docs and keep env references current.
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
     - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
-16. **Mainnet Cutover Preparation**
+17. **Mainnet Cutover Preparation**
     - Plan and execute the switch from testnet to mainnet once UX/mail audits are stable. Define env flips, wallet/xpub validation on mainnet, and a pilot send on mainnet before general availability.
     - Create a backout plan and audit steps to ensure existing testnet invoices remain intact or are clearly segregated.
     - Verification: mainnet dress rehearsal (env flip in staging, sample invoice/address derivation, watcher sanity, mail/send sanity) with sign-off.
-17. **CryptoZing.app Deployment (RC)**
+18. **CryptoZing.app Deployment (RC)**
     - Stand up the cloud environment under `CryptoZing.app` post-UX overhaul and deploy the release candidate.
     - Remove the temporary mail aliasing (set `MAIL_ALIAS_ENABLED=false` / clear the alias domain) so production mail goes to real customer addresses.
     - CryptoZing.app is dedicated to this product—plan DNS/email/infra assuming the root domain and its subdomains are exclusively for the invoice platform.

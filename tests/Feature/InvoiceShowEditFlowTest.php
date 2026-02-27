@@ -109,6 +109,37 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('Delete', false);
     }
 
+    public function test_invoice_show_displays_getting_started_progress_strip_when_context_flag_present(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-GS-2001',
+            'description' => 'Design work',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplegs2',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', ['invoice' => $invoice, 'getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('Back to getting started', false);
+        $response->assertSee(route('getting-started.step', ['step' => 'deliver', 'invoice' => $invoice->id]), false);
+    }
+
     public function test_invoice_edit_cancel_link_points_to_invoice_show(): void
     {
         $owner = User::factory()->create();

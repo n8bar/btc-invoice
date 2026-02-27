@@ -96,10 +96,18 @@
                         <tr>
                             <td colspan="{{ $emptyColspan }}" class="px-6 py-10 text-center text-sm text-gray-500">
                                 <p>No invoices yet. Create one to generate a payment address and share link.</p>
-                                <a href="{{ route('invoices.create') }}"
-                                   class="mt-3 inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white hover:bg-gray-700">
-                                    Create invoice
-                                </a>
+                                <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+                                    <a href="{{ route('invoices.create') }}"
+                                       class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white hover:bg-gray-700">
+                                        Create invoice
+                                    </a>
+                                    @if (auth()->user()?->gettingStartedNeedsAutoShow())
+                                        <a href="{{ route('getting-started.start') }}"
+                                           class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50">
+                                            Resume getting started
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforelse

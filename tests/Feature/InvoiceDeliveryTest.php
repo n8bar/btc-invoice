@@ -63,6 +63,44 @@ class InvoiceDeliveryTest extends TestCase
         });
     }
 
+    public function test_owner_delivery_redirects_to_getting_started_when_context_flag_present(): void
+    {
+        Queue::fake();
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-GS',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplegs',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+            'message' => 'Thanks for your business',
+            'getting_started' => 1,
+        ]);
+
+        $response->assertRedirect(route('getting-started.start'));
+        $response->assertSessionHas('status', 'Invoice email queued.');
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+        ]);
+    }
+
     public function test_receipt_email_queued_when_invoice_paid(): void
     {
         Queue::fake();

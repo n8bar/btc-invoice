@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
+use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
 
 class InvoiceController extends Controller
@@ -46,6 +48,9 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $userId = $request->user()->id;
+        $walletSettingsRouteParams = $request->boolean('getting_started')
+            ? ['getting_started' => 1]
+            : [];
 
         if (!$request->filled('number')) {
             $request->merge(['number' => \App\Models\Invoice::nextNumberForUser($userId)]);
@@ -90,20 +95,28 @@ class InvoiceController extends Controller
 
         $wallet = $request->user()->walletSetting;
         if (!$wallet) {
-            return redirect()->route('wallet.settings.edit')
+            return redirect()->route('wallet.settings.edit', $walletSettingsRouteParams)
                 ->with('status', 'Connect a wallet before creating invoices.');
         }
 
         $data = $this->applyInvoiceDefaults($request->user(), $data);
 
         try {
-            $invoice = DB::transaction(function () use ($data, $wallet, $userId) {
-                $address = app(HdWallet::class)->deriveAddress(
-                    $wallet->bip84_xpub,
-                    $wallet->next_derivation_index,
-                    $wallet->network
-                );
+            $address = app(HdWallet::class)->deriveAddress(
+                $wallet->bip84_xpub,
+                $wallet->next_derivation_index,
+                $wallet->network
+            );
+        } catch (\Throwable $e) {
+            $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
+            return redirect()
+                ->route('wallet.settings.edit', $walletSettingsRouteParams)
+                ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
+                ->withInput();
+        }
 
+        try {
+            $invoice = DB::transaction(function () use ($data, $wallet, $userId, $address) {
                 $invoice = Invoice::create($data + [
                     'user_id' => $userId,
                     'payment_address' => $address,
@@ -114,16 +127,35 @@ class InvoiceController extends Controller
 
                 return $invoice;
             });
+        } catch (QueryException $e) {
+            if ($this->isInvoiceNumberUniqueViolation($e)) {
+                return back()
+                    ->withErrors(['number' => 'That invoice number is unavailable. Try a different number.'])
+                    ->withInput();
+            }
+
+            report($e);
+
+            return back()
+                ->with('error', 'We could not save the invoice. Please try again.')
+                ->withInput();
         } catch (\Throwable $e) {
-            $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
-            return redirect()
-                ->route('wallet.settings.edit')
-                ->withErrors(['bip84_xpub' => "Unable to derive a payment address. Please verify your wallet key (expected {$expected})."])
+            report($e);
+
+            return back()
+                ->with('error', 'We could not save the invoice. Please try again.')
                 ->withInput();
         }
 
         if ($request->wantsJson()) {
             return response()->json($invoice->load('client'), 201);
+        }
+
+        if ($request->boolean('getting_started')) {
+            return redirect()->route('getting-started.step', [
+                'step' => GettingStartedFlow::STEP_DELIVER,
+                'invoice' => $invoice->id,
+            ])->with('status', 'Invoice created.');
         }
 
         return redirect()->route('invoices.index')->with('status', 'Invoice created.');
@@ -132,7 +164,7 @@ class InvoiceController extends Controller
     /**
      * Show one invoice owned by the authenticated user.
      */
-    public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    public function show(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice, GettingStartedFlow $gettingStartedFlow)
     {
         $rate = BtcRate::current();
 
@@ -159,6 +191,9 @@ class InvoiceController extends Controller
             'invoice'           => $invoice,
             'rate'              => $rate,
             'paymentSummary'    => $summary,
+            'gettingStartedStrip' => $request->boolean('getting_started')
+                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_DELIVER, $invoice)
+                : null,
         ] + $display);
     }
 
@@ -243,10 +278,10 @@ class InvoiceController extends Controller
     }
 
 
-    public function create(\Illuminate\Http\Request $request)
+    public function create(\Illuminate\Http\Request $request, GettingStartedFlow $gettingStartedFlow)
     {
         if (!$request->user()->walletSetting) {
-            return redirect()->route('wallet.settings.edit')
+            return redirect()->route('wallet.settings.edit', $request->boolean('getting_started') ? ['getting_started' => 1] : [])
                 ->with('status', 'Connect a wallet before creating invoices.');
         }
 
@@ -255,13 +290,26 @@ class InvoiceController extends Controller
         $suggestedNumber = \App\Models\Invoice::nextNumberForUser($request->user()->id);
 
         $r = BtcRate::current();
-        $prefillRate = $r['rate_usd'] ?? null;
+        $prefillRate = isset($r['rate_usd'])
+            ? number_format((float) $r['rate_usd'], 2, '.', '')
+            : null;
 
         $today = now()->toDateString(); // ✅ for invoice_date default
         $brandingDefaults = $this->brandingDefaults($request->user());
         $invoiceDefaults = $this->invoiceDefaults($request->user(), $today);
 
-        return view('invoices.create', compact('clients','suggestedNumber','prefillRate','today','brandingDefaults','invoiceDefaults'));
+        return view('invoices.create', compact(
+            'clients',
+            'suggestedNumber',
+            'prefillRate',
+            'today',
+            'brandingDefaults',
+            'invoiceDefaults'
+        ) + [
+            'gettingStartedStrip' => $request->boolean('getting_started')
+                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_INVOICE)
+                : null,
+        ]);
     }
 
     public function edit(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -641,5 +689,20 @@ class InvoiceController extends Controller
         }
 
         return $data;
+    }
+
+    private function isInvoiceNumberUniqueViolation(QueryException $e): bool
+    {
+        $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
+        $message = strtolower($e->getMessage());
+
+        if (!in_array($sqlState, ['23000', '23505'], true)) {
+            return false;
+        }
+
+        return str_contains($message, 'invoices_number_unique')
+            || str_contains($message, 'invoices_user_id_number_unique')
+            || str_contains($message, 'unique constraint failed: invoices.number')
+            || str_contains($message, 'unique constraint failed: invoices.user_id, invoices.number');
     }
 }

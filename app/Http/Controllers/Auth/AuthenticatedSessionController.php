@@ -29,8 +29,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
-        if ($user && ! $user->walletSetting) {
-            return redirect()->route('wallet.settings.edit');
+        if ($user && $user->gettingStartedNeedsAutoShow()) {
+            return redirect()->route('getting-started.start');
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

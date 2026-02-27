@@ -32,6 +32,8 @@ class User extends Authenticatable
         'invoice_default_description',
         'invoice_default_terms_days',
         'theme',
+        'getting_started_completed_at',
+        'getting_started_dismissed',
     ];
 
     /**
@@ -62,6 +64,8 @@ class User extends Authenticatable
             'branding_heading' => 'string',
             'invoice_default_terms_days' => 'integer',
             'theme' => 'string',
+            'getting_started_completed_at' => 'datetime',
+            'getting_started_dismissed' => 'boolean',
         ];
     }
 
@@ -84,5 +88,20 @@ class User extends Authenticatable
     public function walletAccounts()
     {
         return $this->hasMany(UserWalletAccount::class);
+    }
+
+    public function gettingStartedIsDone(): bool
+    {
+        return $this->getting_started_completed_at !== null;
+    }
+
+    public function gettingStartedWasDismissed(): bool
+    {
+        return $this->gettingStartedIsDone() && (bool) $this->getting_started_dismissed;
+    }
+
+    public function gettingStartedNeedsAutoShow(): bool
+    {
+        return $this->getting_started_completed_at === null;
     }
 }

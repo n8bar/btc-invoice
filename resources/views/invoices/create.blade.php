@@ -3,15 +3,24 @@
     <x-slot name="header"><h2 class="text-xl font-semibold leading-tight">New Invoice</h2></x-slot>
 
     <div class="py-8">
-        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl space-y-4 sm:px-6 lg:px-8">
+            @isset($gettingStartedStrip)
+                @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
+            @endisset
+
             <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
                 @csrf
+                @if (request()->boolean('getting_started'))
+                    <input type="hidden" name="getting_started" value="1">
+                @endif
                 @php
                     $invoiceDefaults = $invoiceDefaults ?? ['description'=>null,'due_date'=>null,'terms_days'=>null];
                 @endphp
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Client</label>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Client <span class="text-red-600" aria-hidden="true">*</span>
+                    </label>
                     <select name="client_id" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Select…</option>
@@ -33,7 +42,9 @@
                         @error('number')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Invoice date</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Invoice date <span class="text-red-600" aria-hidden="true">*</span>
+                        </label>
                         <input type="date" name="invoice_date" value="{{ old('invoice_date', $today) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('invoice_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -60,13 +71,17 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Amount (USD) <span class="text-red-600" aria-hidden="true">*</span>
+                        </label>
                         <input type="number" step="0.01" min="0" name="amount_usd" id="amount_usd" value="{{ old('amount_usd') }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                         @error('amount_usd')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">BTC rate (USD/BTC)</label>
+                        <label class="block text-sm font-medium text-gray-700">
+                            BTC rate (USD/BTC)
+                        </label>
                         <input type="number" step="0.01" min="0" name="btc_rate" id="btc_rate"
                                value="{{ old('btc_rate', $prefillRate) }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
@@ -75,7 +90,7 @@
                     <p class="mt-1 text-xs text-gray-500">This rate is just for display—each payment uses the USD/BTC rate captured at the moment funds arrive.</p>
                     <button type="button"
                             id="useCurrentRate"
-                            class="mt-2 inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                            class="mt-2 inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-center text-sm font-semibold leading-5 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60">
                         Use current rate
                     </button>
                     <small id="rateStamp" class="ml-2 text-xs text-gray-500"></small>
