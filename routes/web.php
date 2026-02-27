@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
     Route::patch('/theme', ThemePreferenceController::class)->name('theme.update');
     Route::get('/getting-started', [GettingStartedController::class, 'start'])->name('getting-started.start');
+    Route::get('/getting-started/welcome', [GettingStartedController::class, 'welcome'])->name('getting-started.welcome');
     Route::post('/getting-started/dismiss', [GettingStartedController::class, 'dismiss'])->name('getting-started.dismiss');
     Route::post('/getting-started/reopen', [GettingStartedController::class, 'reopen'])->name('getting-started.reopen');
     Route::get('/getting-started/{step}', [GettingStartedController::class, 'step'])

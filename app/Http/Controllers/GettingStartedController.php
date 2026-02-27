@@ -29,6 +29,10 @@ class GettingStartedController extends Controller
                 ->with('status', 'Getting started complete.');
         }
 
+        if ($this->shouldShowWelcome($snapshot)) {
+            return redirect()->route('getting-started.welcome');
+        }
+
         $targetStep = $snapshot['first_incomplete_step'];
         $routeParams = ['step' => $targetStep];
 
@@ -40,6 +44,37 @@ class GettingStartedController extends Controller
         }
 
         return redirect()->route('getting-started.step', $routeParams);
+    }
+
+    public function welcome(Request $request, GettingStartedFlow $flow): View|RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->gettingStartedIsDone()) {
+            return redirect()
+                ->route('dashboard')
+                ->with('status', $flow->doneStatusMessage($user));
+        }
+
+        $snapshot = $flow->snapshot($user);
+
+        if ($snapshot['is_complete']) {
+            $flow->markCompleted($user);
+
+            return redirect()
+                ->route('dashboard')
+                ->with('status', 'Getting started complete.');
+        }
+
+        if (! $this->shouldShowWelcome($snapshot)) {
+            return redirect()->route('getting-started.start');
+        }
+
+        return view('getting-started.welcome', [
+            'stepCount' => count($snapshot['steps']),
+            'startUrl' => route('getting-started.step', ['step' => GettingStartedFlow::STEP_WALLET]),
+            'backUrl' => route('dashboard'),
+        ]);
     }
 
     public function step(Request $request, GettingStartedFlow $flow, string $step): View|RedirectResponse
@@ -137,5 +172,13 @@ class GettingStartedController extends Controller
         $flow->reopen($request->user());
 
         return redirect()->route('getting-started.start');
+    }
+
+    /**
+     * @param  array{steps: array<string, array<string, mixed>>, first_incomplete_step: string|null, is_complete: bool}  $snapshot
+     */
+    private function shouldShowWelcome(array $snapshot): bool
+    {
+        return collect($snapshot['steps'])->every(static fn (array $step): bool => $step['complete'] === false);
     }
 }

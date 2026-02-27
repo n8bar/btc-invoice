@@ -27,7 +27,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('getting-started.start'));
     }
 
     public function test_mixed_case_email_is_accepted_and_preserved_on_registration(): void
@@ -42,7 +42,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('getting-started.start'));
 
         $this->assertDatabaseHas('users', [
             'email' => $email,
