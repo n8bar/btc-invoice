@@ -299,7 +299,7 @@
                                                 : null;
                                         @endphp
                                         @if ($confirmedBtc)
-                                            <div class="text-[11px] text-indigo-800">≈ {{ $confirmedBtc }} BTC</div>
+                                            <div class="text-[14.67px] text-indigo-800">≈ {{ $confirmedBtc }} BTC</div>
                                         @endif
                                     </span>
                                 </div>
@@ -530,7 +530,7 @@
                                     </script>
 
                                     <p class="mt-2 text-xs text-gray-500">Scan with any Bitcoin wallet.</p>
-                                    <p class="mt-1 text-[11px] text-gray-500 leading-snug">
+                                    <p class="mt-1 text-[14.67px] text-gray-500 leading-snug">
                                         BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
                                         refresh right before sending payment; printed copies may be stale.
                                     </p>
@@ -830,7 +830,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600">Or pick exact datetime</label>
                             <input type="datetime-local" name="expires" class="mt-1 w-full rounded-md border-gray-300">
-                            <p class="mt-1 text-[11px] text-gray-500">If set, this overrides the preset.</p>
+                            <p class="mt-1 text-[14.67px] text-gray-500">If set, this overrides the preset.</p>
                         </div>
 
                         <div>

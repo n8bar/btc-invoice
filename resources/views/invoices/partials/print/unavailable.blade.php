@@ -1,6 +1,6 @@
 <div class="box unavailable-box" data-public-unavailable="true">
     @if (!empty($billingDetails['heading']))
-        <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size:12px; margin-bottom:4px;">
+        <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size: 16px; margin-bottom:4px;">
             {{ $billingDetails['heading'] }}
         </div>
     @endif
@@ -9,9 +9,9 @@
         Invoice <span class="muted">#{{ $invoice->number }}</span>
     </h1>
 
-    <h2 style="margin:8px 0 10px; font-size:18px; color:#b91c1c;">This public payment link is no longer active</h2>
+    <h2 style="margin:8px 0 10px; font-size: 24px; color:#b91c1c;">This public payment link is no longer active</h2>
 
-    <p style="margin:0 0 8px; font-size:14px; color:#7f1d1d;">
+    <p style="margin:0 0 8px; font-size: 18.67px; color:#7f1d1d;">
         This invoice link has been disabled or expired. For assistance, please contact
         <strong>{{ $billingDetails['name'] ?? $invoice->user->name }}</strong>
         @if(!empty($billingDetails['email']))
@@ -23,7 +23,7 @@
         .
     </p>
 
-    <p class="muted" style="margin:0; font-size:13px;">
+    <p class="muted" style="margin:0; font-size: 17.33px;">
         Please request a fresh payment link before sending funds.
     </p>
 </div>

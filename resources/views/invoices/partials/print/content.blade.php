@@ -1,7 +1,7 @@
 <header class="print-header">
     <div>
         @if (!empty($billingDetails['heading']))
-            <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size:12px; margin-bottom:4px;">
+            <div class="muted" style="text-transform:uppercase; letter-spacing:0.2em; font-size: 16px; margin-bottom:4px;">
                 {{ $billingDetails['heading'] }}
             </div>
         @endif
@@ -10,7 +10,7 @@
             $issuedAt = $invoice->invoice_date?->copy()->setTimezone(config('app.timezone'))
                 ?? $invoice->created_at?->copy()->setTimezone(config('app.timezone'));
         @endphp
-        <div class="muted" style="font-size:14px;">Generated {{ $issuedAt ? $issuedAt->toDateString() : '-' }}</div>
+        <div class="muted" style="font-size: 18.67px;">Generated {{ $issuedAt ? $issuedAt->toDateString() : '-' }}</div>
     </div>
     <span class="badge
     {{ $st==='paid' ? 'badge-paid' : ($st==='sent' ? 'badge-sent' : ($st==='void' ? 'badge-void' : 'badge-draft')) }}">
@@ -20,7 +20,7 @@
 
 <section class="row section-gap">
     <div class="box">
-        <h3 style="margin:0 0 8px; font-size:14px;">Summary</h3>
+        <h3 style="margin:0 0 8px; font-size: 18.67px;">Summary</h3>
         <table>
             <tr><th>Invoice date</th><td>{{ optional($invoice->invoice_date)->toDateString() ?: '-' }}</td></tr>
             <tr><th>Due date</th><td>{{ optional($invoice->due_date)->toDateString() ?: '-' }}</td></tr>
@@ -29,8 +29,8 @@
         </table>
     </div>
     <div class="box">
-        <h3 style="margin:0 0 8px; font-size:14px;">Bill To</h3>
-        <div style="font-size:14px;">
+        <h3 style="margin:0 0 8px; font-size: 18.67px;">Bill To</h3>
+        <div style="font-size: 18.67px;">
             <div><strong>{{ $invoice->client->name ?? '-' }}</strong></div>
             <div class="muted">{{ $invoice->client->email ?? '' }}</div>
         </div>
@@ -38,8 +38,8 @@
 </section>
 
 <section class="box section-gap">
-    <h3 style="margin:0 0 8px; font-size:14px;">Bill From</h3>
-    <div style="font-size:14px;">
+    <h3 style="margin:0 0 8px; font-size: 18.67px;">Bill From</h3>
+    <div style="font-size: 18.67px;">
         <div><strong>{{ $billingDetails['name'] ?? ($invoice->user->billing_name ?? $invoice->user->name) }}</strong></div>
         @if (!empty($billingDetails['email']))
             <div class="muted"><a href="mailto:{{ $billingDetails['email'] }}" style="color:#4f46e5;">{{ $billingDetails['email'] }}</a></div>
@@ -58,12 +58,12 @@
 </section>
 
 <section class="box section-gap">
-    <h3 style="margin:0 0 8px; font-size:14px;">Description</h3>
-    <div style="white-space:pre-line; font-size:14px;">{{ $invoice->description ?: '-' }}</div>
+    <h3 style="margin:0 0 8px; font-size: 18.67px;">Description</h3>
+    <div style="white-space:pre-line; font-size: 18.67px;">{{ $invoice->description ?: '-' }}</div>
 </section>
 
 <section class="box section-gap">
-    <h3 style="margin:0 0 8px; font-size:14px;">Amounts</h3>
+    <h3 style="margin:0 0 8px; font-size: 18.67px;">Amounts</h3>
     <table>
         <tr><th>USD</th><td class="total">${{ number_format($invoice->amount_usd, 2) }}</td></tr>
         <tr><th>BTC</th><td>{{ $displayAmountBtc !== null ? $displayAmountBtc : '—' }}</td></tr>
@@ -104,7 +104,7 @@
     @endphp
 
     @if (!is_null($summary['expected_usd']))
-        <div style="margin-top:12px; border:1px dashed #c7d2fe; border-radius:10px; padding:12px; font-size:13px;">
+        <div style="margin-top:12px; border:1px dashed #c7d2fe; border-radius:10px; padding:12px; font-size: 17.33px;">
             <div style="display:flex; justify-content:space-between; gap:12px;">
                 <span>Expected</span>
                 <strong>
@@ -128,7 +128,7 @@
                             : null;
                     @endphp
                     @if ($confirmedBtc)
-                        <div style="font-size:11px; color:#4338ca;">≈ {{ $confirmedBtc }} BTC</div>
+                        <div style="font-size: 14.67px; color:#4338ca;">≈ {{ $confirmedBtc }} BTC</div>
                     @endif
                 </span>
             </div>
@@ -142,7 +142,7 @@
                 </span>
             </div>
             @if (!empty($summary['outstanding_btc_formatted']))
-                <div style="margin-top:6px; font-size:11px; color:#4338ca;">
+                <div style="margin-top:6px; font-size: 14.67px; color:#4338ca;">
                     BTC target floats with the latest rate so QR codes always reflect the remaining USD balance.
                 </div>
             @endif
@@ -155,7 +155,7 @@
     @endphp
 
     @if ($lastDetected)
-        <div style="margin-top:8px; font-size:12px; color:#4b5563;">
+        <div style="margin-top:8px; font-size: 16px; color:#4b5563;">
             Last payment detected
             {{ $lastDetected->copy()->timezone(config('app.timezone'))->toDayDateTimeString() }}
             @if ($lastConfirmed)
@@ -166,7 +166,7 @@
 </section>
 
 <section class="box section-gap">
-    <h3 style="margin:0 0 8px; font-size:14px;">Payment</h3>
+    <h3 style="margin:0 0 8px; font-size: 18.67px;">Payment</h3>
     <div class="payment-table-wrap">
         <table class="payment-table">
         <tr>
@@ -237,11 +237,11 @@
                     <div class="payment-qr-wrap">
                         <div class="payment-qr-block">
                             {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(180)->margin(0)->generate($bitcoinUri) !!}
-                            <div class="muted" style="font-size:12px; margin-top:6px;">Scan with any Bitcoin wallet.</div>
+                            <div class="muted" style="font-size: 16px; margin-top:6px;">Scan with any Bitcoin wallet.</div>
                         </div>
 
                         <div class="thank-you-block">
-                            <div style="font-weight:800; font-size:40px; line-height:1; letter-spacing:-0.02em; color:#4f46e5;">
+                            <div style="font-weight:800; font-size: 53.33px; line-height:1; letter-spacing:-0.02em; color:#4f46e5;">
                                 Thank you!
                             </div>
                         </div>
@@ -254,14 +254,14 @@
         </table>
     </div>
 
-    <div style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid #fed7aa; background:#fff7ed; font-size:13px; line-height:1.4;">
+    <div style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid #fed7aa; background:#fff7ed; font-size: 17.33px; line-height:1.4;">
         <strong>Send one payment:</strong> To avoid extra miner fees and processing delays, please send the full outstanding balance in a single Bitcoin transaction. Splitting the invoice across multiple payments can increase costs.
     </div>
 </section>
 
 @if ($invoice->payments->isNotEmpty())
     <section class="box section-gap">
-        <h3 style="margin:0 0 8px; font-size:14px;">Payment history</h3>
+        <h3 style="margin:0 0 8px; font-size: 18.67px;">Payment history</h3>
         <div class="table-wrap">
             <table class="history-table">
                 <thead>
@@ -284,7 +284,7 @@
                                 @if ($payment->fiat_amount !== null)
                                     <div>${{ number_format($payment->fiat_amount, 2) }}</div>
                                     @if ($payment->usd_rate !== null)
-                                        <div style="font-size:11px; color:#6b7280;">
+                                        <div style="font-size: 14.67px; color:#6b7280;">
                                             @ ${{ number_format((float) $payment->usd_rate, 2) }} USD/BTC
                                         </div>
                                     @endif
@@ -313,22 +313,22 @@
     $underpayPercent = $invoice->underpaymentPercent();
 @endphp
 @if ($invoice->requiresClientOverpayAlert())
-    <div class="section-gap" style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size:13px;">
+    <div class="section-gap" style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size: 17.33px;">
         This invoice appears overpaid by approximately {{ number_format($overpayPercent, 1) }}%.
         Overpayments are treated as gratuities by default, so please notify the invoice sender if this was a mistake.
     </div>
 @elseif ($invoice->requiresClientUnderpayAlert())
-    <div class="section-gap" style="border:1px solid #fee2e2; background:#fef2f2; color:#b91c1c; border-radius:10px; padding:12px; font-size:13px;">
+    <div class="section-gap" style="border:1px solid #fee2e2; background:#fef2f2; color:#b91c1c; border-radius:10px; padding:12px; font-size: 17.33px;">
         An outstanding balance of roughly {{ number_format($underpayPercent, 1) }}% remains. Please send the remaining amount or contact the invoice sender for assistance.
     </div>
 @else
-    <div class="section-gap" style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size:13px;">
+    <div class="section-gap" style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size: 17.33px;">
         Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.
     </div>
 @endif
 
 @if (!empty($billingDetails['footer_note']))
-    <div class="section-gap" style="border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:12px; font-size:13px;">
+    <div class="section-gap" style="border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:12px; font-size: 17.33px;">
         {{ $billingDetails['footer_note'] }}
     </div>
 @endif

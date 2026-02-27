@@ -104,7 +104,7 @@
                                             </svg>
                                             <span x-text="message"></span>
                                         </div>
-                                        <div class="rounded bg-green-50 px-2 py-1 font-mono text-[11px] text-green-900 break-all" x-text="address"></div>
+                                        <div class="rounded bg-green-50 px-2 py-1 font-mono text-[14.67px] text-green-900 break-all" x-text="address"></div>
                                     </div>
                                     <div x-show="status === 'error'" class="text-red-600" role="alert" x-text="message"></div>
                                     <x-input-error class="text-xs text-red-600" :messages="$errors->get('bip84_xpub')" />
