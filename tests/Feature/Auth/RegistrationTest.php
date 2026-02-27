@@ -30,11 +30,13 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function test_mixed_case_email_is_accepted_and_normalized_on_registration(): void
+    public function test_mixed_case_email_is_accepted_and_preserved_on_registration(): void
     {
+        $email = 'Test.User+Signup@Example.COM';
+
         $response = $this->post('/register', [
             'name' => 'Test User',
-            'email' => 'Test.User+Signup@Example.COM',
+            'email' => $email,
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
@@ -43,9 +45,9 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertDatabaseHas('users', [
-            'email' => 'test.user+signup@example.com',
+            'email' => $email,
         ]);
 
-        $this->assertTrue(User::where('email', 'test.user+signup@example.com')->exists());
+        $this->assertTrue(User::where('email', $email)->exists());
     }
 }
