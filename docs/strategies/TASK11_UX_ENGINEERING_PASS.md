@@ -100,3 +100,19 @@ This document is a temporary working strategy. It is not a source of truth like 
   - Never render both forms as active primary actions on the same screen at the same time.
   - Keep the zero-client state focused and instructional, not modal-heavy.
   - This finding does not currently recommend clientless invoices, auto-created self-clients, or popup flows.
+
+### Finding 6: Primary action zones are hard to locate across onboarding steps
+- Observation:
+  - During browser QA, the core action surfaces in each step can be hard to spot quickly, which increases friction and hesitation.
+  - Users may understand the instruction text but still spend time scanning for the exact input/button cluster to act on.
+- Direction:
+  - Add onboarding-only visual emphasis ("guided focus" glow) around primary action zones when in getting-started context.
+  - Keep emphasis scoped to primary action(s), not every form field.
+- Step targets:
+  - Step 1 (`/wallet/settings?getting_started=1`): wallet key input area + `Save wallet`.
+  - Step 2 (`/invoices/create?getting_started=1`): primary submit action area (`Save`), while keeping required-field asterisks as-is.
+  - Step 3 (`/invoices/{invoice}?getting_started=1`): `Enable public link` area and send/delivery primary action area.
+- Constraints:
+  - Avoid visual overload; this is directional emphasis, not full-page highlighting.
+  - Keep treatment subtle and consistent (prefer static glow/border over constant animation).
+  - Respect accessibility expectations (`prefers-reduced-motion`) if any motion cue is later introduced.
