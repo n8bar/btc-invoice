@@ -118,6 +118,52 @@ This document is a temporary working plan. It is not a source of truth like `doc
   - `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`
 - Keep this file focused on the implementation pass (v1 behavior + test plan).
 
+## Task 11 Pass1 Findings Strategy (Implementation Order)
+Goal: address the current Pass1 findings in a controlled sequence with small, testable increments.
+
+1. Orientation entry (Finding 1)
+- Add a dedicated welcome route/view for onboarding entry (internal orientation step).
+- Update resolver/login handoff so incomplete users land on this welcome page first.
+- Keep copy concise: what CryptoZing is, 3-step framing, rough "minutes" expectation, single next action.
+- Deliverable check: new registrants and returning incomplete users enter onboarding through the welcome screen.
+
+2. Back-link clarity + placement (Finding 2)
+- Update getting-started card/back-link labels to destination-aware wording.
+- Position the back link in the card top-right area where applicable.
+- Keep labels short and specific to actual destination (`Back to welcome`, `Back to [previous step]`).
+- Deliverable check: no generic "Back to getting started" where a better destination label exists.
+
+3. Wallet helper discoverability (Finding 3)
+- Keep current helper location/order and collapsed default.
+- Add onboarding-only visual emphasis (static, non-animated first pass) so the helper reads as relevant.
+- Validate dark-mode contrast during this pass, with specific attention to indigo-on-slate and dark-on-dark combinations.
+- Deliverable check: helper is easier to spot in onboarding mode without adding visual noise for normal mode.
+
+4. Dashboard prompt controls (Finding 4)
+- Add temporary close control (`X`) on the dashboard prompt (hide until reload only).
+- Add persistent `Hide for now` action with confirmation tied to existing dismiss endpoint/state.
+- Preserve `Resume getting started` as primary CTA.
+- Deliverable check: users can dismiss from dashboard without entering the wizard, and can still resume later.
+
+5. Zero-client invoice gate (Finding 5)
+- When no clients exist, replace invoice form with a focused create-client step on `/invoices/create`.
+- Reuse existing client store validation and shared client fields partial (no duplicate business logic).
+- After create, return to invoice create (preserving onboarding context).
+- Deliverable check: onboarding step 2 is actionable even when client count starts at zero.
+
+6. Guided focus emphasis (Finding 6)
+- Add onboarding-only, subtle glow emphasis to primary action zones:
+  - wallet key input + save action (and helper if needed for discoverability),
+  - invoice create primary submit,
+  - invoice deliver actions (`Enable public link` + send action).
+- Keep emphasis static/subtle for pass1 (no looping animation).
+- Deliverable check: QA can identify required action areas quickly in each step.
+
+7. Pass completion criteria
+- Re-run Task11 browser QA core path and targeted edge checks against these findings.
+- Capture any new issues in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
+- Only move findings out of active queue after both light-mode and dark-mode checks pass.
+
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
 - Avoid global middleware interception in v1 to prevent route allowlist drift and redirect loops.
