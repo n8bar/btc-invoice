@@ -109,13 +109,14 @@
                                     <div x-show="status === 'error'" class="text-red-600" role="alert" x-text="message"></div>
                                     <x-input-error class="text-xs text-red-600" :messages="$errors->get('bip84_xpub')" />
                                 </div>
-                                <div class="mt-3">
-                                    @include('wallet.partials.key-helper')
-                                </div>
                             </div>
 
                             <div class="flex items-center gap-4">
                                 <x-primary-button>Save wallet</x-primary-button>
+                            </div>
+
+                            <div>
+                                @include('wallet.partials.key-helper')
                             </div>
                         </form>
                     </div>
