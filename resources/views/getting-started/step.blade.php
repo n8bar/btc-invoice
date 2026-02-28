@@ -96,14 +96,14 @@
                             </div>
                         @endif
 
-                        @if ($currentStepKey !== $earliestIncompleteStep)
+                        @if ($showRequiredStepNotice)
                             <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900" style="border-color: currentColor;">
-                                You can review this step, but the next required step is still step
+                                You can review this step, but the next required step is step
                                 {{ collect($steps)->firstWhere('key', $earliestIncompleteStep)['position'] ?? '—' }}.
                                 @if (!empty($earliestIncompleteStepUrl))
                                     <a href="{{ $earliestIncompleteStepUrl }}"
                                        class="ml-1 font-semibold underline-offset-2 hover:underline">
-                                        Go to required step
+                                        Open required step
                                     </a>
                                 @endif
                             </div>

@@ -222,6 +222,30 @@ class GettingStartedFlowTest extends TestCase
         $response->assertSee('data-getting-started-step-link="deliver"', false);
     }
 
+    public function test_invoice_step_hides_required_step_notice_when_returning_from_deliver_for_new_draft(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now()->subMinute(),
+            'getting_started_replay_wallet_verified_at' => now(),
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'paid']);
+        $replayInvoice->forceFill([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->save();
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
+
+        $response->assertOk();
+        $response->assertDontSee('next required step is step', false);
+        $response->assertDontSee('Open required step', false);
+    }
+
     public function test_dismiss_and_reopen_update_getting_started_state(): void
     {
         $owner = User::factory()->create();

@@ -151,6 +151,9 @@ class GettingStartedController extends Controller
         $earliestIncompleteStepUrl = $earliestIncomplete !== null
             ? ($stepUrls[$earliestIncomplete] ?? null)
             : null;
+        $suppressRequiredStepNotice = $step === GettingStartedFlow::STEP_INVOICE
+            && $earliestIncomplete === GettingStartedFlow::STEP_DELIVER;
+        $showRequiredStepNotice = $currentStep['key'] !== $earliestIncomplete && ! $suppressRequiredStepNotice;
 
         $backUrl = route('dashboard');
 
@@ -166,6 +169,7 @@ class GettingStartedController extends Controller
             'deliverInvoiceOptions' => $deliverInvoiceOptions,
             'earliestIncompleteStep' => $earliestIncomplete,
             'earliestIncompleteStepUrl' => $earliestIncompleteStepUrl,
+            'showRequiredStepNotice' => $showRequiredStepNotice,
             'stepUrls' => $stepUrls,
             'backUrl' => $backUrl,
         ]);
