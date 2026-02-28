@@ -187,6 +187,38 @@ class GettingStartedFlowTest extends TestCase
             ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
     }
 
+    public function test_deliver_step_shows_no_new_draft_state_when_replay_has_no_draft_target(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now()->subMinute(),
+            'getting_started_replay_wallet_verified_at' => now(),
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'paid']);
+        $replayInvoice->forceFill([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'deliver']));
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'deliver']));
+        $response->assertOk();
+        $response->assertSee('No new draft invoice is available for delivery.', false);
+        $response->assertSee('Create new draft invoice', false);
+        $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
+        $response->assertSee('Go to create invoice', false);
+        $response->assertSee('data-getting-started-step-link="wallet"', false);
+        $response->assertSee('data-getting-started-step-link="invoice"', false);
+        $response->assertSee('data-getting-started-step-link="deliver"', false);
+    }
+
     public function test_dismiss_and_reopen_update_getting_started_state(): void
     {
         $owner = User::factory()->create();

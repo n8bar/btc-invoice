@@ -168,6 +168,7 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
   - Wallet step: verify current wallet settings (no new xpub required).
   - Invoice step: requires an invoice created at/after `replay_started_at`.
   - Deliver step: requires share/send activity at/after `replay_started_at`.
+  - Deliver target selection remains strict (`draft` only). If no new draft is available, stay on step 3 and show an explicit empty state with create-invoice actions (no silent bounce to step 2).
 - Replay entry behavior from user menu:
   - If Getting Started was dismissed, reopen starts immediately.
   - If Getting Started was completed (not dismissed), show a confirmation that includes the recorded completion date before starting replay.
