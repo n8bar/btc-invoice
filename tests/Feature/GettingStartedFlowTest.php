@@ -14,13 +14,13 @@ class GettingStartedFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_start_resolves_to_welcome_for_new_user(): void
+    public function test_start_resolves_to_wallet_step_for_new_user(): void
     {
         $owner = User::factory()->create();
 
         $this->actingAs($owner)
             ->get(route('getting-started.start'))
-            ->assertRedirect(route('getting-started.welcome'));
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
     }
 
     public function test_welcome_redirects_to_start_when_user_already_has_progress(): void

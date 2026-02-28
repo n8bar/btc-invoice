@@ -123,9 +123,11 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 
 1. Orientation entry (Finding 1)
 - Add a dedicated welcome route/view for onboarding entry (internal orientation step).
-- Update resolver/login handoff so incomplete users land on this welcome page first.
+- Route split:
+  - new registrants enter via welcome,
+  - returning incomplete logins enter via resolver-first actionable step.
 - Keep copy concise: what CryptoZing is, 3-step framing, rough "minutes" expectation, single next action.
-- Deliverable check: new registrants and returning incomplete users enter onboarding through the welcome screen.
+- Deliverable check: new registrants see welcome first; returning incomplete users land on the correct next step without intro-loop friction.
 
 2. Back-link clarity + placement (Finding 2)
 - Update getting-started card/back-link labels to destination-aware wording.

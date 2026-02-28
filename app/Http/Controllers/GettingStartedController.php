@@ -29,10 +29,6 @@ class GettingStartedController extends Controller
                 ->with('status', 'Getting started complete.');
         }
 
-        if ($this->shouldShowWelcome($snapshot)) {
-            return redirect()->route('getting-started.welcome');
-        }
-
         $targetStep = $snapshot['first_incomplete_step'];
         $routeParams = ['step' => $targetStep];
 
