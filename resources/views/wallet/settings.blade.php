@@ -13,6 +13,7 @@
         $isTestnet = $defaultNetwork !== 'mainnet';
         $isGettingStarted = request()->boolean('getting_started');
         $isGettingStartedReplay = (bool) ($isGettingStartedReplay ?? false);
+        $replayCancelUrl = route('wallet.settings.edit', $isGettingStarted ? ['getting_started' => 1] : []);
         $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
     @endphp
 
@@ -69,7 +70,7 @@
                                 </p>
                                 @if ($isGettingStarted && $isGettingStartedReplay)
                                     <p class="mt-1 text-xs text-indigo-700 dark:text-indigo-300">
-                                        Your wallet is already connected. Review it, then click Save wallet to verify this step.
+                                        Your wallet is already connected. Review it, then click Verify wallet to confirm this step.
                                     </p>
                                 @endif
                                 <textarea id="bip84_xpub" name="bip84_xpub"
@@ -121,10 +122,23 @@
                             </div>
 
                             <div class="flex items-center gap-4">
+                                @if ($isGettingStartedReplay)
+                                    <a href="{{ $replayCancelUrl }}"
+                                       data-wallet-replay-cancel
+                                       x-show="hasValueChanged()"
+                                       style="display: none;"
+                                       class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                        Cancel
+                                    </a>
+                                @endif
                                 <x-primary-button
                                     class="{{ $isGettingStarted ? $onboardingGlow : '' }}"
                                     :data-getting-started-highlight="$isGettingStarted ? 'wallet-save' : null">
-                                    Save wallet
+                                    @if ($isGettingStartedReplay)
+                                        <span x-text="hasValueChanged() ? 'Save wallet' : 'Verify wallet'"></span>
+                                    @else
+                                        Save wallet
+                                    @endif
                                 </x-primary-button>
                             </div>
 

@@ -527,6 +527,27 @@ class UserSettingsTest extends TestCase
         $response->assertSee('data-getting-started-highlight="wallet-key-helper"', false);
     }
 
+    public function test_wallet_settings_replay_mode_shows_verify_label_and_cancel_toggle_wiring(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now()->subMinute(),
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWalletSetting($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit', ['getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('Review it, then click Verify wallet to confirm this step.', false);
+        $response->assertSee('hasValueChanged() ? \'Save wallet\' : \'Verify wallet\'', false);
+        $response->assertSee('data-wallet-replay-cancel', false);
+        $response->assertSee('style="display: none;"', false);
+    }
+
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
     {
         Config::set('wallet.default_network', 'testnet');
