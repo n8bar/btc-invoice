@@ -117,33 +117,17 @@ This document is a temporary working strategy. It is not a source of truth like 
   - Keep treatment subtle and consistent (prefer static glow/border over constant animation).
   - Respect accessibility expectations (`prefers-reduced-motion`) if any motion cue is later introduced.
 
-### Finding 7: Completed users cannot intentionally restart onboarding from account menu
+### Finding 7: Completed users can’t meaningfully rerun Getting Started
 - Observation:
-  - Selecting `Getting started` from the account menu as a user who already completed onboarding currently returns a success-style banner indicating getting started is completed.
-  - The flow does not provide a clear, immediate way for that user to intentionally reset/re-run the onboarding sequence.
-  - This creates a dead-end for users who want a guided refresher.
+  - When a completed user re-enters Getting Started, existing wallet/invoice/delivery data makes steps appear complete immediately.
+  - This prevents a true guided rerun.
 - Direction:
-  - For completed users, provide an explicit restart affordance rather than only showing informational status.
-  - Keep the current completed state as default; restart should be intentional and user-triggered.
-- Preferred interaction shape:
-  - When a completed user chooses `Getting started`, show a compact banner/card with:
-    - plain-language completion state
-    - a secondary `Cancel`/dismiss action
-    - a primary `Start over` (or `Run setup again`) action
-  - On confirm/start-over:
-    - clear completion timestamp
-    - clear dismissed state
-    - redirect to onboarding welcome entry (internal orientation route), not mid-flow
-- Data/logic expectations:
-  - Restart should reset onboarding progress state only; it must not delete wallet, invoices, deliveries, or clients.
-  - Step derivation remains data-driven from existing records; restart only re-enables the guided flow and completion lifecycle.
-  - Keep this behavior idempotent and safe to trigger multiple times.
-- Constraints:
-  - Do not auto-reset on simple menu click; require explicit user confirmation/action.
-  - Keep copy concise and non-alarming (this is a guide reset, not data reset).
-  - Preserve current security model (auth-only action, CSRF-protected POST).
-- Acceptance checks:
-  - Completed user can intentionally restart from account menu in <=2 clicks after selecting `Getting started`.
-  - Restart sends user to onboarding welcome and shows progress as active/incomplete.
-  - Existing business data remains unchanged after restart.
-  - If user cancels restart, completion state remains intact.
+  - Add a persistent `Replay mode` for Getting Started (persists across logout).
+  - Replay should auto-advance steps, but only from replay-relevant actions.
+- Replay rules:
+  - Start replay with a `replay_started_at` timestamp.
+  - Step 1 (Wallet): user verifies current wallet settings (no new xpub required).
+  - Step 2 (Invoice): requires an invoice created at/after `replay_started_at`.
+  - Step 3 (Deliver): requires share/send activity tied to replay context (at/after `replay_started_at`).
+- Outcome:
+  - Users can intentionally run onboarding again without deleting existing business data.
