@@ -16,7 +16,7 @@
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                     <h3 class="text-base font-semibold text-gray-900">Create your first client</h3>
                     <p class="mt-2 text-sm text-gray-600">
-                        Invoices need a client first. Add one now, then we will return you to invoice creation.
+                        Invoices need a client first. Add one now, then we will continue to invoice creation.
                     </p>
 
                     <form method="POST" action="{{ route('clients.store') }}" class="mt-5 space-y-5">
