@@ -175,7 +175,7 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 - Run a new, focused QA set that re-checks core flow behavior and targets blind spots from earlier passes.
 - Suggested execution order (about 30-45 minutes total):
   - Pass A (10-15m): Core regressions
-    - New registrant lands on welcome entry and can complete all steps end-to-end.
+    - [x] New registrant lands on welcome entry and can complete all steps end-to-end.
     - Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
     - Replay-started user enters wallet step first and does not skip directly to dashboard.
   - Pass B (10-15m): Replay boundary checks
