@@ -8,7 +8,26 @@
                 @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
             @endisset
 
-            <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
+            @if ($showClientGate ?? false)
+                <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-base font-semibold text-gray-900">Create your first client</h3>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Invoices need a client first. Add one now, then we will return you to invoice creation.
+                    </p>
+
+                    <form method="POST" action="{{ route('clients.store') }}" class="mt-5 space-y-5">
+                        @csrf
+                        <input type="hidden" name="return_to" value="{{ $clientGateReturnTo }}">
+                        @include('clients.partials.form-fields', ['showNotes' => false])
+
+                        <div class="flex items-center justify-end gap-3">
+                            <a href="{{ route('clients.index') }}" class="text-sm text-gray-600 hover:underline">Manage clients</a>
+                            <x-primary-button>Create client</x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            @else
+                <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
                 @csrf
                 @if (request()->boolean('getting_started'))
                     <input type="hidden" name="getting_started" value="1">
@@ -194,6 +213,7 @@
                     <x-primary-button>Save</x-primary-button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 
@@ -241,6 +261,8 @@
             const usd = document.getElementById('amount_usd');
             const rate = document.getElementById('btc_rate');
             const btc = document.getElementById('amount_btc');
+
+            if (!usd || !rate || !btc) return;
 
             let active = null; // 'usd' | 'btc' | 'rate'
 

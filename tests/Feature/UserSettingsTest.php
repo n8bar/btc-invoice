@@ -74,6 +74,11 @@ class UserSettingsTest extends TestCase
             'invoice_default_terms_days' => 7,
         ]);
         $this->createWalletSetting($owner);
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
 
         $response = $this
             ->actingAs($owner)
@@ -89,6 +94,11 @@ class UserSettingsTest extends TestCase
     {
         $owner = User::factory()->create();
         $this->createWalletSetting($owner);
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
 
         Cache::put(BtcRate::CACHE_KEY, [
             'rate_usd' => 64_946.955,
@@ -103,6 +113,58 @@ class UserSettingsTest extends TestCase
         $response->assertOk();
         $response->assertSee('value="64946.96"', false);
         $response->assertDontSee('value="64946.955"', false);
+    }
+
+    public function test_invoice_create_shows_client_gate_when_no_clients_exist(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create', ['getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('Create your first client', false);
+        $response->assertSee('Back to connect wallet', false);
+        $response->assertSee('name="return_to"', false);
+        $response->assertSee(route('invoices.create', ['getting_started' => 1], false), false);
+        $response->assertDontSee('Client <span class="text-red-600" aria-hidden="true">*</span>', false);
+    }
+
+    public function test_client_store_from_invoice_gate_redirects_back_to_invoice_create_context(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('clients.store'), [
+                'name' => 'Acme',
+                'email' => 'billing@acme.test',
+                'return_to' => route('invoices.create', ['getting_started' => 1], false),
+            ]);
+
+        $response->assertRedirect(route('invoices.create', ['getting_started' => 1]));
+        $response->assertSessionHas('status', 'Client created.');
+        $this->assertDatabaseHas('clients', [
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+        ]);
+    }
+
+    public function test_client_store_ignores_external_return_to_and_redirects_to_clients_index(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('clients.store'), [
+                'name' => 'Acme',
+                'email' => 'billing@acme.test',
+                'return_to' => 'https://evil.example/phish',
+            ]);
+
+        $response->assertRedirect(route('clients.index'));
     }
 
     public function test_invoice_store_redirects_to_getting_started_deliver_step_when_context_flag_present(): void

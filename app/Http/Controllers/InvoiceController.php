@@ -297,6 +297,8 @@ class InvoiceController extends Controller
         $today = now()->toDateString(); // ✅ for invoice_date default
         $brandingDefaults = $this->brandingDefaults($request->user());
         $invoiceDefaults = $this->invoiceDefaults($request->user(), $today);
+        $clientGateReturnTo = route('invoices.create', $request->boolean('getting_started') ? ['getting_started' => 1] : [], false);
+        $showClientGate = $clients->isEmpty();
 
         return view('invoices.create', compact(
             'clients',
@@ -304,7 +306,9 @@ class InvoiceController extends Controller
             'prefillRate',
             'today',
             'brandingDefaults',
-            'invoiceDefaults'
+            'invoiceDefaults',
+            'showClientGate',
+            'clientGateReturnTo'
         ) + [
             'gettingStartedStrip' => $request->boolean('getting_started')
                 ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_INVOICE)
