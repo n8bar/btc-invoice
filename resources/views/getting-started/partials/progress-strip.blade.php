@@ -16,7 +16,7 @@
         </div>
         <a href="{{ $strip['back_url'] }}"
            class="inline-flex items-center rounded-md border border-indigo-300 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/35 dark:bg-slate-900/75 dark:text-indigo-100 dark:hover:bg-indigo-950/50 dark:focus:ring-offset-slate-900">
-            Back to getting started
+            {{ $strip['back_label'] ?? 'Back' }}
         </a>
     </div>
 

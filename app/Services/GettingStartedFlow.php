@@ -210,10 +210,20 @@ class GettingStartedFlow
         $steps = $snapshot['steps'];
         $current = $steps[$currentStep];
 
-        $backRouteParams = ['step' => $currentStep];
-        if ($currentStep === self::STEP_DELIVER && $deliverInvoice) {
-            $backRouteParams['invoice'] = $deliverInvoice->id;
-        }
+        [$backUrl, $backLabel] = match ($currentStep) {
+            self::STEP_WALLET => [
+                route('getting-started.welcome'),
+                'Back to welcome',
+            ],
+            self::STEP_INVOICE => [
+                route('getting-started.step', ['step' => self::STEP_WALLET]),
+                'Back to connect wallet',
+            ],
+            self::STEP_DELIVER => [
+                route('getting-started.step', ['step' => self::STEP_INVOICE]),
+                'Back to create invoice',
+            ],
+        };
 
         return [
             'steps' => array_values($steps),
@@ -221,7 +231,8 @@ class GettingStartedFlow
             'current_step' => $current,
             'step_count' => count($steps),
             'earliest_incomplete_step' => $snapshot['first_incomplete_step'],
-            'back_url' => route('getting-started.step', $backRouteParams),
+            'back_url' => $backUrl,
+            'back_label' => $backLabel,
         ];
     }
 

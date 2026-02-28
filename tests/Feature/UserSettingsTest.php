@@ -437,8 +437,8 @@ class UserSettingsTest extends TestCase
             ->get(route('wallet.settings.edit', ['getting_started' => 1]));
 
         $response->assertOk();
-        $response->assertSee('Back to getting started', false);
-        $response->assertSee(route('getting-started.step', ['step' => 'wallet']), false);
+        $response->assertSee('Back to welcome', false);
+        $response->assertSee(route('getting-started.welcome'), false);
     }
 
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
