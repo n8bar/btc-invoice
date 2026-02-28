@@ -172,22 +172,30 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 - Deliverable check: completed users can intentionally restart and progress through a meaningful guided rerun.
 
 8. New browser QA pass (coverage + gap finder)
-- Run a new, focused QA set that re-checks core flow behavior and also targets blind spots that prior passes may have missed.
-- Core regression checks:
-  - new registrant lands on welcome entry and can complete all steps end-to-end,
-  - incomplete returning user lands on resolver-first actionable step,
-  - completed user with replay mode can rerun flow without instant auto-complete from old artifacts.
-- Gap-finder checks:
-  - replay mode persistence across logout/login,
-  - replay step progression boundaries around `replay_started_at` (pre-existing vs post-replay actions),
-  - deliver-step behavior when multiple draft invoices exist (selection + progression correctness),
-  - dismissal/reopen/replay interactions do not conflict.
-- Coverage dimensions:
-  - light + dark mode,
-  - desktop + narrower screens,
-  - at least one keyboard-only pass through each step CTA path.
+- Run a new, focused QA set that re-checks core flow behavior and targets blind spots from earlier passes.
+- Suggested execution order (about 30-45 minutes total):
+  - Pass A (10-15m): Core regressions
+    - New registrant lands on welcome entry and can complete all steps end-to-end.
+    - Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
+    - Replay-started user enters wallet step first and does not skip directly to dashboard.
+  - Pass B (10-15m): Replay boundary checks
+    - Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
+    - New replay invoice advances to deliver step.
+    - Replay completion requires replay-era delivery activity and then closes with completion status.
+    - Replay state survives logout/login and resumes at the expected step.
+  - Pass C (5-10m): Deliver-step targeting correctness
+    - Multiple eligible draft invoices: Change selector swaps target correctly.
+    - Invalid or stale `?invoice=` falls back safely.
+    - Non-eligible invoices (sent/void/trashed/other-user) cannot become target invoice.
+  - Pass D (5-10m): UX/a11y quick sweep
+    - Light + dark mode contrast remains acceptable in step cards and highlighted actions.
+    - Desktop + narrower screens avoid horizontal overflow in step shell and progress strip.
+    - One keyboard-only run confirms CTA path is reachable without focus traps.
+- Evidence to capture during QA:
+  - User + scenario tested, exact route hit, expected vs actual result, and whether issue is reproducible.
+  - For regressions, include a short note on whether impact is block/major/minor.
 - Exit criteria:
-  - findings moved out of active queue only after this QA set passes and any new gaps are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
+  - Mark this item complete only when Passes A-D are done and any new issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
 
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
