@@ -116,7 +116,7 @@
                             </div>
 
                             <div>
-                                @include('wallet.partials.key-helper')
+                                @include('wallet.partials.key-helper', ['onboarding' => request()->boolean('getting_started')])
                             </div>
                         </form>
                     </div>

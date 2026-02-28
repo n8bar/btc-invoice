@@ -439,6 +439,7 @@ class UserSettingsTest extends TestCase
         $response->assertOk();
         $response->assertSee('Back to welcome', false);
         $response->assertSee(route('getting-started.welcome'), false);
+        $response->assertSee('Recommended for setup', false);
     }
 
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void
@@ -535,6 +536,7 @@ class UserSettingsTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Where do I find this?', false);
+        $response->assertDontSee('Recommended for setup', false);
         $response->assertSee('Ledger Live', false);
         $response->assertSee('Trezor Suite', false);
     }
