@@ -68,6 +68,23 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
+    public function test_replay_users_are_redirected_to_getting_started_on_login(): void
+    {
+        $user = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now(),
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('getting-started.start'));
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();

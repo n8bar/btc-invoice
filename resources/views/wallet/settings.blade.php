@@ -12,6 +12,7 @@
         $expectedPrefix = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
         $isTestnet = $defaultNetwork !== 'mainnet';
         $isGettingStarted = request()->boolean('getting_started');
+        $isGettingStartedReplay = (bool) ($isGettingStartedReplay ?? false);
         $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
     @endphp
 
@@ -66,6 +67,11 @@
                                 <p class="mt-1 text-xs text-gray-500">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
+                                @if ($isGettingStarted && $isGettingStartedReplay)
+                                    <p class="mt-1 text-xs text-indigo-700 dark:text-indigo-300">
+                                        Your wallet is already connected. Review it, then click Save wallet to verify this step.
+                                    </p>
+                                @endif
                                 <textarea id="bip84_xpub" name="bip84_xpub"
                                           rows="3"
                                           class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 {{ $isGettingStarted ? $onboardingGlow : '' }}"

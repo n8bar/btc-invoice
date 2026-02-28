@@ -26,6 +26,8 @@ class WalletSettingsController extends Controller
                 ->get(),
             'maxAdditionalWallets' => self::MAX_ADDITIONAL_ACCOUNTS,
             'defaultNetwork' => $network,
+            'isGettingStartedReplay' => $request->boolean('getting_started')
+                && $request->user()->gettingStartedReplayActive(),
             'gettingStartedStrip' => $request->boolean('getting_started')
                 ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_WALLET)
                 : null,
@@ -54,7 +56,7 @@ class WalletSettingsController extends Controller
         ]);
     }
 
-    public function update(WalletSettingRequest $request)
+    public function update(WalletSettingRequest $request, GettingStartedFlow $gettingStartedFlow)
     {
         $user = $request->user();
         $network = Config::get('wallet.default_network', 'testnet');
@@ -87,6 +89,8 @@ class WalletSettingsController extends Controller
         }
 
         if ($request->boolean('getting_started')) {
+            $gettingStartedFlow->markReplayWalletVerified($user);
+
             return redirect()->route('getting-started.start')
                 ->with('status', 'Wallet settings saved.');
         }

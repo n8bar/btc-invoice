@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 
 class GettingStartedFlow
 {
@@ -28,29 +29,45 @@ class GettingStartedFlow
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function stepDefinitions(): array
+    public function stepDefinitions(bool $replayMode = false): array
     {
+        $walletBody = $replayMode
+            ? 'Review your current wallet account key and confirm the settings look correct.'
+            : 'Add your wallet account key so CryptoZing can generate a payment address for each invoice.';
+        $walletCriteria = $replayMode
+            ? 'Confirm your wallet settings in this replay.'
+            : 'Save a valid wallet account key.';
+        $invoiceBody = $replayMode
+            ? 'Create a new invoice to continue this getting-started replay.'
+            : 'Create an invoice to continue getting started.';
+        $invoiceCriteria = $replayMode
+            ? 'Create at least one invoice after replay starts.'
+            : 'Create at least one invoice.';
+        $deliverCriteria = $replayMode
+            ? 'Enable a public link and log a delivery attempt for a replay invoice.'
+            : 'Enable a public link and log a delivery attempt.';
+
         return [
             self::STEP_WALLET => [
                 'label' => 'Connect wallet',
                 'title' => 'Connect your wallet',
-                'body' => 'Add your wallet account key so CryptoZing can generate a payment address for each invoice.',
+                'body' => $walletBody,
                 'cta_label' => 'Open wallet settings',
-                'criteria' => 'Save a valid wallet account key.',
+                'criteria' => $walletCriteria,
             ],
             self::STEP_INVOICE => [
                 'label' => 'Create invoice',
                 'title' => 'Create your first invoice',
-                'body' => 'Create an invoice to continue getting started.',
+                'body' => $invoiceBody,
                 'cta_label' => 'Create invoice',
-                'criteria' => 'Create at least one invoice.',
+                'criteria' => $invoiceCriteria,
             ],
             self::STEP_DELIVER => [
                 'label' => 'Share + deliver',
                 'title' => 'Share and send your invoice',
                 'body' => 'Enable the public link, then send the invoice email.',
                 'cta_label' => 'Open invoice',
-                'criteria' => 'Enable a public link and log a delivery attempt.',
+                'criteria' => $deliverCriteria,
             ],
         ];
     }
@@ -80,13 +97,10 @@ class GettingStartedFlow
      */
     public function snapshot(User $user): array
     {
-        $walletComplete = $user->walletSetting()->exists();
-        $invoiceComplete = $user->invoices()->exists();
-        $deliverComplete = Invoice::query()
-            ->ownedBy($user)
-            ->where('public_enabled', true)
-            ->whereHas('deliveries')
-            ->exists();
+        $replayStartedAt = $this->replayStartedAt($user);
+        $walletComplete = $this->walletStepComplete($user, $replayStartedAt);
+        $invoiceComplete = $this->invoiceStepComplete($user, $replayStartedAt);
+        $deliverComplete = $this->deliverStepComplete($user, $replayStartedAt);
 
         $completionMap = [
             self::STEP_WALLET => $walletComplete,
@@ -96,7 +110,7 @@ class GettingStartedFlow
 
         $steps = [];
         $firstIncomplete = null;
-        $definitions = $this->stepDefinitions();
+        $definitions = $this->stepDefinitions($replayStartedAt !== null);
 
         foreach ($this->stepOrder() as $index => $step) {
             $complete = $completionMap[$step];
@@ -116,12 +130,13 @@ class GettingStartedFlow
             'steps' => $steps,
             'first_incomplete_step' => $firstIncomplete,
             'is_complete' => $firstIncomplete === null,
+            'is_replay' => $replayStartedAt !== null,
         ];
     }
 
     public function resolveDeliverInvoice(User $user, mixed $requestedInvoiceId = null): ?Invoice
     {
-        $query = $this->deliverInvoiceQuery($user);
+        $query = $this->deliverInvoiceQuery($user, $this->replayStartedAt($user));
 
         if ($requestedInvoiceId !== null) {
             $invoiceId = filter_var($requestedInvoiceId, FILTER_VALIDATE_INT, [
@@ -147,7 +162,7 @@ class GettingStartedFlow
      */
     public function deliverInvoiceOptions(User $user): Collection
     {
-        return $this->deliverInvoiceQuery($user)
+        return $this->deliverInvoiceQuery($user, $this->replayStartedAt($user))
             ->with('client:id,name')
             ->latest('id')
             ->get(['id', 'client_id', 'number', 'status']);
@@ -160,10 +175,14 @@ class GettingStartedFlow
         $user->forceFill([
             'getting_started_completed_at' => $timestamp,
             'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
         ])->save();
 
         $user->setAttribute('getting_started_completed_at', $timestamp);
         $user->setAttribute('getting_started_dismissed', false);
+        $user->setAttribute('getting_started_replay_started_at', null);
+        $user->setAttribute('getting_started_replay_wallet_verified_at', null);
     }
 
     public function dismiss(User $user): void
@@ -173,21 +192,50 @@ class GettingStartedFlow
         $user->forceFill([
             'getting_started_completed_at' => $timestamp,
             'getting_started_dismissed' => true,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
         ])->save();
 
         $user->setAttribute('getting_started_completed_at', $timestamp);
         $user->setAttribute('getting_started_dismissed', true);
+        $user->setAttribute('getting_started_replay_started_at', null);
+        $user->setAttribute('getting_started_replay_wallet_verified_at', null);
     }
 
     public function reopen(User $user): void
     {
+        $replayStartedAt = $this->isCompleteFromExistingData($user) ? now() : null;
+
         $user->forceFill([
             'getting_started_completed_at' => null,
             'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => $replayStartedAt,
+            'getting_started_replay_wallet_verified_at' => null,
         ])->save();
 
         $user->setAttribute('getting_started_completed_at', null);
         $user->setAttribute('getting_started_dismissed', false);
+        $user->setAttribute('getting_started_replay_started_at', $replayStartedAt);
+        $user->setAttribute('getting_started_replay_wallet_verified_at', null);
+    }
+
+    public function markReplayWalletVerified(User $user): void
+    {
+        if (! $user->gettingStartedReplayActive()) {
+            return;
+        }
+
+        if (! $user->walletSetting()->exists()) {
+            return;
+        }
+
+        $timestamp = now();
+
+        $user->forceFill([
+            'getting_started_replay_wallet_verified_at' => $timestamp,
+        ])->save();
+
+        $user->setAttribute('getting_started_replay_wallet_verified_at', $timestamp);
     }
 
     public function doneStatusMessage(User $user): string
@@ -236,10 +284,74 @@ class GettingStartedFlow
         ];
     }
 
-    private function deliverInvoiceQuery(User $user): Builder
+    private function deliverInvoiceQuery(User $user, ?Carbon $replayStartedAt = null): Builder
     {
-        return Invoice::query()
+        $query = Invoice::query()
             ->ownedBy($user)
             ->where('status', 'draft');
+
+        if ($replayStartedAt !== null) {
+            $query->where('created_at', '>', $replayStartedAt);
+        }
+
+        return $query;
+    }
+
+    private function replayStartedAt(User $user): ?Carbon
+    {
+        return $user->gettingStartedReplayActive()
+            ? $user->getting_started_replay_started_at
+            : null;
+    }
+
+    private function walletStepComplete(User $user, ?Carbon $replayStartedAt): bool
+    {
+        if (! $user->walletSetting()->exists()) {
+            return false;
+        }
+
+        if ($replayStartedAt === null) {
+            return true;
+        }
+
+        $verifiedAt = $user->getting_started_replay_wallet_verified_at;
+
+        return $verifiedAt !== null && $verifiedAt->greaterThanOrEqualTo($replayStartedAt);
+    }
+
+    private function invoiceStepComplete(User $user, ?Carbon $replayStartedAt): bool
+    {
+        $query = $user->invoices();
+
+        if ($replayStartedAt !== null) {
+            $query->where('created_at', '>', $replayStartedAt);
+        }
+
+        return $query->exists();
+    }
+
+    private function deliverStepComplete(User $user, ?Carbon $replayStartedAt): bool
+    {
+        $query = Invoice::query()
+            ->ownedBy($user)
+            ->where('public_enabled', true);
+
+        if ($replayStartedAt !== null) {
+            $query->where('created_at', '>', $replayStartedAt)
+                ->whereHas('deliveries', static function (Builder $deliveries) use ($replayStartedAt): void {
+                    $deliveries->where('created_at', '>', $replayStartedAt);
+                });
+        } else {
+            $query->whereHas('deliveries');
+        }
+
+        return $query->exists();
+    }
+
+    private function isCompleteFromExistingData(User $user): bool
+    {
+        return $this->walletStepComplete($user, null)
+            && $this->invoiceStepComplete($user, null)
+            && $this->deliverStepComplete($user, null);
     }
 }

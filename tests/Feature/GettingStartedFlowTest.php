@@ -198,6 +198,8 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertTrue($owner->getting_started_dismissed);
         $this->assertNotNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
 
         $this->actingAs($owner)
             ->post(route('getting-started.reopen'))
@@ -206,6 +208,107 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertFalse($owner->getting_started_dismissed);
         $this->assertNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+    }
+
+    public function test_completed_user_can_replay_with_post_replay_progress_requirements(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $completedInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $completedInvoice->enablePublicShare();
+        $baselineDelivery = InvoiceDelivery::create([
+            'invoice_id' => $completedInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Completed baseline',
+            'dispatched_at' => now()->subMinute(),
+        ]);
+        $baselineDelivery->forceFill([
+            'created_at' => now()->subMinute(),
+            'updated_at' => now()->subMinute(),
+        ])->save();
+
+        $owner->forceFill([
+            'getting_started_completed_at' => now(),
+            'getting_started_dismissed' => false,
+        ])->save();
+
+        $this->actingAs($owner)
+            ->post(route('getting-started.reopen'))
+            ->assertRedirect(route('getting-started.start'));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
+        $this->assertNotNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
+
+        $owner->forceFill([
+            'getting_started_replay_wallet_verified_at' => now()->addSecond(),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $replayInvoice->forceFill([
+            'created_at' => now()->addSeconds(2),
+            'updated_at' => now()->addSeconds(2),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', [
+                'step' => 'deliver',
+                'invoice' => $replayInvoice->id,
+            ]));
+
+        $replayInvoice->enablePublicShare();
+        $replayInvoice->refresh();
+        $replayInvoice->forceFill([
+            'created_at' => now()->addSeconds(3),
+            'updated_at' => now()->addSeconds(3),
+        ])->save();
+
+        $replayDelivery = InvoiceDelivery::create([
+            'invoice_id' => $replayInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Replay complete',
+            'dispatched_at' => now()->addSeconds(4),
+        ]);
+        $replayDelivery->forceFill([
+            'created_at' => now()->addSeconds(4),
+            'updated_at' => now()->addSeconds(4),
+        ])->save();
+
+        $response = $this->actingAs($owner)->get(route('getting-started.start'));
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('status', 'Getting started complete.');
+
+        $owner->refresh();
+        $this->assertNotNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
     }
 
     public function test_start_marks_flow_complete_and_redirects_to_dashboard_when_steps_are_done(): void
