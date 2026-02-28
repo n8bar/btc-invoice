@@ -296,6 +296,37 @@ class DashboardSnapshotTest extends TestCase
         );
     }
 
+    public function test_completed_non_dismissed_user_getting_started_menu_requires_replay_confirmation(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => Carbon::parse('2026-02-20 14:30:00', config('app.timezone')),
+            'getting_started_dismissed' => false,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('data-getting-started-reopen-mode="confirm"', false);
+        $response->assertSee('data-getting-started-completed-date="February 20, 2026"', false);
+        $response->assertSee('data-getting-started-reopen-message="You already completed this on February 20, 2026. Would you like to run through it again?"', false);
+    }
+
+    public function test_dismissed_user_getting_started_menu_reopens_without_confirmation(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => Carbon::parse('2026-02-20 14:30:00', config('app.timezone')),
+            'getting_started_dismissed' => true,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('data-getting-started-reopen-mode="direct"', false);
+        $response->assertDontSee('data-getting-started-reopen-mode="confirm"', false);
+        $response->assertDontSee('data-getting-started-completed-date=', false);
+        $response->assertDontSee('data-getting-started-reopen-message=', false);
+    }
+
     private int $invoiceSequence = 0;
 
     private function makeClient(User $owner, string $name = 'Client'): Client

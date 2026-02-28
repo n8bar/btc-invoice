@@ -168,6 +168,9 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
   - Wallet step: verify current wallet settings (no new xpub required).
   - Invoice step: requires an invoice created at/after `replay_started_at`.
   - Deliver step: requires share/send activity at/after `replay_started_at`.
+- Replay entry behavior from user menu:
+  - If Getting Started was dismissed, reopen starts immediately.
+  - If Getting Started was completed (not dismissed), show a confirmation that includes the recorded completion date before starting replay.
 - Keep existing business data intact; replay resets onboarding guidance state, not wallets/invoices/clients.
 - Deliverable check: completed users can intentionally restart and progress through a meaningful guided rerun.
 
@@ -176,7 +179,7 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 - Suggested execution order (about 30-45 minutes total):
   - Pass A (10-15m): Core regressions
     - [x] New registrant lands on welcome entry and can complete all steps end-to-end.
-    - Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
+    - [x] Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
     - Replay-started user enters wallet step first and does not skip directly to dashboard.
   - Pass B (10-15m): Replay boundary checks
     - Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
