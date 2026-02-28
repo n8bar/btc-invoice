@@ -181,12 +181,12 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
   - Pass A (10-15m): Core regressions
     - [x] New registrant lands on welcome entry and can complete all steps end-to-end.
     - [x] Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
-    - Replay-started user enters wallet step first and does not skip directly to dashboard.
+    - [x] Replay-started user enters wallet step first and does not skip directly to dashboard.
   - Pass B (10-15m): Replay boundary checks
-    - Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
-    - New replay invoice advances to deliver step.
-    - Replay completion requires replay-era delivery activity and then closes with completion status.
-    - Replay state survives logout/login and resumes at the expected step.
+    - [x] Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
+    - [x] New replay invoice advances to deliver step.
+    - [ ] Replay completion requires replay-era delivery activity and then closes with completion status.
+    - [x] Replay state survives logout/login and resumes at the expected step.
   - Pass C (5-10m): Deliver-step targeting correctness
     - Multiple eligible draft invoices: Change selector swaps target correctly.
     - Invalid or stale `?invoice=` falls back safely.
