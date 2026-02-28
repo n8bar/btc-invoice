@@ -35,16 +35,16 @@ class GettingStartedFlow
             ? 'Review your current wallet account key and confirm the settings look correct.'
             : 'Add your wallet account key so CryptoZing can generate a payment address for each invoice.';
         $walletCriteria = $replayMode
-            ? 'Confirm your wallet settings in this replay.'
+            ? 'Confirm your wallet settings in this setup run.'
             : 'Save a valid wallet account key.';
         $invoiceBody = $replayMode
-            ? 'Create a new invoice to continue this getting-started replay.'
+            ? 'Create a new invoice to continue setup.'
             : 'Create an invoice to continue getting started.';
         $invoiceCriteria = $replayMode
-            ? 'Create at least one invoice after replay starts.'
+            ? 'Create at least one new invoice in this setup run.'
             : 'Create at least one invoice.';
         $deliverCriteria = $replayMode
-            ? 'Enable a public link and log a delivery attempt for a replay invoice.'
+            ? 'Enable a public link and log a delivery attempt for a new invoice.'
             : 'Enable a public link and log a delivery attempt.';
 
         return [
