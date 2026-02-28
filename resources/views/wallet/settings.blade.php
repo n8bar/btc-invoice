@@ -11,6 +11,8 @@
         $xpubValue = ($oldXpub !== null && $oldXpub !== '') ? $oldXpub : (optional($wallet)->bip84_xpub ?? '');
         $expectedPrefix = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
         $isTestnet = $defaultNetwork !== 'mainnet';
+        $isGettingStarted = request()->boolean('getting_started');
+        $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
     @endphp
 
     <div class="py-10">
@@ -49,7 +51,7 @@
                               x-init="init()"
                               @submit.prevent="handleSubmit($event)">
                             @csrf
-                            @if (request()->boolean('getting_started'))
+                            @if ($isGettingStarted)
                                 <input type="hidden" name="getting_started" value="1">
                             @endif
 
@@ -66,13 +68,14 @@
                                 </p>
                                 <textarea id="bip84_xpub" name="bip84_xpub"
                                           rows="3"
-                                          class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100"
+                                          class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 {{ $isGettingStarted ? $onboardingGlow : '' }}"
                                           autocomplete="off"
                                           autocapitalize="none"
                                           autocorrect="off"
                                           spellcheck="false"
                                           required
                                           @if ($errors->has('bip84_xpub')) autofocus @endif
+                                          @if ($isGettingStarted) data-getting-started-highlight="wallet-key-input" @endif
                                           x-ref="input"
                                           x-model="value"
                                           @input="handleInput"
@@ -112,7 +115,11 @@
                             </div>
 
                             <div class="flex items-center gap-4">
-                                <x-primary-button>Save wallet</x-primary-button>
+                                <x-primary-button
+                                    class="{{ $isGettingStarted ? $onboardingGlow : '' }}"
+                                    :data-getting-started-highlight="$isGettingStarted ? 'wallet-save' : null">
+                                    Save wallet
+                                </x-primary-button>
                             </div>
 
                             <div>

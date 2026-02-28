@@ -138,6 +138,8 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertOk();
         $response->assertSee('Back to create invoice', false);
         $response->assertSee(route('getting-started.step', ['step' => 'invoice']), false);
+        $response->assertSee('data-getting-started-highlight="deliver-send-invoice"', false);
+        $response->assertSee('data-getting-started-highlight="deliver-enable-public-link"', false);
     }
 
     public function test_invoice_edit_cancel_link_points_to_invoice_show(): void

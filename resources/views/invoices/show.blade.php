@@ -186,6 +186,7 @@
 
             @php
                 $canDeliver = $invoice->client && !empty($invoice->client->email) && $invoice->public_enabled;
+                $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
             @endphp
 
             <div class="rounded-lg bg-white p-6 shadow">
@@ -215,7 +216,13 @@
                         CC myself
                     </label>
                     <div>
-                        <x-primary-button type="submit" :disabled="!$canDeliver">Send invoice</x-primary-button>
+                        <x-primary-button
+                            type="submit"
+                            :disabled="!$canDeliver"
+                            class="{{ $gettingStartedContext ? $onboardingGlow : '' }}"
+                            :data-getting-started-highlight="$gettingStartedContext ? 'deliver-send-invoice' : null">
+                            Send invoice
+                        </x-primary-button>
                     </div>
                 </form>
             </div>
@@ -834,7 +841,11 @@
                         </div>
 
                         <div>
-                            <x-primary-button class="w-full sm:w-auto">Enable public link</x-primary-button>
+                            <x-primary-button
+                                class="w-full sm:w-auto {{ $gettingStartedContext ? $onboardingGlow : '' }}"
+                                :data-getting-started-highlight="$gettingStartedContext ? 'deliver-enable-public-link' : null">
+                                Enable public link
+                            </x-primary-button>
                         </div>
                     </form>
 

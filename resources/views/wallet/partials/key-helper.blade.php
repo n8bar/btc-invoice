@@ -5,7 +5,9 @@
         : 'rounded border border-gray-200 bg-gray-50/60 p-3 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-300';
 @endphp
 
-<details class="{{ $detailsClasses }}" data-wallet-key-helper="{{ $onboarding ? 'onboarding' : 'default' }}">
+<details class="{{ $detailsClasses }}"
+         data-wallet-key-helper="{{ $onboarding ? 'onboarding' : 'default' }}"
+         @if ($onboarding) data-getting-started-highlight="wallet-key-helper" @endif>
     <summary class="flex cursor-pointer items-center justify-between gap-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
         <span>Where do I find this?</span>
         @if ($onboarding)

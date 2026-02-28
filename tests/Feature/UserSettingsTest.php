@@ -129,7 +129,27 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Back to connect wallet', false);
         $response->assertSee('name="return_to"', false);
         $response->assertSee(route('invoices.create', ['getting_started' => 1], false), false);
+        $response->assertSee('data-getting-started-highlight="invoice-create-client"', false);
         $response->assertDontSee('Client <span class="text-red-600" aria-hidden="true">*</span>', false);
+    }
+
+    public function test_invoice_create_shows_save_highlight_when_getting_started_with_clients(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create', ['getting_started' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('data-getting-started-highlight="invoice-save"', false);
+        $response->assertDontSee('Create your first client', false);
     }
 
     public function test_client_store_from_invoice_gate_redirects_back_to_invoice_create_context(): void
@@ -502,6 +522,9 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Back to welcome', false);
         $response->assertSee(route('getting-started.welcome'), false);
         $response->assertSee('Recommended for setup', false);
+        $response->assertSee('data-getting-started-highlight="wallet-key-input"', false);
+        $response->assertSee('data-getting-started-highlight="wallet-save"', false);
+        $response->assertSee('data-getting-started-highlight="wallet-key-helper"', false);
     }
 
     public function test_wallet_settings_accepts_realistic_testnet_wallet_key_length(): void

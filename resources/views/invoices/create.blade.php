@@ -7,6 +7,10 @@
             @isset($gettingStartedStrip)
                 @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
             @endisset
+            @php
+                $isGettingStartedContext = request()->boolean('getting_started');
+                $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
+            @endphp
 
             @if ($showClientGate ?? false)
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -22,14 +26,18 @@
 
                         <div class="flex items-center justify-end gap-3">
                             <a href="{{ route('clients.index') }}" class="text-sm text-gray-600 hover:underline">Manage clients</a>
-                            <x-primary-button>Create client</x-primary-button>
+                            <x-primary-button
+                                class="{{ $isGettingStartedContext ? $onboardingGlow : '' }}"
+                                :data-getting-started-highlight="$isGettingStartedContext ? 'invoice-create-client' : null">
+                                Create client
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
             @else
                 <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
                 @csrf
-                @if (request()->boolean('getting_started'))
+                @if ($isGettingStartedContext)
                     <input type="hidden" name="getting_started" value="1">
                 @endif
                 @php
@@ -210,7 +218,11 @@
 
                 <div class="flex items-center justify-end gap-3">
                     <a href="{{ route('invoices.index') }}" class="text-gray-600 hover:underline">Cancel</a>
-                    <x-primary-button>Save</x-primary-button>
+                    <x-primary-button
+                        class="{{ $isGettingStartedContext ? $onboardingGlow : '' }}"
+                        :data-getting-started-highlight="$isGettingStartedContext ? 'invoice-save' : null">
+                        Save
+                    </x-primary-button>
                 </div>
             </form>
             @endif
