@@ -83,6 +83,9 @@ class DashboardSnapshotTest extends TestCase
         $response->assertSee('Past due', false);
         $response->assertSee('1', false);
         $response->assertSee('$200.00', false); // recent payment
+        $response->assertSee('Resume getting started', false);
+        $response->assertSee('Hide for now', false);
+        $response->assertSee('data-getting-started-temp-hide', false);
         $response->assertSee($partial->number, false);
         $response->assertDontSee('tx-other', false);
 
