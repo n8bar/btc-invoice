@@ -16,7 +16,7 @@
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
-- Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away.
+- Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
 
 ## Multi-Agent Coordination
@@ -46,7 +46,7 @@
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
-- Whenever `docs/**` changes, commit/push those updates right away.
+- Whenever `docs/**` changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
 ## Roles
