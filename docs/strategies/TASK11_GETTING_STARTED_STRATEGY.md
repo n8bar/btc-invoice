@@ -159,10 +159,33 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 - Keep emphasis static/subtle for pass1 (no looping animation).
 - Deliverable check: QA can identify required action areas quickly in each step.
 
-7. Pass completion criteria
-- Re-run Task11 browser QA core path and targeted edge checks against these findings.
-- Capture any new issues in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
-- Only move findings out of active queue after both light-mode and dark-mode checks pass.
+7. Replay mode for completed users (Finding 7)
+- Add a persistent replay mode so completed users can intentionally run Getting Started again without old data auto-completing every step.
+- Introduce replay state keyed by a `replay_started_at` timestamp (must persist across logout).
+- Step rules in replay mode:
+  - Wallet step: verify current wallet settings (no new xpub required).
+  - Invoice step: requires an invoice created at/after `replay_started_at`.
+  - Deliver step: requires share/send activity at/after `replay_started_at`.
+- Keep existing business data intact; replay resets onboarding guidance state, not wallets/invoices/clients.
+- Deliverable check: completed users can intentionally restart and progress through a meaningful guided rerun.
+
+8. New browser QA pass (coverage + gap finder)
+- Run a new, focused QA set that re-checks core flow behavior and also targets blind spots that prior passes may have missed.
+- Core regression checks:
+  - new registrant lands on welcome entry and can complete all steps end-to-end,
+  - incomplete returning user lands on resolver-first actionable step,
+  - completed user with replay mode can rerun flow without instant auto-complete from old artifacts.
+- Gap-finder checks:
+  - replay mode persistence across logout/login,
+  - replay step progression boundaries around `replay_started_at` (pre-existing vs post-replay actions),
+  - deliver-step behavior when multiple draft invoices exist (selection + progression correctness),
+  - dismissal/reopen/replay interactions do not conflict.
+- Coverage dimensions:
+  - light + dark mode,
+  - desktop + narrower screens,
+  - at least one keyboard-only pass through each step CTA path.
+- Exit criteria:
+  - findings moved out of active queue only after this QA set passes and any new gaps are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
 
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
