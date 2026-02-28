@@ -211,9 +211,12 @@ class GettingStartedFlowTest extends TestCase
         $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'deliver']));
         $response->assertOk();
         $response->assertSee('No new draft invoice is available for delivery.', false);
-        $response->assertSee('Create new draft invoice', false);
+        $response->assertSeeInOrder([
+            'No new draft invoice is available for delivery.',
+            'Create new draft invoice',
+        ], false);
         $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
-        $response->assertSee('Go to create invoice', false);
+        $response->assertDontSee('Go to create invoice', false);
         $response->assertSee('data-getting-started-step-link="wallet"', false);
         $response->assertSee('data-getting-started-step-link="invoice"', false);
         $response->assertSee('data-getting-started-step-link="deliver"', false);

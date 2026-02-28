@@ -93,16 +93,6 @@
                                 <p class="mt-1">
                                     Create a new draft invoice, then return here to enable the public link and send it.
                                 </p>
-                                <div class="mt-3 flex flex-wrap items-center gap-2">
-                                    <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
-                                       class="inline-flex items-center rounded-md bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
-                                        Create new draft invoice
-                                    </a>
-                                    <a href="{{ route('getting-started.step', ['step' => 'invoice']) }}"
-                                       class="inline-flex items-center text-xs font-semibold text-amber-900 underline-offset-2 hover:underline">
-                                        Go to create invoice
-                                    </a>
-                                </div>
                             </div>
                         @endif
 
