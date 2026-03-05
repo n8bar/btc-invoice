@@ -235,20 +235,16 @@ class GettingStartedFlowTest extends TestCase
         $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
         $response->assertOk();
         $response->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
-        $response->assertSeeInOrder([
-            'Your latest invoice is no longer draft. Create a new draft invoice to continue.',
-            'Try creating a new draft invoice',
-        ], false);
-        $response->assertSee('If this happened immediately, your wallet account may have activity from outside CryptoZing.', false);
-        $response->assertSee('CryptoZing requires a dedicated-use wallet account, and receiving payments in other wallets is not supported.', false);
+        $response->assertSee('If this happened instantly, this wallet account may also be receiving payments from another wallet app.', false);
+        $response->assertSee('CryptoZing requires a dedicated-use wallet account. Receiving payments using other wallet apps is not supported. CryptoZing cannot reliably separate invoice payments from unrelated wallet activity.', false);
         $response->assertSee('Connect a different wallet instead', false);
         $response->assertSee(route('getting-started.reconnect-wallet'), false);
         $response->assertSeeInOrder([
             'Success criteria',
             'Create at least one draft invoice.',
-            'Try creating a new draft invoice',
         ], false);
         $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
+        $response->assertSee('Try creating a new draft invoice', false);
         $response->assertDontSee('Go to create invoice', false);
         $response->assertDontSee('No new draft invoice is available for delivery.', false);
     }

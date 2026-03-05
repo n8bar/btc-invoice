@@ -46,8 +46,8 @@
                             <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" style="border-color: currentColor;">
                                 <p class="font-semibold">Your latest invoice is no longer draft. Create a new draft invoice to continue.</p>
                                 <p class="mt-1">
-                                    If this happened immediately, your wallet account may have activity from outside CryptoZing.
-                                    CryptoZing requires a dedicated-use wallet account, and receiving payments in other wallets is not supported.
+                                    If this happened instantly, this wallet account may also be receiving payments from another wallet app.
+                                    CryptoZing requires a dedicated-use wallet account. Receiving payments using other wallet apps is not supported. CryptoZing cannot reliably separate invoice payments from unrelated wallet activity.
                                 </p>
                                 <form method="POST" action="{{ route('getting-started.reconnect-wallet') }}" class="mt-2">
                                     @csrf
@@ -56,10 +56,6 @@
                                         Connect a different wallet instead
                                     </button>
                                 </form>
-                                <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
-                                   class="mt-2 inline-flex items-center font-semibold text-amber-900 underline underline-offset-2 hover:text-amber-700">
-                                    Try creating a new draft invoice
-                                </a>
                             </div>
                         @endif
 
