@@ -41,7 +41,7 @@ class GettingStartedFlow
             ? 'Create a new invoice to continue setup.'
             : 'Create an invoice to continue getting started.';
         $invoiceCriteria = $replayMode
-            ? 'Create at least one new invoice in this setup run.'
+            ? 'Create at least one new draft invoice in this setup run.'
             : 'Create at least one invoice.';
         $deliverCriteria = $replayMode
             ? 'Enable a public link, then send one of your new invoices.'
@@ -321,13 +321,11 @@ class GettingStartedFlow
 
     private function invoiceStepComplete(User $user, ?Carbon $replayStartedAt): bool
     {
-        $query = $user->invoices();
-
         if ($replayStartedAt !== null) {
-            $query->where('created_at', '>', $replayStartedAt);
+            return $this->deliverInvoiceQuery($user, $replayStartedAt)->exists();
         }
 
-        return $query->exists();
+        return $user->invoices()->exists();
     }
 
     private function deliverStepComplete(User $user, ?Carbon $replayStartedAt): bool

@@ -187,7 +187,7 @@ class GettingStartedFlowTest extends TestCase
             ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
     }
 
-    public function test_deliver_step_shows_no_new_draft_state_when_replay_has_no_draft_target(): void
+    public function test_replay_requires_new_draft_invoice_before_deliver_step(): void
     {
         $owner = User::factory()->create([
             'getting_started_completed_at' => null,
@@ -203,6 +203,28 @@ class GettingStartedFlowTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+    }
+
+    public function test_deliver_step_shows_no_new_draft_state_when_non_replay_has_no_draft_target(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
 
         $this->actingAs($owner)
             ->get(route('getting-started.start'))
@@ -233,7 +255,7 @@ class GettingStartedFlowTest extends TestCase
         $this->createWallet($owner);
         $client = $this->createClient($owner);
 
-        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'paid']);
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
         $replayInvoice->forceFill([
             'created_at' => now(),
             'updated_at' => now(),
