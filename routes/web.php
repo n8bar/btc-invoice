@@ -47,6 +47,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getting-started/welcome', [GettingStartedController::class, 'welcome'])->name('getting-started.welcome');
     Route::post('/getting-started/dismiss', [GettingStartedController::class, 'dismiss'])->name('getting-started.dismiss');
     Route::post('/getting-started/reopen', [GettingStartedController::class, 'reopen'])->name('getting-started.reopen');
+    Route::post('/getting-started/reconnect-wallet', [GettingStartedController::class, 'reconnectWallet'])
+        ->name('getting-started.reconnect-wallet');
     Route::get('/getting-started/{step}', [GettingStartedController::class, 'step'])
         ->where('step', 'wallet|invoice|deliver')
         ->name('getting-started.step');

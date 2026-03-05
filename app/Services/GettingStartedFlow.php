@@ -226,6 +226,23 @@ class GettingStartedFlow
         $user->setAttribute('getting_started_replay_wallet_verified_at', null);
     }
 
+    public function requireWalletReconnect(User $user): void
+    {
+        $timestamp = now();
+
+        $user->forceFill([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => $timestamp,
+            'getting_started_replay_wallet_verified_at' => null,
+        ])->save();
+
+        $user->setAttribute('getting_started_completed_at', null);
+        $user->setAttribute('getting_started_dismissed', false);
+        $user->setAttribute('getting_started_replay_started_at', $timestamp);
+        $user->setAttribute('getting_started_replay_wallet_verified_at', null);
+    }
+
     public function markReplayWalletVerified(User $user): void
     {
         if (! $user->gettingStartedReplayActive()) {

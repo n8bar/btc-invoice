@@ -144,7 +144,7 @@ class GettingStartedController extends Controller
             $showInvoiceDraftRequiredWarning = $hasAnyInvoice && !$hasDraftInvoice;
 
             if ($showInvoiceDraftRequiredWarning) {
-                $actionLabel = 'Create new draft invoice';
+                $actionLabel = 'Try creating a new draft invoice';
             }
         }
 
@@ -200,6 +200,13 @@ class GettingStartedController extends Controller
         $flow->reopen($request->user());
 
         return redirect()->route('getting-started.start');
+    }
+
+    public function reconnectWallet(Request $request, GettingStartedFlow $flow): RedirectResponse
+    {
+        $flow->requireWalletReconnect($request->user());
+
+        return redirect()->route('wallet.settings.edit', ['getting_started' => 1]);
     }
 
     /**

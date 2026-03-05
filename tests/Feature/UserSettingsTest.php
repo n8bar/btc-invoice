@@ -115,6 +115,38 @@ class UserSettingsTest extends TestCase
         $response->assertDontSee('value="64946.955"', false);
     }
 
+    public function test_invoice_create_suggested_number_skips_trashed_invoices(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $trashedInvoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-0001',
+            'description' => 'Trashed seed invoice',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qtrashedinvoice0000000000000000000',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+        $trashedInvoice->delete();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('placeholder="INV-0002"', false);
+    }
+
     public function test_invoice_create_shows_client_gate_when_no_clients_exist(): void
     {
         $owner = User::factory()->create();
@@ -386,6 +418,66 @@ class UserSettingsTest extends TestCase
             'user_id' => $owner->id,
             'number' => 'INV-0001',
         ]);
+    }
+
+    public function test_invoice_store_retries_with_new_number_when_insert_collision_occurs_after_validation(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) use ($owner, $client): void {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturnUsing(function () use ($owner, $client): string {
+                    Invoice::create([
+                        'user_id' => $owner->id,
+                        'client_id' => $client->id,
+                        'number' => 'INV-0042',
+                        'description' => 'Inserted during request to simulate race',
+                        'amount_usd' => 95,
+                        'btc_rate' => 50_000,
+                        'amount_btc' => 0.0019,
+                        'payment_address' => 'tb1qexistingduringrequest000000000000000',
+                        'derivation_index' => 9999,
+                        'status' => 'draft',
+                        'invoice_date' => '2025-01-01',
+                    ]);
+
+                    return 'tb1qretryaddress00000000000000000000000';
+                });
+        });
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'number' => 'INV-0042',
+                'client_id' => $client->id,
+                'description' => 'Invoice that should retry',
+                'amount_usd' => 120,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.0024,
+                'status' => 'draft',
+                'invoice_date' => '2025-01-01',
+            ]);
+
+        $response->assertRedirect(route('invoices.index'));
+        $response->assertSessionHas('status', 'Invoice created. Number adjusted to INV-0043 due to a collision.');
+        $response->assertSessionDoesntHaveErrors();
+
+        $this->assertDatabaseHas('invoices', [
+            'user_id' => $owner->id,
+            'number' => 'INV-0043',
+        ]);
+        $this->assertSame(2, $owner->invoices()->count());
+
+        $wallet = $owner->walletSetting()->firstOrFail();
+        $this->assertSame(1, (int) $wallet->next_derivation_index);
     }
 
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void

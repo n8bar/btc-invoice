@@ -130,7 +130,8 @@ class Invoice extends Model
     public static function nextNumberForUser(int $userId): string
     {
         // Start from the highest existing INV-#### for this user
-        $last = static::where('user_id', $userId)
+        $last = static::withTrashed()
+            ->where('user_id', $userId)
             ->where('number', 'like', 'INV-%')
             ->orderByDesc('id')
             ->value('number');
@@ -144,7 +145,12 @@ class Invoice extends Model
         do {
             $n++;
             $candidate = 'INV-' . str_pad((string) $n, 4, '0', STR_PAD_LEFT);
-        } while (static::where('user_id', $userId)->where('number', $candidate)->exists());
+        } while (
+            static::withTrashed()
+                ->where('user_id', $userId)
+                ->where('number', $candidate)
+                ->exists()
+        );
 
         return $candidate;
     }

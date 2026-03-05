@@ -237,17 +237,47 @@ class GettingStartedFlowTest extends TestCase
         $response->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
         $response->assertSeeInOrder([
             'Your latest invoice is no longer draft. Create a new draft invoice to continue.',
-            'Create new draft invoice',
+            'Try creating a new draft invoice',
         ], false);
-        $response->assertSee('If this happened immediately, your wallet account may already have activity from outside CryptoZing.', false);
+        $response->assertSee('If this happened immediately, your wallet account may have activity from outside CryptoZing.', false);
+        $response->assertSee('CryptoZing requires a dedicated-use wallet account, and receiving payments in other wallets is not supported.', false);
+        $response->assertSee('Connect a different wallet instead', false);
+        $response->assertSee(route('getting-started.reconnect-wallet'), false);
         $response->assertSeeInOrder([
             'Success criteria',
             'Create at least one draft invoice.',
-            'Create new draft invoice',
+            'Try creating a new draft invoice',
         ], false);
         $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
         $response->assertDontSee('Go to create invoice', false);
         $response->assertDontSee('No new draft invoice is available for delivery.', false);
+    }
+
+    public function test_invoice_warning_can_force_wallet_reconnect_and_require_step_one_again(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
+
+        $response = $this->actingAs($owner)->post(route('getting-started.reconnect-wallet'));
+        $response->assertRedirect(route('wallet.settings.edit', ['getting_started' => 1]));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
+        $this->assertNotNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'invoice']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
     }
 
     public function test_invoice_step_hides_required_step_notice_when_returning_from_deliver_for_new_draft(): void
