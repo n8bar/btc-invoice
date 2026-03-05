@@ -194,7 +194,7 @@ Goal: address the current findings in a controlled sequence with small, testable
   - UXInspection D (5-10m): UX/a11y quick sweep
     - [x] Light + dark mode contrast remains acceptable in step cards and highlighted actions.
     - [x] Desktop + narrower screens avoid horizontal overflow in step shell and progress strip.
-    - [ ] One keyboard-only run confirms CTA path is reachable without focus traps.
+    - [x] One keyboard-only run confirms CTA path is reachable without focus traps.
 - Evidence to capture during QA:
   - User + scenario tested, exact route hit, expected vs actual result, and whether issue is reproducible.
   - For regressions, include a short note on whether impact is block/major/minor.
