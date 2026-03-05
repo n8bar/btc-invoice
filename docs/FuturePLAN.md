@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-02-25): no post-MVP backlog changes in this pass; active PLAN inserted a new post-UX milestone for on-chain payment attribution hardening (from `docs/qa/Finding1.md`) before mailer/audit work, and UX work continues on Task 12+ in the active PLAN/spec docs.
+Latest scope update (2026-03-04): no new post-MVP backlog items in this pass; active PLAN/spec docs rewrote MS13 Task 12 to match current-state RC scope.
 
 ## Infrastructure & Payments
 1. **Self-Hosted Bitcoin Node + Watcher**
