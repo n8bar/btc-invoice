@@ -513,6 +513,7 @@ class InvoiceController extends Controller
         $data = $request->validate([
             'expires'        => ['nullable','date','after:now'],
             'expires_preset' => ['nullable','in:none,24h,7d,30d'],
+            '_scroll_y'      => ['nullable', 'integer', 'min:0'],
         ]);
 
         $expires = null;
@@ -528,8 +529,15 @@ class InvoiceController extends Controller
 
         $invoice->enablePublicShare($expires);
 
-        return back()->with('status', 'Public link enabled.')
+        $redirect = back()
+            ->with('status', 'Public link enabled.')
             ->with('public_url', $invoice->public_url);
+
+        if (array_key_exists('_scroll_y', $data) && $data['_scroll_y'] !== null) {
+            $redirect->with('restore_scroll_y', (int) $data['_scroll_y']);
+        }
+
+        return $redirect;
     }
 
     public function disableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)

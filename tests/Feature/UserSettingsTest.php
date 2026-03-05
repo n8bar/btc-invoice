@@ -543,7 +543,7 @@ class UserSettingsTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Review it, then click Verify wallet to confirm this step.', false);
-        $response->assertSee('hasValueChanged() ? \'Save wallet\' : \'Verify wallet\'', false);
+        $response->assertSee('hasValueChanged() ? \'👉 Save wallet\' : \'👉 Verify wallet\'', false);
         $response->assertSee('data-wallet-replay-cancel', false);
         $response->assertSee('style="display: none;"', false);
     }
@@ -594,6 +594,84 @@ class UserSettingsTest extends TestCase
 
         $response->assertRedirect(route('getting-started.start'));
         $response->assertSessionHas('status', 'Wallet settings saved.');
+    }
+
+    public function test_wallet_settings_update_keeps_next_derivation_index_when_same_key_is_resaved(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+        WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            'next_derivation_index' => 60000,
+            'onboarded_at' => now()->subDay(),
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+        $this->assertSame(60000, (int) $wallet->next_derivation_index);
+    }
+
+    public function test_wallet_settings_update_clamps_next_derivation_index_to_highest_assigned_invoice_index_plus_one(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            'next_derivation_index' => 2,
+            'onboarded_at' => now()->subDay(),
+        ]);
+
+        Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-NDI-CLAMP-1',
+            'description' => 'clamp test',
+            'amount_usd' => 100,
+            'btc_rate' => 50000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qclampaddress000000000000000000001',
+            'derivation_index' => 11,
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+        $this->assertSame(12, (int) $wallet->next_derivation_index);
     }
 
     public function test_mainnet_rejects_testnet_wallet_key(): void

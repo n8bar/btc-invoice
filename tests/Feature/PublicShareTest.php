@@ -30,9 +30,11 @@ class PublicShareTest extends TestCase
             ->actingAs($owner)
             ->patch(route('invoices.share.enable', $invoice), [
                 'expires_preset' => '24h',
+                '_scroll_y' => 420,
             ]);
 
         $response->assertRedirect();
+        $response->assertSessionHas('restore_scroll_y', 420);
         $response->assertSessionHas('status', 'Public link enabled.');
 
         $invoice->refresh();

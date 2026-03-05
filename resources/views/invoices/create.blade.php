@@ -10,6 +10,7 @@
             @php
                 $isGettingStartedContext = request()->boolean('getting_started');
                 $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
+                $gettingStartedMarker = '👉';
             @endphp
 
             @if ($showClientGate ?? false)
@@ -29,7 +30,7 @@
                             <x-primary-button
                                 class="{{ $isGettingStartedContext ? $onboardingGlow : '' }}"
                                 :data-getting-started-highlight="$isGettingStartedContext ? 'invoice-create-client' : null">
-                                Create client
+                                {{ $isGettingStartedContext ? $gettingStartedMarker . ' Create client' : 'Create client' }}
                             </x-primary-button>
                         </div>
                     </form>
@@ -221,7 +222,7 @@
                     <x-primary-button
                         class="{{ $isGettingStartedContext ? $onboardingGlow : '' }}"
                         :data-getting-started-highlight="$isGettingStartedContext ? 'invoice-save' : null">
-                        Save
+                        {{ $isGettingStartedContext ? $gettingStartedMarker . ' Save' : 'Save' }}
                     </x-primary-button>
                 </div>
             </form>

@@ -15,6 +15,7 @@
         $isGettingStartedReplay = (bool) ($isGettingStartedReplay ?? false);
         $replayCancelUrl = route('wallet.settings.edit', $isGettingStarted ? ['getting_started' => 1] : []);
         $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
+        $gettingStartedMarker = '👉';
     @endphp
 
     <div class="py-10">
@@ -64,6 +65,9 @@
                             @endif
 
                             <div>
+                                @if ($isGettingStarted)
+                                    <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $gettingStartedMarker }} Fill this field</p>
+                                @endif
                                 <x-input-label for="bip84_xpub" :value="__('Wallet account key (xpub/zpub/vpub/tpub)')" />
                                 <p class="mt-1 text-xs text-gray-500">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
@@ -135,9 +139,9 @@
                                     class="{{ $isGettingStarted ? $onboardingGlow : '' }}"
                                     :data-getting-started-highlight="$isGettingStarted ? 'wallet-save' : null">
                                     @if ($isGettingStartedReplay)
-                                        <span x-text="hasValueChanged() ? 'Save wallet' : 'Verify wallet'"></span>
+                                        <span x-text="hasValueChanged() ? '👉 Save wallet' : '👉 Verify wallet'"></span>
                                     @else
-                                        Save wallet
+                                        {{ $isGettingStarted ? $gettingStartedMarker . ' Save wallet' : 'Save wallet' }}
                                     @endif
                                 </x-primary-button>
                             </div>

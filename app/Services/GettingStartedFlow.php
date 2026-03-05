@@ -44,8 +44,8 @@ class GettingStartedFlow
             ? 'Create at least one new invoice in this setup run.'
             : 'Create at least one invoice.';
         $deliverCriteria = $replayMode
-            ? 'Enable a public link and log a delivery attempt for a new invoice.'
-            : 'Enable a public link and log a delivery attempt.';
+            ? 'Enable a public link, then send one of your new invoices.'
+            : 'Enable a public link, then send the invoice.';
 
         return [
             self::STEP_WALLET => [

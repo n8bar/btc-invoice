@@ -18,6 +18,7 @@ class Invoice extends Model
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
         'status','txid','invoice_date','due_date','paid_at',
+        'delivery_message_draft',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
         'payment_detected_at','payment_confirmed_at',
         'billing_name_override','billing_email_override','billing_phone_override',

@@ -1,12 +1,13 @@
 @php
     $currentStep = $strip['current_step'];
     $currentStepKey = $strip['current_step_key'];
+    $gettingStartedMarker = '👉';
 @endphp
 
 <div class="rounded-lg border border-indigo-200 bg-indigo-50/80 p-4 shadow-sm dark:border-indigo-400/30 dark:bg-indigo-950/35" style="border-color: currentColor;">
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200">Getting Started</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200">{{ $gettingStartedMarker }} Getting Started</p>
             <p class="mt-1 text-sm font-semibold text-indigo-950 dark:text-indigo-100">
                 Step {{ $currentStep['position'] }} of {{ $strip['step_count'] }}: {{ $currentStep['label'] }}
             </p>

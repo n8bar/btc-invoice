@@ -187,44 +187,21 @@
             @php
                 $canDeliver = $invoice->client && !empty($invoice->client->email) && $invoice->public_enabled;
                 $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
+                $gettingStartedMarker = '👉';
             @endphp
 
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
-                        <p class="text-xs text-gray-500">Emails include the public share link, summary, and optional note.</p>
-                        <p class="mt-1 text-xs font-medium text-gray-700">To: {{ $invoice->client->email }}</p>
-                    </div>
-                    @if (!$invoice->public_enabled)
-                        <span class="text-xs text-red-600">Enable public link first</span>
-                    @elseif (!$invoice->client || empty($invoice->client->email))
-                        <span class="text-xs text-red-600">Add a client email first</span>
-                    @endif
+            <div class="rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 shadow-sm dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
+                <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
+                    <p class="font-semibold">Delivery steps</p>
+                    <a href="#public-link-card"
+                       class="inline-flex items-center rounded-md border border-indigo-300 bg-white px-1.5 py-1.5 font-semibold text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/40 dark:bg-slate-900/70 dark:text-indigo-200 dark:hover:bg-indigo-950/50 dark:focus:ring-offset-slate-900">
+                        Jump to Public link
+                    </a>
+                    <a href="#send-invoice-email-card"
+                       class="inline-flex items-center rounded-md border border-indigo-300 bg-white px-1.5 py-1.5 font-semibold text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/40 dark:bg-slate-900/70 dark:text-indigo-200 dark:hover:bg-indigo-950/50 dark:focus:ring-offset-slate-900">
+                        Jump to Send invoice email
+                    </a>
                 </div>
-                <form method="POST" action="{{ route('invoices.deliver', $invoice) }}" class="mt-3 space-y-3">
-                    @csrf
-                    @if ($gettingStartedContext)
-                        <input type="hidden" name="getting_started" value="1">
-                    @endif
-                    <textarea name="message" rows="2" class="w-full rounded border-gray-300 text-sm"
-                              placeholder="Optional note to include in the email">{{ old('message') }}</textarea>
-                    @error('message')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                        <input type="checkbox" name="cc_self" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                               @checked(old('cc_self'))>
-                        CC myself
-                    </label>
-                    <div>
-                        <x-primary-button
-                            type="submit"
-                            :disabled="!$canDeliver"
-                            class="{{ $gettingStartedContext ? $onboardingGlow : '' }}"
-                            :data-getting-started-highlight="$gettingStartedContext ? 'deliver-send-invoice' : null">
-                            Send invoice
-                        </x-primary-button>
-                    </div>
-                </form>
             </div>
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
@@ -743,7 +720,7 @@
                 @endif
 
                 {{-- Public link (shareable print view) --}}
-                <div class="rounded-lg border border-gray-200 bg-white p-4">
+                <div id="public-link-card" class="rounded-lg border border-gray-200 bg-white p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-700">Public link</h3>
                     @if ($invoice->public_enabled && $invoice->public_url)
@@ -818,11 +795,15 @@
                         @endif
                     </div>
                 @else
-                    <form action="{{ route('invoices.share.enable', $invoice) }}" method="POST" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
+                    <form action="{{ route('invoices.share.enable', $invoice) }}"
+                          method="POST"
+                          class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end"
+                          onsubmit="const i=this.querySelector('input[name=_scroll_y]'); if(i){ i.value=Math.round(window.scrollY || window.pageYOffset || 0); }">
                         @csrf @method('PATCH')
                         @if ($gettingStartedContext)
                             <input type="hidden" name="getting_started" value="1">
                         @endif
+                        <input type="hidden" name="_scroll_y" value="">
 
                         <div>
                             <label class="block text-xs font-medium text-gray-600">Expiry preset</label>
@@ -844,7 +825,7 @@
                             <x-primary-button
                                 class="w-full sm:w-auto {{ $gettingStartedContext ? $onboardingGlow : '' }}"
                                 :data-getting-started-highlight="$gettingStartedContext ? 'deliver-enable-public-link' : null">
-                                Enable public link
+                                {{ $gettingStartedContext ? $gettingStartedMarker . ' Enable public link' : 'Enable public link' }}
                             </x-primary-button>
                         </div>
                     </form>
@@ -872,6 +853,48 @@
                     </div>
                 @endif
             </div>
+            </div>
+
+            <div id="send-invoice-email-card" class="rounded-lg bg-white p-6 shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
+                        <p class="text-xs text-gray-500">Emails include the public share link, summary, and optional note.</p>
+                        <p class="mt-1 text-xs font-medium text-gray-700">To: {{ $invoice->client->email ?? '—' }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('invoices.deliver', $invoice) }}" class="mt-3 space-y-3"
+                      data-delivery-message-form
+                      data-delivery-draft-url="{{ route('invoices.deliver.draft', $invoice) }}">
+                    @csrf
+                    @if ($gettingStartedContext)
+                        <input type="hidden" name="getting_started" value="1">
+                    @endif
+                    <textarea name="message" rows="2" class="w-full rounded border-gray-300 text-sm"
+                              data-delivery-message-input
+                              placeholder="Optional note to include in the email">{{ old('message', $invoice->delivery_message_draft ?? '') }}</textarea>
+                    <p class="text-xs text-gray-500" data-delivery-message-save-state></p>
+                    @error('message')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="cc_self" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                               @checked(old('cc_self'))>
+                        CC myself
+                    </label>
+                    <div>
+                        @if (!$invoice->public_enabled)
+                            <p class="mb-2 text-xs text-red-600">Enable public link first.</p>
+                        @elseif (!$invoice->client || empty($invoice->client->email))
+                            <p class="mb-2 text-xs text-red-600">Add a client email first.</p>
+                        @endif
+                        <x-primary-button
+                            type="submit"
+                            :disabled="!$canDeliver"
+                            class="{{ $gettingStartedContext ? $onboardingGlow : '' }}"
+                            :data-getting-started-highlight="$gettingStartedContext ? 'deliver-send-invoice' : null">
+                            {{ $gettingStartedContext ? $gettingStartedMarker . ' Send invoice' : 'Send invoice' }}
+                        </x-primary-button>
+                    </div>
+                </form>
             </div>
 
             <div class="mt-6 rounded-lg bg-white p-6 shadow">
@@ -919,6 +942,68 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const restoreScrollY = Number(@json(session('restore_scroll_y')));
+            if (Number.isFinite(restoreScrollY) && restoreScrollY >= 0) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        window.scrollTo({ top: restoreScrollY, left: 0, behavior: 'auto' });
+                    });
+                });
+            }
+
+            const deliveryForm = document.querySelector('[data-delivery-message-form]');
+            const deliveryInput = deliveryForm?.querySelector('[data-delivery-message-input]');
+            const saveState = deliveryForm?.querySelector('[data-delivery-message-save-state]');
+            const draftUrl = deliveryForm?.getAttribute('data-delivery-draft-url');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            if (deliveryForm && deliveryInput && saveState && draftUrl && csrfToken) {
+                let lastSavedValue = deliveryInput.value;
+
+                const setSaveState = (text, isError = false) => {
+                    saveState.textContent = text;
+                    saveState.classList.toggle('text-red-600', isError);
+                    saveState.classList.toggle('text-green-600', !isError && text.length > 0);
+                };
+
+                const saveDraft = async () => {
+                    const currentValue = deliveryInput.value;
+                    if (currentValue === lastSavedValue) {
+                        return;
+                    }
+
+                    setSaveState('Saving...');
+
+                    try {
+                        const response = await fetch(draftUrl, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: JSON.stringify({ message: currentValue }),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('save-failed');
+                        }
+
+                        lastSavedValue = currentValue;
+                        setSaveState('Saved');
+                        setTimeout(() => {
+                            if (saveState.textContent === 'Saved') {
+                                setSaveState('');
+                            }
+                        }, 1200);
+                    } catch {
+                        setSaveState('Could not save this note yet.', true);
+                    }
+                };
+
+                deliveryInput.addEventListener('change', saveDraft);
+            }
+
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
                 const iso = node.getAttribute('data-utc-ts');
                 if (!iso) return;
