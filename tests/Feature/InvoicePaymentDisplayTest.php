@@ -145,6 +145,103 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Overpayments are treated as gratuities by default', false);
     }
 
+    public function test_print_view_hides_client_gratuity_note_when_owner_toggle_is_off(): void
+    {
+        $owner = User::factory()->create([
+            'show_overpayment_gratuity_note' => false,
+        ]);
+        $invoice = $this->makeInvoice($owner, [
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+        ]);
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $overpaySats = (int) round($expectedSats * 1.2); // 20% over
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-overpay-hide-note',
+            'sats_received' => $overpaySats,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 120.00,
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice->fresh('payments')));
+
+        $response->assertSee('overpaid by approximately', false);
+        $response->assertDontSee('Overpayments are treated as gratuities by default', false);
+    }
+
+    public function test_show_hides_qr_refresh_reminder_when_owner_toggle_is_off(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-05 15:00:00', 'UTC'));
+
+        $owner = User::factory()->create([
+            'show_qr_refresh_reminder' => false,
+        ]);
+        $invoice = $this->makeInvoice($owner, [
+            'description' => 'BTC Consulting',
+            'amount_usd' => 320,
+            'btc_rate' => 40000,
+            'amount_btc' => round(320 / 40000, 8),
+        ]);
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40000.00,
+            'as_of'    => Carbon::now(),
+            'source'   => 'cache',
+        ], BtcRate::TTL);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('Payment QR', false);
+        $response->assertDontSee('refresh right before sending payment; printed copies may be stale.', false);
+    }
+
+    public function test_print_hides_qr_refresh_reminder_when_owner_toggle_is_off(): void
+    {
+        $owner = User::factory()->create([
+            'show_qr_refresh_reminder' => false,
+        ]);
+        $invoice = $this->makeInvoice($owner, [
+            'amount_btc' => 0.01234567,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('Payment QR', false);
+        $response->assertDontSee('refresh right before sending payment; printed copies may be stale.', false);
+    }
+
+    public function test_show_keeps_owner_reconciliation_guidance_when_gratuity_note_toggle_is_off(): void
+    {
+        $owner = User::factory()->create([
+            'show_overpayment_gratuity_note' => false,
+        ]);
+        $invoice = $this->makeInvoice($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertDontSee('Overpayments are treated as gratuities by default.', false);
+        $response->assertSee('Need to reconcile an over/under payment?', false);
+    }
+
     public function test_print_view_displays_client_underpayment_alert_when_above_threshold(): void
     {
         $owner = User::factory()->create();

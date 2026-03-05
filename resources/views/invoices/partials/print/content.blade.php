@@ -224,14 +224,20 @@
 
         @php
             $bitcoinUri = $displayBitcoinUri ?? $invoice->bitcoin_uri;
-            $qrRateNote = 'BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees, refresh right before sending payment; printed copies may be stale.';
+            $showOverpaymentGratuityNote = (bool) ($invoice->user?->show_overpayment_gratuity_note ?? true);
+            $showQrRefreshReminder = (bool) ($invoice->user?->show_qr_refresh_reminder ?? true);
+            $qrRateNote = $showQrRefreshReminder
+                ? 'BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees, refresh right before sending payment; printed copies may be stale.'
+                : null;
         @endphp
 
         @if ($bitcoinUri)
             <tr>
                 <th>
                     <div>Payment QR</div>
-                    <div class="payment-qr-rate-note payment-qr-rate-note-mobile">{{ $qrRateNote }}</div>
+                    @if ($qrRateNote)
+                        <div class="payment-qr-rate-note payment-qr-rate-note-mobile">{{ $qrRateNote }}</div>
+                    @endif
                 </th>
                 <td>
                     <div class="payment-qr-wrap">
@@ -246,7 +252,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="payment-qr-rate-note payment-qr-rate-note-desktop">{{ $qrRateNote }}</div>
+                    @if ($qrRateNote)
+                        <div class="payment-qr-rate-note payment-qr-rate-note-desktop">{{ $qrRateNote }}</div>
+                    @endif
                 </td>
             </tr>
         @endif
@@ -315,13 +323,15 @@
 @if ($invoice->requiresClientOverpayAlert())
     <div class="section-gap" style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size: 17.33px;">
         This invoice appears overpaid by approximately {{ number_format($overpayPercent, 1) }}%.
-        Overpayments are treated as gratuities by default, so please notify the invoice sender if this was a mistake.
+        @if ($showOverpaymentGratuityNote)
+            Overpayments are treated as gratuities by default, so please notify the invoice sender if this was a mistake.
+        @endif
     </div>
 @elseif ($invoice->requiresClientUnderpayAlert())
     <div class="section-gap" style="border:1px solid #fee2e2; background:#fef2f2; color:#b91c1c; border-radius:10px; padding:12px; font-size: 17.33px;">
         An outstanding balance of roughly {{ number_format($underpayPercent, 1) }}% remains. Please send the remaining amount or contact the invoice sender for assistance.
     </div>
-@else
+@elseif ($showOverpaymentGratuityNote)
     <div class="section-gap" style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size: 17.33px;">
         Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.
     </div>
