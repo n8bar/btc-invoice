@@ -67,5 +67,8 @@ Execute the full suite via Sail:
 - Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
 - Notification spec: [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/tests/TEST_HARDENING.md`](docs/tests/TEST_HARDENING.md)
+- Task 11 implementation strategy: [`docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md)
+- Task 11 UX Engineering pass: [`docs/strategies/TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS.md)
+- Task 11 UX Engineering pass2: [`docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS2.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
