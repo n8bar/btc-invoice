@@ -100,13 +100,13 @@
             $taglines = [
                 'Trusted access to your invoicing hub',
                 'Secure portal for billing and receivables',
-                'Safe access to your on-chain invoicing',
-                'Secure access to your on-chain receivables',
+                'Access your chain-aware invoicing workspace',
+                'Secure access to your chain-aware receivables',
                 'Secure access to your invoice manager',
-                'Safe sign-in to your invoicing stack',
+                'Sign in to your invoicing stack',
             ];
             $authTagline = session('auth_tagline');
-            if (!$authTagline) {
+            if (!$authTagline || !in_array($authTagline, $taglines, true)) {
                 $sessionId = session()->getId() ?: (string) microtime(true);
                 $index = abs(crc32($sessionId)) % count($taglines);
                 $authTagline = $taglines[$index];
