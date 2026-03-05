@@ -97,6 +97,27 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_login_error_summary_is_visible_on_invalid_attempt(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->from('/login')
+            ->post('/login', [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors('email');
+
+        $page = $this->get('/login');
+
+        $page->assertOk();
+        $page->assertSee('id="login-error-summary"', false);
+        $page->assertSee('We couldn’t sign you in. Check your email and password, then try again.', false);
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();

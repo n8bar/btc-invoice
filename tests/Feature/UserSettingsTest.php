@@ -536,6 +536,20 @@ class UserSettingsTest extends TestCase
         $this->assertSame('CryptoZing Invoice', $owner->branding_heading);
     }
 
+    public function test_invoice_settings_page_shows_task12_polish_copy(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('settings.invoice.edit'));
+
+        $response->assertOk();
+        $response->assertSee('These values populate new invoices automatically.', false);
+        $response->assertSee('Applies to new invoices by default. Existing per-invoice overrides stay unchanged.', false);
+        $response->assertSee('Save invoice settings', false);
+    }
+
     public function test_user_cannot_delete_other_wallet_account(): void
     {
         $owner = User::factory()->create();

@@ -10,14 +10,14 @@
         <div class="auth-card shadow-indigo-900/30 backdrop-blur">
 
             @if (session('status'))
-                <div class="mb-4 rounded-lg alert-success px-4 py-3 text-sm">
+                <div id="login-status-message" class="mb-4 rounded-lg alert-success px-4 py-3 text-sm" role="status" aria-live="polite" tabindex="-1">
                     {{ session('status') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="mb-4 rounded-lg alert-error px-4 py-3 text-sm">
-                    <div class="font-semibold">We couldn’t sign you in.</div>
+                <div id="login-error-summary" class="mb-4 rounded-lg alert-error px-4 py-3 text-sm" role="alert" aria-live="assertive" tabindex="-1">
+                    <div class="font-semibold">We couldn’t sign you in. Check your email and password, then try again.</div>
                     <ul class="mt-2 list-disc list-inside space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -64,4 +64,13 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const focusTarget = document.getElementById('login-error-summary') || document.getElementById('login-status-message');
+            if (focusTarget) {
+                focusTarget.focus();
+            }
+        });
+    </script>
 </x-guest-layout>

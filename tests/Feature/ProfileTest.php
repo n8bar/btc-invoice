@@ -19,6 +19,9 @@ class ProfileTest extends TestCase
             ->get('/profile');
 
         $response->assertOk();
+        $response->assertSee('Workspace preferences', false);
+        $response->assertSee('Client-facing payment notes', false);
+        $response->assertSee('Save profile', false);
     }
 
     public function test_profile_information_can_be_updated(): void

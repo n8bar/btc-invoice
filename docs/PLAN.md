@@ -108,10 +108,10 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
       - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
     - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
-    - [ ] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
+    - [x] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
       - [x] Add per-user toggles (default on): overpayment gratuity note + QR refresh reminder.
       - [x] Wire toggles into invoice show/public/print client-facing copy only; keep owner operational warnings visible.
-      - [ ] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
+      - [x] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
     - [ ] Task 13: Invoice Settings finish-up only for deltas found during the Task 12 sweep (microcopy/focus/error/save-state parity; preserve overrides).
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.

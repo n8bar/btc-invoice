@@ -20,6 +20,17 @@
                         @csrf
                         @method('PATCH')
 
+                        @if ($errors->any())
+                            <div class="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800" role="alert" aria-live="assertive" tabindex="-1" style="border-color: currentColor;">
+                                <p class="font-semibold">Please review the highlighted fields.</p>
+                                <ul class="mt-2 list-disc list-inside space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4 space-y-4">
                             <h3 class="text-sm font-semibold text-gray-700">Branding &amp; footer</h3>
                             <p class="text-xs text-gray-600">
@@ -54,14 +65,14 @@
                             <div>
                                 <x-input-label for="billing_address" :value="__('Biller address')" />
                                 <textarea id="billing_address" name="billing_address" rows="3"
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500"
                                           placeholder="123 Main Street&#10;Suite 100&#10;Denver, CO 80202">{{ old('billing_address', $user->billing_address) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_address')" />
                             </div>
                             <div>
                                 <x-input-label for="invoice_footer_note" :value="__('Invoice footer note')" />
                                 <textarea id="invoice_footer_note" name="invoice_footer_note" rows="2"
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500"
                                           placeholder="Net 7 · Send BTC only to the address above">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note')" />
                             </div>
@@ -75,7 +86,7 @@
                             <div>
                                 <x-input-label for="invoice_default_description" :value="__('Default memo / description')" />
                                 <textarea id="invoice_default_description" name="invoice_default_description" rows="3"
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500"
                                           placeholder="Weekly retainer for CryptoZing">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_default_description')" />
                             </div>
@@ -89,8 +100,9 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>Save settings</x-primary-button>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <x-primary-button>Save invoice settings</x-primary-button>
+                            <p class="text-xs text-gray-500">Applies to new invoices by default. Existing per-invoice overrides stay unchanged.</p>
                         </div>
                     </form>
                 </div>

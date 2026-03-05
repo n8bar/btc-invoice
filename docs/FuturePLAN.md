@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-03-04): added a near-term post-MVP UX backlog item for invoices/clients searching and filtering so list discovery scales cleanly beyond MVP, clarified that wallet key lineage/cursor architecture now lives in active PLAN MS14.1 (RC scope) while this doc keeps post-MVP wallet-selection UX, and confirmed the MS13 Task12 rewrite stays RC-scoped (no new post-MVP items added here).
+Latest scope update (2026-03-04): no new post-MVP backlog items in this pass; active PLAN completed MS13 Task12 polish (Profile/Invoice Settings + Login/Logout consistency) while this doc remains focused on deferred post-MVP items such as invoices/clients search+filter and multi-wallet selection UX.
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**

@@ -95,8 +95,8 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
        - QR refresh/staleness reminder near payment QR surfaces.
    - Guardrail for this task: keep owner-operational warnings and reconciliation guidance visible even when client-facing note toggles are off.
    - Polish pass scope stays implementation-light:
-     - [ ] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
-     - [ ] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
+     - [x] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
+     - [x] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
    - Browser QA checklist (human-eyes):
      1. Open `/profile` and confirm both toggles exist:
         - `Show overpayment gratuity note to clients`
