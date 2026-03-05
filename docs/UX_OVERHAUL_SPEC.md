@@ -84,7 +84,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 
 ## ToDo
 12. User settings & auth UX (current-state rewrite, 2026-03-04)
-   - Baseline already shipped before this task: branded login screen, wallet-settings inline validation/help, grouped invoice settings cards, and existing profile toggles (`show_invoice_ids`, `auto_receipt_emails`).
+   - Baseline already shipped before this task: branded login screen, grouped invoice settings cards, and existing profile toggles (`show_invoice_ids`, `auto_receipt_emails`).
    - Required implementation:
      - Add two Profile toggles (reuse existing profile toggle pattern):
        - `show_overpayment_gratuity_note`
@@ -95,7 +95,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
        - QR refresh/staleness reminder near payment QR surfaces.
    - Guardrail for this task: keep owner-operational warnings and reconciliation guidance visible even when client-facing note toggles are off.
    - Polish pass scope stays implementation-light:
-     - Profile, Invoice Settings, Wallet Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
+     - Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
      - Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
 13. Invoice Settings finish-up (post-Task12 sweep)
    - Use Task13 only for invoice-settings deltas discovered during Task12 consistency review.
@@ -107,6 +107,6 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.
 - UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
 - Task12 toggles are persisted per user (default on) and control only the intended client-facing copy in show/public/print.
-- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match guardrails and updated UX patterns without introducing an auth-flow redesign.
+- Settings/auth screens in Task12 scope (Profile, Invoice Settings, Login/Logout) match guardrails and updated UX patterns without introducing an auth-flow redesign.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.

@@ -111,7 +111,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [ ] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
       - Add per-user toggles (default on): overpayment gratuity note + QR refresh reminder.
       - Wire toggles into invoice show/public/print client-facing copy only; keep owner operational warnings visible.
-      - Keep settings/auth pass implementation-light (Profile + Invoice Settings + Wallet Settings + Login/Logout consistency; no auth-flow redesign).
+      - Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
     - [ ] Task 13: Invoice Settings finish-up only for deltas found during the Task 12 sweep (microcopy/focus/error/save-state parity; preserve overrides).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
