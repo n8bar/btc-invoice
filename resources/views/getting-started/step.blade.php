@@ -42,6 +42,19 @@
                             <p class="mt-1">{{ $currentStep['criteria'] }}</p>
                         </div>
 
+                        @if ($showInvoiceDraftRequiredWarning ?? false)
+                            <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" style="border-color: currentColor;">
+                                <p class="font-semibold">Your latest invoice is no longer draft. Create a new draft invoice to continue.</p>
+                                <p class="mt-1">
+                                    If this happened immediately, your wallet account may already have activity from outside CryptoZing.
+                                </p>
+                                <a href="{{ route('invoices.create', ['getting_started' => 1]) }}"
+                                   class="mt-2 inline-flex items-center font-semibold text-amber-900 underline underline-offset-2 hover:text-amber-700">
+                                    Create new draft invoice
+                                </a>
+                            </div>
+                        @endif
+
                         @if ($currentStepKey === 'deliver' && $deliverInvoice)
                             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-200">
                                 <div class="flex flex-wrap items-start justify-between gap-3">

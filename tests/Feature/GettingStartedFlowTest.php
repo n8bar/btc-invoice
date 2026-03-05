@@ -213,7 +213,7 @@ class GettingStartedFlowTest extends TestCase
             ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
     }
 
-    public function test_deliver_step_shows_no_new_draft_state_when_non_replay_has_no_draft_target(): void
+    public function test_invoice_step_shows_draft_required_warning_when_non_replay_has_only_non_draft_invoices(): void
     {
         $owner = User::factory()->create([
             'getting_started_completed_at' => null,
@@ -228,20 +228,24 @@ class GettingStartedFlowTest extends TestCase
 
         $this->actingAs($owner)
             ->get(route('getting-started.start'))
-            ->assertRedirect(route('getting-started.step', ['step' => 'deliver']));
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
 
-        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'deliver']));
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
         $response->assertOk();
-        $response->assertSee('No new draft invoice is available for delivery.', false);
+        $response->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
         $response->assertSeeInOrder([
-            'No new draft invoice is available for delivery.',
+            'Your latest invoice is no longer draft. Create a new draft invoice to continue.',
+            'Create new draft invoice',
+        ], false);
+        $response->assertSee('If this happened immediately, your wallet account may already have activity from outside CryptoZing.', false);
+        $response->assertSeeInOrder([
+            'Success criteria',
+            'Create at least one draft invoice.',
             'Create new draft invoice',
         ], false);
         $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
         $response->assertDontSee('Go to create invoice', false);
-        $response->assertSee('data-getting-started-step-link="wallet"', false);
-        $response->assertSee('data-getting-started-step-link="invoice"', false);
-        $response->assertSee('data-getting-started-step-link="deliver"', false);
+        $response->assertDontSee('No new draft invoice is available for delivery.', false);
     }
 
     public function test_invoice_step_hides_required_step_notice_when_returning_from_deliver_for_new_draft(): void
@@ -397,7 +401,7 @@ class GettingStartedFlowTest extends TestCase
         $owner = User::factory()->create();
         $this->createWallet($owner);
         $client = $this->createClient($owner);
-        $invoice = $this->createInvoice($owner, $client);
+        $invoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
         $invoice->enablePublicShare();
 
         InvoiceDelivery::create([

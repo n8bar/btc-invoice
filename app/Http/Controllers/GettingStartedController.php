@@ -137,6 +137,16 @@ class GettingStartedController extends Controller
         $actionLabel = $step === GettingStartedFlow::STEP_DELIVER && ! $deliverInvoice
             ? 'Create new draft invoice'
             : $currentStep['cta_label'];
+        $showInvoiceDraftRequiredWarning = false;
+        if ($step === GettingStartedFlow::STEP_INVOICE && !($snapshot['is_replay'] ?? false)) {
+            $hasAnyInvoice = $user->invoices()->exists();
+            $hasDraftInvoice = $user->invoices()->where('status', 'draft')->exists();
+            $showInvoiceDraftRequiredWarning = $hasAnyInvoice && !$hasDraftInvoice;
+
+            if ($showInvoiceDraftRequiredWarning) {
+                $actionLabel = 'Create new draft invoice';
+            }
+        }
 
         $stepUrls = [
             GettingStartedFlow::STEP_WALLET => route('getting-started.step', ['step' => GettingStartedFlow::STEP_WALLET]),
@@ -170,6 +180,7 @@ class GettingStartedController extends Controller
             'earliestIncompleteStep' => $earliestIncomplete,
             'earliestIncompleteStepUrl' => $earliestIncompleteStepUrl,
             'showRequiredStepNotice' => $showRequiredStepNotice,
+            'showInvoiceDraftRequiredWarning' => $showInvoiceDraftRequiredWarning,
             'stepUrls' => $stepUrls,
             'backUrl' => $backUrl,
         ]);
