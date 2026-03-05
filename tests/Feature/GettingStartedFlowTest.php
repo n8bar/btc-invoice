@@ -7,7 +7,9 @@ use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use App\Models\User;
 use App\Models\WalletSetting;
+use App\Services\InvoicePaymentSyncService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class GettingStartedFlowTest extends TestCase
@@ -423,6 +425,71 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertFalse($owner->getting_started_dismissed);
         $this->assertNotNull($owner->getting_started_completed_at);
+    }
+
+    public function test_start_syncs_draft_invoice_state_before_completion_check(): void
+    {
+        config()->set('blockchain.getting_started_sync.enabled', true);
+        config()->set('blockchain.getting_started_sync.throttle_seconds', 0);
+
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+        $invoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $invoice->enablePublicShare();
+
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Test',
+            'dispatched_at' => now(),
+        ]);
+
+        $this->mock(InvoicePaymentSyncService::class, function (MockInterface $mock) use ($invoice): void {
+            $mock->shouldReceive('syncInvoice')
+                ->once()
+                ->withArgs(function (
+                    Invoice $candidate,
+                    ?string $network = null,
+                    bool $force = false,
+                    bool $checkAlerts = true
+                ) use ($invoice): bool {
+                    return $candidate->is($invoice)
+                        && $network === 'testnet'
+                        && $force === false
+                        && $checkAlerts === false;
+                })
+                ->andReturnUsing(function () use ($invoice): array {
+                    $invoice->forceFill([
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                    ])->save();
+
+                    return [
+                        'processed' => true,
+                        'updated' => 1,
+                        'dropped' => 0,
+                        'payments' => [
+                            ['txid' => 'test-sync', 'sats' => 10_000],
+                        ],
+                        'status' => 'paid',
+                        'paid_sats' => 10_000,
+                        'outstanding_sats' => 0,
+                    ];
+                });
+        });
+
+        $response = $this->actingAs($owner)->get(route('getting-started.start'));
+
+        $response->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
     }
 
     public function test_done_users_are_redirected_away_from_getting_started(): void

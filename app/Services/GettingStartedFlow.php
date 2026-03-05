@@ -14,6 +14,11 @@ class GettingStartedFlow
     public const STEP_INVOICE = 'invoice';
     public const STEP_DELIVER = 'deliver';
 
+    public function __construct(
+        private readonly InvoicePaymentSyncService $paymentSyncService
+    ) {
+    }
+
     /**
      * @return list<string>
      */
@@ -98,6 +103,8 @@ class GettingStartedFlow
     public function snapshot(User $user): array
     {
         $replayStartedAt = $this->replayStartedAt($user);
+        $this->syncDraftInvoicesBeforeSnapshot($user, $replayStartedAt);
+
         $walletComplete = $this->walletStepComplete($user, $replayStartedAt);
         $invoiceComplete = $this->invoiceStepComplete($user, $replayStartedAt);
         $deliverComplete = $this->deliverStepComplete($user, $replayStartedAt);
@@ -302,6 +309,38 @@ class GettingStartedFlow
         return $user->gettingStartedReplayActive()
             ? $user->getting_started_replay_started_at
             : null;
+    }
+
+    private function syncDraftInvoicesBeforeSnapshot(User $user, ?Carbon $replayStartedAt): void
+    {
+        if (! config('blockchain.getting_started_sync.enabled', true)) {
+            return;
+        }
+
+        $wallet = $user->walletSetting;
+        if (! $wallet) {
+            return;
+        }
+
+        $maxDraftInvoices = max((int) config('blockchain.getting_started_sync.max_draft_invoices', 5), 1);
+
+        $draftInvoices = $this->deliverInvoiceQuery($user, $replayStartedAt)
+            ->whereNotNull('payment_address')
+            ->latest('id')
+            ->limit($maxDraftInvoices)
+            ->get();
+
+        foreach ($draftInvoices as $invoice) {
+            try {
+                $this->paymentSyncService->syncInvoice(
+                    $invoice,
+                    network: $wallet->network,
+                    checkAlerts: false
+                );
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
     }
 
     private function walletStepComplete(User $user, ?Carbon $replayStartedAt): bool
