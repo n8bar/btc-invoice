@@ -185,7 +185,7 @@ Goal: address the current findings in a controlled sequence with small, testable
   - UXInspection B (10-15m): Replay boundary checks
     - [x] Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
     - [x] New replay invoice advances to deliver step.
-    - [ ] Replay completion requires replay-era delivery activity and then closes with completion status.
+    - [x] Replay completion requires replay-era delivery activity and then closes with completion status.
     - [x] Replay state survives logout/login and resumes at the expected step.
   - UXInspection C (5-10m): Deliver-step targeting correctness
     - [x] Multiple eligible draft invoices: Change selector swaps target correctly.
