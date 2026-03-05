@@ -276,6 +276,36 @@ class GettingStartedFlowTest extends TestCase
             ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
     }
 
+    public function test_non_replay_blocked_step_two_advances_after_creating_new_draft_invoice(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
+
+        $blocked = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
+        $blocked->assertOk();
+        $blocked->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
+
+        $newDraft = $this->createInvoice($owner, $client, [
+            'number' => 'INV-NEW-DRAFT-1',
+            'status' => 'draft',
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', [
+                'step' => 'deliver',
+                'invoice' => $newDraft->id,
+            ]));
+    }
+
     public function test_invoice_step_hides_required_step_notice_when_returning_from_deliver_for_new_draft(): void
     {
         $owner = User::factory()->create([

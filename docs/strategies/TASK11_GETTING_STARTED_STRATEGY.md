@@ -175,7 +175,7 @@ Goal: address the current findings in a controlled sequence with small, testable
 - Keep existing business data intact; replay resets onboarding guidance state, not wallets/invoices/clients.
 - Deliverable check: completed users can intentionally restart and progress through a meaningful guided rerun.
 
-- [ ] 8. New browser QA pass (coverage + gap finder)
+- [x] 8. New browser QA pass (coverage + gap finder)
 - Run a new, focused QA set that re-checks core flow behavior and targets blind spots from earlier UXInspections.
 - Suggested execution order (about 30-45 minutes total):
   - UXInspection A (10-15m): Core regressions
@@ -199,7 +199,7 @@ Goal: address the current findings in a controlled sequence with small, testable
   - User + scenario tested, exact route hit, expected vs actual result, and whether issue is reproducible.
   - For regressions, include a short note on whether impact is block/major/minor.
 - Exit criteria:
-  - Mark this item complete only when UXInspections A-D are done and any new issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
+  - Completed: UXInspections A-D are done and follow-up issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md` and `docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`.
 
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
