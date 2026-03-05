@@ -118,8 +118,8 @@ This document is a temporary working plan. It is not a source of truth like `doc
   - `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`
 - Keep this file focused on the implementation pass (v1 behavior + test plan).
 
-## Task 11 Pass1 Findings Strategy (Implementation Order)
-Goal: address the current Pass1 findings in a controlled sequence with small, testable increments.
+## Task 11 Findings Strategy (Implementation Order)
+Goal: address the current findings in a controlled sequence with small, testable increments.
 
 - [x] 1. Orientation entry (Finding 1)
 - Add a dedicated welcome route/view for onboarding entry (internal orientation step).
@@ -176,30 +176,30 @@ Goal: address the current Pass1 findings in a controlled sequence with small, te
 - Deliverable check: completed users can intentionally restart and progress through a meaningful guided rerun.
 
 - [ ] 8. New browser QA pass (coverage + gap finder)
-- Run a new, focused QA set that re-checks core flow behavior and targets blind spots from earlier passes.
+- Run a new, focused QA set that re-checks core flow behavior and targets blind spots from earlier UXInspections.
 - Suggested execution order (about 30-45 minutes total):
-  - Pass A (10-15m): Core regressions
+  - UXInspection A (10-15m): Core regressions
     - [x] New registrant lands on welcome entry and can complete all steps end-to-end.
     - [x] Incomplete returning user lands on resolver-first actionable step (not forced to welcome).
     - [x] Replay-started user enters wallet step first and does not skip directly to dashboard.
-  - Pass B (10-15m): Replay boundary checks
+  - UXInspection B (10-15m): Replay boundary checks
     - [x] Pre-replay artifacts do not auto-complete replay invoice/deliver steps.
     - [x] New replay invoice advances to deliver step.
     - [ ] Replay completion requires replay-era delivery activity and then closes with completion status.
     - [x] Replay state survives logout/login and resumes at the expected step.
-  - Pass C (5-10m): Deliver-step targeting correctness
-    - Multiple eligible draft invoices: Change selector swaps target correctly.
-    - Invalid or stale `?invoice=` falls back safely.
-    - Non-eligible invoices (sent/void/trashed/other-user) cannot become target invoice.
-  - Pass D (5-10m): UX/a11y quick sweep
-    - Light + dark mode contrast remains acceptable in step cards and highlighted actions.
-    - Desktop + narrower screens avoid horizontal overflow in step shell and progress strip.
-    - One keyboard-only run confirms CTA path is reachable without focus traps.
+  - UXInspection C (5-10m): Deliver-step targeting correctness
+    - [x] Multiple eligible draft invoices: Change selector swaps target correctly.
+    - [x] Invalid or stale `?invoice=` falls back safely.
+    - [x] Non-eligible invoices (sent/void/trashed/other-user) cannot become target invoice.
+  - UXInspection D (5-10m): UX/a11y quick sweep
+    - [x] Light + dark mode contrast remains acceptable in step cards and highlighted actions.
+    - [x] Desktop + narrower screens avoid horizontal overflow in step shell and progress strip.
+    - [ ] One keyboard-only run confirms CTA path is reachable without focus traps.
 - Evidence to capture during QA:
   - User + scenario tested, exact route hit, expected vs actual result, and whether issue is reproducible.
   - For regressions, include a short note on whether impact is block/major/minor.
 - Exit criteria:
-  - Mark this item complete only when Passes A-D are done and any new issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
+  - Mark this item complete only when UXInspections A-D are done and any new issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`.
 
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
