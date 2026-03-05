@@ -29,6 +29,8 @@ class ProfileController extends Controller
         $data = $request->validated();
         $data['show_invoice_ids'] = $request->boolean('show_invoice_ids');
         $data['auto_receipt_emails'] = $request->boolean('auto_receipt_emails');
+        $data['show_overpayment_gratuity_note'] = $request->boolean('show_overpayment_gratuity_note');
+        $data['show_qr_refresh_reminder'] = $request->boolean('show_qr_refresh_reminder');
 
         $request->user()->fill($data);
 

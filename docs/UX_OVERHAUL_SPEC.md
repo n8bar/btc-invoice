@@ -86,17 +86,17 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 12. User settings & auth UX (current-state rewrite, 2026-03-04)
    - Baseline already shipped before this task: branded login screen, grouped invoice settings cards, and existing profile toggles (`show_invoice_ids`, `auto_receipt_emails`).
    - Required implementation:
-     - Add two Profile toggles (reuse existing profile toggle pattern):
+     - [x] Add two Profile toggles (reuse existing profile toggle pattern):
        - `show_overpayment_gratuity_note`
        - `show_qr_refresh_reminder`
-     - Persist per user (default `true` for existing and new users).
-     - Drive conditional copy on invoice show/public/print:
+     - [x] Persist per user (default `true` for existing and new users).
+     - [x] Drive conditional copy on invoice show/public/print:
        - Overpayment gratuity note.
        - QR refresh/staleness reminder near payment QR surfaces.
    - Guardrail for this task: keep owner-operational warnings and reconciliation guidance visible even when client-facing note toggles are off.
    - Polish pass scope stays implementation-light:
-     - Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
-     - Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
+     - [ ] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
+     - [ ] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
 13. Invoice Settings finish-up (post-Task12 sweep)
    - Use Task13 only for invoice-settings deltas discovered during Task12 consistency review.
    - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.

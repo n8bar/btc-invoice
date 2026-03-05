@@ -57,7 +57,11 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 space-y-6">
-            @php $gettingStartedContext = request()->boolean('getting_started'); @endphp
+            @php
+                $gettingStartedContext = request()->boolean('getting_started');
+                $showOverpaymentGratuityNote = (bool) ($invoice->user?->show_overpayment_gratuity_note ?? true);
+                $showQrRefreshReminder = (bool) ($invoice->user?->show_qr_refresh_reminder ?? true);
+            @endphp
 
             @isset($gettingStartedStrip)
                 @include('getting-started.partials.progress-strip', ['strip' => $gettingStartedStrip])
@@ -180,7 +184,9 @@
             @endif
 
             <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2" style="border-color: currentColor;">
-                <p>Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.</p>
+                @if ($showOverpaymentGratuityNote)
+                    <p>Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.</p>
+                @endif
                 <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter a manual adjustment near the bottom of the screen so the ledger stays accurate without touching the original chain data.</p>
             </div>
 
@@ -371,7 +377,10 @@
 
                         @if ($invoice->requiresClientOverpayAlert())
                             <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900" style="border-color: currentColor;">
-                                Client alert will show on the public invoice (overpayment ~{{ number_format($invoice->overpaymentPercent(), 1) }}%). Overpayments are gratuities unless you manually adjust.
+                                Client alert will show on the public invoice (overpayment ~{{ number_format($invoice->overpaymentPercent(), 1) }}%).
+                                @if ($showOverpaymentGratuityNote)
+                                    Overpayments are gratuities unless you manually adjust.
+                                @endif
                             </div>
                         @elseif ($invoice->requiresClientUnderpayAlert())
                             <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900" style="border-color: currentColor;">
@@ -530,10 +539,12 @@
                                     </script>
 
                                     <p class="mt-2 text-xs text-gray-500">Scan with any Bitcoin wallet.</p>
-                                    <p class="mt-1 text-[11px] text-gray-500 leading-snug">
-                                        BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
-                                        refresh right before sending payment; printed copies may be stale.
-                                    </p>
+                                    @if ($showQrRefreshReminder)
+                                        <p class="mt-1 text-[11px] text-gray-500 leading-snug">
+                                            BTC/USD is captured when this page loads. To avoid over/underpayment and additional miner fees,
+                                            refresh right before sending payment; printed copies may be stale.
+                                        </p>
+                                    @endif
                                     <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900" style="border-color: currentColor;">
                                         <strong>Send one payment:</strong> please send the entire outstanding balance in a single transaction.
                                         Splitting the invoice across multiple payments usually adds miner fees and can delay settlement.
