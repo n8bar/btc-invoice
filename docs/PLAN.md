@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-02-25_
+_Last updated: 2026-03-04_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -114,11 +114,17 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
     - Source finding: [`docs/qa/Finding1.md`](qa/Finding1.md) documents the shared account xpub collision issue (new invoices falsely inheriting unrelated on-chain payments).
-    - Lock in reliable on-chain payment detection as a core feature by requiring a dedicated account xpub/derivation namespace for automatic attribution.
-    - Update Wallet Settings guidance to explain the dedicated-account requirement, the shared-account collision risk, and that viewing/spending from the account in other wallets is fine, but using that same account for additional receives/address generation outside CryptoZing is not.
-    - Add corrective tooling to void/ignore wrongly attributed on-chain payments for shared-account mistakes, with strong warning copy (escape hatch, not the recommended workflow).
-    - Review onboarding/wallet flows for where to acknowledge or reinforce the dedicated-account requirement.
-    - Verification: reproduce the shared-account false-paid scenario in QA, confirm the guidance is clear, and confirm correction tooling can recover invoice state safely.
+    - **Phase 14.1 — Wallet key lineage + derivation cursor safety (architecture prerequisite)**
+      - Maintain per-key history/cursors (fingerprint + network + next derivation index) so derivation state is key-aware.
+      - Enforce key-aware NDI behavior: same key resumes/clamps safely; new key starts at derivation index 0; switching back resumes that key’s prior cursor.
+      - Persist key identity on invoices alongside derivation index so attribution and recovery behavior remain auditable.
+    - **Phase 14.2 — Dedicated-wallet UX hardening**
+      - Lock in reliable on-chain payment detection as a core feature by requiring a dedicated account xpub/derivation namespace for automatic attribution.
+      - Update Wallet Settings/onboarding guidance to explain the dedicated-account requirement, the shared-account collision risk, and that viewing/spending from the account in other wallets is fine, but using that same account for additional receives/address generation outside CryptoZing is not.
+      - Review onboarding/wallet flows for where to acknowledge or reinforce this requirement.
+    - **Phase 14.3 — Correction tooling + safeguards**
+      - Add corrective tooling to void/ignore wrongly attributed on-chain payments for shared-account mistakes, with strong warning copy (escape hatch, not the recommended workflow).
+    - Verification: reproduce the shared-account false-paid scenario in QA, confirm guidance clarity, and confirm correction tooling can recover invoice state safely.
 15. **Mailer & Alerts Polish + Audit**
     - Revisit the mailer pipeline and alerting flows (under/over/partial, past-due, receipts) to ensure cooldowns, deduping, and queue processing behave correctly.
     - Add per-user editable email templates (invoice send, reminders/alerts) with safe variables, preview + reset-to-default, and validation; verify/test them during or late in MS15 alongside the mailer audit.
