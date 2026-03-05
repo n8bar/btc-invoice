@@ -110,6 +110,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
     - [ ] User-level toggles (overpayment note, QR refresh reminder).
     - [ ] Settings/auth polish: Profile, Invoice Settings, Wallet Settings, and branded Login/Logout UX.
+    - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
     - Source finding: [`docs/qa/Finding1.md`](qa/Finding1.md) documents the shared account xpub collision issue (new invoices falsely inheriting unrelated on-chain payments).
