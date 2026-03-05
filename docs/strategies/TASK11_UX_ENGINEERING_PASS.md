@@ -116,3 +116,18 @@ This document is a temporary working strategy. It is not a source of truth like 
   - Avoid visual overload; this is directional emphasis, not full-page highlighting.
   - Keep treatment subtle and consistent (prefer static glow/border over constant animation).
   - Respect accessibility expectations (`prefers-reduced-motion`) if any motion cue is later introduced.
+
+### Finding 7: Completed users can’t meaningfully rerun Getting Started
+- Observation:
+  - When a completed user re-enters Getting Started, existing wallet/invoice/delivery data makes steps appear complete immediately.
+  - This prevents a true guided rerun.
+- Direction:
+  - Add a persistent `Replay mode` for Getting Started (persists across logout).
+  - Replay should auto-advance steps, but only from replay-relevant actions.
+- Replay rules:
+  - Start replay with a `replay_started_at` timestamp.
+  - Step 1 (Wallet): user verifies current wallet settings (no new xpub required).
+  - Step 2 (Invoice): requires an invoice created at/after `replay_started_at`.
+  - Step 3 (Deliver): requires share/send activity tied to replay context (at/after `replay_started_at`).
+- Outcome:
+  - Users can intentionally run onboarding again without deleting existing business data.

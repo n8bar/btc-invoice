@@ -116,29 +116,43 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice = DB::transaction(function () use ($data, $wallet, $userId, $address) {
-                $invoice = Invoice::create($data + [
-                    'user_id' => $userId,
-                    'payment_address' => $address,
-                    'derivation_index' => $wallet->next_derivation_index,
-                ]);
-
-                $wallet->increment('next_derivation_index');
-
-                return $invoice;
-            });
+            $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $address);
+            $invoiceCreatedMessage = 'Invoice created.';
         } catch (QueryException $e) {
             if ($this->isInvoiceNumberUniqueViolation($e)) {
+                $submittedNumber = (string) ($data['number'] ?? '');
+                if (! preg_match('/^INV-\d{4,}$/', $submittedNumber)) {
+                    return back()
+                        ->withErrors(['number' => 'That invoice number is unavailable. Try a different number.'])
+                        ->withInput();
+                }
+
+                $data['number'] = Invoice::nextNumberForUser($userId);
+
+                try {
+                    $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $address);
+                    $invoiceCreatedMessage = "Invoice created. Number adjusted to {$data['number']} due to a collision.";
+                } catch (QueryException $retryException) {
+                    if ($this->isInvoiceNumberUniqueViolation($retryException)) {
+                        return back()
+                            ->withErrors(['number' => 'That invoice number is unavailable. Try a different number.'])
+                            ->withInput();
+                    }
+
+                    report($retryException);
+
+                    return back()
+                        ->with('error', 'We could not save the invoice. Please try again.')
+                        ->withInput();
+                }
+            }
+            else {
+                report($e);
+
                 return back()
-                    ->withErrors(['number' => 'That invoice number is unavailable. Try a different number.'])
+                    ->with('error', 'We could not save the invoice. Please try again.')
                     ->withInput();
             }
-
-            report($e);
-
-            return back()
-                ->with('error', 'We could not save the invoice. Please try again.')
-                ->withInput();
         } catch (\Throwable $e) {
             report($e);
 
@@ -155,10 +169,10 @@ class InvoiceController extends Controller
             return redirect()->route('getting-started.step', [
                 'step' => GettingStartedFlow::STEP_DELIVER,
                 'invoice' => $invoice->id,
-            ])->with('status', 'Invoice created.');
+            ])->with('status', $invoiceCreatedMessage);
         }
 
-        return redirect()->route('invoices.index')->with('status', 'Invoice created.');
+        return redirect()->route('invoices.index')->with('status', $invoiceCreatedMessage);
     }
 
     /**
@@ -297,6 +311,8 @@ class InvoiceController extends Controller
         $today = now()->toDateString(); // ✅ for invoice_date default
         $brandingDefaults = $this->brandingDefaults($request->user());
         $invoiceDefaults = $this->invoiceDefaults($request->user(), $today);
+        $clientGateReturnTo = route('invoices.create', $request->boolean('getting_started') ? ['getting_started' => 1] : [], false);
+        $showClientGate = $clients->isEmpty();
 
         return view('invoices.create', compact(
             'clients',
@@ -304,7 +320,9 @@ class InvoiceController extends Controller
             'prefillRate',
             'today',
             'brandingDefaults',
-            'invoiceDefaults'
+            'invoiceDefaults',
+            'showClientGate',
+            'clientGateReturnTo'
         ) + [
             'gettingStartedStrip' => $request->boolean('getting_started')
                 ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_INVOICE)
@@ -509,6 +527,7 @@ class InvoiceController extends Controller
         $data = $request->validate([
             'expires'        => ['nullable','date','after:now'],
             'expires_preset' => ['nullable','in:none,24h,7d,30d'],
+            '_scroll_y'      => ['nullable', 'integer', 'min:0'],
         ]);
 
         $expires = null;
@@ -524,8 +543,15 @@ class InvoiceController extends Controller
 
         $invoice->enablePublicShare($expires);
 
-        return back()->with('status', 'Public link enabled.')
+        $redirect = back()
+            ->with('status', 'Public link enabled.')
             ->with('public_url', $invoice->public_url);
+
+        if (array_key_exists('_scroll_y', $data) && $data['_scroll_y'] !== null) {
+            $redirect->with('restore_scroll_y', (int) $data['_scroll_y']);
+        }
+
+        return $redirect;
     }
 
     public function disableShare(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
@@ -689,6 +715,21 @@ class InvoiceController extends Controller
         }
 
         return $data;
+    }
+
+    private function createInvoiceRecord(array $data, $wallet, int $userId, string $address): Invoice
+    {
+        return DB::transaction(function () use ($data, $wallet, $userId, $address) {
+            $invoice = Invoice::create($data + [
+                'user_id' => $userId,
+                'payment_address' => $address,
+                'derivation_index' => $wallet->next_derivation_index,
+            ]);
+
+            $wallet->increment('next_derivation_index');
+
+            return $invoice;
+        });
     }
 
     private function isInvoiceNumberUniqueViolation(QueryException $e): bool

@@ -6,6 +6,7 @@ window.Alpine = Alpine;
 
 Alpine.data('walletValidation', (config = {}) => ({
     value: config.initialValue || '',
+    initialValue: config.initialValue || '',
     status: 'idle',
     message: '',
     address: '',
@@ -35,7 +36,15 @@ Alpine.data('walletValidation', (config = {}) => ({
     },
 
     cleanedValue() {
-        return (this.value || '').replace(/\s+/g, '');
+        return this.normalizeValue(this.value);
+    },
+
+    normalizeValue(input) {
+        return (input || '').replace(/\s+/g, '');
+    },
+
+    hasValueChanged() {
+        return this.normalizeValue(this.value) !== this.normalizeValue(this.initialValue);
     },
 
     handleInput() {

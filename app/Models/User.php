@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'show_invoice_ids',
         'auto_receipt_emails',
+        'show_overpayment_gratuity_note',
+        'show_qr_refresh_reminder',
         'billing_name',
         'billing_email',
         'billing_phone',
@@ -34,6 +36,8 @@ class User extends Authenticatable
         'theme',
         'getting_started_completed_at',
         'getting_started_dismissed',
+        'getting_started_replay_started_at',
+        'getting_started_replay_wallet_verified_at',
     ];
 
     /**
@@ -58,6 +62,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'show_invoice_ids' => 'boolean',
             'auto_receipt_emails' => 'boolean',
+            'show_overpayment_gratuity_note' => 'boolean',
+            'show_qr_refresh_reminder' => 'boolean',
             'billing_name' => 'string',
             'billing_email' => 'string',
             'billing_phone' => 'string',
@@ -66,6 +72,8 @@ class User extends Authenticatable
             'theme' => 'string',
             'getting_started_completed_at' => 'datetime',
             'getting_started_dismissed' => 'boolean',
+            'getting_started_replay_started_at' => 'datetime',
+            'getting_started_replay_wallet_verified_at' => 'datetime',
         ];
     }
 
@@ -103,5 +111,11 @@ class User extends Authenticatable
     public function gettingStartedNeedsAutoShow(): bool
     {
         return $this->getting_started_completed_at === null;
+    }
+
+    public function gettingStartedReplayActive(): bool
+    {
+        return $this->getting_started_completed_at === null
+            && $this->getting_started_replay_started_at !== null;
     }
 }

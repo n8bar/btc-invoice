@@ -8,28 +8,32 @@
                 </h2>
                 <p class="text-sm text-gray-500">At-a-glance invoice and payment health.</p>
             </div>
-            <div class="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-3">
+            <div class="w-full space-y-2 sm:w-auto sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-2">
                 @php
                     $newClientButtonClasses = ($hasClients ?? false)
                         ? 'inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto'
                         : 'inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto';
                 @endphp
-                <a href="{{ route('clients.create') }}" class="{{ $newClientButtonClasses }}">
-                    <span aria-hidden="true" class="mr-1">👤</span>
-                    <span>New client</span>
-                </a>
-                <a href="{{ route('invoices.create') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
-                    <span aria-hidden="true" class="mr-1">🧾</span>
-                    <span>New invoice</span>
-                </a>
-                <a href="{{ route('clients.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
-                    <span aria-hidden="true" class="mr-1">👥</span>
-                    <span>Clients</span>
-                </a>
-                <a href="{{ route('invoices.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
-                    <span aria-hidden="true" class="mr-1">📄</span>
-                    <span>Invoices</span>
-                </a>
+                <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-none sm:gap-2">
+                    <a href="{{ route('clients.create') }}" class="{{ $newClientButtonClasses }}">
+                        <span aria-hidden="true" class="mr-1">👤</span>
+                        <span>New client</span>
+                    </a>
+                    <a href="{{ route('invoices.create') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                        <span aria-hidden="true" class="mr-1">🧾</span>
+                        <span>New invoice</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-none sm:gap-2">
+                    <a href="{{ route('clients.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                        <span aria-hidden="true" class="mr-1">👥</span>
+                        <span>Clients</span>
+                    </a>
+                    <a href="{{ route('invoices.index') }}" class="inline-flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 whitespace-nowrap sm:w-auto">
+                        <span aria-hidden="true" class="mr-1">📄</span>
+                        <span>Invoices</span>
+                    </a>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -55,17 +59,37 @@
             @endif
 
             @if (!empty($showGettingStartedPrompt))
-                <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm dark:border-indigo-400/25 dark:bg-indigo-950/35" style="border-color: currentColor;">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
+                <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm dark:border-indigo-400/25 dark:bg-indigo-950/35"
+                     style="border-color: currentColor;"
+                     data-getting-started-prompt>
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200">Getting Started</p>
                             <h3 class="mt-1 text-base font-semibold text-indigo-950 dark:text-indigo-100">Finish your setup flow</h3>
                             <p class="mt-1 text-sm text-indigo-900 dark:text-indigo-200">Connect a wallet, create an invoice, and send your first share-enabled invoice.</p>
                         </div>
+                        <button type="button"
+                                data-getting-started-temp-hide
+                                aria-label="Hide prompt until reload"
+                                title="Hide for now (until reload)"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-indigo-200 bg-white/80 text-sm font-semibold text-indigo-700 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/35 dark:bg-slate-900/60 dark:text-indigo-200 dark:hover:bg-slate-900">
+                            ×
+                        </button>
+                    </div>
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
                         <a href="{{ $gettingStartedUrl }}"
                            class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-white dark:text-indigo-900 dark:hover:bg-indigo-50 dark:focus:ring-offset-slate-900">
                             Resume getting started
                         </a>
+                        <form method="POST"
+                              action="{{ route('getting-started.dismiss') }}"
+                              onsubmit="return confirm('Hide getting started for now? You can reopen it later from the account menu.');">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex items-center justify-center rounded-md border border-indigo-300 bg-white px-4 py-2 text-sm font-semibold text-indigo-700 shadow-sm hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/35 dark:bg-slate-900/70 dark:text-indigo-200 dark:hover:bg-indigo-950/50 dark:focus:ring-offset-slate-900">
+                                Hide for now
+                            </button>
+                        </form>
                     </div>
                 </div>
             @endif
@@ -94,7 +118,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-700">📄</span>
-                            <div class="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Draft/Sent/Partial</div>
+                            <div class="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold text-center">Draft/Sent/Partial</div>
                         </div>
                     </div>
                     <dl class="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-600">
@@ -122,7 +146,7 @@
                         <div class="text-right">
                             <div class="flex items-center gap-2 justify-end">
                                 <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 text-amber-800">⏰</span>
-                                <div class="rounded-full bg-amber-50 text-amber-800 px-3 py-1 text-xs font-semibold">Due &amp; open</div>
+                                <div class="rounded-full bg-amber-50 text-amber-800 px-3 py-1 text-xs font-semibold text-center">Due &amp; open</div>
                             </div>
                             <div class="text-sm text-gray-500 mt-1">${{ number_format($totals['past_due_usd'] ?? 0, 2) }}</div>
                         </div>
@@ -138,7 +162,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700 dark:bg-sky-900 dark:text-sky-200">📅</span>
-                            <div class="rounded-full bg-sky-50 text-sky-700 dark:bg-sky-900 dark:text-sky-200 px-3 py-1 text-xs font-semibold">Due soon</div>
+                            <div class="rounded-full bg-sky-50 text-sky-700 dark:bg-sky-900 dark:text-sky-200 px-3 py-1 text-xs font-semibold text-center">Due soon</div>
                         </div>
                     </div>
                     <p class="mt-2 text-sm text-gray-500">Invoices due in the next 7 days.</p>
@@ -153,7 +177,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100">✅</span>
-                            <div class="rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100 px-3 py-1 text-xs font-semibold">{{ $counts['payments_last_7d'] ?? 0 }} payments</div>
+                            <div class="rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-100 px-3 py-1 text-xs font-semibold text-center">{{ $counts['payments_last_7d'] ?? 0 }} payments</div>
                         </div>
                     </div>
                     <p class="mt-2 text-sm text-gray-500">Total detected in the last 7 days.</p>
@@ -235,6 +259,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const prompt = document.querySelector('[data-getting-started-prompt]');
+            const hidePromptButton = document.querySelector('[data-getting-started-temp-hide]');
+            if (prompt && hidePromptButton) {
+                hidePromptButton.addEventListener('click', () => {
+                    prompt.classList.add('hidden');
+                });
+            }
+
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
                 const iso = node.getAttribute('data-utc-ts');
                 if (!iso) return;

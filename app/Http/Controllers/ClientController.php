@@ -31,11 +31,7 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name'  => ['required','string','max:255'],
-            'email' => ['nullable','email','max:255'],
-            'notes' => ['nullable','string','max:2000'],
-        ]);
+        $data = $this->validatedClientData($request);
 
         $client = Client::create([
             'user_id' => $request->user()->id,
@@ -46,6 +42,11 @@ class ClientController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json($client, 201);
+        }
+
+        $returnTo = $this->validatedReturnTo($request->input('return_to'));
+        if ($returnTo !== null) {
+            return redirect($returnTo)->with('status', 'Client created.');
         }
 
         return redirect()->route('clients.index')->with('status', 'Client created.');
@@ -68,11 +69,7 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        $data = $request->validate([
-            'name'  => ['required','string','max:255'],
-            'email' => ['nullable','email','max:255'],
-            'notes' => ['nullable','string','max:2000'],
-        ]);
+        $data = $this->validatedClientData($request);
 
         $client->update($data);
 
@@ -152,5 +149,45 @@ class ClientController extends Controller
             return response()->json(['deleted' => true]);
         }
         return redirect()->route('clients.trash')->with('status', 'Client permanently deleted.');
+    }
+
+    /**
+     * @return array{name:string,email:?string,notes:?string}
+     */
+    private function validatedClientData(Request $request): array
+    {
+        /** @var array{name:string,email:?string,notes:?string} $validated */
+        $validated = $request->validate([
+            'name'  => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        return $validated;
+    }
+
+    private function validatedReturnTo(mixed $returnTo): ?string
+    {
+        if (! is_string($returnTo)) {
+            return null;
+        }
+
+        $candidate = trim($returnTo);
+        if ($candidate === '' || strlen($candidate) > 2048) {
+            return null;
+        }
+
+        if (! str_starts_with($candidate, '/') || str_starts_with($candidate, '//')) {
+            return null;
+        }
+
+        $candidatePath = parse_url($candidate, PHP_URL_PATH);
+        $invoiceCreatePath = parse_url(route('invoices.create', [], false), PHP_URL_PATH);
+
+        if (! is_string($candidatePath) || ! is_string($invoiceCreatePath)) {
+            return null;
+        }
+
+        return $candidatePath === $invoiceCreatePath ? $candidate : null;
     }
 }

@@ -207,3 +207,46 @@
 .dark .border-indigo-500 {
     border-color: var(--color-primary) !important;
 }
+
+/* Keep homepage (/) typography at pre-scale sizing. */
+.landing-type-baseline .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.landing-type-baseline .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.landing-type-baseline .text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.landing-type-baseline .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.landing-type-baseline .text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.landing-type-baseline .text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.landing-type-baseline .text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+@media (min-width: 640px) {
+    .landing-type-baseline .sm\:text-5xl {
+        font-size: 3rem;
+        line-height: 1;
+    }
+}

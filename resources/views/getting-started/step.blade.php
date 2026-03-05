@@ -42,6 +42,23 @@
                             <p class="mt-1">{{ $currentStep['criteria'] }}</p>
                         </div>
 
+                        @if ($showInvoiceDraftRequiredWarning ?? false)
+                            <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" style="border-color: currentColor;">
+                                <p class="font-semibold">Your latest invoice is no longer draft. Create a new draft invoice to continue.</p>
+                                <p class="mt-1">
+                                    If this happened instantly, this wallet account may also be receiving payments from another wallet app.
+                                    CryptoZing requires a dedicated-use wallet account. Receiving payments using other wallet apps is not supported. CryptoZing cannot reliably separate invoice payments from unrelated wallet activity.
+                                </p>
+                                <form method="POST" action="{{ route('getting-started.reconnect-wallet') }}" class="mt-2">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center font-semibold text-amber-900 underline underline-offset-2 hover:text-amber-700">
+                                        Connect a different wallet instead
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
                         @if ($currentStepKey === 'deliver' && $deliverInvoice)
                             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-200">
                                 <div class="flex flex-wrap items-start justify-between gap-3">
@@ -87,19 +104,32 @@
                                     Enable the public link, then use the send form on the invoice page.
                                 </p>
                             </div>
+                        @elseif ($currentStepKey === 'deliver')
+                            <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" style="border-color: currentColor;">
+                                <p class="font-semibold">No new draft invoice is available for delivery.</p>
+                                <p class="mt-1">
+                                    Create a new draft invoice, then return here to enable the public link and send it.
+                                </p>
+                            </div>
                         @endif
 
-                        @if ($currentStepKey !== $earliestIncompleteStep)
+                        @if ($showRequiredStepNotice)
                             <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900" style="border-color: currentColor;">
-                                You can review this step, but the next required step is still step
+                                You can review this step, but the next required step is step
                                 {{ collect($steps)->firstWhere('key', $earliestIncompleteStep)['position'] ?? '—' }}.
+                                @if (!empty($earliestIncompleteStepUrl))
+                                    <a href="{{ $earliestIncompleteStepUrl }}"
+                                       class="ml-1 font-semibold underline-offset-2 hover:underline">
+                                        Open required step
+                                    </a>
+                                @endif
                             </div>
                         @endif
 
                         <div class="flex flex-wrap items-center gap-3">
                             <a href="{{ $actionUrl }}"
                                class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                {{ $currentStep['cta_label'] }}
+                                {{ $actionLabel }}
                             </a>
 
                             <form method="POST" action="{{ route('getting-started.dismiss') }}">
@@ -119,6 +149,7 @@
                         @foreach ($steps as $step)
                             @php
                                 $isCurrent = $step['key'] === $currentStepKey;
+                                $stepUrl = $stepUrls[$step['key']] ?? null;
                             @endphp
                             <li class="rounded-lg border p-3 {{ $isCurrent ? 'border-indigo-300 bg-indigo-50 dark:border-indigo-400/30 dark:bg-indigo-950/35' : 'border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900/50' }}"
                                 @if ($isCurrent) aria-current="step" @endif>
@@ -130,10 +161,19 @@
                                             {{ $step['position'] }}
                                         @endif
                                     </div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-slate-100">{{ $step['label'] }}</p>
-                                        <p class="mt-1 text-xs text-gray-600 dark:text-slate-300">{{ $step['criteria'] }}</p>
-                                    </div>
+                                    @if ($stepUrl)
+                                        <a href="{{ $stepUrl }}"
+                                           data-getting-started-step-link="{{ $step['key'] }}"
+                                           class="min-w-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded-sm">
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-slate-100 group-hover:underline">{{ $step['label'] }}</p>
+                                            <p class="mt-1 text-xs text-gray-600 dark:text-slate-300">{{ $step['criteria'] }}</p>
+                                        </a>
+                                    @else
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-slate-100">{{ $step['label'] }}</p>
+                                            <p class="mt-1 text-xs text-gray-600 dark:text-slate-300">{{ $step['criteria'] }}</p>
+                                        </div>
+                                    @endif
                                 </div>
                             </li>
                         @endforeach

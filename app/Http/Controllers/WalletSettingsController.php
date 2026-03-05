@@ -26,6 +26,8 @@ class WalletSettingsController extends Controller
                 ->get(),
             'maxAdditionalWallets' => self::MAX_ADDITIONAL_ACCOUNTS,
             'defaultNetwork' => $network,
+            'isGettingStartedReplay' => $request->boolean('getting_started')
+                && $request->user()->gettingStartedReplayActive(),
             'gettingStartedStrip' => $request->boolean('getting_started')
                 ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_WALLET)
                 : null,
@@ -54,10 +56,11 @@ class WalletSettingsController extends Controller
         ]);
     }
 
-    public function update(WalletSettingRequest $request)
+    public function update(WalletSettingRequest $request, GettingStartedFlow $gettingStartedFlow)
     {
         $user = $request->user();
         $network = Config::get('wallet.default_network', 'testnet');
+        $previousNextDerivationIndex = (int) ($user->walletSetting?->next_derivation_index ?? 0);
 
         $payload = $request->validated();
         $payload['network'] = $network;
@@ -81,12 +84,24 @@ class WalletSettingsController extends Controller
             'onboarded_at' => now(),
         ]);
 
-        if ($wallet->wasRecentlyCreated || $wallet->wasChanged('bip84_xpub')) {
-            $wallet->next_derivation_index = 0;
+        $maxAssignedIndex = $user->invoices()
+            ->whereNotNull('derivation_index')
+            ->max('derivation_index');
+        $safeFloor = $maxAssignedIndex === null ? 0 : ((int) $maxAssignedIndex + 1);
+        $targetNextDerivationIndex = max(
+            (int) $wallet->next_derivation_index,
+            $previousNextDerivationIndex,
+            $safeFloor
+        );
+
+        if ((int) $wallet->next_derivation_index !== $targetNextDerivationIndex) {
+            $wallet->next_derivation_index = $targetNextDerivationIndex;
             $wallet->save();
         }
 
         if ($request->boolean('getting_started')) {
+            $gettingStartedFlow->markReplayWalletVerified($user);
+
             return redirect()->route('getting-started.start')
                 ->with('status', 'Wallet settings saved.');
         }

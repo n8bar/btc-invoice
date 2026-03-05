@@ -9,9 +9,8 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 - Invoices & Clients UI polish (CRUD surfaces, show/edit flows, print/public/share, delivery logs/actions).
 - Public/share layouts refresh to mirror updated show/print patterns.
 - Guided onboarding wizard (wallet setup → create invoice → deliver).
-- User-level toggles for overpayment note and QR refresh reminder.
-- Per-user editable email templates (invoice send/reminders/alerts).
-- Settings/auth polish (Profile, Invoice Settings, Wallet Settings) and branded Login/Logout UX.
+- User-level communication toggles for overpayment note and QR refresh reminder.
+- Settings/auth consistency polish (Profile, Invoice Settings, Wallet Settings, Login/Logout) using existing patterns.
 
 ## Completed Tasks
 1. Dashboard snapshot redesign (counts/totals/recent payments).
@@ -84,16 +83,65 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Coverage includes `GettingStartedFlowTest` and integration assertions in auth/wallet/invoice delivery/show test suites.
 
 ## ToDo
-12. User settings & auth UX
-   - Keep this task implementation-light: add the overpayment note and QR refresh reminder as user-level toggles on **Profile** (reuse the existing profile toggle pattern), persist per user, and drive conditional copy in show/public/print.
-   - Polish pass only for Profile, Invoice Settings, and Wallet Settings: clear grouping, validation/error states, helper text, visible focus, and consistent action buttons (no major page redesign in this task).
-   - Login/Logout UX: ensure branded, accessible, and consistent with the updated theme; error/success states are friendly and clear (polish/consistency pass, not a new auth flow).
-13. Invoice Settings polish
-   - Branding defaults UI cleanup; copy hints for footer/heading/address; preserves overrides.
+12. User settings & auth UX (current-state rewrite, 2026-03-04)
+   - Baseline already shipped before this task: branded login screen, grouped invoice settings cards, and existing profile toggles (`show_invoice_ids`, `auto_receipt_emails`).
+   - Required implementation:
+     - [x] Add two Profile toggles (reuse existing profile toggle pattern):
+       - `show_overpayment_gratuity_note`
+       - `show_qr_refresh_reminder`
+     - [x] Persist per user (default `true` for existing and new users).
+     - [x] Drive conditional copy on invoice show/public/print:
+       - Overpayment gratuity note.
+       - QR refresh/staleness reminder near payment QR surfaces.
+   - Guardrail for this task: keep owner-operational warnings and reconciliation guidance visible even when client-facing note toggles are off.
+   - Polish pass scope stays implementation-light:
+     - [ ] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
+     - [ ] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
+   - Browser QA checklist (human-eyes):
+     1. Open `/profile` and confirm both toggles exist:
+        - `Show overpayment gratuity note to clients`
+        - `Show QR refresh reminder to clients`
+     2. Confirm both toggles default to ON for existing accounts after migration.
+     3. Save with both ON, hard refresh `/profile`, and confirm both remain ON.
+     4. Open owner invoice show (`/invoices/{id}`) and verify visible:
+        - `Overpayments are treated as gratuities by default`
+        - `Need to reconcile an over/under payment?`
+        - `refresh right before sending payment; printed copies may be stale.`
+     5. Open print view (`/invoices/{id}/print`) and verify visible:
+        - `Payment QR`
+        - `Overpayments are treated as gratuities by default`
+        - `refresh right before sending payment; printed copies may be stale.`
+     6. Open public view (`/p/{token}`) and verify the same two client-facing notes appear.
+     7. Set `Show overpayment gratuity note to clients` OFF and keep QR reminder ON; save.
+     8. Re-check owner show:
+        - `Overpayments are treated as gratuities by default` is hidden.
+        - `Need to reconcile an over/under payment?` remains visible.
+     9. Re-check print and public:
+        - `Overpayments are treated as gratuities by default` is hidden.
+        - QR refresh reminder remains visible.
+     10. Set gratuity ON and `Show QR refresh reminder to clients` OFF; save.
+     11. Re-check owner show, print, and public:
+        - `refresh right before sending payment; printed copies may be stale.` is hidden.
+        - `Payment QR` remains visible and functional.
+     12. Set both toggles OFF; save.
+     13. Re-check owner show, print, and public:
+        - Both client-facing notes are hidden.
+        - Owner reconciliation guidance remains visible on owner show.
+     14. Logout/login, return to `/profile`, and confirm persisted toggle state.
+     15. Keyboard/accessibility quick pass:
+        - Tab focus ring is visible on each toggle.
+        - Space toggles each checkbox.
+        - Save still works from keyboard flow.
+13. Invoice Settings finish-up (post-Task12 sweep)
+   - Use Task13 only for invoice-settings deltas discovered during Task12 consistency review.
+   - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
+   - Preserve existing per-invoice override behavior; no structural redesign.
+   - If Task12 sweep finds no substantive invoice-settings deltas, close Task13 as verified/no-op with test/doc evidence.
 
 ## Definition of Done
-- All outputs above implemented or explicitly deferred to FuturePLAN with pointers.
+- All MS13 outputs above implemented or explicitly deferred with clear pointers.
 - UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
-- Settings/auth screens (Profile, Invoice Settings, Wallet Settings, Login/Logout) match the updated UX patterns; per-user toggles behave as specified.
+- Task12 toggles are persisted per user (default on) and control only the intended client-facing copy in show/public/print.
+- Settings/auth screens in Task12 scope (Profile, Invoice Settings, Login/Logout) match guardrails and updated UX patterns without introducing an auth-flow redesign.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.

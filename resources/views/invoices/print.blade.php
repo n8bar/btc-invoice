@@ -31,7 +31,7 @@
             position: relative;
             z-index: 1;
         }
-        h1 { margin: 0 0 4px; font-size: 24px; }
+        h1 { margin: 0 0 4px; font-size: 32px; }
         .muted { color: var(--gray); }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .box { border: 1px solid var(--light); border-radius: 12px; padding: 16px; }
@@ -46,13 +46,13 @@
             padding: 8px 6px;
             border-bottom: 1px solid var(--light);
             text-align: left;
-            font-size: 14px;
+            font-size: 18.67px;
             vertical-align: top;
             overflow-wrap: anywhere;
         }
-        th { text-transform: uppercase; font-size: 12px; letter-spacing: .03em; color: var(--gray); }
+        th { text-transform: uppercase; font-size: 16px; letter-spacing: .03em; color: var(--gray); }
         .total { font-weight: 700; }
-        .badge { display:inline-block; padding:2px 8px; border-radius:9999px; font-size:12px; }
+        .badge { display:inline-block; padding:2px 8px; border-radius:9999px; font-size: 16px; }
         .badge-paid { background:#dcfce7; color:#166534; }
         .badge-sent { background:#dbeafe; color:#1e40af; }
         .badge-void { background:#fef9c3; color:#92400e; }
@@ -65,7 +65,7 @@
             cursor:pointer;
             text-decoration:none;
             color:inherit;
-            font-size:14px;
+            font-size: 18.67px;
             line-height:1.2;
             display:inline-flex;
             align-items:center;
@@ -119,7 +119,7 @@
         }
         .payment-qr-rate-note {
             color: var(--gray);
-            font-size: 11px;
+            font-size: 14.67px;
             line-height: 1.4;
             font-weight: 400;
             text-transform: none;
@@ -150,7 +150,7 @@
             z-index: 0;
         }
         .paid-watermark span {
-            font-size: clamp(48px, 12vw, 140px);
+            font-size: clamp(64px, 16vw, 186.67px);
             font-weight: 900;
             letter-spacing: 0.2em;
             color: rgba(220, 38, 38, 0.15);

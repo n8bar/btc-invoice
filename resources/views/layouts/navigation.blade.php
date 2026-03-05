@@ -11,7 +11,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-	                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+		                <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex">
                         @auth
 	                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
 	                            {{ __('Dashboard') }}
@@ -34,6 +34,12 @@
                 @php
                     $themePreference = auth()->user()?->theme ?? 'system';
                     $themeEndpoint = auth()->check() ? route('theme.update') : '';
+                    $authUser = Auth::user();
+                    $requiresReplayConfirm = $authUser?->gettingStartedIsDone() && ! $authUser->gettingStartedWasDismissed();
+                    $gettingStartedCompletedOn = $authUser?->getting_started_completed_at?->setTimezone(config('app.timezone'))->format('F j, Y');
+                    $gettingStartedReplayConfirmMessage = $gettingStartedCompletedOn
+                        ? "You already completed this on {$gettingStartedCompletedOn}. Would you like to run through it again?"
+                        : 'You already completed Getting started. Would you like to run through it again?';
                 @endphp
                 <div class="flex items-center gap-1" role="group" aria-label="Theme" data-theme-endpoint="{{ $themeEndpoint }}" data-theme-initial="{{ $themePreference }}">
                     <button type="button"
@@ -86,7 +92,14 @@
                                 {{ __('Wallet Settings') }}
                             </x-dropdown-link>
                             @if (Auth::user()->gettingStartedIsDone())
-                                <form method="POST" action="{{ route('getting-started.reopen') }}">
+                                <form method="POST"
+                                      action="{{ route('getting-started.reopen') }}"
+                                      data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"
+                                      @if ($requiresReplayConfirm)
+                                          data-getting-started-completed-date="{{ $gettingStartedCompletedOn }}"
+                                          data-getting-started-reopen-message="{{ $gettingStartedReplayConfirmMessage }}"
+                                          onsubmit="return confirm(@js($gettingStartedReplayConfirmMessage));"
+                                      @endif>
                                     @csrf
                                     <button type="submit"
                                             class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
@@ -214,7 +227,14 @@
                         {{ __('Wallet Settings') }}
                     </x-responsive-nav-link>
                     @if (Auth::user()->gettingStartedIsDone())
-                        <form method="POST" action="{{ route('getting-started.reopen') }}">
+                        <form method="POST"
+                              action="{{ route('getting-started.reopen') }}"
+                              data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"
+                              @if ($requiresReplayConfirm)
+                                  data-getting-started-completed-date="{{ $gettingStartedCompletedOn }}"
+                                  data-getting-started-reopen-message="{{ $gettingStartedReplayConfirmMessage }}"
+                                  onsubmit="return confirm(@js($gettingStartedReplayConfirmMessage));"
+                              @endif>
                             @csrf
                             <button type="submit"
                                     class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">

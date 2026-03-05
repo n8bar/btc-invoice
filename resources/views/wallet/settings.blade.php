@@ -11,6 +11,11 @@
         $xpubValue = ($oldXpub !== null && $oldXpub !== '') ? $oldXpub : (optional($wallet)->bip84_xpub ?? '');
         $expectedPrefix = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
         $isTestnet = $defaultNetwork !== 'mainnet';
+        $isGettingStarted = request()->boolean('getting_started');
+        $isGettingStartedReplay = (bool) ($isGettingStartedReplay ?? false);
+        $replayCancelUrl = route('wallet.settings.edit', $isGettingStarted ? ['getting_started' => 1] : []);
+        $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
+        $gettingStartedMarker = '👉';
     @endphp
 
     <div class="py-10">
@@ -49,7 +54,7 @@
                               x-init="init()"
                               @submit.prevent="handleSubmit($event)">
                             @csrf
-                            @if (request()->boolean('getting_started'))
+                            @if ($isGettingStarted)
                                 <input type="hidden" name="getting_started" value="1">
                             @endif
 
@@ -60,19 +65,28 @@
                             @endif
 
                             <div>
+                                @if ($isGettingStarted)
+                                    <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $gettingStartedMarker }} Fill this field</p>
+                                @endif
                                 <x-input-label for="bip84_xpub" :value="__('Wallet account key (xpub/zpub/vpub/tpub)')" />
                                 <p class="mt-1 text-xs text-gray-500">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
+                                @if ($isGettingStarted && $isGettingStartedReplay)
+                                    <p class="mt-1 text-xs text-indigo-700 dark:text-indigo-300">
+                                        Your wallet is already connected. Review it, then click Verify wallet to confirm this step.
+                                    </p>
+                                @endif
                                 <textarea id="bip84_xpub" name="bip84_xpub"
                                           rows="3"
-                                          class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100"
+                                          class="mt-2 block w-full rounded-md border border-slate-300 bg-gray-50 px-3 py-2 text-base leading-relaxed text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 {{ $isGettingStarted ? $onboardingGlow : '' }}"
                                           autocomplete="off"
                                           autocapitalize="none"
                                           autocorrect="off"
                                           spellcheck="false"
                                           required
                                           @if ($errors->has('bip84_xpub')) autofocus @endif
+                                          @if ($isGettingStarted) data-getting-started-highlight="wallet-key-input" @endif
                                           x-ref="input"
                                           x-model="value"
                                           @input="handleInput"
@@ -104,7 +118,7 @@
                                             </svg>
                                             <span x-text="message"></span>
                                         </div>
-                                        <div class="rounded bg-green-50 px-2 py-1 font-mono text-[11px] text-green-900 break-all" x-text="address"></div>
+                                        <div class="rounded bg-green-50 px-2 py-1 font-mono text-[14.67px] text-green-900 break-all" x-text="address"></div>
                                     </div>
                                     <div x-show="status === 'error'" class="text-red-600" role="alert" x-text="message"></div>
                                     <x-input-error class="text-xs text-red-600" :messages="$errors->get('bip84_xpub')" />
@@ -112,11 +126,28 @@
                             </div>
 
                             <div class="flex items-center gap-4">
-                                <x-primary-button>Save wallet</x-primary-button>
+                                @if ($isGettingStartedReplay)
+                                    <a href="{{ $replayCancelUrl }}"
+                                       data-wallet-replay-cancel
+                                       x-show="hasValueChanged()"
+                                       style="display: none;"
+                                       class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                        Cancel
+                                    </a>
+                                @endif
+                                <x-primary-button
+                                    class="{{ $isGettingStarted ? $onboardingGlow : '' }}"
+                                    :data-getting-started-highlight="$isGettingStarted ? 'wallet-save' : null">
+                                    @if ($isGettingStartedReplay)
+                                        <span x-text="hasValueChanged() ? '👉 Save wallet' : '👉 Verify wallet'"></span>
+                                    @else
+                                        {{ $isGettingStarted ? $gettingStartedMarker . ' Save wallet' : 'Save wallet' }}
+                                    @endif
+                                </x-primary-button>
                             </div>
 
                             <div>
-                                @include('wallet.partials.key-helper')
+                                @include('wallet.partials.key-helper', ['onboarding' => request()->boolean('getting_started')])
                             </div>
                         </form>
                     </div>

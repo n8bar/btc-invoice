@@ -7,20 +7,22 @@ use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use App\Models\User;
 use App\Models\WalletSetting;
+use App\Services\InvoicePaymentSyncService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class GettingStartedFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_start_resolves_to_welcome_for_new_user(): void
+    public function test_start_resolves_to_wallet_step_for_new_user(): void
     {
         $owner = User::factory()->create();
 
         $this->actingAs($owner)
             ->get(route('getting-started.start'))
-            ->assertRedirect(route('getting-started.welcome'));
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
     }
 
     public function test_welcome_redirects_to_start_when_user_already_has_progress(): void
@@ -187,6 +189,147 @@ class GettingStartedFlowTest extends TestCase
             ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
     }
 
+    public function test_replay_requires_new_draft_invoice_before_deliver_step(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now()->subMinute(),
+            'getting_started_replay_wallet_verified_at' => now(),
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'paid']);
+        $replayInvoice->forceFill([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+    }
+
+    public function test_invoice_step_shows_draft_required_warning_when_non_replay_has_only_non_draft_invoices(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
+        $response->assertOk();
+        $response->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
+        $response->assertSee('If this happened instantly, this wallet account may also be receiving payments from another wallet app.', false);
+        $response->assertSee('CryptoZing requires a dedicated-use wallet account. Receiving payments using other wallet apps is not supported. CryptoZing cannot reliably separate invoice payments from unrelated wallet activity.', false);
+        $response->assertSee('Connect a different wallet instead', false);
+        $response->assertSee(route('getting-started.reconnect-wallet'), false);
+        $response->assertSeeInOrder([
+            'Success criteria',
+            'Create at least one draft invoice.',
+        ], false);
+        $response->assertSee(route('invoices.create', ['getting_started' => 1]), false);
+        $response->assertSee('Try creating a new draft invoice', false);
+        $response->assertDontSee('Go to create invoice', false);
+        $response->assertDontSee('No new draft invoice is available for delivery.', false);
+    }
+
+    public function test_invoice_warning_can_force_wallet_reconnect_and_require_step_one_again(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
+
+        $response = $this->actingAs($owner)->post(route('getting-started.reconnect-wallet'));
+        $response->assertRedirect(route('wallet.settings.edit', ['getting_started' => 1]));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
+        $this->assertNotNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'invoice']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
+    }
+
+    public function test_non_replay_blocked_step_two_advances_after_creating_new_draft_invoice(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => null,
+            'getting_started_replay_wallet_verified_at' => null,
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'paid']);
+
+        $blocked = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
+        $blocked->assertOk();
+        $blocked->assertSee('Your latest invoice is no longer draft. Create a new draft invoice to continue.', false);
+
+        $newDraft = $this->createInvoice($owner, $client, [
+            'number' => 'INV-NEW-DRAFT-1',
+            'status' => 'draft',
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', [
+                'step' => 'deliver',
+                'invoice' => $newDraft->id,
+            ]));
+    }
+
+    public function test_invoice_step_hides_required_step_notice_when_returning_from_deliver_for_new_draft(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+            'getting_started_replay_started_at' => now()->subMinute(),
+            'getting_started_replay_wallet_verified_at' => now(),
+        ]);
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $replayInvoice->forceFill([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->save();
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'invoice']));
+
+        $response->assertOk();
+        $response->assertDontSee('next required step is step', false);
+        $response->assertDontSee('Open required step', false);
+    }
+
     public function test_dismiss_and_reopen_update_getting_started_state(): void
     {
         $owner = User::factory()->create();
@@ -198,6 +341,8 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertTrue($owner->getting_started_dismissed);
         $this->assertNotNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
 
         $this->actingAs($owner)
             ->post(route('getting-started.reopen'))
@@ -206,6 +351,107 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertFalse($owner->getting_started_dismissed);
         $this->assertNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+    }
+
+    public function test_completed_user_can_replay_with_post_replay_progress_requirements(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $completedInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $completedInvoice->enablePublicShare();
+        $baselineDelivery = InvoiceDelivery::create([
+            'invoice_id' => $completedInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Completed baseline',
+            'dispatched_at' => now()->subMinute(),
+        ]);
+        $baselineDelivery->forceFill([
+            'created_at' => now()->subMinute(),
+            'updated_at' => now()->subMinute(),
+        ])->save();
+
+        $owner->forceFill([
+            'getting_started_completed_at' => now(),
+            'getting_started_dismissed' => false,
+        ])->save();
+
+        $this->actingAs($owner)
+            ->post(route('getting-started.reopen'))
+            ->assertRedirect(route('getting-started.start'));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
+        $this->assertNotNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'wallet']));
+
+        $owner->forceFill([
+            'getting_started_replay_wallet_verified_at' => now()->addSecond(),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $replayInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $replayInvoice->forceFill([
+            'created_at' => now()->addSeconds(2),
+            'updated_at' => now()->addSeconds(2),
+        ])->save();
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.start'))
+            ->assertRedirect(route('getting-started.step', [
+                'step' => 'deliver',
+                'invoice' => $replayInvoice->id,
+            ]));
+
+        $replayInvoice->enablePublicShare();
+        $replayInvoice->refresh();
+        $replayInvoice->forceFill([
+            'created_at' => now()->addSeconds(3),
+            'updated_at' => now()->addSeconds(3),
+        ])->save();
+
+        $replayDelivery = InvoiceDelivery::create([
+            'invoice_id' => $replayInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Replay complete',
+            'dispatched_at' => now()->addSeconds(4),
+        ]);
+        $replayDelivery->forceFill([
+            'created_at' => now()->addSeconds(4),
+            'updated_at' => now()->addSeconds(4),
+        ])->save();
+
+        $response = $this->actingAs($owner)->get(route('getting-started.start'));
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('status', 'Getting started complete.');
+
+        $owner->refresh();
+        $this->assertNotNull($owner->getting_started_completed_at);
+        $this->assertNull($owner->getting_started_replay_started_at);
+        $this->assertNull($owner->getting_started_replay_wallet_verified_at);
     }
 
     public function test_start_marks_flow_complete_and_redirects_to_dashboard_when_steps_are_done(): void
@@ -213,7 +459,7 @@ class GettingStartedFlowTest extends TestCase
         $owner = User::factory()->create();
         $this->createWallet($owner);
         $client = $this->createClient($owner);
-        $invoice = $this->createInvoice($owner, $client);
+        $invoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
         $invoice->enablePublicShare();
 
         InvoiceDelivery::create([
@@ -235,6 +481,71 @@ class GettingStartedFlowTest extends TestCase
         $owner->refresh();
         $this->assertFalse($owner->getting_started_dismissed);
         $this->assertNotNull($owner->getting_started_completed_at);
+    }
+
+    public function test_start_syncs_draft_invoice_state_before_completion_check(): void
+    {
+        config()->set('blockchain.getting_started_sync.enabled', true);
+        config()->set('blockchain.getting_started_sync.throttle_seconds', 0);
+
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+        $invoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $invoice->enablePublicShare();
+
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Test',
+            'dispatched_at' => now(),
+        ]);
+
+        $this->mock(InvoicePaymentSyncService::class, function (MockInterface $mock) use ($invoice): void {
+            $mock->shouldReceive('syncInvoice')
+                ->once()
+                ->withArgs(function (
+                    Invoice $candidate,
+                    ?string $network = null,
+                    bool $force = false,
+                    bool $checkAlerts = true
+                ) use ($invoice): bool {
+                    return $candidate->is($invoice)
+                        && $network === 'testnet'
+                        && $force === false
+                        && $checkAlerts === false;
+                })
+                ->andReturnUsing(function () use ($invoice): array {
+                    $invoice->forceFill([
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                    ])->save();
+
+                    return [
+                        'processed' => true,
+                        'updated' => 1,
+                        'dropped' => 0,
+                        'payments' => [
+                            ['txid' => 'test-sync', 'sats' => 10_000],
+                        ],
+                        'status' => 'paid',
+                        'paid_sats' => 10_000,
+                        'outstanding_sats' => 0,
+                    ];
+                });
+        });
+
+        $response = $this->actingAs($owner)->get(route('getting-started.start'));
+
+        $response->assertRedirect(route('getting-started.step', ['step' => 'invoice']));
+
+        $owner->refresh();
+        $this->assertNull($owner->getting_started_completed_at);
+        $this->assertFalse($owner->getting_started_dismissed);
     }
 
     public function test_done_users_are_redirected_away_from_getting_started(): void

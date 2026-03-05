@@ -63,6 +63,111 @@ class InvoiceDeliveryTest extends TestCase
         });
     }
 
+    public function test_owner_can_save_delivery_message_draft(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-DRAFT',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampledraft',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patchJson(route('invoices.deliver.draft', $invoice), [
+                'message' => 'Follow up tomorrow morning',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'saved' => true,
+                'message' => 'Follow up tomorrow morning',
+            ]);
+
+        $this->assertDatabaseHas('invoices', [
+            'id' => $invoice->id,
+            'delivery_message_draft' => 'Follow up tomorrow morning',
+        ]);
+    }
+
+    public function test_saving_blank_delivery_message_draft_clears_previous_value(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-DRAFT-CLEAR',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampledraftclear',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+            'delivery_message_draft' => 'Existing note',
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patchJson(route('invoices.deliver.draft', $invoice), [
+                'message' => '   ',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'saved' => true,
+                'message' => null,
+            ]);
+
+        $invoice->refresh();
+        $this->assertNull($invoice->delivery_message_draft);
+    }
+
+    public function test_non_owner_cannot_save_delivery_message_draft(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-DRAFT-403',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampledraft403',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $this
+            ->actingAs($otherUser)
+            ->patchJson(route('invoices.deliver.draft', $invoice), [
+                'message' => 'Unauthorized change',
+            ])
+            ->assertForbidden();
+    }
+
     public function test_owner_delivery_redirects_to_getting_started_when_context_flag_present(): void
     {
         Queue::fake();
@@ -99,6 +204,42 @@ class InvoiceDeliveryTest extends TestCase
             'type' => 'send',
             'status' => 'queued',
         ]);
+    }
+
+    public function test_successful_delivery_clears_saved_delivery_message_draft(): void
+    {
+        Queue::fake();
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-CLEAR-DRAFT',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplecleardraft',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+            'delivery_message_draft' => 'Draft that should clear',
+        ]);
+        $invoice->enablePublicShare();
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver', $invoice), [
+                'message' => 'Final send note',
+                'cc_self' => false,
+            ])
+            ->assertRedirect();
+
+        $invoice->refresh();
+        $this->assertNull($invoice->delivery_message_draft);
     }
 
     public function test_receipt_email_queued_when_invoice_paid(): void

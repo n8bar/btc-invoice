@@ -83,6 +83,9 @@ class DashboardSnapshotTest extends TestCase
         $response->assertSee('Past due', false);
         $response->assertSee('1', false);
         $response->assertSee('$200.00', false); // recent payment
+        $response->assertSee('Resume getting started', false);
+        $response->assertSee('Hide for now', false);
+        $response->assertSee('data-getting-started-temp-hide', false);
         $response->assertSee($partial->number, false);
         $response->assertDontSee('tx-other', false);
 
@@ -291,6 +294,37 @@ class DashboardSnapshotTest extends TestCase
             'href="' . route('clients.create') . '" class="inline-flex w-full items-center justify-center rounded-md bg-white',
             false
         );
+    }
+
+    public function test_completed_non_dismissed_user_getting_started_menu_requires_replay_confirmation(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => Carbon::parse('2026-02-20 14:30:00', config('app.timezone')),
+            'getting_started_dismissed' => false,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('data-getting-started-reopen-mode="confirm"', false);
+        $response->assertSee('data-getting-started-completed-date="February 20, 2026"', false);
+        $response->assertSee('data-getting-started-reopen-message="You already completed this on February 20, 2026. Would you like to run through it again?"', false);
+    }
+
+    public function test_dismissed_user_getting_started_menu_reopens_without_confirmation(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => Carbon::parse('2026-02-20 14:30:00', config('app.timezone')),
+            'getting_started_dismissed' => true,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('data-getting-started-reopen-mode="direct"', false);
+        $response->assertDontSee('data-getting-started-reopen-mode="confirm"', false);
+        $response->assertDontSee('data-getting-started-completed-date=', false);
+        $response->assertDontSee('data-getting-started-reopen-message=', false);
     }
 
     private int $invoiceSequence = 0;

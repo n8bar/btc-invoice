@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         if ($user->gettingStartedNeedsAutoShow()) {
-            return redirect()->route('getting-started.start');
+            return redirect()->route('getting-started.welcome');
         }
 
         return redirect(route('dashboard', absolute: false));

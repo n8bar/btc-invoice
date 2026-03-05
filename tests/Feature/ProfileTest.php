@@ -31,6 +31,8 @@ class ProfileTest extends TestCase
                 'name' => 'Test User',
                 'email' => 'test@example.com',
                 'show_invoice_ids' => true,
+                'show_overpayment_gratuity_note' => true,
+                'show_qr_refresh_reminder' => true,
             ]);
 
         $response
@@ -43,6 +45,8 @@ class ProfileTest extends TestCase
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
         $this->assertTrue($user->show_invoice_ids);
+        $this->assertTrue($user->show_overpayment_gratuity_note);
+        $this->assertTrue($user->show_qr_refresh_reminder);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

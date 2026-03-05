@@ -29,10 +29,6 @@ class GettingStartedController extends Controller
                 ->with('status', 'Getting started complete.');
         }
 
-        if ($this->shouldShowWelcome($snapshot)) {
-            return redirect()->route('getting-started.welcome');
-        }
-
         $targetStep = $snapshot['first_incomplete_step'];
         $routeParams = ['step' => $targetStep];
 
@@ -122,11 +118,6 @@ class GettingStartedController extends Controller
         $deliverInvoiceOptions = collect();
         if ($step === GettingStartedFlow::STEP_DELIVER) {
             $deliverInvoice = $flow->resolveDeliverInvoice($user, $request->query('invoice'));
-
-            if (! $deliverInvoice) {
-                return redirect()->route('getting-started.step', ['step' => GettingStartedFlow::STEP_INVOICE]);
-            }
-
             $deliverInvoiceOptions = $flow->deliverInvoiceOptions($user);
         }
 
@@ -136,11 +127,43 @@ class GettingStartedController extends Controller
         $actionUrl = match ($step) {
             GettingStartedFlow::STEP_WALLET => route('wallet.settings.edit', ['getting_started' => 1]),
             GettingStartedFlow::STEP_INVOICE => route('invoices.create', ['getting_started' => 1]),
-            GettingStartedFlow::STEP_DELIVER => route('invoices.show', [
-                'invoice' => $deliverInvoice,
-                'getting_started' => 1,
-            ]),
+            GettingStartedFlow::STEP_DELIVER => $deliverInvoice
+                ? route('invoices.show', [
+                    'invoice' => $deliverInvoice,
+                    'getting_started' => 1,
+                ])
+                : route('invoices.create', ['getting_started' => 1]),
         };
+        $actionLabel = $step === GettingStartedFlow::STEP_DELIVER && ! $deliverInvoice
+            ? 'Create new draft invoice'
+            : $currentStep['cta_label'];
+        $showInvoiceDraftRequiredWarning = false;
+        if ($step === GettingStartedFlow::STEP_INVOICE && !($snapshot['is_replay'] ?? false)) {
+            $hasAnyInvoice = $user->invoices()->exists();
+            $hasDraftInvoice = $user->invoices()->where('status', 'draft')->exists();
+            $showInvoiceDraftRequiredWarning = $hasAnyInvoice && !$hasDraftInvoice;
+
+            if ($showInvoiceDraftRequiredWarning) {
+                $actionLabel = 'Try creating a new draft invoice';
+            }
+        }
+
+        $stepUrls = [
+            GettingStartedFlow::STEP_WALLET => route('getting-started.step', ['step' => GettingStartedFlow::STEP_WALLET]),
+            GettingStartedFlow::STEP_INVOICE => route('getting-started.step', ['step' => GettingStartedFlow::STEP_INVOICE]),
+            GettingStartedFlow::STEP_DELIVER => $deliverInvoice
+                ? route('getting-started.step', [
+                    'step' => GettingStartedFlow::STEP_DELIVER,
+                    'invoice' => $deliverInvoice->id,
+                ])
+                : route('getting-started.step', ['step' => GettingStartedFlow::STEP_DELIVER]),
+        ];
+        $earliestIncompleteStepUrl = $earliestIncomplete !== null
+            ? ($stepUrls[$earliestIncomplete] ?? null)
+            : null;
+        $suppressRequiredStepNotice = $step === GettingStartedFlow::STEP_INVOICE
+            && $earliestIncomplete === GettingStartedFlow::STEP_DELIVER;
+        $showRequiredStepNotice = $currentStep['key'] !== $earliestIncomplete && ! $suppressRequiredStepNotice;
 
         $backUrl = route('dashboard');
 
@@ -151,9 +174,14 @@ class GettingStartedController extends Controller
             'currentStepNumber' => $currentStep['position'],
             'stepCount' => count($steps),
             'actionUrl' => $actionUrl,
+            'actionLabel' => $actionLabel,
             'deliverInvoice' => $deliverInvoice,
             'deliverInvoiceOptions' => $deliverInvoiceOptions,
             'earliestIncompleteStep' => $earliestIncomplete,
+            'earliestIncompleteStepUrl' => $earliestIncompleteStepUrl,
+            'showRequiredStepNotice' => $showRequiredStepNotice,
+            'showInvoiceDraftRequiredWarning' => $showInvoiceDraftRequiredWarning,
+            'stepUrls' => $stepUrls,
             'backUrl' => $backUrl,
         ]);
     }
@@ -172,6 +200,13 @@ class GettingStartedController extends Controller
         $flow->reopen($request->user());
 
         return redirect()->route('getting-started.start');
+    }
+
+    public function reconnectWallet(Request $request, GettingStartedFlow $flow): RedirectResponse
+    {
+        $flow->requireWalletReconnect($request->user());
+
+        return redirect()->route('wallet.settings.edit', ['getting_started' => 1]);
     }
 
     /**

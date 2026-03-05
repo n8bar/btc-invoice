@@ -18,6 +18,7 @@ class Invoice extends Model
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
         'status','txid','invoice_date','due_date','paid_at',
+        'delivery_message_draft',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
         'payment_detected_at','payment_confirmed_at',
         'billing_name_override','billing_email_override','billing_phone_override',
@@ -129,7 +130,8 @@ class Invoice extends Model
     public static function nextNumberForUser(int $userId): string
     {
         // Start from the highest existing INV-#### for this user
-        $last = static::where('user_id', $userId)
+        $last = static::withTrashed()
+            ->where('user_id', $userId)
             ->where('number', 'like', 'INV-%')
             ->orderByDesc('id')
             ->value('number');
@@ -143,7 +145,12 @@ class Invoice extends Model
         do {
             $n++;
             $candidate = 'INV-' . str_pad((string) $n, 4, '0', STR_PAD_LEFT);
-        } while (static::where('user_id', $userId)->where('number', $candidate)->exists());
+        } while (
+            static::withTrashed()
+                ->where('user_id', $userId)
+                ->where('number', $candidate)
+                ->exists()
+        );
 
         return $candidate;
     }
