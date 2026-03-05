@@ -18,7 +18,7 @@ This document is a temporary working strategy. It is not a source of truth like 
 - Direction:
   - Align non-replay Step 2 gating with deliver targeting: require at least one eligible draft invoice before Step 2 is considered complete.
   - Keep Step 3 completion criteria action-based (public link enabled + delivery attempt), not draft-status-based.
-- Optional guard (approved direction):
+- Additional guard (approved direction):
   - After onboarding invoice creation, if the created invoice is immediately non-draft, show an explicit warning that reused-wallet activity likely triggered early payment detection and instruct the user to create a new draft invoice.
 - Desired outcome:
   - Users hit the collision effect earlier (at Step 2) with clearer guidance.
