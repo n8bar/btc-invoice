@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-05 | Task 13 no-op closeout subitem removed | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to remove the prior “close as verified/no-op” subitem since substantive Task13 deltas are already known. |
 | 2026-03-05 | Task 13 subitem numbering adjusted to avoid task-count inflation | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 subitems from markdown ordered-list syntax to numbered labels (`- 1)` ... `- 5)`) so they stay scoped as subitems instead of being interpreted as additional top-level tasks in some renderers. |
 | 2026-03-05 | Task 13 spec wording updated to cover invoice UX polish | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 title to remove the parenthetical and rewrote Task13 subitems as a numbered list, clarifying scope now covers invoice settings plus invoice UX finish-up deltas from Task12. Synced `docs/PLAN.md` and `docs/FuturePLAN.md` wording to match. |
 | 2026-03-05 | Task 13 spec now includes draft-only invoice creation | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 and `docs/PLAN.md` MS13 notes to remove create-time status selection from planned invoice-create UX and require all new invoices to start as `draft` (status can be changed after creation). Synced `docs/FuturePLAN.md` scope summary to confirm this remains active-plan scope with no post-MVP backlog change. |
