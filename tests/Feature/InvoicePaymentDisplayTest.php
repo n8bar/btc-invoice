@@ -59,6 +59,25 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Thank&nbsp;you!', false);
     }
 
+    public function test_show_hides_single_payment_note_when_invoice_is_paid(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+            'public_enabled' => true,
+            'public_token' => 'tok-paid-show',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertDontSee('Send one payment (if possible):', false);
+        $response->assertDontSee('Tip: remind the client to send the full balance in a single Bitcoin transaction if possible when you share this link.', false);
+    }
+
     public function test_print_view_contains_qr_and_wallet_prompt(): void
     {
         $owner = User::factory()->create();
