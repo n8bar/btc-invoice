@@ -1,8 +1,6 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-03-05): no new deferred post-MVP backlog items were added in this pass.
-
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**
    - Add list search on both `/invoices` and `/clients` (number/name/email/status query support as appropriate).
