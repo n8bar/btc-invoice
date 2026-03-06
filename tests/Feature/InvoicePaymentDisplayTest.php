@@ -198,6 +198,9 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('overpaid by approximately', false);
         $response->assertDontSee('Overpayments are treated as gratuities by default', false);
+        $response->assertSee('If this was unintentional, contact', false);
+        $response->assertSee('to discuss a refund or credit.', false);
+        $response->assertDontSee('invoice sender', false);
     }
 
     public function test_show_hides_qr_refresh_reminder_when_owner_toggle_is_off(): void

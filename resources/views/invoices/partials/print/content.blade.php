@@ -321,12 +321,15 @@
 @php
     $overpayPercent = $invoice->overpaymentPercent();
     $underpayPercent = $invoice->underpaymentPercent();
+    $billerContactName = !empty($billingDetails['name']) ? $billingDetails['name'] : 'the biller';
 @endphp
 @if ($invoice->requiresClientOverpayAlert())
     <div class="section-gap" style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size: 17.33px;">
         This invoice appears overpaid by approximately {{ number_format($overpayPercent, 1) }}%.
         @if ($showOverpaymentGratuityNote)
             Overpayments are treated as gratuities by default. If you sent too much by mistake, contact the invoice sender to request a refund or credit.
+        @else
+            If this was unintentional, contact {{ $billerContactName }} to discuss a refund or credit.
         @endif
     </div>
 @elseif ($invoice->requiresClientUnderpayAlert())
