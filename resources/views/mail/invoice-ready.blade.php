@@ -16,7 +16,7 @@ Your invoice for **${{ number_format($invoice->amount_usd, 2) }}** is ready. Fol
 </x-mail::panel>
 
 <x-mail::panel>
-**Tip:** Send the full balance in a single Bitcoin transaction. Splitting the invoice into multiple payments usually adds extra miner fees and can slow down processing.
+**Tip:** Send the full balance in a single Bitcoin transaction if possible. If you need to split between wallets, multiple payments are accepted, but this can add extra miner fees and slow processing.
 </x-mail::panel>
 
 @if ($publicUrl)

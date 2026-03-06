@@ -263,7 +263,7 @@
     </div>
 
     <div style="margin-top:12px; padding:10px; border-radius:10px; border:1px solid #fed7aa; background:#fff7ed; font-size: 17.33px; line-height:1.4;">
-        <strong>Send one payment:</strong> To avoid extra miner fees and processing delays, please send the full outstanding balance in a single Bitcoin transaction. Splitting the invoice across multiple payments can increase costs.
+        <strong>Send one payment (if possible):</strong> To avoid extra miner fees and processing delays, please send the full outstanding balance in a single Bitcoin transaction. If you need to split between wallets, multiple payments are accepted, but costs may increase.
     </div>
 </section>
 
