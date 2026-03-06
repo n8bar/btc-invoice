@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-03-04_
+_Last updated: 2026-03-05_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -117,6 +117,8 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Preserve existing per-invoice override behavior; no structural redesign.
       - Include invoice create simplification: remove create-time status selection and force all new invoices to start as `draft`; users can set another status after creation.
       - Require client email for create/edit flows and harden schema by making `clients.email` non-null (include safe backfill/migration handling for existing null data).
+      - Expand paid-print state visibility: show a large translucent diagonal `PAID` watermark on paid owner prints as well as active public prints.
+      - Refine client-facing payment exception copy to use biller/brand identity (invoice billing name with fallback) instead of generic “invoice sender” wording.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**

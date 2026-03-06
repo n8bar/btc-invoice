@@ -138,6 +138,8 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - 3) Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
    - 4) Preserve existing per-invoice override behavior; no structural redesign.
    - 5) Require client email on client create/edit and enforce it at the database layer (`clients.email` non-null) with a safe migration/backfill path for any existing null rows.
+   - 6) Paid-invoice print polish: render a prominent, translucent diagonal `PAID` watermark on paid print views (owner print and active public print) so payment state is unmistakable in exported/printed copies.
+   - 7) Client-facing over/underpayment wording polish: replace generic “invoice sender” phrasing with biller/brand-facing wording (use invoice billing name with a safe fallback) so public/print copy reads as authored by the invoice owner.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.

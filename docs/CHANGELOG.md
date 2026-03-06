@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-05 | Task 13 scope expanded for paid print watermark + branded client-facing payment copy | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 scope to include (a) a prominent diagonal `PAID` watermark for paid owner/public print views and (b) replacing generic “invoice sender” client-facing over/underpayment wording with biller/brand identity (billing name with fallback). Synced `docs/FuturePLAN.md` latest scope summary. |
 | 2026-03-05 | Task 13 now includes required client email + DB hardening | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 scope to require client email on client create/edit flows and enforce `clients.email` as non-null at the schema layer with safe backfill handling for any null legacy rows. Synced `docs/FuturePLAN.md` summary to reflect this remains active-plan scope. |
 | 2026-03-05 | Task 13 no-op closeout subitem removed | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to remove the prior “close as verified/no-op” subitem since substantive Task13 deltas are already known. |
 | 2026-03-05 | Task 13 subitem numbering adjusted to avoid task-count inflation | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 subitems from markdown ordered-list syntax to numbered labels (`- 1)` ... `- 5)`) so they stay scoped as subitems instead of being interpreted as additional top-level tasks in some renderers. |
