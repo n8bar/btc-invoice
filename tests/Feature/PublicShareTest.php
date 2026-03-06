@@ -226,6 +226,32 @@ class PublicShareTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_public_print_hides_single_payment_note_when_invoice_is_paid(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        Cache::forget(BtcRate::CACHE_KEY);
+
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '42500.00'],
+            ], 200),
+        ]);
+
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+            'public_enabled' => true,
+            'public_token' => 'tok-paid-note-hidden',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        $this->get(route('invoices.public-print', ['token' => 'tok-paid-note-hidden']))
+            ->assertOk()
+            ->assertDontSee('Send one payment (if possible):', false);
+
+        Carbon::setTestNow();
+    }
+
     public function test_public_print_does_not_render_owner_only_controls(): void
     {
         Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));

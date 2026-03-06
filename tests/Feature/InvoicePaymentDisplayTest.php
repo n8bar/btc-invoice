@@ -59,6 +59,25 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Thank&nbsp;you!', false);
     }
 
+    public function test_show_hides_single_payment_note_when_invoice_is_paid(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+            'public_enabled' => true,
+            'public_token' => 'tok-paid-show',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $response->assertOk();
+        $response->assertDontSee('Send one payment (if possible):', false);
+        $response->assertDontSee('Tip: remind the client to send the full balance in a single Bitcoin transaction if possible when you share this link.', false);
+    }
+
     public function test_print_view_contains_qr_and_wallet_prompt(): void
     {
         $owner = User::factory()->create();
@@ -143,6 +162,8 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('overpaid by approximately', false);
         $response->assertSee('Overpayments are treated as gratuities by default', false);
+        $response->assertSee('contact the invoice sender to request a refund or credit', false);
+        $response->assertDontSee('your client', false);
     }
 
     public function test_print_view_hides_client_gratuity_note_when_owner_toggle_is_off(): void
@@ -177,6 +198,9 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('overpaid by approximately', false);
         $response->assertDontSee('Overpayments are treated as gratuities by default', false);
+        $response->assertSee('If this was unintentional, contact', false);
+        $response->assertSee('to discuss a refund or credit.', false);
+        $response->assertDontSee('invoice sender', false);
     }
 
     public function test_show_hides_qr_refresh_reminder_when_owner_toggle_is_off(): void

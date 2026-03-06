@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-03-04_
+_Last updated: 2026-03-05_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -108,11 +108,19 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
       - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
     - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
-    - [ ] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
+    - [x] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
       - [x] Add per-user toggles (default on): overpayment gratuity note + QR refresh reminder.
       - [x] Wire toggles into invoice show/public/print client-facing copy only; keep owner operational warnings visible.
-      - [ ] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
-    - [ ] Task 13: Invoice Settings finish-up only for deltas found during the Task 12 sweep (microcopy/focus/error/save-state parity; preserve overrides).
+      - [x] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
+    - [ ] Task 13: Invoice settings and invoice UX finish-up from Task12 deltas.
+      - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
+      - Preserve existing per-invoice override behavior; no structural redesign.
+      - Include invoice create simplification: remove create-time status selection and force all new invoices to start as `draft`; users can set another status after creation.
+      - Require client email for create/edit flows and harden schema by making `clients.email` non-null (include safe backfill/migration handling for existing null data).
+      - Expand paid-print state visibility: show a large translucent diagonal `PAID` watermark on paid owner prints as well as active public prints.
+      - Refine client-facing payment exception copy to use biller/brand identity (invoice billing name with fallback) instead of generic “invoice sender” wording.
+      - Remove payment-action surfaces on paid invoices across owner/client views: hide QR + BIP21/copy actions on owner show, owner print, and active public print to prevent accidental rescans/overpayments.
+      - Add a “Reset to my custom defaults” action near the top of create/edit `Branding & footer` sections so per-invoice overrides can be reverted to Invoice Settings defaults in one click.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**

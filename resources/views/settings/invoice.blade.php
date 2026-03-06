@@ -29,7 +29,7 @@
                                 <div>
                                     <x-input-label for="branding_heading" :value="__('Invoice heading')" />
                                     <x-text-input id="branding_heading" name="branding_heading" type="text" class="mt-1 block w-full"
-                                                  :value="old('branding_heading', $user->branding_heading)" placeholder="CryptoZing Invoice" />
+                                                  :value="old('branding_heading', $user->branding_heading)" placeholder="Invoice" />
                                     <x-input-error class="mt-2" :messages="$errors->get('branding_heading')" />
                                 </div>
                                 <div>

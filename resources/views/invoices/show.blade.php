@@ -61,6 +61,7 @@
                 $gettingStartedContext = request()->boolean('getting_started');
                 $showOverpaymentGratuityNote = (bool) ($invoice->user?->show_overpayment_gratuity_note ?? true);
                 $showQrRefreshReminder = (bool) ($invoice->user?->show_qr_refresh_reminder ?? true);
+                $showSinglePaymentGuidance = $st !== 'paid';
             @endphp
 
             @isset($gettingStartedStrip)
@@ -529,10 +530,12 @@
                                             refresh right before sending payment; printed copies may be stale.
                                         </p>
                                     @endif
-                                    <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900" style="border-color: currentColor;">
-                                        <strong>Send one payment:</strong> please send the entire outstanding balance in a single transaction.
-                                        Splitting the invoice across multiple payments usually adds miner fees and can delay settlement.
-                                    </div>
+                                    @if ($showSinglePaymentGuidance)
+                                        <div class="mt-3 rounded border border-amber-100 bg-amber-50 p-3 text-xs text-amber-900" style="border-color: currentColor;">
+                                            <strong>Send one payment (if possible):</strong> please send the entire outstanding balance in a single transaction.
+                                            If you need to split across wallets, multiple payments are accepted, but may add miner fees and delay settlement.
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <!-- Right: big centered Thank you -->
@@ -791,18 +794,20 @@
                                 <p class="mt-2 text-xs text-gray-500">Expires {{ $invoice->public_expires_at->toDayDateTimeString() }}</p>
                             @endif
                         @endif
-                        @if ($isPublicLinkExpired)
-                            <div class="mt-4">
-                                <p class="text-xs text-amber-700">
-                                    Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
-                                    Splitting the payment often increases miner fees.
+                        @if ($showSinglePaymentGuidance)
+                            @if ($isPublicLinkExpired)
+                                <div class="mt-4">
+                                    <p class="text-xs text-amber-700">
+                                        Tip: remind the client to send the full balance in a single Bitcoin transaction if possible when you share this link.
+                                        Multiple payments are accepted, but splitting often increases miner fees.
+                                    </p>
+                                </div>
+                            @else
+                                <p class="mt-2 text-xs text-amber-700">
+                                    Tip: remind the client to send the full balance in a single Bitcoin transaction if possible when you share this link.
+                                    Multiple payments are accepted, but splitting often increases miner fees.
                                 </p>
-                            </div>
-                        @else
-                            <p class="mt-2 text-xs text-amber-700">
-                                Tip: remind the client to send the full balance in a single Bitcoin transaction when you share this link.
-                                Splitting the payment often increases miner fees.
-                            </p>
+                            @endif
                         @endif
                     </div>
                 @else
