@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-03-05): MS13 Task12 is complete; active scope is now Task13 invoice settings + invoice UX finish-up. No new post-MVP backlog items were added in this pass.
+Latest scope update (2026-03-05): no new deferred post-MVP backlog items were added in this pass.
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**

@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-05 | FuturePLAN update line narrowed to post-MVP scope only | Rewrote `docs/FuturePLAN.md` “Latest scope update” text to remove active MS13/UX-overhaul status and keep this doc focused strictly on deferred post-MVP backlog updates. |
 | 2026-03-05 | Task 13 scope adds Branding & footer reset-to-defaults control (spec-only) | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 scope to include a “Reset to my custom defaults” affordance near the top of create/edit Branding & footer sections so users can quickly revert per-invoice overrides to Invoice Settings defaults. Synced `docs/FuturePLAN.md` latest scope summary. |
 | 2026-03-05 | Task 13 subitems cleaned up (removed meta item, renumbered actions) | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to remove the non-action “use Task13 for deltas” line and renumber the remaining subitems so the list is purely actionable. |
 | 2026-03-05 | UX Task 12 moved to Completed status | Updated `docs/UX_OVERHAUL_SPEC.md` to move Task 12 from ToDo into Completed Tasks after Browser QA closure, and synced `docs/PLAN.md` checklist status to mark Task 12 fully complete. Updated `docs/FuturePLAN.md` latest scope summary so active MS13 scope now points at Task 13. |
