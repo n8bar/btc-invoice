@@ -98,11 +98,11 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      - [ ] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
      - [ ] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
    - Browser QA checklist (human-eyes):
-     1. Open `/profile` and confirm both toggles exist:
+     1. [x] Open `/profile` and confirm both toggles exist:
         - `Show overpayment gratuity note to clients`
         - `Show QR refresh reminder to clients`
-     2. Confirm both toggles default to ON for existing accounts after migration.
-     3. Save with both ON, hard refresh `/profile`, and confirm both remain ON.
+     2. [x] Confirm both toggles default to ON for existing accounts after migration.
+     3. [x] Save with both ON, hard refresh `/profile`, and confirm both remain ON.
      4. Open owner invoice show (`/invoices/{id}`) and verify visible:
         - `Overpayments are treated as gratuities by default`
         - `Need to reconcile an over/under payment?`
