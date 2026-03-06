@@ -97,6 +97,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - 5) Paid-invoice print polish: render a prominent, translucent diagonal `PAID` watermark on paid print views (owner print and active public print) so payment state is unmistakable in exported/printed copies.
    - 6) Client-facing over/underpayment wording polish: replace generic “invoice sender” phrasing with biller/brand-facing wording (use invoice billing name with a safe fallback) so public/print copy reads as authored by the invoice owner.
    - 7) Paid-invoice payment-action safety: hide payment QR + BIP21/copy payment action surfaces once an invoice is paid across owner and client views (including owner invoice show, owner print, and active public print) to reduce accidental extra payments from rescanning old invoices.
+   - 8) Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.

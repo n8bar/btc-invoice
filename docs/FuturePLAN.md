@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-03-05): no new post-MVP backlog items in this pass; MS13 Task12 is now marked complete (profile communication toggles + settings/auth consistency pass), while active scope remains in Task13 (invoice settings + invoice UX finish-up) including draft-only create flow, client-email hardening (`clients.email` non-null target), and the added polish items (paid-print watermark expansion, biller-branded client-facing over/underpayment wording, and hiding QR/BIP21 payment actions once invoices are paid across owner/client surfaces). This doc remains focused on deferred post-MVP items such as invoices/clients search+filter and multi-wallet selection UX.
+Latest scope update (2026-03-05): no new post-MVP backlog items in this pass; MS13 Task12 is now marked complete (profile communication toggles + settings/auth consistency pass), while active scope remains in Task13 (invoice settings + invoice UX finish-up) including draft-only create flow, client-email hardening (`clients.email` non-null target), and the added polish items (paid-print watermark expansion, biller-branded client-facing over/underpayment wording, hiding QR/BIP21 payment actions once invoices are paid across owner/client surfaces, and a create/edit Branding & footer reset-to-defaults affordance). This doc remains focused on deferred post-MVP items such as invoices/clients search+filter and multi-wallet selection UX.
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**
