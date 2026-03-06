@@ -143,6 +143,8 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('overpaid by approximately', false);
         $response->assertSee('Overpayments are treated as gratuities by default', false);
+        $response->assertSee('contact the invoice sender to request a refund or credit', false);
+        $response->assertDontSee('your client', false);
     }
 
     public function test_print_view_hides_client_gratuity_note_when_owner_toggle_is_off(): void

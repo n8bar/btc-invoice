@@ -324,7 +324,7 @@
     <div class="section-gap" style="border:1px solid #dcfce7; background:#f0fdf4; color:#166534; border-radius:10px; padding:12px; font-size: 17.33px;">
         This invoice appears overpaid by approximately {{ number_format($overpayPercent, 1) }}%.
         @if ($showOverpaymentGratuityNote)
-            Overpayments are treated as gratuities by default, so please notify the invoice sender if this was a mistake.
+            Overpayments are treated as gratuities by default. If you sent too much by mistake, contact the invoice sender to request a refund or credit.
         @endif
     </div>
 @elseif ($invoice->requiresClientUnderpayAlert())
@@ -333,7 +333,7 @@
     </div>
 @elseif ($showOverpaymentGratuityNote)
     <div class="section-gap" style="border:1px solid #fef3c7; background:#fffbeb; color:#92400e; border-radius:10px; padding:12px; font-size: 17.33px;">
-        Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.
+        Overpayments are treated as gratuities by default. If you sent too much by mistake, contact the invoice sender to request a refund or credit.
     </div>
 @endif
 
