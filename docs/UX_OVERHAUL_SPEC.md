@@ -127,8 +127,8 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      13. [x] Re-check owner show, print, and public:
         - Both client-facing notes are hidden.
         - Owner reconciliation guidance remains visible on owner show.
-     14. Logout/login, return to `/profile`, and confirm persisted toggle state.
-     15. Keyboard/accessibility quick pass:
+     14. [x] Logout/login, return to `/profile`, and confirm persisted toggle state.
+     15. [x] Keyboard/accessibility quick pass:
         - Tab focus ring is visible on each toggle.
         - Space toggles each checkbox.
         - Save still works from keyboard flow.
