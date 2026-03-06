@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\ViewErrorBag;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -22,6 +23,21 @@ class ProfileTest extends TestCase
         $response->assertSee('Workspace preferences', false);
         $response->assertSee('Client-facing payment notes', false);
         $response->assertSee('Save profile', false);
+    }
+
+    public function test_profile_note_toggles_default_to_checked_when_values_are_null(): void
+    {
+        $user = User::factory()->create();
+        $user->setAttribute('show_overpayment_gratuity_note', null);
+        $user->setAttribute('show_qr_refresh_reminder', null);
+
+        $html = view('profile.partials.update-profile-information-form', [
+            'user' => $user,
+            'errors' => new ViewErrorBag(),
+        ])->render();
+
+        $this->assertMatchesRegularExpression('/id="show_overpayment_gratuity_note"[^>]*checked/', $html);
+        $this->assertMatchesRegularExpression('/id="show_qr_refresh_reminder"[^>]*checked/', $html);
     }
 
     public function test_profile_information_can_be_updated(): void

@@ -18,6 +18,8 @@
             'show_overpayment_gratuity_note',
             'show_qr_refresh_reminder',
         ])->flatMap(fn ($field) => $errors->get($field))->filter()->values();
+        $showOverpaymentGratuityNote = old('show_overpayment_gratuity_note', $user->show_overpayment_gratuity_note ?? true);
+        $showQrRefreshReminder = old('show_qr_refresh_reminder', $user->show_qr_refresh_reminder ?? true);
     @endphp
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -121,7 +123,7 @@
             <div class="flex items-start gap-3">
                 <div>
                     <input id="show_overpayment_gratuity_note" type="checkbox" name="show_overpayment_gratuity_note" value="1"
-                           @checked(old('show_overpayment_gratuity_note', $user->show_overpayment_gratuity_note))
+                           @checked($showOverpaymentGratuityNote)
                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1">
                 </div>
                 <div>
@@ -136,7 +138,7 @@
             <div class="flex items-start gap-3">
                 <div>
                     <input id="show_qr_refresh_reminder" type="checkbox" name="show_qr_refresh_reminder" value="1"
-                           @checked(old('show_qr_refresh_reminder', $user->show_qr_refresh_reminder))
+                           @checked($showQrRefreshReminder)
                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1">
                 </div>
                 <div>
