@@ -137,6 +137,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - 2) Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
    - 3) Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
    - 4) Preserve existing per-invoice override behavior; no structural redesign.
+   - 5) Require client email on client create/edit and enforce it at the database layer (`clients.email` non-null) with a safe migration/backfill path for any existing null rows.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.

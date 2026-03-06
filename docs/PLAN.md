@@ -116,6 +116,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
       - Preserve existing per-invoice override behavior; no structural redesign.
       - Include invoice create simplification: remove create-time status selection and force all new invoices to start as `draft`; users can set another status after creation.
+      - Require client email for create/edit flows and harden schema by making `clients.email` non-null (include safe backfill/migration handling for existing null data).
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**

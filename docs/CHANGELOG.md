@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-05 | Task 13 now includes required client email + DB hardening | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 scope to require client email on client create/edit flows and enforce `clients.email` as non-null at the schema layer with safe backfill handling for any null legacy rows. Synced `docs/FuturePLAN.md` summary to reflect this remains active-plan scope. |
 | 2026-03-05 | Task 13 no-op closeout subitem removed | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to remove the prior “close as verified/no-op” subitem since substantive Task13 deltas are already known. |
 | 2026-03-05 | Task 13 subitem numbering adjusted to avoid task-count inflation | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 subitems from markdown ordered-list syntax to numbered labels (`- 1)` ... `- 5)`) so they stay scoped as subitems instead of being interpreted as additional top-level tasks in some renderers. |
 | 2026-03-05 | Task 13 spec wording updated to cover invoice UX polish | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 title to remove the parenthetical and rewrote Task13 subitems as a numbered list, clarifying scope now covers invoice settings plus invoice UX finish-up deltas from Task12. Synced `docs/PLAN.md` and `docs/FuturePLAN.md` wording to match. |

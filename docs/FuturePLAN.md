@@ -1,7 +1,7 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
 
-Latest scope update (2026-03-05): no new post-MVP backlog items in this pass; active PLAN/UX spec refined MS13 Task13 scope wording (invoice settings + invoice UX finish-up) and kept the invoice-create simplification (new invoices always start as draft, status set after creation), while this doc remains focused on deferred post-MVP items such as invoices/clients search+filter and multi-wallet selection UX.
+Latest scope update (2026-03-05): no new post-MVP backlog items in this pass; active PLAN/UX spec refined MS13 Task13 scope wording (invoice settings + invoice UX finish-up), kept the invoice-create simplification (new invoices always start as draft, status set after creation), and added client-email hardening (required on create/edit + `clients.email` non-null schema target), while this doc remains focused on deferred post-MVP items such as invoices/clients search+filter and multi-wallet selection UX.
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**
