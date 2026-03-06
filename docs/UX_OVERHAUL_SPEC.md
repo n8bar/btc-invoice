@@ -81,57 +81,14 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Existing pages remain the source of truth for the actual work; wallet settings, invoice create, and invoice show render a compact getting-started progress strip when reached from the flow.
    - Context-aware success redirects resume the flow after wallet save, invoice create, and invoice delivery; v1 auto-show behavior is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception).
    - Coverage includes `GettingStartedFlowTest` and integration assertions in auth/wallet/invoice delivery/show test suites.
+12. User settings & auth UX (Completed, 2026-03-05)
+   - Profile communication toggles shipped and persisted per user (default on): `show_overpayment_gratuity_note` and `show_qr_refresh_reminder`.
+   - Invoice show/public/print copy gating shipped for overpayment gratuity messaging and QR refresh/staleness reminders.
+   - Guardrail upheld: owner reconciliation/operational guidance remains visible when client-facing note toggles are off.
+   - Browser QA checklist completed (items 1-15).
+   - Scope remained implementation-light for settings/auth consistency (Profile, Invoice Settings, Login/Logout) without introducing auth-flow redesign.
 
 ## ToDo
-12. User settings & auth UX (current-state rewrite, 2026-03-04)
-   - Baseline already shipped before this task: branded login screen, grouped invoice settings cards, and existing profile toggles (`show_invoice_ids`, `auto_receipt_emails`).
-   - Required implementation:
-     - [x] Add two Profile toggles (reuse existing profile toggle pattern):
-       - `show_overpayment_gratuity_note`
-       - `show_qr_refresh_reminder`
-     - [x] Persist per user (default `true` for existing and new users).
-     - [x] Drive conditional copy on invoice show/public/print:
-       - Overpayment gratuity note.
-       - QR refresh/staleness reminder near payment QR surfaces.
-   - Guardrail for this task: keep owner-operational warnings and reconciliation guidance visible even when client-facing note toggles are off.
-   - Polish pass scope stays implementation-light:
-     - [ ] Profile and Invoice Settings: grouping clarity, helper text, validation/error handling, visible focus, and consistent action buttons.
-     - [ ] Login/Logout UX: branded + accessible consistency only (error/success wording and focus behavior), not a new auth flow.
-   - Browser QA checklist (human-eyes):
-     1. [x] Open `/profile` and confirm both toggles exist:
-        - `Show overpayment gratuity note to clients`
-        - `Show QR refresh reminder to clients`
-     2. [x] Confirm both toggles default to ON for existing accounts after migration.
-     3. [x] Save with both ON, hard refresh `/profile`, and confirm both remain ON.
-     4. [x] Open owner invoice show (`/invoices/{id}`) and verify visible:
-        - `Overpayments are treated as gratuities by default`
-        - `Need to reconcile an over/under payment?`
-        - `refresh right before sending payment; printed copies may be stale.`
-     5. [x] Open print view (`/invoices/{id}/print`) and verify visible:
-        - `Payment QR`
-        - `Overpayments are treated as gratuities by default`
-        - `refresh right before sending payment; printed copies may be stale.`
-     6. [x] Open public view (`/p/{token}`) and verify the same two client-facing notes appear.
-     7. [x] Set `Show overpayment gratuity note to clients` OFF and keep QR reminder ON; save.
-     8. [x] Re-check owner show:
-        - `Overpayments are treated as gratuities by default` is hidden.
-        - `Need to reconcile an over/under payment?` remains visible.
-     9. [x] Re-check print and public:
-        - `Overpayments are treated as gratuities by default` is hidden.
-        - QR refresh reminder remains visible.
-     10. [x] Set gratuity ON and `Show QR refresh reminder to clients` OFF; save.
-     11. [x] Re-check owner show, print, and public:
-        - `refresh right before sending payment; printed copies may be stale.` is hidden.
-        - `Payment QR` remains visible and functional.
-     12. [x] Set both toggles OFF; save.
-     13. [x] Re-check owner show, print, and public:
-        - Both client-facing notes are hidden.
-        - Owner reconciliation guidance remains visible on owner show.
-     14. [x] Logout/login, return to `/profile`, and confirm persisted toggle state.
-     15. [x] Keyboard/accessibility quick pass:
-        - Tab focus ring is visible on each toggle.
-        - Space toggles each checkbox.
-        - Save still works from keyboard flow.
 13. Invoice settings and invoice UX finish-up
    - 1) Use Task13 for invoice-settings and invoice UX deltas discovered during the Task12 consistency review.
    - 2) Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
