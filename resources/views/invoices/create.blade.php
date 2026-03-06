@@ -203,6 +203,12 @@
                         </div>
                     </div>
                 </details>
+                <p class="text-xs text-gray-600">
+                    Need to update your default branding or footer note?
+                    <a href="{{ route('settings.invoice.edit') }}" class="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">
+                        Open Invoice Settings
+                    </a>.
+                </p>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
