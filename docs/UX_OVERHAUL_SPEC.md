@@ -135,6 +135,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 13. Invoice Settings finish-up (post-Task12 sweep)
    - Use Task13 only for invoice-settings deltas discovered during Task12 consistency review.
    - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
+   - Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
    - Preserve existing per-invoice override behavior; no structural redesign.
    - If Task12 sweep finds no substantive invoice-settings deltas, close Task13 as verified/no-op with test/doc evidence.
 
