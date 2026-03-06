@@ -119,6 +119,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Require client email for create/edit flows and harden schema by making `clients.email` non-null (include safe backfill/migration handling for existing null data).
       - Expand paid-print state visibility: show a large translucent diagonal `PAID` watermark on paid owner prints as well as active public prints.
       - Refine client-facing payment exception copy to use biller/brand identity (invoice billing name with fallback) instead of generic “invoice sender” wording.
+      - Remove payment-action surfaces on paid invoices across owner/client views: hide QR + BIP21/copy actions on owner show, owner print, and active public print to prevent accidental rescans/overpayments.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
