@@ -112,7 +112,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - [x] Add per-user toggles (default on): overpayment gratuity note + QR refresh reminder.
       - [x] Wire toggles into invoice show/public/print client-facing copy only; keep owner operational warnings visible.
       - [ ] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
-    - [ ] Task 13: Invoice Settings finish-up only for deltas found during the Task 12 sweep (microcopy/focus/error/save-state parity; preserve overrides).
+    - [ ] Task 13: Invoice settings and invoice UX finish-up from Task12 deltas.
+      - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
+      - Preserve existing per-invoice override behavior; no structural redesign.
       - Include invoice create simplification: remove create-time status selection and force all new invoices to start as `draft`; users can set another status after creation.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
