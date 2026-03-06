@@ -103,28 +103,28 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
         - `Show QR refresh reminder to clients`
      2. [x] Confirm both toggles default to ON for existing accounts after migration.
      3. [x] Save with both ON, hard refresh `/profile`, and confirm both remain ON.
-     4. Open owner invoice show (`/invoices/{id}`) and verify visible:
+     4. [x] Open owner invoice show (`/invoices/{id}`) and verify visible:
         - `Overpayments are treated as gratuities by default`
         - `Need to reconcile an over/under payment?`
         - `refresh right before sending payment; printed copies may be stale.`
-     5. Open print view (`/invoices/{id}/print`) and verify visible:
+     5. [x] Open print view (`/invoices/{id}/print`) and verify visible:
         - `Payment QR`
         - `Overpayments are treated as gratuities by default`
         - `refresh right before sending payment; printed copies may be stale.`
-     6. Open public view (`/p/{token}`) and verify the same two client-facing notes appear.
-     7. Set `Show overpayment gratuity note to clients` OFF and keep QR reminder ON; save.
-     8. Re-check owner show:
+     6. [x] Open public view (`/p/{token}`) and verify the same two client-facing notes appear.
+     7. [x] Set `Show overpayment gratuity note to clients` OFF and keep QR reminder ON; save.
+     8. [x] Re-check owner show:
         - `Overpayments are treated as gratuities by default` is hidden.
         - `Need to reconcile an over/under payment?` remains visible.
-     9. Re-check print and public:
+     9. [x] Re-check print and public:
         - `Overpayments are treated as gratuities by default` is hidden.
         - QR refresh reminder remains visible.
-     10. Set gratuity ON and `Show QR refresh reminder to clients` OFF; save.
-     11. Re-check owner show, print, and public:
+     10. [x] Set gratuity ON and `Show QR refresh reminder to clients` OFF; save.
+     11. [x] Re-check owner show, print, and public:
         - `refresh right before sending payment; printed copies may be stale.` is hidden.
         - `Payment QR` remains visible and functional.
-     12. Set both toggles OFF; save.
-     13. Re-check owner show, print, and public:
+     12. [x] Set both toggles OFF; save.
+     13. [x] Re-check owner show, print, and public:
         - Both client-facing notes are hidden.
         - Owner reconciliation guidance remains visible on owner show.
      14. Logout/login, return to `/profile`, and confirm persisted toggle state.
