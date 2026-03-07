@@ -106,7 +106,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      8. Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
    - Phase C — IA correction implementation + acceptance/regression Browser QA
-     1. Correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
+     1. [ ] Correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
      2. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      3. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
      4. [ ] Verify client email is required in create/edit with clear validation copy and schema-backed enforcement.
