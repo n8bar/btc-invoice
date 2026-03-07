@@ -124,6 +124,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Add a “Reset to my custom defaults” action near the top of create/edit `Branding & footer` sections so per-invoice overrides can be reverted to Invoice Settings defaults in one click.
       - Hide the editable invoice-level `TXID` field from owner edit UI while keeping backend/internal compatibility for legacy/manual/recovery workflows.
       - Move the owner invoice Footer note card to render immediately before Payment Details instead of near the top status/action area.
+      - Phase C IA correction: relocate the overpayment gratuity note + QR refresh reminder controls from Profile UI to Invoice Settings UI (keep current user-level storage/defaults).
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
