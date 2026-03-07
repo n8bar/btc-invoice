@@ -119,7 +119,7 @@
                                 <x-text-input id="billing_name_override" name="billing_name_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_name_override', $invoice->billing_name_override)"
-                                              placeholder="{{ $brand['name'] }}" />
+                                              placeholder="{{ $brand['name'] ?? 'Biller name' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
                             </div>
                             <div>
@@ -127,7 +127,7 @@
                                 <x-text-input id="billing_email_override" name="billing_email_override" type="email"
                                               class="mt-1 block w-full"
                                               :value="old('billing_email_override', $invoice->billing_email_override)"
-                                              placeholder="{{ $brand['email'] }}" />
+                                              placeholder="{{ $brand['email'] ?? 'name@example.com' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
                             </div>
                             <div>
@@ -135,7 +135,7 @@
                                 <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_phone_override', $invoice->billing_phone_override)"
-                                              placeholder="{{ $brand['phone'] }}" />
+                                              placeholder="{{ $brand['phone'] ?? '(555) 123-4567' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_phone_override')" />
                             </div>
                         </div>
@@ -143,14 +143,14 @@
                             <x-input-label for="billing_address_override" :value="__('Biller address')" />
                             <textarea id="billing_address_override" name="billing_address_override" rows="3"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                      placeholder="{{ $brand['address'] }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
+                                      placeholder="{{ $brand['address'] ?? '123 Main St, Suite 100, Denver, CO 80202' }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('billing_address_override')" />
                         </div>
                         <div>
                             <x-input-label for="invoice_footer_note_override" :value="__('Footer note (public & print)')" />
                             <textarea id="invoice_footer_note_override" name="invoice_footer_note_override" rows="2"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                      placeholder="{{ $brand['footer_note'] }}">{{ old('invoice_footer_note_override', $invoice->invoice_footer_note_override) }}</textarea>
+                                      placeholder="{{ $brand['footer_note'] ?? 'We appreciate your business.' }}">{{ old('invoice_footer_note_override', $invoice->invoice_footer_note_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note_override')" />
                         </div>
                     </div>
