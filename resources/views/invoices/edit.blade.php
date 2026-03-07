@@ -186,16 +186,19 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('invoices.show', $invoice) }}" class="text-gray-600 hover:underline">Cancel</a>
-                    @if($editLocked)
-                        <p class="text-xs text-yellow-700">Disable public link above to enable saving.</p>
-                    @endif
+                    <a href="{{ route('invoices.show', $invoice) }}"
+                       class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </a>
                     <x-primary-button
                         :disabled="$editLocked"
                         data-edit-save-button="true"
                         data-edit-save-disabled="{{ $editLocked ? 'true' : 'false' }}">
                         Save
                     </x-primary-button>
+                    @if($editLocked)
+                        <p class="text-xs text-yellow-700">Disable public link above to enable saving.</p>
+                    @endif
                 </div>
             </form>
 
