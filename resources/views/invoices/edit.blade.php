@@ -162,7 +162,7 @@
                         <div class="flex items-center justify-between">
                             <label class="block text-sm font-medium text-gray-700">BTC address</label>
                             @if ($invoice->payment_address)
-                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
+                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">📋 Copy</x-secondary-button>
                             @endif
                         </div>
                         <textarea rows="3" readonly aria-label="BTC address"
