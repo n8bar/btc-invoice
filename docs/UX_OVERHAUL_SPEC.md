@@ -96,16 +96,16 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      3. [x] Over/underpayment alerts (gratuity note ON/OFF): capture current public/print copy wording and biller-name references.
      4. [x] Confirmed Task13 quality priorities during baseline review: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
    - Phase B — Implementation
-     1. Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
-     2. Preserve existing per-invoice override behavior; no structural redesign.
-     3. Require client email on client create/edit and enforce it at the database layer (`clients.email` non-null) with a safe migration/backfill path for any existing null rows.
-     4. Paid-invoice print polish: render a prominent, translucent diagonal `PAID` watermark on paid print views (owner print and active public print) so payment state is unmistakable in exported/printed copies.
-     5. Client-facing over/underpayment wording polish: replace generic “invoice sender” phrasing with biller/brand-facing wording (use invoice billing name with a safe fallback) so public/print copy reads as authored by the invoice owner.
-     6. Paid-invoice payment-action safety: hide payment QR + BIP21/copy payment action surfaces once an invoice is paid across owner and client views (including owner invoice show, owner print, and active public print) to reduce accidental extra payments from rescanning old invoices.
-     7. Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
-     8. Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
-     9. Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
-     10. IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
+     1. [x] Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
+     2. [x] Preserve existing per-invoice override behavior; no structural redesign.
+     3. [x] Require client email on client create/edit and enforce it at the database layer (`clients.email` non-null) with a safe migration/backfill path for any existing null rows.
+     4. [x] Paid-invoice print polish: render a prominent, translucent diagonal `PAID` watermark on paid print views (owner print and active public print) so payment state is unmistakable in exported/printed copies.
+     5. [x] Client-facing over/underpayment wording polish: replace generic “invoice sender” phrasing with biller/brand-facing wording (use invoice billing name with a safe fallback) so public/print copy reads as authored by the invoice owner.
+     6. [x] Paid-invoice payment-action safety: hide payment QR + BIP21/copy payment action surfaces once an invoice is paid across owner and client views (including owner invoice show, owner print, and active public print) to reduce accidental extra payments from rescanning old invoices.
+     7. [x] Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
+     8. [x] Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
+     9. [x] Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
+     10. [ ] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
