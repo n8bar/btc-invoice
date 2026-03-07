@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-06 | Task 13 spec cleanup: Phase A/B/C QA ordering + Footer note move scope | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 so paid-surface watermark/action verification is tracked in Phase C (post-implementation) instead of Phase A baseline, and added a new Phase B implementation item to move the owner invoice Footer note card to immediately before Payment Details. Synced `docs/PLAN.md` Task 13 bullets. |
 | 2026-03-06 | Task 13 scope adds TXID edit-field removal from owner UI | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 implementation scope to hide the editable invoice-level `TXID` field from invoice edit while retaining backend/internal compatibility for legacy/manual/recovery workflows. |
 | 2026-03-06 | Task 13 rewritten into pre-BQA -> implementation -> post-BQA phases | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to separate baseline Browser QA, implementation scope, and acceptance/regression Browser QA so execution order is explicit. Synced `docs/PLAN.md` Task 13 wording and PLAN last-updated date. |
 | 2026-03-05 | FuturePLAN update line narrowed to post-MVP scope only | Rewrote `docs/FuturePLAN.md` “Latest scope update” text to remove active MS13/UX-overhaul status and keep this doc focused strictly on deferred post-MVP backlog updates. |
