@@ -91,9 +91,9 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 ## ToDo
 13. Invoice settings and invoice UX finish-up
    - Phase A — Pre-implementation Browser QA (baseline, lightweight)
-     1. [ ] Invoice create (`/invoices/create`): capture current Branding & footer behavior, including how defaults/overrides are currently shown.
-     2. [ ] Invoice Settings (`/settings/invoice`): capture current placeholder/default behavior for branding heading and related helper text.
-     3. [ ] Over/underpayment alerts (gratuity note ON/OFF): capture current public/print copy wording and biller-name references.
+     1. [x] Invoice create (`/invoices/create`): capture current Branding & footer behavior, including how defaults/overrides are currently shown.
+     2. [x] Invoice Settings (`/settings/invoice`): capture current placeholder/default behavior for branding heading and related helper text.
+     3. [x] Over/underpayment alerts (gratuity note ON/OFF): capture current public/print copy wording and biller-name references.
    - Phase B — Implementation
      1. Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
      2. Invoice create flow simplification: remove the status dropdown from create and always create new invoices as `draft` by default. Users can change status after creation on invoice show/edit actions.
