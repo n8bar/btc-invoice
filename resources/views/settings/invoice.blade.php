@@ -7,7 +7,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @include('settings.partials.tabs')
 
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
