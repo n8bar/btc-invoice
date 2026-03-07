@@ -36,7 +36,7 @@ class ClientController extends Controller
         $client = Client::create([
             'user_id' => $request->user()->id,
             'name'    => $data['name'],
-            'email'   => $data['email'] ?? null,
+            'email'   => $data['email'],
             'notes'   => $data['notes'] ?? null,
         ]);
 
@@ -152,14 +152,14 @@ class ClientController extends Controller
     }
 
     /**
-     * @return array{name:string,email:?string,notes:?string}
+     * @return array{name:string,email:string,notes:?string}
      */
     private function validatedClientData(Request $request): array
     {
-        /** @var array{name:string,email:?string,notes:?string} $validated */
+        /** @var array{name:string,email:string,notes:?string} $validated */
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 

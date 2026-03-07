@@ -67,6 +67,41 @@ class UserSettingsTest extends TestCase
         $this->assertSame('2025-01-11', Carbon::parse($invoice->due_date)->toDateString());
     }
 
+    public function test_invoice_store_forces_new_invoices_to_draft(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-FORCE-DRAFT',
+                'description' => 'Should still save as draft',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'sent',
+                'invoice_date' => '2025-01-01',
+            ])
+            ->assertRedirect(route('invoices.index'));
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+        $this->assertSame('draft', $invoice->status);
+    }
+
     public function test_invoice_create_prefills_defaults(): void
     {
         $owner = User::factory()->create([
@@ -88,6 +123,25 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Consulting retainer', false);
         $expectedDue = now()->addDays(7)->toDateString();
         $response->assertSee('value="' . $expectedDue . '"', false);
+    }
+
+    public function test_invoice_create_hides_status_selector(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertDontSee('name="status"', false);
+        $response->assertSee('Reset to my custom defaults', false);
     }
 
     public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void

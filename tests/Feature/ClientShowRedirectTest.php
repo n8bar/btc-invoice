@@ -92,4 +92,47 @@ class ClientShowRedirectTest extends TestCase
         $response->assertSee('Delete client', false);
         $response->assertSee(route('clients.destroy', $client), false);
     }
+
+    public function test_client_store_requires_email(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('clients.index'))
+            ->post(route('clients.store'), [
+                'name' => 'Acme Co',
+                'email' => '',
+                'notes' => 'Missing email should fail',
+            ]);
+
+        $response->assertRedirect(route('clients.index'));
+        $response->assertSessionHasErrors('email');
+        $this->assertDatabaseMissing('clients', [
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+        ]);
+    }
+
+    public function test_client_update_requires_email(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->from(route('clients.edit', $client))
+            ->put(route('clients.update', $client), [
+                'name' => 'Acme Co',
+                'email' => '',
+                'notes' => 'Trying to clear email',
+            ]);
+
+        $response->assertRedirect(route('clients.edit', $client));
+        $response->assertSessionHasErrors('email');
+    }
 }

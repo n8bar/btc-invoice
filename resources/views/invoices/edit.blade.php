@@ -105,6 +105,11 @@
                         <span>Branding &amp; footer</span>
                         <span class="text-xs font-normal text-gray-500">Leave fields blank to use profile defaults.</span>
                     </summary>
+                    <div class="mt-3 flex justify-end">
+                        <x-secondary-button type="button" data-reset-branding-defaults>
+                            Reset to my custom defaults
+                        </x-secondary-button>
+                    </div>
                     <div class="mt-4 space-y-4">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -112,6 +117,7 @@
                                 <x-text-input id="branding_heading_override" name="branding_heading_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('branding_heading_override', $invoice->branding_heading_override)"
+                                              data-branding-override-field="true"
                                               placeholder="{{ $brand['heading'] ?? 'Invoice' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('branding_heading_override')" />
                             </div>
@@ -120,6 +126,7 @@
                                 <x-text-input id="billing_name_override" name="billing_name_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_name_override', $invoice->billing_name_override)"
+                                              data-branding-override-field="true"
                                               placeholder="{{ $brand['name'] ?? 'Biller name' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
                             </div>
@@ -128,6 +135,7 @@
                                 <x-text-input id="billing_email_override" name="billing_email_override" type="email"
                                               class="mt-1 block w-full"
                                               :value="old('billing_email_override', $invoice->billing_email_override)"
+                                              data-branding-override-field="true"
                                               placeholder="{{ $brand['email'] ?? 'name@example.com' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
                             </div>
@@ -136,6 +144,7 @@
                                 <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_phone_override', $invoice->billing_phone_override)"
+                                              data-branding-override-field="true"
                                               placeholder="{{ $brand['phone'] ?? '(555) 123-4567' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_phone_override')" />
                             </div>
@@ -143,6 +152,7 @@
                         <div>
                             <x-input-label for="billing_address_override" :value="__('Biller address')" />
                             <textarea id="billing_address_override" name="billing_address_override" rows="3"
+                                      data-branding-override-field="true"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                       placeholder="{{ $brand['address'] ?? '123 Main St, Suite 100, Denver, CO 80202' }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('billing_address_override')" />
@@ -150,6 +160,7 @@
                         <div>
                             <x-input-label for="invoice_footer_note_override" :value="__('Footer note (public & print)')" />
                             <textarea id="invoice_footer_note_override" name="invoice_footer_note_override" rows="2"
+                                      data-branding-override-field="true"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                       placeholder="{{ $brand['footer_note'] ?? 'We appreciate your business.' }}">{{ old('invoice_footer_note_override', $invoice->invoice_footer_note_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note_override')" />
@@ -223,6 +234,15 @@
 
     <script>
         (function(){
+            document.querySelectorAll('[data-reset-branding-defaults]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const panel = button.closest('details');
+                    panel?.querySelectorAll('[data-branding-override-field]').forEach((field) => {
+                        field.value = '';
+                    });
+                });
+            });
+
             const btn = document.getElementById('useCurrentRate');
             const rateInput = document.getElementById('btc_rate');
             const usdInput  = document.getElementById('amount_usd');

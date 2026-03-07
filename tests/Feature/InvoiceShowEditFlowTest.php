@@ -170,6 +170,7 @@ class InvoiceShowEditFlowTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('href="' . route('invoices.show', $invoice) . '"', false);
+        $response->assertSee('Reset to my custom defaults', false);
     }
 
     public function test_invoice_edit_disables_save_when_public_link_is_enabled(): void

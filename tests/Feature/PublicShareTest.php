@@ -247,7 +247,9 @@ class PublicShareTest extends TestCase
 
         $this->get(route('invoices.public-print', ['token' => 'tok-paid-note-hidden']))
             ->assertOk()
-            ->assertDontSee('Send one payment (if possible):', false);
+            ->assertSee('class="paid-watermark"', false)
+            ->assertDontSee('Send one payment (if possible):', false)
+            ->assertDontSee('Payment QR', false);
 
         Carbon::setTestNow();
     }

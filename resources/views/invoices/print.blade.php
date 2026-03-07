@@ -211,7 +211,7 @@
     $linkActive = $publicState === 'active';
 @endphp
 
-@if ($publicMode && $st === 'paid' && $linkActive)
+@if ($st === 'paid' && (!$publicMode || $linkActive))
     <div class="paid-watermark">
         <span>Paid</span>
     </div>

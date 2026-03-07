@@ -69,10 +69,7 @@ class InvoiceController extends Controller
             'amount_usd'  => ['required','numeric','min:0.01'],
             'btc_rate'    => ['nullable','numeric','min:0'],         // USD per BTC
             'amount_btc'  => ['nullable','numeric','min:0'],
-            'status'      => ['nullable','in:draft,sent,paid,void'],
             'due_date'    => ['nullable','date'],
-            'paid_at'     => ['nullable','date'],
-            'txid'        => ['nullable','string','max:128'],
             'invoice_date' => ['required','date'],
             'billing_name_override' => ['nullable','string','max:255'],
             'billing_email_override' => ['nullable','email','max:255'],
@@ -87,6 +84,9 @@ class InvoiceController extends Controller
                 $data[$field] = null;
             }
         }
+
+        // Creation flow is draft-only; status changes happen after creation.
+        $data['status'] = 'draft';
 
         // If rate is provided and BTC amount omitted, compute it.
         if (empty($data['amount_btc']) && !empty($data['btc_rate']) && $data['btc_rate'] > 0) {

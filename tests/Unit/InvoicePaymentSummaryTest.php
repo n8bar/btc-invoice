@@ -19,6 +19,7 @@ class InvoicePaymentSummaryTest extends TestCase
         $client = Client::create([
             'user_id' => $user->id,
             'name' => 'Acme',
+            'email' => 'billing@acme.test',
         ]);
 
         $invoice = Invoice::create([
