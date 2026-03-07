@@ -1,7 +1,7 @@
 @php
     $tabs = [
         [
-            'label' => 'Profile',
+            'label' => 'Account',
             'href' => route('profile.edit'),
             'active' => request()->routeIs('profile.edit'),
         ],
@@ -23,15 +23,15 @@
     ];
 @endphp
 
-<nav class="rounded-lg border border-gray-200 bg-white p-2 shadow-sm" aria-label="Settings">
-    <ul class="flex flex-wrap gap-2">
+<nav class="border-b border-gray-200" aria-label="Settings">
+    <ul class="-mb-px flex flex-wrap gap-x-4 gap-y-2">
         @foreach ($tabs as $tab)
             <li>
                 <a href="{{ $tab['href'] }}"
                    @class([
-                       'inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition',
-                       'bg-indigo-600 text-white shadow-sm' => $tab['active'],
-                       'bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50' => ! $tab['active'],
+                       'inline-flex items-center border-b-2 px-1 pb-2 text-xs font-medium leading-5 transition duration-150 ease-in-out',
+                       'border-indigo-400 text-gray-900 focus:border-indigo-700 focus:text-gray-900' => $tab['active'],
+                       'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700' => ! $tab['active'],
                    ])>
                     {{ $tab['label'] }}
                 </a>

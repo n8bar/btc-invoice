@@ -655,6 +655,7 @@ class UserSettingsTest extends TestCase
         foreach ($routes as $url) {
             $response = $this->actingAs($owner)->get($url);
             $response->assertOk();
+            $response->assertSee('Account', false);
             $response->assertSee(route('profile.edit'), false);
             $response->assertSee(route('wallet.settings.edit'), false);
             $response->assertSee(route('settings.invoice.edit'), false);

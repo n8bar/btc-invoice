@@ -10,7 +10,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
 - Public/share layouts refresh to mirror updated show/print patterns.
 - Guided onboarding wizard (wallet setup → create invoice → deliver).
 - User-level communication toggles for overpayment note and QR refresh reminder.
-- Settings/auth consistency polish (Profile, Invoice Settings, Wallet Settings, Login/Logout) using existing patterns.
+- Settings/auth consistency polish (Account, Invoice Settings, Wallet Settings, Login/Logout) using existing patterns.
 
 ## Completed Tasks
 1. Dashboard snapshot redesign (counts/totals/recent payments).
@@ -86,7 +86,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Invoice show/public/print copy gating shipped for overpayment gratuity messaging and QR refresh/staleness reminders.
    - Guardrail upheld: owner reconciliation/operational guidance remains visible when client-facing note toggles are off.
    - Browser QA checklist completed (items 1-15).
-   - Scope remained implementation-light for settings/auth consistency (Profile, Invoice Settings, Login/Logout) without introducing auth-flow redesign.
+   - Scope remained implementation-light for settings/auth consistency (Account, Invoice Settings, Login/Logout) without introducing auth-flow redesign.
 
 ## ToDo
 13. Invoice settings and invoice UX finish-up
@@ -106,10 +106,10 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      8. [x] Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. [x] Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
      10. [x] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
-     11. [x] Settings IA shell: add a unified Settings surface with tabs for `Profile`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
-     12. [x] Keep `Show invoice IDs in list` as a Profile preference (under `Settings > Profile`), not under invoice-specific settings.
-     13. [x] Move `Auto email paid receipts` from Profile into `Settings > Notifications` as outbound communication behavior.
-     14. [x] Account-menu cleanup: collapse `Profile`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Profile`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
+     11. [x] Settings IA shell: add a unified Settings surface with tabs for `Account`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
+     12. [x] Keep `Show invoice IDs in list` as an Account preference (under `Settings > Account`), not under invoice-specific settings.
+     13. [x] Move `Auto email paid receipts` from Account into `Settings > Notifications` as outbound communication behavior.
+     14. [x] Account-menu cleanup: collapse `Account`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Account`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
@@ -119,15 +119,15 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      6. [ ] Verify Branding & footer reset-to-defaults control works on create/edit without breaking existing per-invoice override behavior.
      7. [ ] Verify the owner invoice Footer note now renders immediately above Payment Details and no longer appears in the top status/action area.
      8. [ ] Verify both communication toggles now live in Invoice Settings and are no longer shown on Profile.
-     9. [ ] Verify Settings shell exposes `Profile`, `Wallet`, `Invoices`, and `Notifications` tabs with stable navigation and active-state cues.
-     10. [ ] Verify `Show invoice IDs in list` appears only in `Settings > Profile` and still controls invoice-list column visibility.
-     11. [ ] Verify `Auto email paid receipts` appears in `Settings > Notifications`, persists correctly, and is absent from `Settings > Profile`.
-     12. [ ] Verify account menu contains only `Settings`, `Getting Started`, and `Logout`; `Settings` opens the unified Settings surface on the `Profile` tab.
+     9. [ ] Verify Settings shell exposes `Account`, `Wallet`, `Invoices`, and `Notifications` tabs with stable navigation and active-state cues.
+     10. [ ] Verify `Show invoice IDs in list` appears only in `Settings > Account` and still controls invoice-list column visibility.
+     11. [ ] Verify `Auto email paid receipts` appears in `Settings > Notifications`, persists correctly, and is absent from `Settings > Account`.
+     12. [ ] Verify account menu contains only `Settings`, `Getting Started`, and `Logout`; `Settings` opens the unified Settings surface on the `Account` tab.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.
 - UX changes reflected across invoices/clients CRUD, show/public/print/share/delivery flows without breaking auth or ownership constraints.
 - Task12 toggles are persisted per user (default on) and control only the intended client-facing copy in show/public/print.
-- Settings/auth screens in Task12 scope (Profile, Invoice Settings, Login/Logout) match guardrails and updated UX patterns without introducing an auth-flow redesign.
+- Settings/auth screens in Task12 scope (Account, Invoice Settings, Login/Logout) match guardrails and updated UX patterns without introducing an auth-flow redesign.
 - Tests updated/added for new flows and toggles; public views remain noindex and 403-safe.
 - Docs (PLAN + onboarding/quick start later) updated after UX ships; changelog entries added per milestone.
