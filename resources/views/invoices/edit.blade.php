@@ -159,15 +159,15 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">BTC address</label>
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-gray-700">BTC address</label>
+                            @if ($invoice->payment_address)
+                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
+                            @endif
+                        </div>
                         <textarea rows="3" readonly aria-label="BTC address"
                                   class="mt-1 block w-full rounded-md border-gray-300 bg-transparent font-mono text-sm text-gray-800 shadow-sm break-all"
                                   style="overflow-wrap:anywhere; word-break:break-all;">{{ $invoice->payment_address ?: '—' }}</textarea>
-                        @if ($invoice->payment_address)
-                            <div class="mt-2 flex justify-end">
-                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
-                            </div>
-                        @endif
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status</label>
