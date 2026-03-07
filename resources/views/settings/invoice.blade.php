@@ -62,7 +62,7 @@
                                 <x-input-label for="invoice_footer_note" :value="__('Invoice footer note')" />
                                 <textarea id="invoice_footer_note" name="invoice_footer_note" rows="2"
                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                          placeholder="Net 7 · Thank you for your business">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
+                                          placeholder="We appreciate your business.">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note')" />
                             </div>
                         </div>
