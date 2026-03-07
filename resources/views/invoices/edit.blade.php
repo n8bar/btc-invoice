@@ -161,7 +161,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">BTC address</label>
                         <textarea rows="3" readonly aria-label="BTC address"
-                                  class="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 font-mono text-sm text-gray-800 shadow-sm break-all"
+                                  class="mt-1 block w-full rounded-md border-gray-300 bg-transparent font-mono text-sm text-gray-800 shadow-sm break-all"
                                   style="overflow-wrap:anywhere; word-break:break-all;">{{ $invoice->payment_address ?: '—' }}</textarea>
                         @if ($invoice->payment_address)
                             <div class="mt-2 flex justify-end">
