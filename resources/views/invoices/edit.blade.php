@@ -111,7 +111,7 @@
                                 <x-text-input id="branding_heading_override" name="branding_heading_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('branding_heading_override', $invoice->branding_heading_override)"
-                                              placeholder="{{ $brand['heading'] ?? 'CryptoZing Invoice' }}" />
+                                              placeholder="{{ $brand['heading'] ?? 'Invoice' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('branding_heading_override')" />
                             </div>
                             <div>
