@@ -105,16 +105,16 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      7. Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
      8. Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
-   - Phase C — IA correction implementation + acceptance/regression Browser QA
-     1. [ ] Correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
-     2. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
-     3. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
-     4. [ ] Verify client email is required in create/edit with clear validation copy and schema-backed enforcement.
-     5. [ ] Verify paid invoice surfaces (owner show + owner print + public print) match scope: payment-action surfaces hidden where specified and `PAID` watermark behavior matches implementation.
-     6. [ ] Verify over/underpayment client-facing copy (gratuity ON/OFF paths) is actionable and biller-branded.
-     7. [ ] Verify Branding & footer reset-to-defaults control works on create/edit without breaking existing per-invoice override behavior.
-     8. [ ] Verify the owner invoice Footer note now renders immediately above Payment Details and no longer appears in the top status/action area.
-     9. [ ] Verify both communication toggles now live in Invoice Settings and are no longer shown on Profile.
+     10. IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
+   - Phase C — Post-implementation Browser QA (acceptance + regression)
+     1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
+     2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
+     3. [ ] Verify client email is required in create/edit with clear validation copy and schema-backed enforcement.
+     4. [ ] Verify paid invoice surfaces (owner show + owner print + public print) match scope: payment-action surfaces hidden where specified and `PAID` watermark behavior matches implementation.
+     5. [ ] Verify over/underpayment client-facing copy (gratuity ON/OFF paths) is actionable and biller-branded.
+     6. [ ] Verify Branding & footer reset-to-defaults control works on create/edit without breaking existing per-invoice override behavior.
+     7. [ ] Verify the owner invoice Footer note now renders immediately above Payment Details and no longer appears in the top status/action area.
+     8. [ ] Verify both communication toggles now live in Invoice Settings and are no longer shown on Profile.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.
