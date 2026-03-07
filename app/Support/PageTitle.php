@@ -24,9 +24,10 @@ class PageTitle
             $routeName === 'dashboard' => 'Dashboard',
             $routeName === 'help' => 'Notes',
 
-            $routeName === 'profile.edit' => 'Profile',
+            $routeName === 'profile.edit' => 'Settings',
             $routeName === 'settings.invoice.edit' => 'Settings',
-            $routeName === 'wallet.settings.edit' => 'Wallet',
+            $routeName === 'settings.notifications.edit' => 'Settings',
+            $routeName === 'wallet.settings.edit' => 'Settings',
 
             $routeName === 'clients.index' => 'Clients',
             $routeName === 'clients.create' => 'New Client',
@@ -77,4 +78,3 @@ class PageTitle
         return $fallback;
     }
 }
-

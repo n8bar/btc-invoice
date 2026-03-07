@@ -82,14 +82,8 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('settings.invoice.edit')">
-                                {{ __('Invoice Settings') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('wallet.settings.edit')">
-                                {{ __('Wallet Settings') }}
+                            <x-dropdown-link :href="route('settings.index')">
+                                {{ __('Settings') }}
                             </x-dropdown-link>
                             @if (Auth::user()->gettingStartedIsDone())
                                 <form method="POST"
@@ -217,14 +211,8 @@
                 </div>
 
                 <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('settings.invoice.edit')" :active="request()->routeIs('settings.invoice.*')">
-                        {{ __('Invoice Settings') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('wallet.settings.edit')" :active="request()->routeIs('wallet.settings.*')">
-                        {{ __('Wallet Settings') }}
+                    <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('profile.edit', 'settings.invoice.*', 'wallet.settings.*', 'settings.notifications.*')">
+                        {{ __('Settings') }}
                     </x-responsive-nav-link>
                     @if (Auth::user()->gettingStartedIsDone())
                         <form method="POST"

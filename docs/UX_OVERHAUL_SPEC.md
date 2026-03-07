@@ -106,10 +106,10 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      8. [x] Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. [x] Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
      10. [x] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
-     11. [ ] Settings IA shell: add a unified Settings surface with tabs for `Profile`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
-     12. [ ] Keep `Show invoice IDs in list` as a Profile preference (under `Settings > Profile`), not under invoice-specific settings.
-     13. [ ] Move `Auto email paid receipts` from Profile into `Settings > Notifications` as outbound communication behavior.
-     14. [ ] Account-menu cleanup: collapse `Profile`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Profile`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
+     11. [x] Settings IA shell: add a unified Settings surface with tabs for `Profile`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
+     12. [x] Keep `Show invoice IDs in list` as a Profile preference (under `Settings > Profile`), not under invoice-specific settings.
+     13. [x] Move `Auto email paid receipts` from Profile into `Settings > Notifications` as outbound communication behavior.
+     14. [x] Account-menu cleanup: collapse `Profile`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Profile`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.

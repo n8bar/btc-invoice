@@ -2,12 +2,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Invoice Settings
+            Settings
         </h2>
     </x-slot>
 
     <div class="py-8">
-        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+            @include('settings.partials.tabs')
+
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
                 <div class="p-6">
                     @if (session('status') === 'invoice-settings-updated')

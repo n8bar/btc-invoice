@@ -611,6 +611,57 @@ class UserSettingsTest extends TestCase
         $response->assertSee('name="show_qr_refresh_reminder"', false);
     }
 
+    public function test_user_can_update_notification_settings_page(): void
+    {
+        $owner = User::factory()->create([
+            'auto_receipt_emails' => true,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('settings.notifications.update'), [
+                'auto_receipt_emails' => false,
+            ])
+            ->assertRedirect(route('settings.notifications.edit'));
+
+        $owner->refresh();
+        $this->assertFalse($owner->auto_receipt_emails);
+    }
+
+    public function test_notification_settings_page_shows_auto_receipt_toggle(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('settings.notifications.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Receipts', false);
+        $response->assertSee('name="auto_receipt_emails"', false);
+    }
+
+    public function test_settings_tabs_render_on_all_settings_pages(): void
+    {
+        $owner = User::factory()->create();
+
+        $routes = [
+            route('profile.edit'),
+            route('wallet.settings.edit'),
+            route('settings.invoice.edit'),
+            route('settings.notifications.edit'),
+        ];
+
+        foreach ($routes as $url) {
+            $response = $this->actingAs($owner)->get($url);
+            $response->assertOk();
+            $response->assertSee(route('profile.edit'), false);
+            $response->assertSee(route('wallet.settings.edit'), false);
+            $response->assertSee(route('settings.invoice.edit'), false);
+            $response->assertSee(route('settings.notifications.edit'), false);
+        }
+    }
+
     public function test_user_cannot_delete_other_wallet_account(): void
     {
         $owner = User::factory()->create();
