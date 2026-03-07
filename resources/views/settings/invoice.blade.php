@@ -76,7 +76,7 @@
                                 <x-input-label for="invoice_default_description" :value="__('Default memo / description')" />
                                 <textarea id="invoice_default_description" name="invoice_default_description" rows="3"
                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                          placeholder="Weekly retainer for CryptoZing">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
+                                          placeholder="Weekly retainer for consulting services">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_default_description')" />
                             </div>
                             <div>
