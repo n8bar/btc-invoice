@@ -104,6 +104,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      6. Client-facing over/underpayment wording polish: replace generic “invoice sender” phrasing with biller/brand-facing wording (use invoice billing name with a safe fallback) so public/print copy reads as authored by the invoice owner.
      7. Paid-invoice payment-action safety: hide payment QR + BIP21/copy payment action surfaces once an invoice is paid across owner and client views (including owner invoice show, owner print, and active public print) to reduce accidental extra payments from rescanning old invoices.
      8. Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
+     9. Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.

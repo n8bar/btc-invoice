@@ -122,6 +122,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
       - Refine client-facing payment exception copy to use biller/brand identity (invoice billing name with fallback) instead of generic “invoice sender” wording.
       - Remove payment-action surfaces on paid invoices across owner/client views: hide QR + BIP21/copy actions on owner show, owner print, and active public print to prevent accidental rescans/overpayments.
       - Add a “Reset to my custom defaults” action near the top of create/edit `Branding & footer` sections so per-invoice overrides can be reverted to Invoice Settings defaults in one click.
+      - Hide the editable invoice-level `TXID` field from owner edit UI while keeping backend/internal compatibility for legacy/manual/recovery workflows.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
