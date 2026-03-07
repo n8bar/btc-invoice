@@ -111,9 +111,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Communication-toggle rollout and settings/auth consistency pass.
       - Canonical behavior and Browser QA closure are tracked in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
     - [ ] Invoice settings and invoice UX finish-up from earlier UX deltas.
-      - Canonical scope/checklists live in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (Phase A/B/C).
-      - Status snapshot: Phase A baseline is finished; Phase B implementation items 1-9 are shipped with item 10 (IA correction) remaining; Phase C acceptance/regression QA remains.
-      - Remaining implementation correction is in Phase B: move gratuity/QR reminder controls from Profile UI to Invoice Settings UI.
+      - Canonical scope, execution status, and Browser QA checklists live only in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
