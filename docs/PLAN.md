@@ -95,7 +95,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
-    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for UX Task 11.
+    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for the guided onboarding flow.
     - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) captures the shipped wallet UX scope.
     - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
     - [x] Dashboard snapshot and light/dark theme toggle.
@@ -103,16 +103,16 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-      - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
+      - Verified in the UX overhaul spec checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
     - [x] Guided onboarding wizard: wallet setup → create invoice → deliver.
       - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
       - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
     - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
-    - [x] Task 12 complete: communication-toggle rollout and settings/auth consistency pass.
-      - Canonical Task 12 behavior and Browser QA closure are tracked in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
-    - [ ] Task 13 in progress: invoice settings and invoice UX finish-up from Task12 deltas.
-      - Canonical scope/checklists live in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) Task 13 (Phase A/B/C).
-      - Status snapshot: Phase A baseline is complete; Phase B implementation and Phase C correction/acceptance QA remain.
+    - [x] Communication-toggle rollout and settings/auth consistency pass.
+      - Canonical behavior and Browser QA closure are tracked in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
+    - [ ] Invoice settings and invoice UX finish-up from earlier UX deltas.
+      - Canonical scope/checklists live in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) (Phase A/B/C).
+      - Status snapshot: Phase A baseline is finished; Phase B implementation and Phase C correction/acceptance QA remain.
       - Includes the Phase C IA correction to move gratuity/QR reminder controls from Profile UI to Invoice Settings UI.
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.

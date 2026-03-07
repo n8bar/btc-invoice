@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-07 | PLAN UX-overhaul wording cleanup (no Task-number labels in milestone bullets) | Updated `docs/PLAN.md` Milestone 13 wording to remove direct Task-number references in UX-overhaul bullets, and removed redundant “complete” wording where `[x]` status already conveys completion. Scope/status are unchanged and remain detailed in `docs/UX_OVERHAUL_SPEC.md`. |
 | 2026-03-07 | PLAN MS13 verbosity reduced; Task detail deferred to UX spec | Simplified `docs/PLAN.md` Milestone 13 tracking so Task 12/13 stay milestone-level and point to `docs/UX_OVERHAUL_SPEC.md` for detailed Task13 phase scope/checklists. Preserved status snapshot and Phase C IA-correction note without duplicating spec-level implementation bullets. |
 | 2026-03-07 | Task 13 Phase A/B cleanup: priorities moved to baseline and checked off | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to move the quality-priorities line out of Phase B implementation into Phase A baseline Browser QA and mark it complete. Renumbered Phase B implementation items accordingly and synced `docs/PLAN.md` wording. |
 | 2026-03-06 | Task 13 spec corrected for communication-toggle IA placement | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 Phase C to include the correction implementation that relocates the overpayment gratuity and QR refresh reminder controls from Profile UI to Invoice Settings UI, then verifies the new placement in Browser QA. Synced `docs/PLAN.md` Task 13 bullets. |
