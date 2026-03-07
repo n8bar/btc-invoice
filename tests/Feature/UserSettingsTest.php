@@ -571,7 +571,10 @@ class UserSettingsTest extends TestCase
 
     public function test_user_can_update_invoice_settings_page(): void
     {
-        $owner = User::factory()->create();
+        $owner = User::factory()->create([
+            'show_overpayment_gratuity_note' => true,
+            'show_qr_refresh_reminder' => true,
+        ]);
 
         $this
             ->actingAs($owner)
@@ -581,6 +584,8 @@ class UserSettingsTest extends TestCase
                 'billing_email' => 'billing@cryptozing.app',
                 'invoice_default_description' => 'Weekly retainer',
                 'invoice_default_terms_days' => 14,
+                'show_overpayment_gratuity_note' => false,
+                'show_qr_refresh_reminder' => false,
             ])
             ->assertRedirect(route('settings.invoice.edit'));
 
@@ -588,6 +593,22 @@ class UserSettingsTest extends TestCase
         $this->assertSame('Weekly retainer', $owner->invoice_default_description);
         $this->assertSame(14, $owner->invoice_default_terms_days);
         $this->assertSame('CryptoZing Invoice', $owner->branding_heading);
+        $this->assertFalse($owner->show_overpayment_gratuity_note);
+        $this->assertFalse($owner->show_qr_refresh_reminder);
+    }
+
+    public function test_invoice_settings_page_shows_client_facing_payment_note_toggles(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('settings.invoice.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Client-facing payment notes', false);
+        $response->assertSee('name="show_overpayment_gratuity_note"', false);
+        $response->assertSee('name="show_qr_refresh_reminder"', false);
     }
 
     public function test_user_cannot_delete_other_wallet_account(): void

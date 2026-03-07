@@ -27,8 +27,6 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'show_invoice_ids' => ['nullable', 'boolean'],
             'auto_receipt_emails' => ['nullable', 'boolean'],
-            'show_overpayment_gratuity_note' => ['nullable', 'boolean'],
-            'show_qr_refresh_reminder' => ['nullable', 'boolean'],
             'billing_name' => ['nullable','string','max:255'],
             'billing_email' => ['nullable','email','max:255'],
             'billing_phone' => ['nullable','string','max:255'],

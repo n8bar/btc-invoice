@@ -105,7 +105,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      7. [x] Branding & footer reset affordance: add a clear “Reset to my custom defaults” action near the top of the create/edit Branding & footer section so users can quickly revert per-invoice overrides back to Invoice Settings defaults.
      8. [x] Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. [x] Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
-     10. [ ] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
+     10. [x] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.

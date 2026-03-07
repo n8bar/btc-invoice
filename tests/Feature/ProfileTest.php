@@ -19,11 +19,16 @@ class ProfileTest extends TestCase
             ->get('/profile');
 
         $response->assertOk();
+        $response->assertDontSee('Show overpayment gratuity note to clients', false);
+        $response->assertDontSee('Show QR refresh reminder to clients', false);
     }
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'show_overpayment_gratuity_note' => false,
+            'show_qr_refresh_reminder' => false,
+        ]);
 
         $response = $this
             ->actingAs($user)
@@ -45,8 +50,8 @@ class ProfileTest extends TestCase
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
         $this->assertTrue($user->show_invoice_ids);
-        $this->assertTrue($user->show_overpayment_gratuity_note);
-        $this->assertTrue($user->show_qr_refresh_reminder);
+        $this->assertFalse($user->show_overpayment_gratuity_note);
+        $this->assertFalse($user->show_qr_refresh_reminder);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

@@ -22,6 +22,8 @@ class InvoiceSettingsRequest extends FormRequest
             'invoice_footer_note' => ['nullable','string','max:1000'],
             'invoice_default_description' => ['nullable','string','max:2000'],
             'invoice_default_terms_days' => ['nullable','integer','min:0','max:365'],
+            'show_overpayment_gratuity_note' => ['nullable','boolean'],
+            'show_qr_refresh_reminder' => ['nullable','boolean'],
         ];
     }
 }

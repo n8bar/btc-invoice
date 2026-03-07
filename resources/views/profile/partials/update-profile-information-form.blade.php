@@ -77,36 +77,6 @@
             </div>
         </div>
 
-        <div class="flex items-start gap-3">
-            <div>
-                <input id="show_overpayment_gratuity_note" type="checkbox" name="show_overpayment_gratuity_note" value="1"
-                       @checked(old('show_overpayment_gratuity_note', $user->show_overpayment_gratuity_note))
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            </div>
-            <div>
-                <x-input-label for="show_overpayment_gratuity_note" :value="__('Show overpayment gratuity note to clients')" />
-                <p class="text-sm text-gray-500">
-                    {{ __('Display the gratuity guidance note in invoice show/public/print views when overpayments are possible.') }}
-                </p>
-                <x-input-error class="mt-2" :messages="$errors->get('show_overpayment_gratuity_note')" />
-            </div>
-        </div>
-
-        <div class="flex items-start gap-3">
-            <div>
-                <input id="show_qr_refresh_reminder" type="checkbox" name="show_qr_refresh_reminder" value="1"
-                       @checked(old('show_qr_refresh_reminder', $user->show_qr_refresh_reminder))
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            </div>
-            <div>
-                <x-input-label for="show_qr_refresh_reminder" :value="__('Show QR refresh reminder to clients')" />
-                <p class="text-sm text-gray-500">
-                    {{ __('Display the QR staleness reminder near payment QR blocks in invoice show/public/print views.') }}
-                </p>
-                <x-input-error class="mt-2" :messages="$errors->get('show_qr_refresh_reminder')" />
-            </div>
-        </div>
-
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
