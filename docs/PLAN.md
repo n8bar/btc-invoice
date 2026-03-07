@@ -139,8 +139,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Sail-first quick start and contributor walkthrough docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](get-live/CONTRIBUTOR_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
     - Add any future contributor walkthrough polish (screenshots, new flows) in those docs and keep env references current.
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
+    - Pre-RC test-suite rationalization pass: comb through the full test suite and remove tests that are redundant, low-signal, ineffective, or obsolete while preserving meaningful behavioral coverage.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
-    - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
+    - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, pre-RC test-suite rationalization is complete, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
 17. **Mainnet Cutover Preparation**
     - Plan and execute the switch from testnet to mainnet once UX/mail audits are stable. Define env flips, wallet/xpub validation on mainnet, and a pilot send on mainnet before general availability.
     - Create a backout plan and audit steps to ensure existing testnet invoices remain intact or are clearly segregated.
