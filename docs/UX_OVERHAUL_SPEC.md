@@ -109,7 +109,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      11. [ ] Settings IA shell: add a unified Settings surface with tabs for `Profile`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
      12. [ ] Keep `Show invoice IDs in list` as a Profile preference (under `Settings > Profile`), not under invoice-specific settings.
      13. [ ] Move `Auto email paid receipts` from Profile into `Settings > Notifications` as outbound communication behavior.
-     14. [ ] Navigation cleanup: account/menu entry should route to the unified Settings surface (defaulting to `Profile`) so settings live in one IA.
+     14. [ ] Account-menu cleanup: collapse `Profile`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Profile`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
      1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
@@ -122,7 +122,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      9. [ ] Verify Settings shell exposes `Profile`, `Wallet`, `Invoices`, and `Notifications` tabs with stable navigation and active-state cues.
      10. [ ] Verify `Show invoice IDs in list` appears only in `Settings > Profile` and still controls invoice-list column visibility.
      11. [ ] Verify `Auto email paid receipts` appears in `Settings > Notifications`, persists correctly, and is absent from `Settings > Profile`.
-     12. [ ] Verify account/menu settings entry opens unified Settings (default `Profile`) rather than a separate standalone Profile destination.
+     12. [ ] Verify account menu contains only `Settings`, `Getting Started`, and `Logout`; `Settings` opens the unified Settings surface on the `Profile` tab.
 
 ## Definition of Done
 - All MS13 outputs above implemented or explicitly deferred with clear pointers.
