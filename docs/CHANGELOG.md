@@ -2,6 +2,7 @@
 
 | Date (America/Denver) | Change | Notes |
 |-----------------------|--------|-------|
+| 2026-03-07 | Task 13 Phase A/B cleanup: priorities moved to baseline and checked off | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 to move the quality-priorities line out of Phase B implementation into Phase A baseline Browser QA and mark it complete. Renumbered Phase B implementation items accordingly and synced `docs/PLAN.md` wording. |
 | 2026-03-06 | Task 13 spec corrected for communication-toggle IA placement | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 Phase C to include the correction implementation that relocates the overpayment gratuity and QR refresh reminder controls from Profile UI to Invoice Settings UI, then verifies the new placement in Browser QA. Synced `docs/PLAN.md` Task 13 bullets. |
 | 2026-03-06 | Task 13 spec cleanup: Phase A/B/C QA ordering + Footer note move scope | Updated `docs/UX_OVERHAUL_SPEC.md` Task 13 so paid-surface watermark/action verification is tracked in Phase C (post-implementation) instead of Phase A baseline, and added a new Phase B implementation item to move the owner invoice Footer note card to immediately before Payment Details. Synced `docs/PLAN.md` Task 13 bullets. |
 | 2026-03-06 | Task 13 scope adds TXID edit-field removal from owner UI | Updated `docs/UX_OVERHAUL_SPEC.md` and `docs/PLAN.md` Task 13 implementation scope to hide the editable invoice-level `TXID` field from invoice edit while retaining backend/internal compatibility for legacy/manual/recovery workflows. |
