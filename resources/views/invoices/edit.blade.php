@@ -4,10 +4,11 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+            @php $editLocked = (bool) $invoice->public_enabled; @endphp
 
-            @if($invoice->public_enabled)
+            @if($editLocked)
                 <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800" style="border-color: currentColor;">
-                    This invoice is currently public. To edit, first
+                    This invoice is currently public. To edit invoice details, first
                     <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
                           onsubmit="return confirm('Disable the public link?');">
                         @csrf @method('PATCH')
@@ -186,7 +187,15 @@
 
                 <div class="flex items-center justify-end gap-3">
                     <a href="{{ route('invoices.show', $invoice) }}" class="text-gray-600 hover:underline">Cancel</a>
-                    <x-primary-button>Save</x-primary-button>
+                    @if($editLocked)
+                        <p class="text-xs text-yellow-700">Disable public link above to enable saving.</p>
+                    @endif
+                    <x-primary-button
+                        :disabled="$editLocked"
+                        data-edit-save-button="true"
+                        data-edit-save-disabled="{{ $editLocked ? 'true' : 'false' }}">
+                        Save
+                    </x-primary-button>
                 </div>
             </form>
 

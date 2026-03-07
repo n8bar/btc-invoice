@@ -172,6 +172,43 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('href="' . route('invoices.show', $invoice) . '"', false);
     }
 
+    public function test_invoice_edit_disables_save_when_public_link_is_enabled(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-3002',
+            'description' => 'Public link lock',
+            'amount_usd' => 120,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.0024,
+            'payment_address' => 'tb1qq0example3002',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->forceFill([
+            'public_enabled' => true,
+            'public_token' => 'tok-edit-lock',
+            'public_expires_at' => now()->addDay(),
+        ])->save();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.edit', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('data-edit-save-button="true"', false);
+        $response->assertSee('data-edit-save-disabled', false);
+        $response->assertSee('Disable public link above to enable saving.', false);
+    }
+
     public function test_paid_invoice_cannot_be_reset_to_draft(): void
     {
         $owner = User::factory()->create();
