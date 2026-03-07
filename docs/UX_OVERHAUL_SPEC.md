@@ -106,7 +106,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      8. [x] Hide the editable invoice-level `TXID` field from owner invoice edit UI (keep backend/internal compatibility for legacy/manual/recovery workflows).
      9. [x] Move the owner invoice “Footer note” card so it renders immediately before “Payment Details” instead of near the top action/status area.
      10. [x] IA correction implementation: move the overpayment gratuity note toggle and QR refresh reminder toggle from Profile UI into Invoice Settings UI, keeping persistence/default behavior user-level for now.
-     11. [x] Settings IA shell: add a unified Settings surface with tabs for `Account`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell).
+     11. [x] Settings IA shell: add a unified Settings surface with tabs for `Account`, `Wallet`, `Invoices`, and `Notifications` (initial pass can reuse existing forms/routes behind the new tab shell), and keep the settings tab bar sticky so it remains visible while scrolling settings pages.
      12. [x] Keep `Show invoice IDs in list` as an Account preference (under `Settings > Account`), not under invoice-specific settings.
      13. [x] Move `Auto email paid receipts` from Account into `Settings > Notifications` as outbound communication behavior.
      14. [x] Account-menu cleanup: collapse `Account`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Account`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
@@ -119,7 +119,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      6. [ ] Verify Branding & footer reset-to-defaults control works on create/edit without breaking existing per-invoice override behavior.
      7. [ ] Verify the owner invoice Footer note now renders immediately above Payment Details and no longer appears in the top status/action area.
      8. [ ] Verify both communication toggles now live in Invoice Settings and are no longer shown on Profile.
-     9. [ ] Verify Settings shell exposes `Account`, `Wallet`, `Invoices`, and `Notifications` tabs with stable navigation and active-state cues.
+     9. [ ] Verify Settings shell exposes `Account`, `Wallet`, `Invoices`, and `Notifications` tabs with stable navigation/active-state cues and sticky persistence while scrolling.
      10. [ ] Verify `Show invoice IDs in list` appears only in `Settings > Account` and still controls invoice-list column visibility.
      11. [ ] Verify `Auto email paid receipts` appears in `Settings > Notifications`, persists correctly, and is absent from `Settings > Account`.
      12. [ ] Verify account menu contains only `Settings`, `Getting Started`, and `Logout`; `Settings` opens the unified Settings surface on the `Account` tab.
