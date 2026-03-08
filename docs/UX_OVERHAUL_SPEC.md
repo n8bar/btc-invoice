@@ -111,7 +111,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
      13. [x] Move `Auto email paid receipts` from Account into `Settings > Notifications` as outbound communication behavior.
      14. [x] Account-menu cleanup: collapse `Account`, `Wallet`, and `Invoice Settings` into one `Settings` entry (default tab: `Account`) so account menu items are only `Settings`, `Getting Started`, and `Logout`.
    - Phase C — Post-implementation Browser QA (acceptance + regression)
-     1. [ ] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
+     1. [x] Re-run Phase A checks and confirm intended behavior changes shipped without regressions.
      2. [ ] Verify invoice create now always starts as `draft` and no create-time status selector is shown.
      3. [ ] Verify client email is required in create/edit with clear validation copy and schema-backed enforcement.
      4. [ ] Verify paid invoice surfaces (owner show + owner print + public print) match scope: payment-action surfaces hidden where specified and `PAID` watermark behavior matches implementation.
