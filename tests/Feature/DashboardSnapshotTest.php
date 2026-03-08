@@ -339,6 +339,8 @@ class DashboardSnapshotTest extends TestCase
         $response->assertOk();
         $response->assertSee('href="' . route('settings.index') . '"', false);
         $response->assertSee('>Settings<', false);
+        $response->assertSee('>Getting started<', false);
+        $response->assertSeeText('Log Out');
         $response->assertDontSee('href="' . route('wallet.settings.edit') . '"', false);
         $response->assertDontSee('href="' . route('settings.invoice.edit') . '"', false);
         $response->assertDontSee('>Profile<', false);

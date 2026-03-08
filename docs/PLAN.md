@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-03-06_
+_Last updated: 2026-03-07_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -91,29 +91,12 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Legacy derivation mismatches corrected via `wallet:reassign-invoice-addresses` (supports `--include-paid --reset-payments --use-next-index`), moving all affected invoices to the proper external chain and advancing wallet indices.
     - Verified on 2025-12-06: invoices 7/8/10 (testnet, indices 11/12/13) derive correctly from the stored xpub; watcher sanity runs (`wallet:watch-payments --invoice=7,8,10`) processed paid/partial states without derivation issues.
     - Payment/confirmation behavior documented (USD canonical, per-payment rate locking, floating BTC outstanding) and outstanding sats now clamp to zero once USD is settled to avoid residual dust after adjustments.
+13. **UX Overhaul (main, completed 2026-03-07)**
+    - Scope and closure are captured in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md), including completed Task 13 Phase A/B/C Browser QA.
+    - Shipped outcomes include dashboard snapshot + theme, public Helpful Notes, wallet UX validation guidance, invoices/clients/public/share polish, onboarding flow, and unified Settings IA (`Account`, `Wallet`, `Invoice`, `Notifications`).
+    - Final closeout included invoice-settings finish-up deltas (draft-only create, client-email enforcement, paid watermark/action safety, footer-note placement, settings/menu IA cleanup) and human Browser QA sign-off.
 
 ## Roadmap: Milestones to Release Candidate
-13. **UX Overhaul**
-    - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
-    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for the guided onboarding flow.
-    - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) captures the shipped wallet UX scope.
-    - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
-    - [x] Dashboard snapshot and light/dark theme toggle.
-    - [x] Helpful Notes: public, context-linked explanations (`/help`, starting with xpub safety + why we ask; treat as an SEO surface and link it from landing).
-    - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
-    - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
-    - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-      - Verified in the UX overhaul spec checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
-    - [x] Guided onboarding wizard: wallet setup → create invoice → deliver.
-      - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
-      - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
-    - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
-    - [x] Communication-toggle rollout and settings/auth consistency pass.
-      - Canonical behavior and Browser QA closure are tracked in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
-    - [ ] Invoice settings and invoice UX finish-up from earlier UX deltas.
-      - Canonical scope, execution status, and Browser QA checklists live only in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
-    - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
-    - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
     - Source finding: [`docs/qa/Finding1.md`](qa/Finding1.md) documents the shared account xpub collision issue (new invoices falsely inheriting unrelated on-chain payments).
     - **Phase 14.1 — Wallet key lineage + derivation cursor safety (architecture prerequisite)**

@@ -1,5 +1,6 @@
 # Future Plan (Post-MVP)
 _Working list of initiatives queued after the MVP ships. Maintained alongside docs/PLAN.md._
+_Last synced with active PLAN: 2026-03-07 (MS13 moved to Completed Milestones; no post-MVP scope changes)._
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**

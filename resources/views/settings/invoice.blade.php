@@ -1,15 +1,18 @@
 <x-emoji-favicon symbol="🧾" bg="#E0F2FE" />
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Settings
-        </h2>
+        <div class="flex flex-col">
+            <h2 class="mb-4 text-xl font-semibold leading-tight text-gray-800">
+                Settings
+            </h2>
+            <div class="mt-8">
+                @include('settings.partials.tabs')
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            @include('settings.partials.tabs')
-
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
                 <div class="p-6">
                     @if (session('status') === 'invoice-settings-updated')

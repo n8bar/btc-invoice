@@ -19,6 +19,7 @@ class ProfileTest extends TestCase
             ->get('/profile');
 
         $response->assertOk();
+        $response->assertSee('name="show_invoice_ids"', false);
         $response->assertSee(route('settings.notifications.edit'), false);
         $response->assertDontSee('Auto email paid receipts', false);
         $response->assertDontSee('Show overpayment gratuity note to clients', false);

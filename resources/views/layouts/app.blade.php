@@ -6,6 +6,7 @@
     $providedTitle = trim((string) $attributes->get('title'));
     $pageTitle = $providedTitle !== '' ? $providedTitle : \App\Support\PageTitle::resolve(request());
     $documentTitle = $pageTitle !== '' ? $brand . ' - ' . $pageTitle : $brand;
+    $isSettingsShellRoute = request()->routeIs('profile.edit', 'settings.invoice.*', 'settings.notifications.*', 'wallet.settings.*');
 @endphp
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ $themePreference }}" class="{{ $isDark ? 'dark' : '' }}">
     <head>
@@ -25,8 +26,14 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-slate-100">
-        <div class="min-h-screen">
+    <body @class([
+        'font-sans antialiased bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-slate-100',
+        'h-screen overflow-hidden' => $isSettingsShellRoute,
+    ])>
+        <div @class([
+            'min-h-screen' => ! $isSettingsShellRoute,
+            'flex h-screen flex-col' => $isSettingsShellRoute,
+        ])>
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -39,7 +46,10 @@
             @endisset
 
             <!-- Page Content -->
-            <main class="px-1">
+            <main @class([
+                'px-1',
+                'min-h-0 flex-1 overflow-y-auto' => $isSettingsShellRoute,
+            ])>
                 {{ $slot }}
             </main>
         </div>

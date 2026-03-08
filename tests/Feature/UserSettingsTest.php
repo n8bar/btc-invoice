@@ -646,21 +646,65 @@ class UserSettingsTest extends TestCase
         $owner = User::factory()->create();
 
         $routes = [
-            route('profile.edit'),
-            route('wallet.settings.edit'),
-            route('settings.invoice.edit'),
-            route('settings.notifications.edit'),
+            [
+                'url' => route('profile.edit'),
+                'active' => route('profile.edit'),
+            ],
+            [
+                'url' => route('wallet.settings.edit'),
+                'active' => route('wallet.settings.edit'),
+            ],
+            [
+                'url' => route('settings.invoice.edit'),
+                'active' => route('settings.invoice.edit'),
+            ],
+            [
+                'url' => route('settings.notifications.edit'),
+                'active' => route('settings.notifications.edit'),
+            ],
         ];
 
-        foreach ($routes as $url) {
-            $response = $this->actingAs($owner)->get($url);
+        foreach ($routes as $tab) {
+            $response = $this->actingAs($owner)->get($tab['url']);
             $response->assertOk();
             $response->assertSee('Account', false);
             $response->assertSee(route('profile.edit'), false);
             $response->assertSee(route('wallet.settings.edit'), false);
             $response->assertSee(route('settings.invoice.edit'), false);
             $response->assertSee(route('settings.notifications.edit'), false);
+            $response->assertSee('h-screen overflow-hidden', false);
+            $response->assertSee('min-h-0 flex-1 overflow-y-auto', false);
+            $response->assertDontSee('sticky top-16', false);
+            $response->assertDontSee('sticky top-32', false);
+
+            $content = $response->getContent();
+            $this->assertIsString($content);
+            $this->assertMatchesRegularExpression(
+                '/<a href="' . preg_quote($tab['active'], '/') . '"[^>]*class="[^"]*border-indigo-400[^"]*"/',
+                $content
+            );
         }
+    }
+
+    public function test_show_invoice_ids_toggle_is_only_available_on_account_tab(): void
+    {
+        $owner = User::factory()->create();
+
+        $account = $this->actingAs($owner)->get(route('profile.edit'));
+        $account->assertOk();
+        $account->assertSee('name="show_invoice_ids"', false);
+
+        $wallet = $this->actingAs($owner)->get(route('wallet.settings.edit'));
+        $wallet->assertOk();
+        $wallet->assertDontSee('name="show_invoice_ids"', false);
+
+        $invoice = $this->actingAs($owner)->get(route('settings.invoice.edit'));
+        $invoice->assertOk();
+        $invoice->assertDontSee('name="show_invoice_ids"', false);
+
+        $notifications = $this->actingAs($owner)->get(route('settings.notifications.edit'));
+        $notifications->assertOk();
+        $notifications->assertDontSee('name="show_invoice_ids"', false);
     }
 
     public function test_user_cannot_delete_other_wallet_account(): void
