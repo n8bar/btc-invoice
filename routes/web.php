@@ -6,6 +6,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\WalletSettingsController;
 use App\Http\Controllers\InvoiceSettingsController;
+use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
@@ -54,11 +55,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('getting-started.step');
 
     // Breeze profile management
+    Route::redirect('/settings', '/profile')->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/settings/invoice', [InvoiceSettingsController::class, 'edit'])->name('settings.invoice.edit');
     Route::patch('/settings/invoice', [InvoiceSettingsController::class, 'update'])->name('settings.invoice.update');
+    Route::get('/settings/notifications', [NotificationSettingsController::class, 'edit'])->name('settings.notifications.edit');
+    Route::patch('/settings/notifications', [NotificationSettingsController::class, 'update'])->name('settings.notifications.update');
     Route::get('/wallet/settings', [WalletSettingsController::class, 'edit'])->name('wallet.settings.edit');
     Route::post('/wallet/settings', [WalletSettingsController::class, 'update'])->name('wallet.settings.update');
     Route::post('/wallet/settings/validate', [WalletSettingsController::class, 'validateKey'])

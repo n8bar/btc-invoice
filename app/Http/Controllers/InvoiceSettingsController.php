@@ -19,7 +19,11 @@ class InvoiceSettingsController extends Controller
 
     public function update(InvoiceSettingsRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated())->save();
+        $data = $request->validated();
+        $data['show_overpayment_gratuity_note'] = $request->boolean('show_overpayment_gratuity_note');
+        $data['show_qr_refresh_reminder'] = $request->boolean('show_qr_refresh_reminder');
+
+        $request->user()->fill($data)->save();
 
         return Redirect::route('settings.invoice.edit')->with('status', 'invoice-settings-updated');
     }

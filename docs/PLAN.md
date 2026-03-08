@@ -1,5 +1,5 @@
 # PROJECT PLAN — Bitcoin Invoice Generator
-_Last updated: 2026-03-05_
+_Last updated: 2026-03-06_
 
 > Maintained by Codex – this document is updated whenever PRs land or the delivery plan changes.
 
@@ -95,7 +95,7 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
 ## Roadmap: Milestones to Release Candidate
 13. **UX Overhaul**
     - Spec: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md) captures scope and Definition of Done.
-    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for UX Task 11.
+    - Onboarding wizard details: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md) is the working spec for the guided onboarding flow.
     - Wallet/Xpub UX details: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md) captures the shipped wallet UX scope.
     - UX guardrails: apply [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) across all UX work (Nielsen/WCAG + form/error/accessibility norms).
     - [x] Dashboard snapshot and light/dark theme toggle.
@@ -103,24 +103,15 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - [x] Wallet UX improvements (xpub guidance, network cues, validation helpers).
     - [x] Invoices & Clients UI polish across CRUD surfaces (show/edit, print/public/share, delivery/receipts, trash/restore); client detail can route to edit until a dedicated show view is needed.
     - [x] Public/share layout refresh to mirror updated show/print patterns; friendly disabled/expired states.
-      - Completed per the Task 10 checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
+      - Verified in the UX overhaul spec checklist in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md): shared print/public template rendering, explicit active vs disabled/expired public states, public-safe controls only, and narrower-screen public/share sanity verification.
     - [x] Guided onboarding wizard: wallet setup → create invoice → deliver.
       - Implemented per [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md): `/getting-started` step shells, dismiss/reopen, derived progress, contextual success redirects, and progress strips on wallet/invoice pages.
       - v1 auto-show scope is login redirect + dashboard/invoice empty-state/menu prompts (no global route interception middleware).
     - [x] Login entry now routes incomplete users into `/getting-started` (replacing the temporary `/wallet/settings` redirect bridge).
-    - [x] Task 12: Profile communication toggles + targeted settings/auth consistency pass.
-      - [x] Add per-user toggles (default on): overpayment gratuity note + QR refresh reminder.
-      - [x] Wire toggles into invoice show/public/print client-facing copy only; keep owner operational warnings visible.
-      - [x] Keep settings/auth pass implementation-light (Profile + Invoice Settings + Login/Logout consistency; no auth-flow redesign).
-    - [ ] Task 13: Invoice settings and invoice UX finish-up from Task12 deltas.
-      - Priorities: heading/footer/address microcopy clarity, focus/error parity, and save-state consistency.
-      - Preserve existing per-invoice override behavior; no structural redesign.
-      - Include invoice create simplification: remove create-time status selection and force all new invoices to start as `draft`; users can set another status after creation.
-      - Require client email for create/edit flows and harden schema by making `clients.email` non-null (include safe backfill/migration handling for existing null data).
-      - Expand paid-print state visibility: show a large translucent diagonal `PAID` watermark on paid owner prints as well as active public prints.
-      - Refine client-facing payment exception copy to use biller/brand identity (invoice billing name with fallback) instead of generic “invoice sender” wording.
-      - Remove payment-action surfaces on paid invoices across owner/client views: hide QR + BIP21/copy actions on owner show, owner print, and active public print to prevent accidental rescans/overpayments.
-      - Add a “Reset to my custom defaults” action near the top of create/edit `Branding & footer` sections so per-invoice overrides can be reverted to Invoice Settings defaults in one click.
+    - [x] Communication-toggle rollout and settings/auth consistency pass.
+      - Canonical behavior and Browser QA closure are tracked in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
+    - [ ] Invoice settings and invoice UX finish-up from earlier UX deltas.
+      - Canonical scope, execution status, and Browser QA checklists live only in [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
     - Deferred post-MVP: invoice/client list searching and filtering (tracked in [`docs/FuturePLAN.md`](FuturePLAN.md) Item 1).
     - Note: keep docs/quick start in sync after UX changes land.
 14. **On-Chain Payment Attribution Hardening**
@@ -148,8 +139,9 @@ A Laravel application for generating and sharing Bitcoin invoices. Users can man
     - Sail-first quick start and contributor walkthrough docs now live at [`docs/get-live/QUICK_START.md`](get-live/QUICK_START.md) and [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](get-live/CONTRIBUTOR_WALKTHROUGH.md) (clone → `./vendor/bin/sail up -d` → migrate/seed → wallet → invoice → deliver).
     - Add any future contributor walkthrough polish (screenshots, new flows) in those docs and keep env references current.
     - Align notifications with [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md): document which mails are live (paid, past-due, over/under), which are stubbed, and where they’re tested.
+    - Pre-RC test-suite rationalization pass: comb through the full test suite and remove tests that are redundant, low-signal, ineffective, or obsolete while preserving meaningful behavioral coverage.
     - Keep RC-scoped work in this PLAN; route anything deferred to [`docs/FuturePLAN.md`](FuturePLAN.md) with a brief pointer here.
-    - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
+    - Definition of Done: the quick start + contributor walkthrough docs exist and match current UX, notification coverage is documented and tested, pre-RC test-suite rationalization is complete, and PLAN/FuturePLAN reflect what’s in vs. out for RC.
 17. **Mainnet Cutover Preparation**
     - Plan and execute the switch from testnet to mainnet once UX/mail audits are stable. Define env flips, wallet/xpub validation on mainnet, and a pilot send on mainnet before general availability.
     - Create a backout plan and audit steps to ensure existing testnet invoices remain intact or are clearly segregated.

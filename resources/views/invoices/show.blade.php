@@ -170,19 +170,12 @@
                     <a href="{{ route('invoices.print', $invoice) }}"
                        target="_blank" rel="noopener"
                        class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                        Print
+                        🖨️ Print
                     </a>
 
                 </div>
 
             </div>
-
-            @if (!empty($billingDetails['footer_note']))
-                <div class="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-1">Footer note</h3>
-                    <p class="whitespace-pre-line">{{ $billingDetails['footer_note'] }}</p>
-                </div>
-            @endif
 
             <div class="rounded-lg border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 space-y-2" style="border-color: currentColor;">
                 @if ($showOverpaymentGratuityNote)
@@ -415,6 +408,13 @@
                     </div>
                 </div>
 
+                @if (!empty($billingDetails['footer_note']))
+                    <div class="p-6 border-t">
+                        <h3 class="mb-1 text-sm font-semibold text-gray-700">Footer note</h3>
+                        <p class="whitespace-pre-line text-sm text-gray-700">{{ $billingDetails['footer_note'] }}</p>
+                    </div>
+                @endif
+
                 <div class="p-6 border-t"> <!-- ---------------------------------------     Payment Details    ----------------------------------------------------- -->
                     <h3 class="mb-2 text-sm font-semibold text-gray-700">Payment Details</h3>
                     <dl class="space-y-2 text-sm">
@@ -422,8 +422,8 @@
                             <dt class="text-gray-600">BTC address</dt>
                             <dd class="font-mono flex items-center gap-2">
                                 <span>{{ $invoice->payment_address ?: '-' }}</span>
-                                @if ($invoice->payment_address)
-                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
+                                @if ($invoice->payment_address && $showSinglePaymentGuidance)
+                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">📋 Copy</x-secondary-button>
                                 @endif
                             </dd>
                         </div>
@@ -436,7 +436,7 @@
                             <dd class="font-mono flex items-center gap-2">
                                 @if ($invoice->txid)
                                     <span>{{ \Illuminate\Support\Str::limit($invoice->txid, 18, '…') }}</span>
-                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->txid }}">Copy</x-secondary-button>
+                                    <x-secondary-button type="button" data-copy-text="{{ $invoice->txid }}">📋 Copy</x-secondary-button>
                                 @else
                                     <span>-</span>
                                 @endif
@@ -490,14 +490,14 @@
 
                         @php $uri = $displayBitcoinUri; @endphp
 
-                        @if ($uri)
+                        @if ($uri && $showSinglePaymentGuidance)
                             <div class="flex justify-between">
                                 <dt class="text-gray-600">Bitcoin URI</dt>
                                 <dd class="font-mono flex items-center gap-2">
                                     <a href="{{ $uri }}" class="text-indigo-600 hover:underline">
                                         {{ \Illuminate\Support\Str::limit($uri, 48) }}
                                     </a>
-                                    <x-secondary-button type="button" data-copy-text="{{ $uri }}">Copy</x-secondary-button>
+                                    <x-secondary-button type="button" data-copy-text="{{ $uri }}">📋 Copy</x-secondary-button>
                                 </dd>
                             </div>
 
@@ -773,7 +773,7 @@
                     <div class="mt-3">
                         <div class="flex items-center gap-2">
                             <input type="text" readonly class="w-full rounded-md border-gray-300" value="{{ $invoice->public_url }}">
-                            <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">Copy</x-secondary-button>
+                            <x-secondary-button type="button" data-copy-text="{{ $invoice->public_url }}">📋 Copy</x-secondary-button>
                             <a href="{{ $invoice->public_url }}" target="_blank" rel="noopener"
                                class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
                                 Open

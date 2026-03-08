@@ -15,10 +15,13 @@
 </div>
 
 <div>
-    <label class="block text-sm font-medium text-gray-700">Email</label>
+    <label class="block text-sm font-medium text-gray-700">
+        Email <span class="text-red-600" aria-hidden="true">*</span>
+    </label>
     <input type="email"
            name="email"
            value="{{ old('email', $client->email ?? '') }}"
+           required
            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
     @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
 </div>

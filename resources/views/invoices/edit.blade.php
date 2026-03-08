@@ -4,10 +4,11 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+            @php $editLocked = (bool) $invoice->public_enabled; @endphp
 
-            @if($invoice->public_enabled)
+            @if($editLocked)
                 <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800" style="border-color: currentColor;">
-                    This invoice is currently public. To edit, first
+                    This invoice is currently public. To edit invoice details, first
                     <form action="{{ route('invoices.share.disable', $invoice) }}" method="POST" class="inline"
                           onsubmit="return confirm('Disable the public link?');">
                         @csrf @method('PATCH')
@@ -104,6 +105,11 @@
                         <span>Branding &amp; footer</span>
                         <span class="text-xs font-normal text-gray-500">Leave fields blank to use profile defaults.</span>
                     </summary>
+                    <div class="mt-3 flex justify-end">
+                        <x-secondary-button type="button" data-reset-branding-defaults>
+                            Reset to my custom defaults
+                        </x-secondary-button>
+                    </div>
                     <div class="mt-4 space-y-4">
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -111,7 +117,8 @@
                                 <x-text-input id="branding_heading_override" name="branding_heading_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('branding_heading_override', $invoice->branding_heading_override)"
-                                              placeholder="{{ $brand['heading'] ?? 'CryptoZing Invoice' }}" />
+                                              data-branding-override-field="true"
+                                              placeholder="{{ $brand['heading'] ?? 'Invoice' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('branding_heading_override')" />
                             </div>
                             <div>
@@ -119,7 +126,8 @@
                                 <x-text-input id="billing_name_override" name="billing_name_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_name_override', $invoice->billing_name_override)"
-                                              placeholder="{{ $brand['name'] }}" />
+                                              data-branding-override-field="true"
+                                              placeholder="{{ $brand['name'] ?? 'Biller name' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_name_override')" />
                             </div>
                             <div>
@@ -127,7 +135,8 @@
                                 <x-text-input id="billing_email_override" name="billing_email_override" type="email"
                                               class="mt-1 block w-full"
                                               :value="old('billing_email_override', $invoice->billing_email_override)"
-                                              placeholder="{{ $brand['email'] }}" />
+                                              data-branding-override-field="true"
+                                              placeholder="{{ $brand['email'] ?? 'name@example.com' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_email_override')" />
                             </div>
                             <div>
@@ -135,22 +144,25 @@
                                 <x-text-input id="billing_phone_override" name="billing_phone_override" type="text"
                                               class="mt-1 block w-full"
                                               :value="old('billing_phone_override', $invoice->billing_phone_override)"
-                                              placeholder="{{ $brand['phone'] }}" />
+                                              data-branding-override-field="true"
+                                              placeholder="{{ $brand['phone'] ?? '(555) 123-4567' }}" />
                                 <x-input-error class="mt-2" :messages="$errors->get('billing_phone_override')" />
                             </div>
                         </div>
                         <div>
                             <x-input-label for="billing_address_override" :value="__('Biller address')" />
                             <textarea id="billing_address_override" name="billing_address_override" rows="3"
+                                      data-branding-override-field="true"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                      placeholder="{{ $brand['address'] }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
+                                      placeholder="{{ $brand['address'] ?? '123 Main St, Suite 100, Denver, CO 80202' }}">{{ old('billing_address_override', $invoice->billing_address_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('billing_address_override')" />
                         </div>
                         <div>
                             <x-input-label for="invoice_footer_note_override" :value="__('Footer note (public & print)')" />
                             <textarea id="invoice_footer_note_override" name="invoice_footer_note_override" rows="2"
+                                      data-branding-override-field="true"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                      placeholder="{{ $brand['footer_note'] }}">{{ old('invoice_footer_note_override', $invoice->invoice_footer_note_override) }}</textarea>
+                                      placeholder="{{ $brand['footer_note'] ?? 'We appreciate your business.' }}">{{ old('invoice_footer_note_override', $invoice->invoice_footer_note_override) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note_override')" />
                         </div>
                     </div>
@@ -158,13 +170,15 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">BTC address</label>
-                        <div class="mt-1 flex items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm text-gray-800">
-                            <span>{{ $invoice->payment_address ?: '—' }}</span>
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-gray-700">BTC address</label>
                             @if ($invoice->payment_address)
-                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">Copy</x-secondary-button>
+                                <x-secondary-button type="button" data-copy-text="{{ $invoice->payment_address }}">📋 Copy</x-secondary-button>
                             @endif
                         </div>
+                        <textarea rows="3" readonly aria-label="BTC address"
+                                  class="mt-1 block w-full rounded-md border-gray-300 bg-transparent font-mono text-sm text-gray-800 shadow-sm break-all"
+                                  style="overflow-wrap:anywhere; word-break:break-all;">{{ $invoice->payment_address ?: '—' }}</textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -177,16 +191,30 @@
                     </div>
                 </div>
 
+                {{--
+                Legacy invoice-level TXID input kept here for quick restore, but hidden from owner edit UX.
                 <div>
                     <label class="block text-sm font-medium text-gray-700">TXID (optional)</label>
                     <input name="txid" value="{{ old('txid',$invoice->txid) }}"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"/>
                     @error('txid')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
+                --}}
 
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('invoices.show', $invoice) }}" class="text-gray-600 hover:underline">Cancel</a>
-                    <x-primary-button>Save</x-primary-button>
+                    <a href="{{ route('invoices.show', $invoice) }}"
+                       class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </a>
+                    <x-primary-button
+                        :disabled="$editLocked"
+                        data-edit-save-button="true"
+                        data-edit-save-disabled="{{ $editLocked ? 'true' : 'false' }}">
+                        Save
+                    </x-primary-button>
+                    @if($editLocked)
+                        <p class="text-xs text-yellow-700">Disable public link above to enable saving.</p>
+                    @endif
                 </div>
             </form>
 
@@ -206,6 +234,15 @@
 
     <script>
         (function(){
+            document.querySelectorAll('[data-reset-branding-defaults]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const panel = button.closest('details');
+                    panel?.querySelectorAll('[data-branding-override-field]').forEach((field) => {
+                        field.value = '';
+                    });
+                });
+            });
+
             const btn = document.getElementById('useCurrentRate');
             const rateInput = document.getElementById('btc_rate');
             const usdInput  = document.getElementById('amount_usd');

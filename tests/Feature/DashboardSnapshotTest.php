@@ -327,6 +327,23 @@ class DashboardSnapshotTest extends TestCase
         $response->assertDontSee('data-getting-started-reopen-message=', false);
     }
 
+    public function test_account_menu_collapses_to_settings_getting_started_and_logout(): void
+    {
+        $owner = User::factory()->create([
+            'getting_started_completed_at' => null,
+            'getting_started_dismissed' => false,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('href="' . route('settings.index') . '"', false);
+        $response->assertSee('>Settings<', false);
+        $response->assertDontSee('href="' . route('wallet.settings.edit') . '"', false);
+        $response->assertDontSee('href="' . route('settings.invoice.edit') . '"', false);
+        $response->assertDontSee('>Profile<', false);
+    }
+
     private int $invoiceSequence = 0;
 
     private function makeClient(User $owner, string $name = 'Client'): Client

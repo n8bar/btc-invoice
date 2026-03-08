@@ -2,12 +2,14 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            Invoice Settings
+            Settings
         </h2>
     </x-slot>
 
     <div class="py-8">
-        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            @include('settings.partials.tabs')
+
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
                 <div class="p-6">
                     @if (session('status') === 'invoice-settings-updated')
@@ -62,7 +64,7 @@
                                 <x-input-label for="invoice_footer_note" :value="__('Invoice footer note')" />
                                 <textarea id="invoice_footer_note" name="invoice_footer_note" rows="2"
                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                          placeholder="Net 7 · Send BTC only to the address above">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
+                                          placeholder="We appreciate your business.">{{ old('invoice_footer_note', $user->invoice_footer_note) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_footer_note')" />
                             </div>
                         </div>
@@ -76,7 +78,7 @@
                                 <x-input-label for="invoice_default_description" :value="__('Default memo / description')" />
                                 <textarea id="invoice_default_description" name="invoice_default_description" rows="3"
                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                          placeholder="Weekly retainer for CryptoZing">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
+                                          placeholder="Weekly retainer for consulting services">{{ old('invoice_default_description', $user->invoice_default_description) }}</textarea>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_default_description')" />
                             </div>
                             <div>
@@ -86,6 +88,41 @@
                                               :value="old('invoice_default_terms_days', $user->invoice_default_terms_days)" />
                                 <p class="mt-1 text-xs text-gray-500">Set how many days after the invoice date the due date should default to. Leave blank to pick dates manually.</p>
                                 <x-input-error class="mt-2" :messages="$errors->get('invoice_default_terms_days')" />
+                            </div>
+                        </div>
+
+                        <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-700">Client-facing payment notes</h3>
+                            <p class="text-xs text-gray-600">
+                                Control the optional payment-note copy shown to clients in invoice show/public/print surfaces.
+                            </p>
+                            <div class="flex items-start gap-3">
+                                <div>
+                                    <input id="show_overpayment_gratuity_note" type="checkbox" name="show_overpayment_gratuity_note" value="1"
+                                           @checked(old('show_overpayment_gratuity_note', $user->show_overpayment_gratuity_note))
+                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <x-input-label for="show_overpayment_gratuity_note" :value="__('Show overpayment gratuity note to clients')" />
+                                    <p class="text-sm text-gray-500">
+                                        {{ __('Display the gratuity guidance note when invoices appear overpaid.') }}
+                                    </p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('show_overpayment_gratuity_note')" />
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div>
+                                    <input id="show_qr_refresh_reminder" type="checkbox" name="show_qr_refresh_reminder" value="1"
+                                           @checked(old('show_qr_refresh_reminder', $user->show_qr_refresh_reminder))
+                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <x-input-label for="show_qr_refresh_reminder" :value="__('Show QR refresh reminder to clients')" />
+                                    <p class="text-sm text-gray-500">
+                                        {{ __('Display the QR staleness reminder near payment QR blocks.') }}
+                                    </p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('show_qr_refresh_reminder')" />
+                                </div>
                             </div>
                         </div>
 

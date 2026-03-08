@@ -76,6 +76,9 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Send one payment (if possible):', false);
         $response->assertDontSee('Tip: remind the client to send the full balance in a single Bitcoin transaction if possible when you share this link.', false);
+        $response->assertDontSee('Payment QR', false);
+        $response->assertDontSee('Bitcoin URI', false);
+        $response->assertDontSee('data-copy-text="' . e($invoice->payment_address) . '"', false);
     }
 
     public function test_print_view_contains_qr_and_wallet_prompt(): void
@@ -102,6 +105,23 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Scan with any Bitcoin wallet.', false);
         $response->assertSee('Paid amount (BTC)', false);
         $response->assertSee('0.01234567', false);
+    }
+
+    public function test_paid_owner_print_shows_watermark_and_hides_payment_qr(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+            'paid_at' => Carbon::now(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.print', $invoice));
+
+        $response->assertOk();
+        $response->assertSee('class="paid-watermark"', false);
+        $response->assertDontSee('Payment QR', false);
     }
 
     public function test_print_view_uses_billing_overrides_and_footer_note(): void
@@ -134,7 +154,9 @@ class InvoicePaymentDisplayTest extends TestCase
 
     public function test_print_view_displays_client_overpayment_alert_when_above_threshold(): void
     {
-        $owner = User::factory()->create();
+        $owner = User::factory()->create([
+            'billing_name' => 'CryptoZing',
+        ]);
         $invoice = $this->makeInvoice($owner, [
             'amount_usd' => 100,
             'btc_rate' => 50_000,
@@ -162,7 +184,8 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertSee('overpaid by approximately', false);
         $response->assertSee('Overpayments are treated as gratuities by default', false);
-        $response->assertSee('contact the invoice sender to request a refund or credit', false);
+        $response->assertSee('contact CryptoZing to request a refund or credit', false);
+        $response->assertDontSee('invoice sender', false);
         $response->assertDontSee('your client', false);
     }
 
@@ -268,7 +291,9 @@ class InvoicePaymentDisplayTest extends TestCase
 
     public function test_print_view_displays_client_underpayment_alert_when_above_threshold(): void
     {
-        $owner = User::factory()->create();
+        $owner = User::factory()->create([
+            'billing_name' => 'CryptoZing',
+        ]);
         $invoice = $this->makeInvoice($owner, [
             'amount_usd' => 200,
             'btc_rate' => 40_000,
@@ -295,6 +320,8 @@ class InvoicePaymentDisplayTest extends TestCase
             ->get(route('invoices.print', $invoice->fresh('payments')));
 
         $response->assertSee('An outstanding balance of roughly', false);
+        $response->assertSee('contact CryptoZing for assistance.', false);
+        $response->assertDontSee('invoice sender', false);
     }
 
     public function test_payment_metadata_fields_render_when_present(): void
@@ -348,6 +375,7 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('CryptoZing Invoice', false);
         $response->assertSee('Custom Studio', false);
         $response->assertSee('Send BTC only to this address.', false);
+        $response->assertSeeInOrder(['Footer note', 'Send BTC only to this address.', 'Payment Details'], false);
     }
 
     public function test_draft_with_on_chain_payments_shows_warning_with_mark_sent_link(): void

@@ -1,7 +1,7 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+            {{ __('Account Information') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
@@ -59,51 +59,6 @@
                     {{ __('Display the internal invoice ID as the first column on the invoice list.') }}
                 </p>
                 <x-input-error class="mt-2" :messages="$errors->get('show_invoice_ids')" />
-            </div>
-        </div>
-
-        <div class="flex items-start gap-3">
-            <div>
-                <input id="auto_receipt_emails" type="checkbox" name="auto_receipt_emails" value="1"
-                       @checked(old('auto_receipt_emails', $user->auto_receipt_emails))
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            </div>
-            <div>
-                <x-input-label for="auto_receipt_emails" :value="__('Auto email paid receipts')" />
-                <p class="text-sm text-gray-500">
-                    {{ __('When invoices are marked paid, automatically send a receipt to the client email.') }}
-                </p>
-                <x-input-error class="mt-2" :messages="$errors->get('auto_receipt_emails')" />
-            </div>
-        </div>
-
-        <div class="flex items-start gap-3">
-            <div>
-                <input id="show_overpayment_gratuity_note" type="checkbox" name="show_overpayment_gratuity_note" value="1"
-                       @checked(old('show_overpayment_gratuity_note', $user->show_overpayment_gratuity_note))
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            </div>
-            <div>
-                <x-input-label for="show_overpayment_gratuity_note" :value="__('Show overpayment gratuity note to clients')" />
-                <p class="text-sm text-gray-500">
-                    {{ __('Display the gratuity guidance note in invoice show/public/print views when overpayments are possible.') }}
-                </p>
-                <x-input-error class="mt-2" :messages="$errors->get('show_overpayment_gratuity_note')" />
-            </div>
-        </div>
-
-        <div class="flex items-start gap-3">
-            <div>
-                <input id="show_qr_refresh_reminder" type="checkbox" name="show_qr_refresh_reminder" value="1"
-                       @checked(old('show_qr_refresh_reminder', $user->show_qr_refresh_reminder))
-                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            </div>
-            <div>
-                <x-input-label for="show_qr_refresh_reminder" :value="__('Show QR refresh reminder to clients')" />
-                <p class="text-sm text-gray-500">
-                    {{ __('Display the QR staleness reminder near payment QR blocks in invoice show/public/print views.') }}
-                </p>
-                <x-input-error class="mt-2" :messages="$errors->get('show_qr_refresh_reminder')" />
             </div>
         </div>
 

@@ -67,6 +67,41 @@ class UserSettingsTest extends TestCase
         $this->assertSame('2025-01-11', Carbon::parse($invoice->due_date)->toDateString());
     }
 
+    public function test_invoice_store_forces_new_invoices_to_draft(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-FORCE-DRAFT',
+                'description' => 'Should still save as draft',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'status' => 'sent',
+                'invoice_date' => '2025-01-01',
+            ])
+            ->assertRedirect(route('invoices.index'));
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+        $this->assertSame('draft', $invoice->status);
+    }
+
     public function test_invoice_create_prefills_defaults(): void
     {
         $owner = User::factory()->create([
@@ -88,6 +123,25 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Consulting retainer', false);
         $expectedDue = now()->addDays(7)->toDateString();
         $response->assertSee('value="' . $expectedDue . '"', false);
+    }
+
+    public function test_invoice_create_hides_status_selector(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertDontSee('name="status"', false);
+        $response->assertSee('Reset to my custom defaults', false);
     }
 
     public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void
@@ -517,7 +571,10 @@ class UserSettingsTest extends TestCase
 
     public function test_user_can_update_invoice_settings_page(): void
     {
-        $owner = User::factory()->create();
+        $owner = User::factory()->create([
+            'show_overpayment_gratuity_note' => true,
+            'show_qr_refresh_reminder' => true,
+        ]);
 
         $this
             ->actingAs($owner)
@@ -527,6 +584,8 @@ class UserSettingsTest extends TestCase
                 'billing_email' => 'billing@cryptozing.app',
                 'invoice_default_description' => 'Weekly retainer',
                 'invoice_default_terms_days' => 14,
+                'show_overpayment_gratuity_note' => false,
+                'show_qr_refresh_reminder' => false,
             ])
             ->assertRedirect(route('settings.invoice.edit'));
 
@@ -534,6 +593,74 @@ class UserSettingsTest extends TestCase
         $this->assertSame('Weekly retainer', $owner->invoice_default_description);
         $this->assertSame(14, $owner->invoice_default_terms_days);
         $this->assertSame('CryptoZing Invoice', $owner->branding_heading);
+        $this->assertFalse($owner->show_overpayment_gratuity_note);
+        $this->assertFalse($owner->show_qr_refresh_reminder);
+    }
+
+    public function test_invoice_settings_page_shows_client_facing_payment_note_toggles(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('settings.invoice.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Client-facing payment notes', false);
+        $response->assertSee('name="show_overpayment_gratuity_note"', false);
+        $response->assertSee('name="show_qr_refresh_reminder"', false);
+    }
+
+    public function test_user_can_update_notification_settings_page(): void
+    {
+        $owner = User::factory()->create([
+            'auto_receipt_emails' => true,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('settings.notifications.update'), [
+                'auto_receipt_emails' => false,
+            ])
+            ->assertRedirect(route('settings.notifications.edit'));
+
+        $owner->refresh();
+        $this->assertFalse($owner->auto_receipt_emails);
+    }
+
+    public function test_notification_settings_page_shows_auto_receipt_toggle(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('settings.notifications.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Receipts', false);
+        $response->assertSee('name="auto_receipt_emails"', false);
+    }
+
+    public function test_settings_tabs_render_on_all_settings_pages(): void
+    {
+        $owner = User::factory()->create();
+
+        $routes = [
+            route('profile.edit'),
+            route('wallet.settings.edit'),
+            route('settings.invoice.edit'),
+            route('settings.notifications.edit'),
+        ];
+
+        foreach ($routes as $url) {
+            $response = $this->actingAs($owner)->get($url);
+            $response->assertOk();
+            $response->assertSee('Account', false);
+            $response->assertSee(route('profile.edit'), false);
+            $response->assertSee(route('wallet.settings.edit'), false);
+            $response->assertSee(route('settings.invoice.edit'), false);
+            $response->assertSee(route('settings.notifications.edit'), false);
+        }
     }
 
     public function test_user_cannot_delete_other_wallet_account(): void
