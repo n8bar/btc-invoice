@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ClientShowRedirectTest extends TestCase
@@ -107,7 +109,9 @@ class ClientShowRedirectTest extends TestCase
             ]);
 
         $response->assertRedirect(route('clients.index'));
-        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors([
+            'email' => 'The email field is required.',
+        ]);
         $this->assertDatabaseMissing('clients', [
             'user_id' => $owner->id,
             'name' => 'Acme Co',
@@ -133,6 +137,24 @@ class ClientShowRedirectTest extends TestCase
             ]);
 
         $response->assertRedirect(route('clients.edit', $client));
-        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors([
+            'email' => 'The email field is required.',
+        ]);
+    }
+
+    public function test_client_email_is_non_nullable_at_schema_level(): void
+    {
+        $owner = User::factory()->create();
+
+        $this->expectException(QueryException::class);
+
+        DB::table('clients')->insert([
+            'user_id' => $owner->id,
+            'name' => 'Schema Check Co',
+            'email' => null,
+            'notes' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

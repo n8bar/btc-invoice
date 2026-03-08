@@ -11,7 +11,7 @@
             'active' => request()->routeIs('wallet.settings.*'),
         ],
         [
-            'label' => 'Invoices',
+            'label' => 'Invoice',
             'href' => route('settings.invoice.edit'),
             'active' => request()->routeIs('settings.invoice.*'),
         ],
@@ -23,7 +23,7 @@
     ];
 @endphp
 
-<nav class="sticky top-16 z-20 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90" aria-label="Settings">
+<nav class="border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90" aria-label="Settings">
     <ul class="-mb-px flex flex-wrap gap-x-4 gap-y-2">
         @foreach ($tabs as $tab)
             <li>

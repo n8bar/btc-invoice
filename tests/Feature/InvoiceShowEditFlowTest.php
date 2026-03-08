@@ -28,6 +28,51 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('overflow-x-auto', false);
     }
 
+    public function test_profile_invoice_id_preference_controls_invoice_index_id_column_visibility(): void
+    {
+        $owner = User::factory()->create(['show_invoice_ids' => false]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-ID-COL',
+            'description' => 'ID column visibility test',
+            'amount_usd' => 150,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.003,
+            'payment_address' => 'tb1qq0exampleidcol',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.index'))
+            ->assertOk()
+            ->assertDontSee('md:table-cell">ID</th>', false);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('profile.update'), [
+                'name' => $owner->name,
+                'email' => $owner->email,
+                'show_invoice_ids' => true,
+            ])
+            ->assertRedirect('/profile');
+
+        $this
+            ->actingAs($owner->fresh())
+            ->get(route('invoices.index'))
+            ->assertOk()
+            ->assertSee('md:table-cell">ID</th>', false)
+            ->assertSee('md:table-cell">' . $invoice->id . '</td>', false);
+    }
+
     public function test_invoice_update_redirects_back_to_show_with_status_flash(): void
     {
         $owner = User::factory()->create();
@@ -104,6 +149,9 @@ class InvoiceShowEditFlowTest extends TestCase
             ->get(route('invoices.show', $invoice));
 
         $response->assertOk();
+        $response->assertSee('sticky top-16', false);
+        $response->assertSeeInOrder(['Need to update invoice details?', 'Summary'], false);
+        $response->assertSee('>edit<', false);
         $response->assertSee(route('invoices.edit', $invoice), false);
         $response->assertSee(route('invoices.destroy', $invoice), false);
         $response->assertSee('Delete', false);
@@ -208,6 +256,72 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('data-edit-save-button="true"', false);
         $response->assertSee('data-edit-save-disabled', false);
         $response->assertSee('Disable public link above to enable saving.', false);
+    }
+
+    public function test_invoice_update_can_clear_branding_overrides_to_use_profile_defaults(): void
+    {
+        $owner = User::factory()->create([
+            'branding_heading' => 'Default Invoice Heading',
+            'billing_name' => 'Default Biller LLC',
+            'invoice_footer_note' => 'Default footer note.',
+        ]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RESET-DEFAULTS',
+            'description' => 'Override reset behavior',
+            'amount_usd' => 210,
+            'btc_rate' => 42_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampleresetdefaults',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+            'branding_heading_override' => 'Custom Heading',
+            'billing_name_override' => 'Custom Biller',
+            'invoice_footer_note_override' => 'Custom footer note.',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->put(route('invoices.update', $invoice), [
+                'client_id' => $client->id,
+                'number' => 'INV-RESET-DEFAULTS',
+                'description' => 'Override reset behavior',
+                'amount_usd' => 210,
+                'btc_rate' => 42_000,
+                'amount_btc' => 0.005,
+                'status' => 'draft',
+                'invoice_date' => now()->toDateString(),
+                'txid' => null,
+                'branding_heading_override' => '',
+                'billing_name_override' => '',
+                'invoice_footer_note_override' => '',
+            ]);
+
+        $response->assertRedirect(route('invoices.show', $invoice));
+
+        $invoice->refresh();
+        $this->assertNull($invoice->branding_heading_override);
+        $this->assertNull($invoice->billing_name_override);
+        $this->assertNull($invoice->invoice_footer_note_override);
+
+        $show = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice));
+
+        $show->assertOk();
+        $show->assertSee('Default Invoice Heading', false);
+        $show->assertSee('Default Biller LLC', false);
+        $show->assertSee('Default footer note.', false);
+        $show->assertDontSee('Custom Heading', false);
+        $show->assertDontSee('Custom Biller', false);
+        $show->assertDontSee('Custom footer note.', false);
     }
 
     public function test_paid_invoice_cannot_be_reset_to_draft(): void

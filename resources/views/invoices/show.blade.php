@@ -106,7 +106,7 @@
                 </div>
             @endif
 
-            <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90">
                 <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:underline">← Back to Invoices</a>
                 @php
                     $st = $invoice->status ?? 'draft';
@@ -205,6 +205,9 @@
             </div>
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
+                <div class="border-b border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-indigo-900" style="border-color: currentColor;">
+                    Need to update invoice details? <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold underline hover:text-indigo-700">edit</a> this invoice.
+                </div>
                 <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
                     <div class="p-6 border-b md:border-b-0 md:border-r">
                         <h3 class="mb-3 text-sm font-semibold text-gray-700">Summary</h3>
