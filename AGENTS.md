@@ -2,8 +2,11 @@
 
 ## Working Style
 - Always run artisan/composer/npm commands through Sail (`./vendor/bin/sail ...`).
-- Keep `docs/PLAN.md` and `docs/FuturePLAN.md` in sync with every merge or scope change.
-- Keep `docs/CHANGELOG.md` updated alongside PLAN when scope/decisions shift.
+- Keep canonical docs in sync with every merge or scope change:
+  - `docs/ROADMAP.md` for RC milestone order/status/dependencies
+  - `docs/PRODUCT_SPEC.md` for global product behavior and invariants
+  - `docs/BACKLOG.md` for post-MVP and deferred work only
+- Keep `docs/CHANGELOG.md` updated alongside canonical docs when scope or doc structure shifts.
 - Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
@@ -11,13 +14,15 @@
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
-- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like specs/`docs/PLAN.md`/`docs/CHANGELOG.md`; they may be deleted after implementation if they’re no longer useful.
+- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like specs/`docs/ROADMAP.md`/`docs/PRODUCT_SPEC.md`/`docs/BACKLOG.md`/`docs/CHANGELOG.md`; they may be deleted after implementation if they’re no longer useful.
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
 - Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
+- GitHub `main` is canonical and protected. New work branches follow `codex/<task>`, and existing PRs must be updated via their original source branch rather than alternate branches.
+- PRs are gated by GitHub Actions `PR Tests`; keep branches current with `origin/main` before requesting review.
 
 ## Multi-Agent Coordination
 - Primary and secondary agents are role-based, not capability-limited: secondaries can work docs, code, tests, or modules within their stated task.

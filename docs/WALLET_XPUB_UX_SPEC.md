@@ -26,7 +26,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - None.
 
 ## Deferred (post-RC)
-- Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/FuturePLAN.md`.
+- Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.
 
 ## UI & Interaction
 - Layout: keep the primary wallet form above the fold on laptop screens; reserve space under the field for helper/validation so the layout does not shift.
