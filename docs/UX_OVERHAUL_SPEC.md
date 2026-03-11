@@ -44,7 +44,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Structured page for growth with Wallet & Security, Invoices, Payments, and Privacy categories.
    - Context link added on Wallet Settings (xpub guidance) that deep-links into `/help#import-wallet-key` and shows a “Back to Wallet Settings” affordance when linked from that screen.
    - SEO note: keep titles/descriptions/copy/heading structure polished over time; `/help?from=…` should canonicalize to `/help` to avoid duplicate indexing.
-   - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/FuturePLAN.md`.
+   - Post-MVP: a CMS-style, non-dev editable Help Center is tracked in `docs/BACKLOG.md`.
 7. Wallet UX improvements
    - Wallet settings now include inline guidance and derive validation preview; additional wallets UI is deferred to post-RC.
 8. Login redirect to wallet setup (interim bridge)

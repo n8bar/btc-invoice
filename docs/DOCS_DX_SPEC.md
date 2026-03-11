@@ -6,7 +6,7 @@ Item 12 clarification for Release Candidate: what we will ship for developer doc
 - `docs/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
 - `docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`: end-to-end contributor walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
 - `docs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
-- `README.md` and `docs/PLAN.md` updated to link the above and keep RC scope vs. FuturePLAN clear.
+- `README.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, and `docs/BACKLOG.md` updated to link the above and keep RC scope separate from post-MVP backlog.
 
 ## Quick Start + Env Var Reference
 Audience: new contributors running the stack locally with Sail.
@@ -27,9 +27,9 @@ Goal: show the first successful invoice lifecycle with minimal branching.
 ## Notification Coverage (tie-in to `docs/NOTIFICATIONS.md`)
 - Add a matrix with columns: Audience, Trigger, Mailable/Job, Status (`live` / `stubbed` / `planned`), Tests (Feature test names/paths), Delivery log type(s).
 - Must cover: paid notices (owner + client receipt), past-due (owner + client), overpayment alert (client + optional owner), underpayment alert (client + owner notice).
-- Note any gaps and whether they are deferred to FuturePLAN; align copy guidelines with the spec.
+- Note any gaps and whether they are deferred to `docs/BACKLOG.md`; align copy guidelines with the spec.
 
 ## Definition of Done
 - Quick start and contributor walkthrough docs exist, are linked from README and PLAN, and match current UX/commands.
 - Notification coverage is documented with live vs. stub status and test pointers in `docs/NOTIFICATIONS.md`.
-- PLAN keeps RC scope for docs/DX; anything deferred is explicitly routed to `docs/FuturePLAN.md`.
+- `docs/ROADMAP.md` keeps RC scope for Docs & DX; anything deferred is explicitly routed to `docs/BACKLOG.md`.

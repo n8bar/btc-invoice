@@ -1,4 +1,11 @@
-# Partial Payments Spec
+# Partial Payments, Confirmations & Adjustment Spec
+
+This doc is canonical for:
+- the payment ledger
+- outstanding-balance math
+- confirmation-gated status behavior
+- RBF and dropped-transaction cleanup
+- manual adjustments and over/underpayment handling
 
 ## Goals
 - Record every on-chain payment that hits an invoice address, even if the amount is below the invoice total.
@@ -35,6 +42,28 @@
         - `draft` stays draft if we really want to block payments until “sent” — TBD.
     4. `paid_at` stays the first confirmed timestamp once confirmed USD crosses expected; confirmation timestamps update when block data arrives.
 - Handle multiple payments per tx/address pair gracefully (e.g., same tx sends two outputs to us) by summing `sats_received`.
+
+## Confirmation and RBF Safety
+### Status Flow
+- `sent`: no payments detected.
+- `pending`: unconfirmed payments detected; awaiting confirmations.
+- `partial`: confirmed payments received but confirmed USD remains below expected.
+- `paid`: confirmed USD meets or exceeds expected after the confirmation threshold is satisfied.
+
+### Confirmation Gate
+- Default confirmation threshold: 1, configurable via `BLOCKCHAIN_CONFIRMATIONS_REQUIRED`.
+- Post-RC direction: allow a per-user required-confirmations setting with app-default fallback.
+- Invoice transitions to `paid` only when confirmed USD totals satisfy expected USD.
+- `paid_at` is set only on confirmed transition.
+
+### RBF and dropped transaction handling
+- On each watcher run:
+  - fetch current mempool transactions for the invoice address
+  - for stored unconfirmed txids that are no longer present, drop or ignore them
+  - never drop confirmed txs
+  - deduplicate by txid so a replacement is treated as the live record rather than additive
+- Recompute sats, per-payment USD, outstanding balance, and invoice status after cleanup.
+- Log dropped or replaced tx events; owner notification remains optional.
 
 ## USD Snapshot
 - When we log each payment, capture the USD/BTC rate:
@@ -75,6 +104,9 @@
     - Multiple partials summing to paid across different rates.
     - Confirmations updating existing payment rows.
     - Overpayments (money above expected) flagged but still mark invoice `paid`.
+    - Unconfirmed payment does not mark paid, then flips to paid after confirmations meet threshold.
+    - RBF replacement removes the old live tx from totals and avoids double-counting.
+    - Dropped unconfirmed tx shrinks totals and reverts status appropriately.
 - Blade tests / snapshots for the payment history table and public view.
 
 ## Completed Tasks
@@ -92,3 +124,6 @@
 - **Overpayments / Tips**: record the surplus (treat it as a tip by default), keep status `paid`, and introduce two levels of handling:
     - **Noise tolerance** (≤ $10 USD equivalent or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
     - **Significant overpay** (> tolerance) — flag the invoice for the owner (UI + notification) with recommended actions: keep it as a tip, credit the excess toward the next invoice, or refund minus fees. If a client has multiple overpaid invoices, batch the refund/credit calculation so the owner can settle them in one transaction. Future automation can email the client with those options if we don’t act within a configured SLA so mistaken overpayments can be corrected.
+
+## Post-RC Direction
+- Add a per-user required-confirmations setting (1-6) used by the watcher, with app-default fallback.

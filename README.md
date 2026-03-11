@@ -1,6 +1,6 @@
 # Bitcoin Invoice Generator
 
-This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md); the delivery plan, roadmap, and branching policy live in [`docs/PLAN.md`](docs/PLAN.md).
+This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md); milestone status lives in [`docs/ROADMAP.md`](docs/ROADMAP.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
 
 ## Highlights
 - **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
@@ -51,8 +51,11 @@ Execute the full suite via Sail:
 - **Public links:** `APP_PUBLIC_URL` controls the base URL used in invoice emails/public share links. Set it per environment (localhost for dev, `https://cryptozing.app` for production).
 
 ## Documentation & Specs
-- Delivery plan & roadmap: [`docs/PLAN.md`](docs/PLAN.md)
-- Future backlog: [`docs/FuturePLAN.md`](docs/FuturePLAN.md)
+- Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- Product spec: [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
+- Backlog: [`docs/BACKLOG.md`](docs/BACKLOG.md)
+- Changelog: [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
+- UX guardrails reference: [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md)
 - Docs & DX spec: [`docs/DOCS_DX_SPEC.md`](docs/DOCS_DX_SPEC.md)
 - Quick start: [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md)
 - Contributor walkthrough: [`docs/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/get-live/CONTRIBUTOR_WALKTHROUGH.md)
@@ -60,13 +63,12 @@ Execute the full suite via Sail:
 - UX Overhaul spec: [`docs/UX_OVERHAUL_SPEC.md`](docs/UX_OVERHAUL_SPEC.md)
 - Onboarding wizard spec: [`docs/ONBOARD_SPEC.md`](docs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/WALLET_XPUB_UX_SPEC.md`](docs/WALLET_XPUB_UX_SPEC.md)
-- UX guardrails reference: [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md)
 - Print/Public polish spec: [`docs/PRINT_PUBLIC_POLISH.md`](docs/PRINT_PUBLIC_POLISH.md)
 - Rate handling rules: [`docs/RATES.md`](docs/RATES.md)
-- Partial payments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
-- Invoice delivery spec: [`docs/INVOICE_DELIVERY.md`](docs/INVOICE_DELIVERY.md)
-- Notification spec: [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md)
+- Partial payments, confirmations, and adjustments spec: [`docs/PARTIAL_PAYMENTS.md`](docs/PARTIAL_PAYMENTS.md)
+- Notifications, delivery, and alerts spec: [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/tests/TEST_HARDENING.md`](docs/tests/TEST_HARDENING.md)
+- MS14 implementation strategy: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Task 11 implementation strategy: [`docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md)
 - Task 11 UX Engineering pass: [`docs/strategies/TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS.md)
 - Task 11 UX Engineering pass2: [`docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS2.md)
