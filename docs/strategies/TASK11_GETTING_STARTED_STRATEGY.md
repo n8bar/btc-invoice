@@ -2,11 +2,11 @@
 
 Status: Advisory implementation strategy for UX Task 11.
 
-This document is a temporary working plan. It is not a source of truth like `docs/ONBOARD_SPEC.md`, `docs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 ships.
+This document is a temporary working plan. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/specs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 ships.
 
 ## Canonical Inputs
-- Product/flow requirements: `docs/ONBOARD_SPEC.md`
-- UX milestone tracking: `docs/UX_OVERHAUL_SPEC.md`
+- Product/flow requirements: `docs/specs/ONBOARD_SPEC.md`
+- UX milestone tracking: `docs/specs/UX_OVERHAUL_SPEC.md`
 - RC roadmap status: `docs/ROADMAP.md`
 
 ## Locked v1 Decisions
@@ -204,4 +204,4 @@ Goal: address the current findings in a controlled sequence with small, testable
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.
 - Avoid global middleware interception in v1 to prevent route allowlist drift and redirect loops.
-- Re-check accessibility requirements in `docs/ONBOARD_SPEC.md` before final UI polish (focus order, status announcements, keyboard reachability).
+- Re-check accessibility requirements in `docs/specs/ONBOARD_SPEC.md` before final UI polish (focus order, status announcements, keyboard reachability).

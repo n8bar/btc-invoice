@@ -3,10 +3,10 @@
 End-to-end guide from fresh clone to first paid invoice.
 
 Audience: contributors/maintainers validating the current product flow in local/dev.
-This is not the end-user onboarding wizard spec (see `docs/ONBOARD_SPEC.md`).
+This is not the end-user onboarding wizard spec (see `docs/specs/ONBOARD_SPEC.md`).
 
 ## 1) Start from Quick Start
-- Follow [`docs/get-live/QUICK_START.md`](docs/get-live/QUICK_START.md) to bring up Sail, install deps, and migrate/seed.
+- Follow [`docs/ops/get-live/QUICK_START.md`](QUICK_START.md) to bring up Sail, install deps, and migrate/seed.
 - Ensure `WALLET_NETWORK` matches your test network and mail aliasing is enabled for safety in pre-prod.
 
 ## 2) Connect a Wallet
