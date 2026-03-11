@@ -5,18 +5,17 @@ This is the canonical product-level spec for CryptoZing.
 
 Use this file for global behavior, concepts, invariants, and cross-feature requirements.
 Use [`docs/ROADMAP.md`](ROADMAP.md) for milestone order and status only.
-Use feature and milestone specs for detailed local scope, acceptance criteria, and implementation-impacting notes.
+Use detailed specs under `docs/specs/` for local scope, acceptance criteria, and implementation-impacting notes.
 
 ## Canonical Doc Roles
 - [`docs/ROADMAP.md`](ROADMAP.md): RC milestone order, status, dependency, short intent only.
 - [`docs/BACKLOG.md`](BACKLOG.md): post-MVP and deferred work only.
 - [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md): global UX, accessibility, and interaction rules.
-- Feature and milestone specs under `docs/*.md`: canonical detailed requirements for their local domain.
+- Feature and milestone specs under `docs/specs/*.md`: canonical detailed requirements for their local domain.
+- `docs/ops/**`: rollout, contributor, and deployment runbooks.
 - [`docs/CHANGELOG.md`](CHANGELOG.md): append-only record of scope, requirement, and doc-structure changes.
 - `docs/strategies/**`: advisory working docs only; never canonical.
-- `docs/qa/**`: findings and risk docs.
-- `docs/tests/**`: verification and hardening docs.
-- `docs/snapshots/**`: archive/reference only.
+- `docs/qa/**`: findings, verification, and archive/reference docs.
 
 ## Product Purpose
 CryptoZing is a BTC-native invoicing product.
@@ -59,11 +58,11 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - `paid` means confirmed USD value meets or exceeds the expected USD amount; unconfirmed chain activity alone is not sufficient.
 
 ### Rates, payments, and outstanding balance
-- BTC request amounts, BIP21 links, and QR output must follow the rate behavior defined in [`docs/RATES.md`](RATES.md).
+- BTC request amounts, BIP21 links, and QR output must follow the rate behavior defined in [`docs/specs/RATES.md`](specs/RATES.md).
 - Per-payment USD snapshots are preserved when on-chain payments are detected so settled USD does not float retroactively with BTC price changes.
 - Outstanding payment requests target the current outstanding balance rather than the original invoice BTC snapshot.
-- Small-balance resolution, adjustment handling, over/underpayment thresholds, and payment history rules are defined in [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md).
-- Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md).
+- Small-balance resolution, adjustment handling, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
+- Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
@@ -74,7 +73,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ### Public links, print output, and outbound communication
 - Public-share and email links must use `APP_PUBLIC_URL`.
-- Public and print surfaces must honor public-safe boundaries and status-specific behavior defined in [`docs/PRINT_PUBLIC_POLISH.md`](PRINT_PUBLIC_POLISH.md) and [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md).
+- Public and print surfaces must honor public-safe boundaries and status-specific behavior defined in [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md) and [`docs/specs/UX_OVERHAUL_SPEC.md`](specs/UX_OVERHAUL_SPEC.md).
 - Outbound mail in pre-production may be recipient-aliased via `MAIL_ALIAS_ENABLED` and `MAIL_ALIAS_DOMAIN`; this aliasing must be disabled before RC or real-customer use.
 - Invoice send, receipt delivery, notification triggers, and delivery logging must remain auditable.
 
@@ -89,16 +88,16 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 
 ## Canonical Spec Map
-- Rates and BTC/USD behavior: [`docs/RATES.md`](RATES.md)
-- Partial payments, confirmations, adjustments, and outstanding summaries: [`docs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md)
-- Outbound invoice communication, receipts, and alerts: [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md)
-- Print/public behavior: [`docs/PRINT_PUBLIC_POLISH.md`](PRINT_PUBLIC_POLISH.md)
-- UX overhaul milestone scope: [`docs/UX_OVERHAUL_SPEC.md`](UX_OVERHAUL_SPEC.md)
-- Onboarding flow: [`docs/ONBOARD_SPEC.md`](ONBOARD_SPEC.md)
-- Wallet import and wallet UX: [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md)
+- Rates and BTC/USD behavior: [`docs/specs/RATES.md`](specs/RATES.md)
+- Partial payments, confirmations, adjustments, and outstanding summaries: [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md)
+- Outbound invoice communication, receipts, and alerts: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md)
+- Print/public behavior: [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md)
+- UX overhaul milestone scope: [`docs/specs/UX_OVERHAUL_SPEC.md`](specs/UX_OVERHAUL_SPEC.md)
+- Onboarding flow: [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md)
+- Wallet import and wallet UX: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
 - Cross-cutting UX and accessibility rules: [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)
-- Docs and contributor-experience scope: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md)
-- Rollout verification: [`docs/RC_ROLLOUT_CHECKLIST.md`](RC_ROLLOUT_CHECKLIST.md)
+- Docs and contributor-experience scope: [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md)
+- Rollout verification: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
 
 ## Current Cross-Feature Constraints
 - Additional wallet storage exists, but invoice-level multi-wallet selection remains deferred to post-MVP and is tracked in [`docs/BACKLOG.md`](BACKLOG.md).

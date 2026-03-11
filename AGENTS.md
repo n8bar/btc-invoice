@@ -6,6 +6,10 @@
   - `docs/ROADMAP.md` for RC milestone order/status/dependencies
   - `docs/PRODUCT_SPEC.md` for global product behavior and invariants
   - `docs/BACKLOG.md` for post-MVP and deferred work only
+- Keep the docs structure roles straight:
+  - `docs/specs/**` for detailed feature and milestone requirements
+  - `docs/ops/**` for rollout, contributor, and deployment runbooks
+  - `docs/qa/**` for findings, test plans, verification notes, and archive material
 - Keep `docs/CHANGELOG.md` updated alongside canonical docs when scope or doc structure shifts.
 - Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.

@@ -7,7 +7,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Clear, confidence-building guidance with inline “show me how” steps and wallet-specific hints.
 - Fast, calm validation that preserves user input and avoids layout jumps.
 - Friendly error recovery and explicit testnet-only cues when relevant; no network noise on mainnet.
-- Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md) for all wallet UX work (Nielsen/WCAG + project non‑negotiables).
+- Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](../UX_GUARDRAILS.md) for all wallet UX work (Nielsen/WCAG + project non-negotiables).
 
 ## Completed Tasks
 1. Mainnet-first UI: env-driven network only, no mainnet badge/copy, testnet-only helper text, and server-side prefix validation to reject mismatched networks (primary + additional wallets).
@@ -74,4 +74,4 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Wallet settings implements the above layout, helper copy, validation states, and testnet-only cue.
 - Additional wallets share the same UX patterns and respect the configured network.
 - No network selector remains; env-driven network is authoritative.
-- Docs updated: contributor walkthrough/quick start screenshots later; PLAN/CHANGELOG/UX spec link updated with this spec reference.
+- Docs updated: contributor walkthrough/quick start screenshots later; ROADMAP/CHANGELOG/UX spec link updated with this spec reference.

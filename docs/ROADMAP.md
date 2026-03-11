@@ -5,7 +5,7 @@ This is the canonical roadmap doc for Release Candidate work.
 
 Use this file for milestone order, status, dependency, and short intent only.
 Use [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md) for global product behavior and invariants.
-Use feature and milestone specs for detailed requirements, acceptance criteria, and edge cases.
+Use detailed specs under `docs/specs/` for requirements, acceptance criteria, and edge cases.
 Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 
 ## Completed Milestones
@@ -29,24 +29,24 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 14. **On-Chain Payment Attribution Hardening** — `active`
    Depends on: MS13 complete.
    Intent: make attribution key-aware, reinforce the dedicated-account requirement, and provide safe correction tooling for shared-account mistakes.
-   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md), [`docs/WALLET_XPUB_UX_SPEC.md`](WALLET_XPUB_UX_SPEC.md).
+   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md).
 
 15. **Mailer & Alerts Polish + Audit** — `planned`
    Depends on: MS14 payment attribution behavior being stable enough to audit downstream alerts.
    Intent: tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the product’s core send/receipt model.
-   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/NOTIFICATIONS.md`](NOTIFICATIONS.md).
+   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md).
 
 16. **Docs & DX** — `planned`
    Depends on: live UX and notification behavior being stable enough to document accurately.
    Intent: keep contributor docs current, document notification coverage, and rationalize the test suite before RC closeout.
-   Canonical detail: [`docs/DOCS_DX_SPEC.md`](DOCS_DX_SPEC.md), [`docs/tests/TEST_HARDENING.md`](tests/TEST_HARDENING.md).
+   Canonical detail: [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md), [`docs/qa/tests/TEST_HARDENING.md`](qa/tests/TEST_HARDENING.md).
 
 17. **Mainnet Cutover Preparation** — `planned`
    Depends on: MS14 through MS16 being stable enough to rehearse a safe network switch.
    Intent: define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet.
-   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/RC_ROLLOUT_CHECKLIST.md`](RC_ROLLOUT_CHECKLIST.md).
+   Canonical detail: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md).
 
 18. **CryptoZing.app Deployment (RC)** — `planned`
    Depends on: successful mainnet cutover preparation and rollout readiness checks.
    Intent: deploy the RC under `cryptozing.app`, remove temporary mail aliasing, and complete rollout verification.
-   Canonical detail: [`docs/RC_ROLLOUT_CHECKLIST.md`](RC_ROLLOUT_CHECKLIST.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md).
+   Canonical detail: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md).

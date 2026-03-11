@@ -2,7 +2,7 @@
 
 Status: Finding 2.1 implemented; this doc remains as follow-up traceability for Task 11.
 
-This document is a temporary working strategy. It is not a source of truth like `docs/ONBOARD_SPEC.md`, `docs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 follow-up work ships.
+This document is a temporary working strategy. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/specs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 follow-up work ships.
 
 ## Purpose
 - Capture post-pass findings while current UXInspections continue without scope churn.

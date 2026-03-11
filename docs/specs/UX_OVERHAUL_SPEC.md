@@ -19,7 +19,7 @@ Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows befo
    - Queries/scopes: invoice scopes for `ownedBy`/`open`/`pastDue`/`dueSoon` and payment scopes for recent payments; respect soft deletes and ownership.
    - UI: card grid for counts/totals with clear labels and icons; “Recent payments” list/table with invoice number, client, amount paid, and a link to invoice show; CTA links to invoices index/clients/create on dashboard.
    - Routing: reuse `/dashboard`; inject snapshot data from controller; keep view logic minimal and avoid duplicating queries in Blade.
-   - Edge cases: amounts format per `docs/RATES.md`; no public/share tokens exposed; detected_at fallback to created_at.
+   - Edge cases: amounts format per `docs/specs/RATES.md`; no public/share tokens exposed; detected_at fallback to created_at.
    - Tests: Feature coverage asserts counts/totals and recent payments list for owner, ignores foreign/trashed invoices, caps to 5 ordered payments, and checks per-user cache isolation/refresh expectations.
    - Performance: recent payments limited to 5 with minimal eager-loads; joins scoped by ownership and soft deletes.
 2. Light/Dark mode toggle
