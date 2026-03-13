@@ -97,6 +97,24 @@ Handle historical data and operator recovery after the forward paths are in plac
 2. Extend existing address reassignment tooling only after lineage is in place, so corrections preserve key identity columns.
 3. Add any operator runbook notes that the backfill/recovery path requires once the command behavior is settled.
 
+#### 14.1.5 Verification
+Run all checks through Sail.
+
+Automated:
+- `./vendor/bin/sail artisan test` at minimum for merge-ready 14.1 work.
+- Add/expand coverage for:
+  - key switch forward/back cursor resume behavior
+  - invoice creation persisting key identity
+  - watcher using invoice-bound network/lineage
+  - lineage backfill command output/reporting
+
+Manual QA:
+- Reproduce the shared-account false-paid scenario in test fixtures.
+- Sanity-run:
+  - `./vendor/bin/sail artisan wallet:watch-payments`
+  - `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
+  - new lineage/correction commands introduced during 14.1
+
 ### Phase 14.2 - Dedicated-Wallet UX Hardening
 
 #### 14.2.1 Wallet settings copy
@@ -117,6 +135,18 @@ Keep guardrails from `docs/UX_GUARDRAILS.md`:
 - keyboard/focus sanity for any new controls.
 
 - Add event/log entries when users save wallet settings after seeing dedicated-account guidance (for support/debug traceability).
+
+#### 14.2.4 Verification
+Run all checks through Sail.
+
+Automated:
+- `./vendor/bin/sail artisan test` at minimum for merge-ready 14.2 work.
+- Add/expand coverage for wallet-settings copy/flow changes and any onboarding reinforcement that ships.
+
+Manual QA:
+- Verify dedicated-account warning clarity on wallet settings.
+- Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
+- Confirm any telemetry/logging added for guidance acknowledgment is emitted as expected.
 
 ### Phase 14.3 - Correction Tooling + Safeguards
 
@@ -141,26 +171,20 @@ Re-run payment state recomputation after ignore/restore.
 - Disallow ignoring manual adjustment rows.
 - Log every ignore/restore action with invoice/payment/user IDs.
 
-## Test Plan
+#### 14.3.4 Verification
+Run all checks through Sail.
 
-### Automated (required per implementation item)
-- Use Sail for all runs.
-- `./vendor/bin/sail artisan test` at minimum for merge-ready implementation steps.
-- Add/expand feature coverage for:
-  - key switch forward/back cursor resume behavior.
-  - invoice creation persisting key identity.
-  - watcher using invoice-bound network/lineage.
-  - ignore/restore payment recalculation and authorization.
-- Add command tests for lineage backfill output/reporting.
+Automated:
+- `./vendor/bin/sail artisan test` at minimum for merge-ready 14.3 work.
+- Add/expand coverage for:
+  - ignore/restore payment recalculation
+  - authorization and owner-only safeguards
+  - audit logging / metadata persistence
 
-### Manual QA (browser + console)
-1. Reproduce shared-account false-paid scenario in test fixtures.
-2. Verify dedicated-account warning clarity on wallet settings and onboarding.
-3. Verify correction flow recovers invoice state without deleting raw tx history.
-4. Sanity-run commands:
-- `./vendor/bin/sail artisan wallet:watch-payments`
-- `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
-- new lineage/correction commands introduced in MS14.
+Manual QA:
+- Verify correction flow recovers invoice state without deleting raw tx history.
+- Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
+- Confirm manual adjustment rows cannot be ignored.
 
 ## Risks and Mitigations
 1. Risk: incorrect backfill guesses for historical invoices.
