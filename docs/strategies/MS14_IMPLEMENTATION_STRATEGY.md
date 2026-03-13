@@ -60,23 +60,43 @@ Inventory the existing dataset so we know how much historical ambiguity we are c
 - Count invoices with payments detected before invoice creation.
 - Compare stored invoice addresses against re-derived addresses from each user's current wallet key.
 - Identify invoices whose owner no longer has a wallet row.
+- Use the scan results to decide which existing rows are discarded and which user records remain as the base for reseeding.
 
 #### 1.2 Historical data handling policy
-Choose how to handle ambiguous historical invoices before backfill/runtime work begins.
+Apply the agreed cleanup-and-reseed policy before backfill/runtime work begins.
 
-- Because the current dataset is still test-only, allow deletion or full reset of ambiguous invoices instead of preserving them purely for completeness.
-- If historical invoices are kept, use explicit `matched` / `inferred` / `unknown` handling and avoid pretending ambiguous rows are safe.
-- Document the chosen policy before continuing into runtime lineage work.
+- Keep existing `users`.
+- Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
+- Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
+- Remove accidental duplicate extended keys from normal fixtures.
+- Add at least one deliberate duplicate-key scenario as an explicit MS14 test fixture rather than leaving duplicates as accidental residue.
+- Build reseeding around named scenarios that cover the MS14 risk surface, including:
+  - clean dedicated-wallet user
+  - key-rotation user
+  - deliberate duplicate-key pair
+  - high-derivation-index user
+  - no-wallet user
+  - partial/multi-payment history user
+  - draft-payment edge case
+- Fund selected reseeded invoice addresses on `testnet4` so MS14 has intentional on-chain payment fixtures to exercise. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
+- Keep the duplicate-key scenario isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
+- Committed fixtures and app behavior may use public derivation material only. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
+- At this stage, outbound mail is not part of the reseeding concern; mail restoration and queue cleanup remain MS15 work.
+- Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
 #### 1.3 Verification
 Run all checks through Sail.
 
 Automated / scripted:
-- Re-run the risk scan after any cleanup/reset so the baseline is explicit.
-- If cleanup tooling is added, verify it reports what it removed or preserved.
+- Re-run the risk scan after cleanup/reseed so the new baseline is explicit.
+- Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
+- Fund the selected `testnet4` invoice addresses and confirm watcher observations through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+- If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Manual QA:
-- Review suspicious invoice sets and confirm the chosen keep/delete/reset policy matches the current test-data reality.
+- Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
+- Confirm the deliberate duplicate-key fixture is isolated and clearly named.
+- Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
 - Confirm the working dataset is in the state we want before Phase 2 begins.
 
 ### Phase 2 - Key Lineage + Cursor Model
