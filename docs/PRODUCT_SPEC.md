@@ -45,6 +45,9 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 7. Prefer minimal, high-leverage safeguards before operational complexity.
    Add the smallest effective protections first and defer heavy process overhead until adoption requires it.
 
+8. Remain watch-only and never hold spending secrets.
+   CryptoZing must never require, collect, store, process, or depend on private keys or seed phrases for normal product operation. Wallet integration is watch-only and limited to public derivation material.
+
 ## Cross-Feature Requirements
 ### Ownership and access
 - Client and invoice data are owner-scoped.
@@ -67,6 +70,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
+- CryptoZing remains watch-only: wallet setup uses public derivation material only, and no normal product flow may require or accept seed phrases or private keys.
 - Reliable automatic attribution requires a dedicated account xpub or derivation namespace for CryptoZing receives.
 - Users may view or spend from that account in other wallets, but they should not use that same account for additional receives or address generation outside CryptoZing if they want reliable invoice tracking.
 - When attribution is uncertain, the product must surface that uncertainty and provide a correction path rather than silently assuming correctness.
