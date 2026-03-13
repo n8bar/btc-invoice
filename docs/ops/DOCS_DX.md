@@ -6,7 +6,7 @@ Release Candidate contributor-docs and documentation-operations scope.
 - `docs/ops/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
 - `docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`: end-to-end contributor walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
 - `docs/specs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
-- `README.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, and `docs/BACKLOG.md` updated to link the above and keep RC scope separate from post-MVP backlog.
+- `README.md`, `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/BACKLOG.md` updated to link the above and keep RC scope separate from post-MVP backlog.
 
 ## Quick Start + Env Var Reference
 Audience: new contributors running the stack locally with Sail.
@@ -30,6 +30,6 @@ Goal: show the first successful invoice lifecycle with minimal branching.
 - Note any gaps and whether they are deferred to `docs/BACKLOG.md`; align copy guidelines with the spec.
 
 ## Definition of Done
-- Quick start and contributor walkthrough docs exist, are linked from README and `docs/ROADMAP.md`, and match current UX/commands.
+- Quick start and contributor walkthrough docs exist, are linked from README and `docs/PLAN.md`, and match current UX/commands.
 - Notification coverage is documented with live vs. stub status and test pointers in `docs/specs/NOTIFICATIONS.md`.
-- `docs/ROADMAP.md` keeps RC scope for Docs & DX; anything deferred is explicitly routed to `docs/BACKLOG.md`.
+- `docs/PLAN.md` keeps RC scope for Docs & DX; anything deferred is explicitly routed to `docs/BACKLOG.md`.

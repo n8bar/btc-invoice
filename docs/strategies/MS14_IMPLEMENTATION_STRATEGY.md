@@ -3,10 +3,10 @@
 Status: Advisory implementation strategy for Milestone 14.
 Date: 2026-03-07
 
-This is a working execution plan for MS14 and is not canonical scope. Canonical scope remains in `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, and `docs/qa/Finding1.md`.
+This is a working execution plan for MS14 and is not canonical scope. Canonical scope remains in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/qa/Finding1.md`.
 
 ## Canonical Inputs
-- `docs/ROADMAP.md`
+- `docs/PLAN.md`
 - `docs/PRODUCT_SPEC.md`
 - `docs/qa/Finding1.md`
 - Existing wallet/payment behavior in:

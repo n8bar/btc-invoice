@@ -4,7 +4,7 @@ _Last updated: 2026-03-10_
 This is the canonical post-MVP backlog.
 
 Use this file only for deferred or future work.
-Anything still in RC scope belongs in [`docs/ROADMAP.md`](ROADMAP.md) and its linked canonical specs instead.
+Anything still in RC scope belongs in [`docs/PLAN.md`](PLAN.md) and its linked canonical docs instead.
 
 ## Near-Term Product UX
 1. **Invoices + Clients Search and Filtering**

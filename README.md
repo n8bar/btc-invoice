@@ -1,6 +1,6 @@
 # Bitcoin Invoice Generator
 
-This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md); milestone status lives in [`docs/ROADMAP.md`](docs/ROADMAP.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
+This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md); current milestone status lives in [`docs/PLAN.md`](docs/PLAN.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
 
 ## Highlights
 - **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
@@ -51,7 +51,7 @@ Execute the full suite via Sail:
 - **Public links:** `APP_PUBLIC_URL` controls the base URL used in invoice emails/public share links. Set it per environment (localhost for dev, `https://cryptozing.app` for production).
 
 ## Documentation & Specs
-- Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- Plan: [`docs/PLAN.md`](docs/PLAN.md)
 - Product spec: [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
 - Backlog: [`docs/BACKLOG.md`](docs/BACKLOG.md)
 - Changelog: [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
@@ -60,7 +60,7 @@ Execute the full suite via Sail:
 - Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)
 - Contributor walkthrough: [`docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
-- UX Overhaul spec: [`docs/specs/UX_OVERHAUL_SPEC.md`](docs/specs/UX_OVERHAUL_SPEC.md)
+- MS13 UX Overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](docs/milestones/MS13_UX_OVERHAUL.md)
 - Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
 - Print/Public polish spec: [`docs/specs/PRINT_PUBLIC_POLISH.md`](docs/specs/PRINT_PUBLIC_POLISH.md)
