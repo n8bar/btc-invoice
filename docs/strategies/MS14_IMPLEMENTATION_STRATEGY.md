@@ -37,7 +37,7 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 
 ## Proposed Architecture
 
-### A) Key Lineage + Cursor Model (Phase 14.1)
+### Phase 14.1 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and treat `wallet_settings` as the active key pointer.
 
 #### Data model
@@ -87,7 +87,7 @@ Create a durable per-key cursor ledger and treat `wallet_settings` as the active
 
 2. Extend existing address reassignment tooling only after lineage is in place, so corrections preserve key identity columns.
 
-### B) Dedicated-Wallet UX Hardening (Phase 14.2)
+### Phase 14.2 - Dedicated-Wallet UX Hardening
 
 #### UX updates
 1. Update wallet settings copy to explicitly state:
@@ -107,7 +107,7 @@ Create a durable per-key cursor ledger and treat `wallet_settings` as the active
 #### Validation and telemetry
 - Add event/log entries when users save wallet settings after seeing dedicated-account guidance (for support/debug traceability).
 
-### C) Correction Tooling + Safeguards (Phase 14.3)
+### Phase 14.3 - Correction Tooling + Safeguards
 
 #### Data + behavior
 1. Add correction metadata to `invoice_payments` (or companion audit table):
