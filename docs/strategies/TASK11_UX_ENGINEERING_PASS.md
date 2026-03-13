@@ -2,7 +2,7 @@
 
 Status: Advisory UX refinement pass for Task 11 based on browser QA findings.
 
-This document is a temporary working strategy. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/specs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 follow-up work ships.
+This document is a temporary working strategy. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/milestones/MS13_UX_OVERHAUL.md`, `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 follow-up work ships.
 
 ## Purpose
 - Collect browser-QA findings and address them in a focused Task 11 UX refinement pass.

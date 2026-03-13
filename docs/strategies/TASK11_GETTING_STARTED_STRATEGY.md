@@ -2,12 +2,12 @@
 
 Status: Advisory implementation strategy for UX Task 11.
 
-This document is a temporary working plan. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/specs/UX_OVERHAUL_SPEC.md`, `docs/ROADMAP.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 ships.
+This document is a temporary working plan. It is not a source of truth like `docs/specs/ONBOARD_SPEC.md`, `docs/milestones/MS13_UX_OVERHAUL.md`, `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, or `docs/CHANGELOG.md`, and may be deleted after Task 11 ships.
 
 ## Canonical Inputs
 - Product/flow requirements: `docs/specs/ONBOARD_SPEC.md`
-- UX milestone tracking: `docs/specs/UX_OVERHAUL_SPEC.md`
-- RC roadmap status: `docs/ROADMAP.md`
+- UX milestone tracking: `docs/milestones/MS13_UX_OVERHAUL.md`
+- RC plan status: `docs/PLAN.md`
 
 ## Locked v1 Decisions
 - Scope this branch/PR to Task 11 only.

@@ -1,6 +1,10 @@
-# UX Overhaul Spec (RC)
+# MS13 - UX Overhaul
 
-Scope and Definition of Done for PLAN Item 13. Focus: tighten core UX flows before RC.
+Status: Completed on 2026-03-07.
+Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
+Supporting docs: [`docs/specs/ONBOARD_SPEC.md`](../specs/ONBOARD_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](../specs/WALLET_XPUB_UX_SPEC.md), [`docs/specs/PRINT_PUBLIC_POLISH.md`](../specs/PRINT_PUBLIC_POLISH.md)
+
+This is the milestone execution doc for MS13. It preserves the detailed checklist, outputs, and acceptance/history for the large UX-overhaul workstream that was completed before RC.
 
 ## Outputs
 - Dashboard snapshot redesign that surfaces invoice/client health at a glance.

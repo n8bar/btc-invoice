@@ -1,7 +1,7 @@
 # Feature Test Draft – Test Hardening Initiative
-_Last updated: 2025-11-07 (Codex)_
+_Last updated: 2026-03-13 (Codex)_
 
-This document outlines the exact feature tests we plan to implement next, reflecting the active RC roadmap in `docs/ROADMAP.md` and the cross-feature behavior in `docs/PRODUCT_SPEC.md`. Each test case lists preconditions, steps, and key assertions.
+This document outlines the exact feature tests we plan to implement next, reflecting the active RC plan in `docs/PLAN.md` and the cross-feature behavior in `docs/PRODUCT_SPEC.md`. Each test case lists preconditions, steps, and key assertions.
 
 ## 1. Public Share Lifecycle
 ### 1.1 Enable Public Share

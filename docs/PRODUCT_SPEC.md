@@ -1,17 +1,18 @@
 # Product Spec
-_Last updated: 2026-03-10_
+_Last updated: 2026-03-13_
 
 This is the canonical product-level spec for CryptoZing.
 
 Use this file for global behavior, concepts, invariants, and cross-feature requirements.
-Use [`docs/ROADMAP.md`](ROADMAP.md) for milestone order and status only.
-Use detailed specs under `docs/specs/` for local scope, acceptance criteria, and implementation-impacting notes.
+Use [`docs/PLAN.md`](PLAN.md) for milestone order, current focus, and the primary next doc.
+Use detailed docs under `docs/specs/` and `docs/milestones/` for local scope, acceptance criteria, and implementation-impacting notes.
 
 ## Canonical Doc Roles
-- [`docs/ROADMAP.md`](ROADMAP.md): RC milestone order, status, dependency, short intent only.
+- [`docs/PLAN.md`](PLAN.md): human-facing execution dashboard for RC milestone order, current focus, and the primary next doc.
 - [`docs/BACKLOG.md`](BACKLOG.md): post-MVP and deferred work only.
 - [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md): global UX, accessibility, and interaction rules.
-- Feature and milestone specs under `docs/specs/*.md`: canonical detailed requirements for their local domain.
+- `docs/milestones/**`: milestone execution docs when a milestone is active or large enough to need detailed checklist tracking.
+- Feature and domain specs under `docs/specs/*.md`: canonical detailed requirements for their local domain.
 - `docs/ops/**`: rollout, contributor, and deployment runbooks.
 - [`docs/CHANGELOG.md`](CHANGELOG.md): append-only record of scope, requirement, and doc-structure changes.
 - `docs/strategies/**`: advisory working docs only; never canonical.
@@ -73,7 +74,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ### Public links, print output, and outbound communication
 - Public-share and email links must use `APP_PUBLIC_URL`.
-- Public and print surfaces must honor public-safe boundaries and status-specific behavior defined in [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md) and [`docs/specs/UX_OVERHAUL_SPEC.md`](specs/UX_OVERHAUL_SPEC.md).
+- Public and print surfaces must honor public-safe boundaries and status-specific behavior defined in [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md) and [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md).
 - Outbound mail in pre-production may be recipient-aliased via `MAIL_ALIAS_ENABLED` and `MAIL_ALIAS_DOMAIN`; this aliasing must be disabled before RC or real-customer use.
 - Invoice send, receipt delivery, notification triggers, and delivery logging must remain auditable.
 
@@ -82,7 +83,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Server-side operational time is anchored to `America/Denver` unless a narrower spec defines a specific display exception.
 - Viewer-facing time localization may differ from server calculation time where explicitly documented.
 
-### Active roadmap-linked requirements
+### Active plan-linked requirements
 - Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
 - Mailer and alerts hardening must add duplicate-send safeguards, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email.
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
@@ -92,7 +93,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Partial payments, confirmations, adjustments, and outstanding summaries: [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md)
 - Outbound invoice communication, receipts, and alerts: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md)
 - Print/public behavior: [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md)
-- UX overhaul milestone scope: [`docs/specs/UX_OVERHAUL_SPEC.md`](specs/UX_OVERHAUL_SPEC.md)
+- MS13 UX overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
 - Onboarding flow: [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md)
 - Wallet import and wallet UX: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
 - Cross-cutting UX and accessibility rules: [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)
@@ -101,4 +102,4 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ## Current Cross-Feature Constraints
 - Additional wallet storage exists, but invoice-level multi-wallet selection remains deferred to post-MVP and is tracked in [`docs/BACKLOG.md`](BACKLOG.md).
-- Mainnet rollout is a roadmap item, not a background assumption; until that cutover is complete, contributor and deployment docs must keep environment and mail-safety steps explicit.
+- Mainnet rollout is a plan item, not a background assumption; until that cutover is complete, contributor and deployment docs must keep environment and mail-safety steps explicit.
