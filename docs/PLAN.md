@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: begin MS14 with the Phase 14.1 / Slice 1 foundation work from the strategy doc: add key-lineage schema (`wallet_key_cursors` plus invoice key snapshot columns) before changing watcher behavior.
+- Next action: begin MS14 with Phase 14.1.1 foundation work from the strategy doc: add key-lineage schema (`wallet_key_cursors` plus invoice key snapshot columns) before changing watcher behavior.
 - Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
