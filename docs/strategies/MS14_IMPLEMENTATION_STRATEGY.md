@@ -99,8 +99,8 @@ Browser QA:
    - invoice `52` owned by `ChesterTester2@nospam.site`: underpaid sent invoice, currently `pending`
    - invoice `53` owned by `TestTestTest@nospam.site`: overpaid sent invoice, currently `pending`
    - invoice `54` owned by `test4user@nospam.site`: partial-to-paid sent invoice, currently `pending`
-   - invoice `55` owned by `antonina12@example.net`: draft invoice with exact payment edge, currently still `draft`
-   - invoice `56` owned by `antonina12@example.net`: draft invoice with partial payment edge, currently still `draft`
+   - invoice `55` owned by `antonina12@nospam.site`: draft invoice with exact payment edge, currently still `draft`
+   - invoice `56` owned by `antonina12@nospam.site`: draft invoice with partial payment edge, currently still `draft`
    - invoice `57` owned by `tester5@nospam.site`: deliberate duplicate-key source invoice, currently `pending`
    - invoice `58` owned by `recovered-user-5@local.invalid`: deliberate duplicate-key collision target invoice, currently `pending`
 2. [ ] Open invoices `57` and `58` and confirm both are visible as separate records while sharing the same receive address `tb1q5lpzjj7c3pthr6f3qy8tdd4vzjqr7gj487gzy6`.
