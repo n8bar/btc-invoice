@@ -71,6 +71,11 @@ Address the current historical-data uncertainty before changing runtime lineage 
    6. draft invoice with payment edge cases
    7. deliberate duplicate-key collision fixture
 5. Fund only the selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
+   1. select the invoice scenarios that actually need on-chain fixtures
+   2. derive or collect the target invoice receive addresses after reseeding
+   3. fund those addresses from local-only `testnet4` wallet material stored in an untracked path
+   4. broadcast the transactions and record the txid for each funded scenario
+   5. carry those txids into `1.2` watcher verification
 6. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
 7. Treat outbound mail as out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
 8. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
