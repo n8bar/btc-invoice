@@ -15,7 +15,7 @@
 - Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
-- Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs or local recovery files.
+- Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs, local recovery files, or other local-only helper artifacts. For local-only work under `.cybercreek/`, follow `.cybercreek/LOCAL_AGENTS.md` if present.
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
@@ -58,6 +58,7 @@
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
+- For substantive local-only changes under `.cybercreek/`, update `.cybercreek/UNTRACKED_CHANGELOG.md`. Log "after this PR" findings in `.cybercreek/after-this-pr.md` with per-item timestamps, following `.cybercreek/LOCAL_AGENTS.md` if present.
 - Whenever `docs/**` changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
