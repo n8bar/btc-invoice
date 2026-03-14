@@ -85,16 +85,13 @@ Address the current historical-data uncertainty before changing runtime lineage 
 Run all checks through Sail.
 
 Automated / scripted:
-1.2.1 [x] Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-1.2.2 [x] Confirm CryptoZing detects each funded `testnet4` payment and establishes the intended Phase 1 baseline using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+1. [x] Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
+2. [x] Confirm CryptoZing detects each funded `testnet4` payment and establishes the intended Phase 1 baseline using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
    - Current local result on 2026-03-14: all funded payments were detected. The deliberate duplicate-address fixture reproduced the known MS14 bug by attaching the same tx to both invoices `57` and `58`.
-1.2.3 [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
-
-Human / Browser QA:
-1.2.4 [ ] Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
-1.2.5 [ ] Confirm the deliberate duplicate-key fixture is isolated and clearly named.
-1.2.6 [ ] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
-1.2.7 [ ] Confirm the working dataset is in the state we want before Phase 2 begins.
+3. [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
+4. [x] Confirm the deliberate duplicate-key fixture is isolated and clearly named.
+5. [x] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
+6. [x] Confirm the working dataset is in the state we want before Phase 2 begins.
 
 ### Phase 2 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and remove legacy per-wallet cursor state.
@@ -134,22 +131,22 @@ Create a durable per-key cursor ledger and remove legacy per-wallet cursor state
 
 #### 2.5 Verify Phase 2
 Automated / command verification:
-2.5.1 Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 2 work.
-2.5.2 Add or expand automated coverage for:
-   2.5.2.1 saving a new key creates the expected cursor row
-   2.5.2.2 saving a previously used key resumes that key's historical cursor
-   2.5.2.3 invoice creation persists key identity and increments only the cursor ledger
-   2.5.2.4 watcher behavior uses invoice-bound network/lineage
-   2.5.2.5 address-assignment and reassignment commands use the cursor ledger and keep lineage columns in sync
-2.5.3 Sanity-run:
-   2.5.3.1 `./vendor/bin/sail artisan wallet:watch-payments`
-   2.5.3.2 `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
-   2.5.3.3 the updated address-reassignment command path introduced during Phase 2
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 2 work.
+2. Add or expand automated coverage for:
+   1. saving a new key creates the expected cursor row
+   2. saving a previously used key resumes that key's historical cursor
+   3. invoice creation persists key identity and increments only the cursor ledger
+   4. watcher behavior uses invoice-bound network/lineage
+   5. address-assignment and reassignment commands use the cursor ledger and keep lineage columns in sync
+3. Sanity-run:
+   1. `./vendor/bin/sail artisan wallet:watch-payments`
+   2. `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
+   3. the updated address-reassignment command path introduced during Phase 2
+4. Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
 
-Human / Browser QA:
-2.5.4 Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
-2.5.5 Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
-2.5.6 Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
+Browser QA:
+5. Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
+6. Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
 
 ### Phase 3 - Unsupported Configuration Detection + Flagging
 Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsupported state only where evidence supports it.
@@ -185,19 +182,19 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
 
 #### 3.5 Verify Phase 3
 Automated / command verification:
-3.5.1 Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
-3.5.2 Add or expand automated coverage for:
-   3.5.2.1 proactive unsupported-state detection when a saved wallet shows prior outside receive activity
-   3.5.2.2 evidence-triggered wallet flagging from invoice/payment collisions
-   3.5.2.3 new invoices inheriting unsupported state while the wallet is flagged
-   3.5.2.4 existing invoices remaining unflagged unless invoice-specific evidence marks them
-   3.5.2.5 unsupported-state UI indicators appearing only when the wallet is actually flagged
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
+2. Add or expand automated coverage for:
+   1. proactive unsupported-state detection when a saved wallet shows prior outside receive activity
+   2. evidence-triggered wallet flagging from invoice/payment collisions
+   3. new invoices inheriting unsupported state while the wallet is flagged
+   4. existing invoices remaining unflagged unless invoice-specific evidence marks them
+   5. unsupported-state UI indicators appearing only when the wallet is actually flagged
 
-Human / Browser QA:
-3.5.3 Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
-3.5.4 Confirm the wallet warning language stays gentle and points the owner toward connecting a new dedicated account key.
-3.5.5 Create a new invoice while the wallet is flagged and confirm the invoice is marked unsupported at creation time.
-3.5.6 Confirm an older invoice is not retroactively marked unsupported unless evidence for that specific invoice triggers it.
+Browser QA:
+3. Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
+4. Confirm the wallet warning language stays gentle and points the owner toward connecting a new dedicated account key.
+5. Create a new invoice while the wallet is flagged and confirm the invoice is marked unsupported at creation time.
+6. Confirm an older invoice is not retroactively marked unsupported unless evidence for that specific invoice triggers it.
 
 ### Phase 4 - Dedicated-Wallet UX Hardening
 
@@ -208,7 +205,7 @@ Human / Browser QA:
 
 #### 4.2 Reinforce the dedicated-account requirement in onboarding
 1. Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
-2. Add an explicit acknowledgment checkbox only if Human / Browser QA shows the warning copy is being ignored.
+2. Add an explicit acknowledgment checkbox only if Browser QA shows the warning copy is being ignored.
 
 #### 4.3 Publish a Helpful Notes explainer for less technical users
 1. Add a public Helpful Notes article that explains CryptoZing's watch-only model in plain language.
@@ -225,14 +222,14 @@ Human / Browser QA:
 
 #### 4.5 Verify Phase 4
 Automated / command verification:
-4.5.1 Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
-4.5.2 Add or expand automated coverage for wallet-settings copy/flow changes, any onboarding reinforcement that ships, and any Helpful Notes linkage or rendering that ships with this phase.
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
+2. Add or expand automated coverage for wallet-settings copy/flow changes, any onboarding reinforcement that ships, and any Helpful Notes linkage or rendering that ships with this phase.
+3. Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
 
-Human / Browser QA:
-4.5.3 Verify dedicated-account warning clarity on wallet settings.
-4.5.4 Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
-4.5.5 Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
-4.5.6 Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
+Browser QA:
+4. Verify dedicated-account warning clarity on wallet settings.
+5. Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
+6. Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
 
 ### Phase 5 - Correction Tooling + Safeguards
 
@@ -258,16 +255,17 @@ Re-run payment state recomputation after ignore/restore.
 
 #### 5.4 Verify Phase 5
 Automated / command verification:
-5.4.1 Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
-5.4.2 Add or expand automated coverage for:
-   5.4.2.1 ignore/restore payment recalculation
-   5.4.2.2 authorization and owner-only safeguards
-   5.4.2.3 audit logging and metadata persistence
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
+2. Add or expand automated coverage for:
+   1. ignore/restore payment recalculation
+   2. authorization and owner-only safeguards
+   3. audit logging and metadata persistence
+3. Verify raw tx history remains present after ignore/restore.
 
-Human / Browser QA:
-5.4.3 Verify the correction flow recovers invoice state without deleting raw tx history.
-5.4.4 Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
-5.4.5 Confirm manual adjustment rows cannot be ignored.
+Browser QA:
+4. Exercise the correction flow in the browser and confirm visible invoice state recovers as expected.
+5. Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
+6. Confirm manual adjustment rows cannot be ignored.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
