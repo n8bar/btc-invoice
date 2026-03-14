@@ -54,9 +54,10 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 Address the current historical-data uncertainty before changing runtime lineage behavior.
 
 #### 1.1 Reset baseline
-1. Treat the current wallet/invoice/payment data as disposable test data.
-2. Do not spend time inventorying outgoing rows in detail before reset.
-3. Proceed directly to the reset-and-reseed policy below.
+1. Create a database backup first, even though the current dataset is still test-only.
+2. Treat the current wallet/invoice/payment data as disposable test data.
+3. Do not spend time inventorying outgoing rows in detail before reset.
+4. Proceed directly to the reset-and-reseed policy below.
 
 #### 1.2 Reset-and-reseed policy
 1. Keep existing `users`.
