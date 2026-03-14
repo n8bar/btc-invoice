@@ -93,9 +93,21 @@ Automated / scripted:
 5. [x] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
 
 Browser QA:
-1. [ ] Review the seeded invoices in the browser and confirm the visible scenario set matches the intended MS14 baseline.
-2. [ ] Open the deliberate duplicate-address pair and confirm both invoices are visible as separate records while sharing the same receive address.
-3. [ ] Spot-check the funded invoices in the browser and confirm the current pre-MS14 states match expectations, including pending funded invoices and draft invoices with detected payments.
+1. [ ] Review the seeded invoices in the browser and confirm the visible scenario set matches the intended MS14 baseline:
+   - invoice `50` owned by `nate@cybercreek.us`: unpaid sent invoice
+   - invoice `51` owned by `test1@cybercreek.us`: exact-paid sent invoice, currently `pending`
+   - invoice `52` owned by `ChesterTester2@nospam.site`: underpaid sent invoice, currently `pending`
+   - invoice `53` owned by `TestTestTest@nospam.site`: overpaid sent invoice, currently `pending`
+   - invoice `54` owned by `test4user@nospam.site`: partial-to-paid sent invoice, currently `pending`
+   - invoice `55` owned by `antonina12@example.net`: draft invoice with exact payment edge, currently still `draft`
+   - invoice `56` owned by `antonina12@example.net`: draft invoice with partial payment edge, currently still `draft`
+   - invoice `57` owned by `tester5@nospam.site`: deliberate duplicate-key source invoice, currently `pending`
+   - invoice `58` owned by `recovered-user-5@local.invalid`: deliberate duplicate-key collision target invoice, currently `pending`
+2. [ ] Open invoices `57` and `58` and confirm both are visible as separate records while sharing the same receive address `tb1q5lpzjj7c3pthr6f3qy8tdd4vzjqr7gj487gzy6`.
+3. [ ] Spot-check the funded invoices in the browser and confirm the current pre-MS14 states match expectations:
+   - invoices `51`, `52`, `53`, `54`, `57`, and `58` show detected payments and remain `pending`
+   - invoices `55` and `56` remain `draft` even though payments were detected
+   - invoice `50` remains the unfunded control case
 
 ### Phase 2 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and remove legacy per-wallet cursor state.
