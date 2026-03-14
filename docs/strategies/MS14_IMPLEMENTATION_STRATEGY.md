@@ -207,21 +207,29 @@ Human / Browser QA:
 1. Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
 2. Add an explicit acknowledgment checkbox only if Human / Browser QA shows the warning copy is being ignored.
 
-#### 4.3 Keep dedicated-wallet guidance usable and traceable
+#### 4.3 Publish a Helpful Notes explainer for less technical users
+1. Add a public Helpful Notes article that explains CryptoZing's watch-only model in plain language.
+2. Explain why automatic payment tracking needs a dedicated receiving account key.
+3. Explain that spending elsewhere is fine, but receiving elsewhere with the same account key makes automatic attribution unreliable.
+4. Explain what unsupported configuration means and why the recommended fix is to connect a fresh dedicated account key.
+5. Recommend separate receive and spend apps or accounts as the safest pattern without making separate apps a hard product requirement.
+
+#### 4.4 Keep dedicated-wallet guidance usable and traceable
 1. Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.
 2. Preserve wallet input on validation failures.
 3. Keep keyboard and focus behavior sane for any new guidance controls.
 4. Add event or log entries when users save wallet settings after seeing dedicated-account guidance if support/debug traceability proves necessary.
 
-#### 4.4 Verify Phase 4
+#### 4.5 Verify Phase 4
 Automated / command verification:
 1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
-2. Add or expand automated coverage for wallet-settings copy/flow changes and any onboarding reinforcement that ships.
+2. Add or expand automated coverage for wallet-settings copy/flow changes, any onboarding reinforcement that ships, and any Helpful Notes linkage or rendering that ships with this phase.
 
 Human / Browser QA:
 1. Verify dedicated-account warning clarity on wallet settings.
 2. Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
-3. Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
+3. Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
+4. Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
 
 ### Phase 5 - Correction Tooling + Safeguards
 
@@ -261,6 +269,6 @@ Human / Browser QA:
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
 2. Unsupported wallet reuse can be detected and flagged without hard-blocking the owner, and unsupported invoice state is applied only where creation-time state or invoice-specific evidence supports it.
-3. Wallet/onboarding UX clearly communicates the dedicated-account requirement.
+3. Wallet/onboarding/help UX clearly communicates the dedicated-account requirement.
 4. Operators and owners can recover from shared-account mistakes through auditable correction tooling.
 5. QA can reproduce the prior failure mode and confirm the flagging/recovery path.

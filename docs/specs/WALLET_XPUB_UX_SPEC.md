@@ -66,6 +66,13 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
 - Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.
+- Publish a matching Helpful Notes article in plain language that explains:
+  - why CryptoZing is watch-only
+  - why automatic payment tracking needs a dedicated receiving account key
+  - why spending elsewhere is fine but receiving elsewhere breaks attribution
+  - what unsupported configuration means
+  - how to fix the problem by connecting a fresh dedicated account key
+  - that using separate receive and spend apps or accounts is the safest recommended pattern, without making separate apps a hard product requirement
 
 ## Copy & Tone
 - Avoid jargon in headings; use “Wallet settings” and “Wallet account key.”
@@ -88,6 +95,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - evidence-triggered unsupported-state behavior for an implicated invoice
   - invoices created while the wallet is flagged unsupported inheriting that flag
   - previously existing invoices remaining unflagged unless invoice-specific evidence marks them
+  - the Helpful Notes article surfacing the same dedicated-receive guidance in plain language
 - Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.
 
