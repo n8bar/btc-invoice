@@ -53,18 +53,13 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 ### Phase 1 - Historical Data Risk Mitigation
 Address the current historical-data uncertainty before changing runtime lineage behavior.
 
-#### 1.1 Reset baseline
+#### 1.1 Reset and reseed the MS14 baseline
 1. Create a database backup first, even though the current dataset is still test-only.
-2. Treat the current wallet/invoice/payment data as disposable test data.
-3. Do not spend time inventorying outgoing rows in detail before reset.
-4. Proceed directly to the reset-and-reseed policy below.
-
-#### 1.2 Reset-and-reseed policy
-1. Keep existing `users`.
-2. Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
-3. Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
-4. Reseed normal wallet fixtures with unique extended keys only.
-5. Rebuild invoice fixtures around explicit MS14 scenarios:
+2. Keep existing `users`.
+3. Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
+4. Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
+5. Reseed normal wallet fixtures with unique extended keys only.
+6. Rebuild invoice fixtures around explicit MS14 scenarios:
    1. unpaid sent invoice
    2. exact-paid sent invoice
    3. underpaid sent invoice
@@ -72,13 +67,13 @@ Address the current historical-data uncertainty before changing runtime lineage 
    5. partial-to-paid sent invoice
    6. draft invoice with payment edge cases
    7. deliberate duplicate-key collision fixture
-6. Only some invoices need on-chain payments. Fund selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
-7. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
-8. Committed fixtures and app behavior may use public derivation material only. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
-9. At this stage, outbound mail is not part of the reseeding concern; mail restoration and queue cleanup remain MS15 work.
-10. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
+7. Fund only the selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
+8. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
+9. Keep committed fixtures and app behavior limited to public derivation material. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
+10. Treat outbound mail as out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
+11. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
-#### 1.3 Verification
+#### 1.2 Verify the reseeded MS14 baseline
 Run all checks through Sail.
 
 Automated / scripted:
