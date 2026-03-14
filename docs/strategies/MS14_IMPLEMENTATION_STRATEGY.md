@@ -86,8 +86,8 @@ Run all checks through Sail.
 
 Automated / scripted:
 1. [x] Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-2. [ ] Confirm CryptoZing detects each funded `testnet4` payment, attaches it to the expected invoice, and updates payment/state behavior as defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
-   - Current local result on 2026-03-14: detection worked for all funded outputs, but the deliberate duplicate-address collision also attached the same funding tx to both invoices `57` and `58`. That known attribution failure remains Phase 2/3 work.
+2. [x] Confirm CryptoZing detects each funded `testnet4` payment and establishes the intended Phase 1 baseline using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+   - Current local result on 2026-03-14: detection worked for all funded outputs. The normal fixtures followed the expected pre-MS14 payment/state behavior from [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), and the deliberate duplicate-address collision also reproduced the known false-attribution failure by attaching the same funding tx to both invoices `57` and `58`. Correcting that remains Phase 2/3 work.
 3. [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Human / Browser QA:
