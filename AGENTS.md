@@ -35,9 +35,7 @@
 - Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
 - Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
 - Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
-- Keep agent coordination logs local-only and untracked; use `Agents.comm` in the untracked `.cybercreek/` area for agent-to-agent notes/checkouts/checkins.
-- Checkout/checkin in `Agents.comm` is optional but recommended for high-conflict files; include agent, file paths, purpose, and lease/expiry so stale claims are obvious.
-- If you checkout files in `Agents.comm`, check them back in before any wait state (before asking the user a clarifying question, when blocked/waiting, before switching tasks, and before ending your session).
+- Keep agent coordination logs local-only and untracked. If you use coordination artifacts under `.cybercreek/` (for example `Agents.comm`), follow `.cybercreek/LOCAL_AGENTS.md`.
 - On checkin, leave a short handoff note: what changed, what remains, and any risks/tests to run.
 
 ## Handy Commands
@@ -58,7 +56,7 @@
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
-- For substantive local-only changes under `.cybercreek/`, update `.cybercreek/UNTRACKED_CHANGELOG.md`. Log "after this PR" findings in `.cybercreek/after-this-pr.md` with per-item timestamps, following `.cybercreek/LOCAL_AGENTS.md` if present.
+- For `.cybercreek/` changelog/findings handling, follow `.cybercreek/LOCAL_AGENTS.md`.
 - Whenever `docs/**` changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
