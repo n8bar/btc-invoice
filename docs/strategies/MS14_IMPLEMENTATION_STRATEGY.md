@@ -63,7 +63,7 @@ Address the current historical-data uncertainty before changing runtime lineage 
 1. Keep existing `users`.
 2. Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
 3. Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
-4. Remove accidental duplicate extended keys from normal fixtures.
+4. Reseed normal wallet fixtures with unique extended keys only.
 5. Rebuild invoice fixtures around explicit MS14 scenarios:
    1. unpaid sent invoice
    2. exact-paid sent invoice
