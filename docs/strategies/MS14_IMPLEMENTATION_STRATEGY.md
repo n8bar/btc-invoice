@@ -70,7 +70,7 @@ Address the current historical-data uncertainty before changing runtime lineage 
    3. underpaid sent invoice
    4. overpaid sent invoice
    5. partial-to-paid sent invoice
-   6. draft invoice with payment edge case
+   6. draft invoice with payment edge cases
    7. deliberate duplicate-key collision fixture
 6. Only some invoices need on-chain payments. Fund selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
 7. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
