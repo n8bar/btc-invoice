@@ -56,9 +56,14 @@ Address the current historical-data uncertainty before changing runtime lineage 
 #### 1.1 Reset and reseed the MS14 baseline
 1. Create a database backup first, even though the current dataset is still test-only.
 2. Keep existing `users`.
-3. Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
-4. Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
-5. Reseed normal wallet fixtures with unique extended keys only.
+3. Delete existing wallet configuration data, invoices, and invoice-linked payment/delivery test data from the disposable dataset.
+4. Reseed wallet fixtures with fresh `testnet4` account keys under the watch-only product boundary:
+   1. generate new public extended keys for the reseeded wallet fixtures
+   2. generate any matching private keys only through local developer tooling
+   3. keep those private keys untracked and outside normal application flows
+   4. never commit private keys or seed phrases into repo files, app config, fixtures, tests, or docs
+   5. reserve one deliberate duplicate-key pair for the collision fixture
+5. Reseed normal wallet fixtures with unique extended keys everywhere else.
 6. Rebuild invoice fixtures around explicit MS14 scenarios:
    1. unpaid sent invoice
    2. exact-paid sent invoice
@@ -69,7 +74,7 @@ Address the current historical-data uncertainty before changing runtime lineage 
    7. deliberate duplicate-key collision fixture
 7. Fund only the selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
 8. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
-9. Keep committed fixtures and app behavior limited to public derivation material. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
+9. Keep committed fixtures and app behavior limited to public derivation material, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
 10. Treat outbound mail as out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
 11. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
@@ -78,7 +83,7 @@ Run all checks through Sail.
 
 Automated / scripted:
 1. Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-2. Fund the selected `testnet4` invoice addresses and confirm watcher observations through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+2. Confirm watcher observations for the funded `testnet4` invoices through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
 3. If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Manual QA:
