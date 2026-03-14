@@ -52,6 +52,7 @@
 - Wallet xpub onboarding lives at `/wallet/settings`; invoices expect a configured wallet or redirect there.
 - Node helper for BTC derivation lives in `node_scripts/derive-address.cjs` and is invoked via `App\Services\HdWallet`.
 - **Data hygiene:** As of 2025-11-16 the app only holds seed/test data—no real customers yet. Remove this note (and treat production emails accordingly) once live customer data exists.
+- CryptoZing must remain watch-only: never put private keys or seed phrases into tracked repo files, app config, database seeders, fixtures, tests, or normal application flows. If local testnet funding keys are needed for developer-only scenario setup, keep them only in untracked local storage (for example under `.cybercreek/`) and outside the product boundary.
 - Email delivery currently rewrites recipients to the CryptoZing catch-all via `MAIL_ALIAS_ENABLED/MAIL_ALIAS_DOMAIN` (set to `mailer.cryptozing.app` so Mailgun routes everything to Proton). Disable the aliasing before RC or any real-customer deployment.
 - The CryptoZing.app domain is reserved solely for this project; feel free to provision DNS/subdomains/mail for app needs without saving it for other products.
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.

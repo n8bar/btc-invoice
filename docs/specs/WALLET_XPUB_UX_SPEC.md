@@ -22,8 +22,9 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 5. Tests:
    - Coverage for helper visibility, validation preview endpoint, and invalid-key errors preserving input.
 
-## ToDo
-- None.
+## Current Status
+- The MS13 wallet-settings baseline in this spec is shipped.
+- MS14 follow-on unsupported-configuration UX and Helpful Notes guidance in this spec are canonical upcoming requirements for active roadmap work.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.
@@ -51,6 +52,29 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Empty submission: “Please paste your wallet account key.”
 - Loading: small inline spinner next to the helper, no page-level overlay; avoid shifting the CTA.
 
+## MS14 Follow-On Wallet Risk UX
+- When CryptoZing detects wallet activity outside its dedicated receive flow, the system may internally mark the wallet as an `unsupported configuration`.
+- User-facing copy should stay gentle and corrective, not punitive. Preferred direction:
+  - “We found wallet activity outside CryptoZing.”
+  - “Automatic payment tracking is no longer reliable for this wallet account.”
+  - “To keep using automatic tracking, connect a new dedicated wallet account key.”
+- Spending from the same wallet elsewhere is not the warning trigger by itself; the warning is about outside receive activity or collision evidence in the same account namespace.
+- Red attention UI should appear only when the wallet is actually flagged unsupported:
+  - attention-grabbing label near the user menu
+  - red dot on the Settings nav item
+  - red dot on the Wallet settings tab
+  - red warning near the wallet account key field
+- The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
+- Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
+- Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.
+- Publish a matching Helpful Notes article in plain language that explains:
+  - why CryptoZing is watch-only
+  - why automatic payment tracking needs a dedicated receiving account key
+  - why spending elsewhere is fine but receiving elsewhere breaks attribution
+  - what unsupported configuration means
+  - how to fix the problem by connecting a fresh dedicated account key
+  - that using separate receive and spend apps or accounts is the safest recommended pattern, without making separate apps a hard product requirement
+
 ## Copy & Tone
 - Avoid jargon in headings; use “Wallet settings” and “Wallet account key.”
 - Safety reminder: “This key can receive only. Never share or paste your seed phrase.”
@@ -67,6 +91,12 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - Testnet: helper text renders; network is not selectable.
   - Invalid xpub: inline error appears, input preserved, submit stays enabled.
   - Successful validation: success message + sample address render.
+- When the MS14 unsupported-configuration UX ships, add coverage for:
+  - proactive unsupported-state detection surfacing the red warning/UI indicators only when the wallet is actually flagged
+  - evidence-triggered unsupported-state behavior for an implicated invoice
+  - invoices created while the wallet is flagged unsupported inheriting that flag
+  - previously existing invoices remaining unflagged unless invoice-specific evidence marks them
+  - the Helpful Notes article surfacing the same dedicated-receive guidance in plain language
 - Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.
 
@@ -74,4 +104,4 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Wallet settings implements the above layout, helper copy, validation states, and testnet-only cue.
 - Additional wallets share the same UX patterns and respect the configured network.
 - No network selector remains; env-driven network is authoritative.
-- Docs updated: contributor walkthrough/quick start screenshots later; ROADMAP/CHANGELOG/UX spec link updated with this spec reference.
+- Docs updated: contributor walkthrough/quick start screenshots later; PLAN/CHANGELOG/UX spec link updated with this spec reference.

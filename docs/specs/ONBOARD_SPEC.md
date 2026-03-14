@@ -7,10 +7,11 @@ Purpose: define the guided onboarding flow that helps a signed-in owner reach fi
 - The flow links into existing wallet/invoice pages; it does not replace policy checks or controller authorization.
 - The wizard can be dismissed or completed.
 - Empty states (no wallet / no invoices) should point into the onboarding flow with clear CTAs.
+- The wallet step should reinforce the dedicated receiving-account requirement in plain language and link into the Helpful Notes explainer when that content ships.
 
 ## Wizard Steps
 1. Connect wallet.
-- Action: go to `/wallet/settings` and save a valid wallet account key.
+- Action: go to `/wallet/settings`, save a valid dedicated wallet account key, and review the dedicated-account guidance / Helpful Notes explainer if needed.
 - Completion signal: the authenticated user has a wallet setting.
 
 2. Create first invoice.
@@ -100,7 +101,7 @@ If any step proves too broad during implementation, split it into explicit subst
   - `Getting started complete.`
 - Step shell examples (what the getting-started page shows):
   - Wallet title: `Connect your wallet`
-  - Wallet body: `Add your wallet account key so CryptoZing can generate a payment address for each invoice.`
+  - Wallet body: `Add a dedicated wallet account key so CryptoZing can generate a payment address for each invoice. Need help? Review why CryptoZing needs a dedicated receiving account key.`
   - Wallet CTA: `Open wallet settings`
   - Invoice title: `Create your first invoice`
   - Invoice body: `Create an invoice to continue getting started.`
@@ -139,3 +140,4 @@ If any step proves too broad during implementation, split it into explicit subst
 - "Share enabled" means the invoice public link is enabled (`public_enabled=true`) so the public URL is active.
 - If onboarding is dismissed, it should stay dismissed until the user intentionally reopens it.
 - Reopen entry point should be available from the authenticated user dropdown.
+- Onboarding reinforces the dedicated receiving-account requirement but does not hard-block solely because wallet-risk guidance or unsupported-state warnings appear.

@@ -1,5 +1,5 @@
 # Product Spec
-_Last updated: 2026-03-13_
+_Last updated: 2026-03-14_
 
 This is the canonical product-level spec for CryptoZing.
 
@@ -45,6 +45,9 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 7. Prefer minimal, high-leverage safeguards before operational complexity.
    Add the smallest effective protections first and defer heavy process overhead until adoption requires it.
 
+8. Remain watch-only and never hold spending secrets.
+   CryptoZing must never require, collect, store, process, or depend on private keys or seed phrases for normal product operation. Wallet integration is watch-only and limited to public derivation material.
+
 ## Cross-Feature Requirements
 ### Ownership and access
 - Client and invoice data are owner-scoped.
@@ -67,8 +70,14 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
+- CryptoZing remains watch-only: wallet setup uses public derivation material only, and no normal product flow may require or accept seed phrases or private keys.
 - Reliable automatic attribution requires a dedicated account xpub or derivation namespace for CryptoZing receives.
 - Users may view or spend from that account in other wallets, but they should not use that same account for additional receives or address generation outside CryptoZing if they want reliable invoice tracking.
+- Wallet settings, onboarding guidance, unsupported-state warnings, and public Helpful Notes content are all valid ways to communicate this requirement; Helpful Notes is one reinforcing surface, not the whole safeguard.
+- CryptoZing may flag a wallet configuration as unsupported when it detects outside receive activity or invoice-specific collision evidence that makes automatic payment attribution unreliable.
+- Unsupported configuration handling is warning/escalation behavior, not a hard block; the product should direct the user to connect a fresh dedicated account key for continued automatic tracking.
+- Invoices created while a wallet is flagged unsupported inherit unsupported state at creation time.
+- Existing invoices must not be bulk retroactively marked unsupported; mark an existing invoice unsupported only when invoice-specific evidence implicates that invoice.
 - When attribution is uncertain, the product must surface that uncertainty and provide a correction path rather than silently assuming correctness.
 - The source finding and locked product decision behind this requirement live in [`docs/qa/Finding1.md`](qa/Finding1.md).
 
@@ -84,7 +93,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Viewer-facing time localization may differ from server calculation time where explicitly documented.
 
 ### Active plan-linked requirements
-- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
+- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
 - Mailer and alerts hardening must add duplicate-send safeguards, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email.
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 

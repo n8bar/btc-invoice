@@ -1,5 +1,5 @@
 # Backlog (Post-MVP)
-_Last updated: 2026-03-10_
+_Last updated: 2026-03-14_
 
 This is the canonical post-MVP backlog.
 
@@ -77,3 +77,9 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Track per-client credit balances that can be issued manually (refunds, overpayments, goodwill adjustments) and applied to future invoices.
    - Show each client’s net outstanding balance as: total open invoice balances minus unspent credit balance.
    - Surface an owner-facing ledger so credit issuance, application, reversal, and remaining credit are auditable over time.
+
+15. **Spending-only companion wallet ecosystem idea**
+   - Separate product idea, not RC scope for CryptoZing itself.
+   - Explore a companion wallet app that can spend/send but does not receive, and only shares public derivation material with CryptoZing.
+   - Goal: reduce accidental outside receive activity on the same account namespace while keeping CryptoZing watch-only.
+   - Future direction to evaluate later: whether a tighter CryptoZing + companion-wallet pairing should be encouraged or even required in a future product generation.

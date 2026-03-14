@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: begin MS14 with the Phase 14.1 / Slice 1 foundation work from the strategy doc: add key-lineage schema (`wallet_key_cursors` plus invoice key snapshot columns) before changing watcher behavior.
+- Next action: begin MS14 with Phase 1 risk-mitigation work from the strategy doc: preserve users, reset/reseed wallet and invoice test data, rebuild the explicit MS14 invoice/payment scenario set, and fund only the selected `testnet4` cases needed for the clean baseline.
 - Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
@@ -21,7 +21,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 14 | On-Chain Payment Attribution Hardening | Make attribution key-aware, reinforce dedicated-account usage, and provide auditable correction tooling. | [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md) |
+| [ ] | 14 | On-Chain Payment Attribution Hardening | Make attribution key-aware, detect unsupported wallet reuse, reinforce dedicated-account usage, and provide auditable correction tooling. | [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md) |
 | [ ] | 15 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
 | [ ] | 16 | Docs & DX | Keep contributor docs current, document notification coverage, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 17 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
