@@ -87,7 +87,7 @@ Automated / scripted:
 2. Confirm CryptoZing detects each funded `testnet4` payment, attaches it to the expected invoice, and updates payment/state behavior as defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
 3. If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
-Manual QA:
+Human / Browser QA:
 1. Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
 2. Confirm the deliberate duplicate-key fixture is isolated and clearly named.
 3. Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
@@ -148,49 +148,90 @@ Human / Browser QA:
 2. Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
 3. Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
 
-### Phase 3 - Dedicated-Wallet UX Hardening
+### Phase 3 - Unsupported Configuration Detection + Flagging
+Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsupported state only where evidence supports it.
 
-#### 3.1 Wallet settings copy
-Update wallet settings copy to explicitly state:
-- Use a dedicated account xpub for CryptoZing receives.
-- Sharing the same account for receives elsewhere can cause false payment attribution.
-- Viewing/spending from that account elsewhere is fine.
+#### 3.1 Persist unsupported wallet and invoice state
+1. Add wallet-level unsupported-state fields that capture whether the primary wallet is currently flagged plus enough metadata to explain why it was flagged.
+2. Add invoice-level unsupported-state fields so newly created invoices can snapshot wallet unsupported state and existing invoices can be flagged individually when direct evidence implicates them.
+3. Keep unsupported-state metadata explicit enough to distinguish proactive detection from evidence-triggered detection.
 
-#### 3.2 Onboarding reinforcement
-Add onboarding reinforcement in wallet step:
-- concise warning block + link to Helpful Notes anchor.
-- optional explicit acknowledgment checkbox if Browser QA shows warning copy is ignored.
+#### 3.2 Detect unsupported wallet activity proactively
+1. Inspect the saved primary wallet key for prior outside receive activity when the owner saves or replaces the wallet.
+2. Flag the wallet as unsupported when proactive detection finds prior activity that makes automatic tracking unreliable.
+3. Allow the owner to continue after save instead of hard-blocking the wallet flow.
+4. Treat outside receive activity as the trigger; spending elsewhere alone is not enough to flag the wallet unsupported.
 
-#### 3.3 Guardrails and telemetry
-Keep guardrails from `docs/UX_GUARDRAILS.md`:
-- no layout shift from warning blocks.
-- preserved input on validation failures.
-- keyboard/focus sanity for any new controls.
+#### 3.3 Detect unsupported cases from invoice/payment evidence
+1. Flag the wallet as unsupported when watcher or lineage evidence later shows collision-style activity that undermines automatic attribution.
+2. Mark only the implicated existing invoice unsupported when the evidence is specific to that invoice.
+3. Do not retroactively bulk-mark older invoices unsupported without invoice-specific evidence.
+4. Mark every newly created invoice unsupported while the wallet remains flagged unsupported.
 
-- Add event/log entries when users save wallet settings after seeing dedicated-account guidance (for support/debug traceability).
+#### 3.4 Surface unsupported state in app chrome and wallet flows
+1. Show red attention UI only when the wallet is actually flagged unsupported:
+   1. an attention-grabbing label near the user menu
+   2. a red dot on the Settings nav item
+   3. a red dot on the Wallet settings tab
+   4. a red warning near the wallet account key field
+2. Keep the warning copy gentle and corrective:
+   1. explain that CryptoZing found wallet activity outside its dedicated receive flow
+   2. explain that automatic tracking is no longer reliable for this wallet account
+   3. direct the owner to connect a fresh dedicated account key
+3. Mark invoices created while the wallet is flagged unsupported as unsupported in their own UI/state so that replacing the wallet later does not silently make them look safe.
 
-#### 3.4 Verification
-Run all checks through Sail.
+#### 3.5 Verify Phase 3
+Automated / command verification:
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
+2. Add or expand automated coverage for:
+   1. proactive unsupported-state detection when a saved wallet shows prior outside receive activity
+   2. evidence-triggered wallet flagging from invoice/payment collisions
+   3. new invoices inheriting unsupported state while the wallet is flagged
+   4. existing invoices remaining unflagged unless invoice-specific evidence marks them
+   5. unsupported-state UI indicators appearing only when the wallet is actually flagged
 
-Automated:
-- `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
-- Add/expand coverage for wallet-settings copy/flow changes and any onboarding reinforcement that ships.
+Human / Browser QA:
+1. Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
+2. Confirm the wallet warning language stays gentle and points the owner toward connecting a new dedicated account key.
+3. Create a new invoice while the wallet is flagged and confirm the invoice is marked unsupported at creation time.
+4. Confirm an older invoice is not retroactively marked unsupported unless evidence for that specific invoice triggers it.
 
-Manual QA:
-- Verify dedicated-account warning clarity on wallet settings.
-- Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
-- Confirm any telemetry/logging added for guidance acknowledgment is emitted as expected.
+### Phase 4 - Dedicated-Wallet UX Hardening
 
-### Phase 4 - Correction Tooling + Safeguards
+#### 4.1 Update wallet settings copy
+1. Update wallet settings copy to explicitly state that CryptoZing expects a dedicated account xpub for receives.
+2. Explain that sharing the same account for receives elsewhere can cause false payment attribution.
+3. Clarify that viewing or spending from that account elsewhere is fine.
 
-#### 4.1 Correction metadata
+#### 4.2 Reinforce the dedicated-account requirement in onboarding
+1. Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
+2. Add an explicit acknowledgment checkbox only if Human / Browser QA shows the warning copy is being ignored.
+
+#### 4.3 Keep dedicated-wallet guidance usable and traceable
+1. Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.
+2. Preserve wallet input on validation failures.
+3. Keep keyboard and focus behavior sane for any new guidance controls.
+4. Add event or log entries when users save wallet settings after seeing dedicated-account guidance if support/debug traceability proves necessary.
+
+#### 4.4 Verify Phase 4
+Automated / command verification:
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
+2. Add or expand automated coverage for wallet-settings copy/flow changes and any onboarding reinforcement that ships.
+
+Human / Browser QA:
+1. Verify dedicated-account warning clarity on wallet settings.
+2. Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
+3. Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
+
+### Phase 5 - Correction Tooling + Safeguards
+
+#### 5.1 Add correction metadata
 Add correction metadata to `invoice_payments` (or companion audit table):
 - `ignored_at`, `ignored_by_user_id`, `ignore_reason`.
 
-#### 4.2 Ignore/restore behavior
-Update payment summaries/state logic:
-- ignored on-chain rows are excluded from paid/outstanding calculations.
-- original tx rows remain stored for audit.
+#### 5.2 Add ignore/restore behavior
+1. Update payment summaries and state logic so ignored on-chain rows are excluded from paid/outstanding calculations.
+2. Preserve the original tx rows for audit.
 
 Owner UI on invoice show/payment history:
 - `Ignore` action per on-chain payment with warning copy.
@@ -199,28 +240,27 @@ Owner UI on invoice show/payment history:
 
 Re-run payment state recomputation after ignore/restore.
 
-#### 4.3 Safeguards and auditability
-- Only owner can ignore/restore.
-- Disallow ignoring manual adjustment rows.
-- Log every ignore/restore action with invoice/payment/user IDs.
+#### 5.3 Keep corrections guarded and auditable
+1. Restrict ignore/restore to the owner.
+2. Disallow ignoring manual adjustment rows.
+3. Log every ignore/restore action with invoice/payment/user IDs.
 
-#### 4.4 Verification
-Run all checks through Sail.
+#### 5.4 Verify Phase 5
+Automated / command verification:
+1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
+2. Add or expand automated coverage for:
+   1. ignore/restore payment recalculation
+   2. authorization and owner-only safeguards
+   3. audit logging and metadata persistence
 
-Automated:
-- `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
-- Add/expand coverage for:
-  - ignore/restore payment recalculation
-  - authorization and owner-only safeguards
-  - audit logging / metadata persistence
-
-Manual QA:
-- Verify correction flow recovers invoice state without deleting raw tx history.
-- Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
-- Confirm manual adjustment rows cannot be ignored.
+Human / Browser QA:
+1. Verify the correction flow recovers invoice state without deleting raw tx history.
+2. Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
+3. Confirm manual adjustment rows cannot be ignored.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
-2. Wallet/onboarding UX clearly communicates dedicated-account requirement.
-3. Operators and owners can recover from shared-account mistakes through auditable correction tooling.
-4. QA can reproduce prior failure mode and confirm safe recovery path.
+2. Unsupported wallet reuse can be detected and flagged without hard-blocking the owner, and unsupported invoice state is applied only where creation-time state or invoice-specific evidence supports it.
+3. Wallet/onboarding UX clearly communicates the dedicated-account requirement.
+4. Operators and owners can recover from shared-account mistakes through auditable correction tooling.
+5. QA can reproduce the prior failure mode and confirm the flagging/recovery path.
