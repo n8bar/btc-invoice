@@ -22,8 +22,9 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 5. Tests:
    - Coverage for helper visibility, validation preview endpoint, and invalid-key errors preserving input.
 
-## ToDo
-- None.
+## Current Status
+- The MS13 wallet-settings baseline in this spec is shipped.
+- MS14 follow-on unsupported-configuration UX and Helpful Notes guidance in this spec are canonical upcoming requirements for active roadmap work.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.

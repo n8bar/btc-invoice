@@ -1,5 +1,5 @@
 # Product Spec
-_Last updated: 2026-03-13_
+_Last updated: 2026-03-14_
 
 This is the canonical product-level spec for CryptoZing.
 
@@ -73,6 +73,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - CryptoZing remains watch-only: wallet setup uses public derivation material only, and no normal product flow may require or accept seed phrases or private keys.
 - Reliable automatic attribution requires a dedicated account xpub or derivation namespace for CryptoZing receives.
 - Users may view or spend from that account in other wallets, but they should not use that same account for additional receives or address generation outside CryptoZing if they want reliable invoice tracking.
+- Wallet settings, onboarding guidance, unsupported-state warnings, and public Helpful Notes content are all valid ways to communicate this requirement; Helpful Notes is one reinforcing surface, not the whole safeguard.
 - CryptoZing may flag a wallet configuration as unsupported when it detects outside receive activity or invoice-specific collision evidence that makes automatic payment attribution unreliable.
 - Unsupported configuration handling is warning/escalation behavior, not a hard block; the product should direct the user to connect a fresh dedicated account key for continued automatic tracking.
 - Invoices created while a wallet is flagged unsupported inherit unsupported state at creation time.

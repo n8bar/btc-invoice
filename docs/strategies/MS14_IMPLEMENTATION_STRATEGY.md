@@ -3,11 +3,13 @@
 Status: Advisory implementation strategy for Milestone 14.
 Date: 2026-03-07
 
-This is a working execution plan for MS14 and is not canonical scope. Canonical scope remains in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/qa/Finding1.md`.
+This is a working execution plan for MS14 and is not canonical scope. Canonical scope remains in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, `docs/specs/WALLET_XPUB_UX_SPEC.md`, `docs/specs/ONBOARD_SPEC.md`, and `docs/qa/Finding1.md`.
 
 ## Canonical Inputs
 - `docs/PLAN.md`
 - `docs/PRODUCT_SPEC.md`
+- `docs/specs/WALLET_XPUB_UX_SPEC.md`
+- `docs/specs/ONBOARD_SPEC.md`
 - `docs/qa/Finding1.md`
 - Existing wallet/payment behavior in:
   - `app/Http/Controllers/WalletSettingsController.php`
@@ -37,7 +39,7 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 
 ## Risks and Mitigations
 1. Risk: incorrect backfill guesses for historical invoices.
-- Mitigation: start with a historical-data risk pass. Because the current dataset is still test-only, we may choose to delete/reset ambiguous invoices instead of preserving them. If any historical data is kept, retain explicit `matched` / `inferred` / `unknown` buckets and do not fabricate certainty when lineage is not provable.
+- Mitigation: Phase 1 resets and reseeds the current test-only wallet/invoice/payment dataset instead of preserving ambiguous historical rows. If future non-test data ever needs to be retained, use explicit `matched` / `inferred` / `unknown` buckets and do not fabricate certainty when lineage is not provable.
 
 2. Risk: cursor regression causing address reuse.
 - Mitigation: enforce floor checks (`highest_assigned_for_key + 1`) and add regression tests around key switching.
