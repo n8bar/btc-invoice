@@ -53,51 +53,43 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 ### Phase 1 - Historical Data Risk Mitigation
 Address the current historical-data uncertainty before changing runtime lineage behavior.
 
-#### 1.1 Current-data risk scan
-Inventory the existing dataset so we know how much historical ambiguity we are carrying.
+#### 1.1 Reset baseline
+1. Treat the current wallet/invoice/payment data as disposable test data.
+2. Do not spend time inventorying outgoing rows in detail before reset.
+3. Proceed directly to the reset-and-reseed policy below.
 
-- Count invoices with `derivation_index` but no future key identity fields.
-- Count invoices with payments detected before invoice creation.
-- Compare stored invoice addresses against re-derived addresses from each user's current wallet key.
-- Identify invoices whose owner no longer has a wallet row.
-- Use the scan results to decide which existing rows are discarded and which user records remain as the base for reseeding.
-
-#### 1.2 Historical data handling policy
-Apply the agreed cleanup-and-reseed policy before backfill/runtime work begins.
-
-- Keep existing `users`.
-- Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
-- Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
-- Remove accidental duplicate extended keys from normal fixtures.
-- Add at least one deliberate duplicate-key scenario as an explicit MS14 test fixture rather than leaving duplicates as accidental residue.
-- Build reseeding around named scenarios that cover the MS14 risk surface, including:
-  - clean dedicated-wallet user
-  - key-rotation user
-  - deliberate duplicate-key pair
-  - high-derivation-index user
-  - no-wallet user
-  - partial/multi-payment history user
-  - draft-payment edge case
-- Fund selected reseeded invoice addresses on `testnet4` so MS14 has intentional on-chain payment fixtures to exercise. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
-- Keep the duplicate-key scenario isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
-- Committed fixtures and app behavior may use public derivation material only. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
-- At this stage, outbound mail is not part of the reseeding concern; mail restoration and queue cleanup remain MS15 work.
-- Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
+#### 1.2 Reset-and-reseed policy
+1. Keep existing `users`.
+2. Delete and reseed wallet configuration data so runtime lineage work starts from intentional fixtures instead of ambiguous history.
+3. Delete and reseed invoices plus invoice-linked payment/delivery test data instead of preserving ambiguous historical rows.
+4. Remove accidental duplicate extended keys from normal fixtures.
+5. Rebuild invoice fixtures around explicit MS14 scenarios:
+   1. unpaid sent invoice
+   2. exact-paid sent invoice
+   3. underpaid sent invoice
+   4. overpaid sent invoice
+   5. partial-to-paid sent invoice
+   6. draft invoice with payment edge case
+   7. deliberate duplicate-key collision fixture
+6. Only some invoices need on-chain payments. Fund selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
+7. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
+8. Committed fixtures and app behavior may use public derivation material only. Any private keys used to fund local `testnet4` scenarios must remain untracked and outside the product boundary, per [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) and [`AGENTS.md`](../../AGENTS.md).
+9. At this stage, outbound mail is not part of the reseeding concern; mail restoration and queue cleanup remain MS15 work.
+10. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
 #### 1.3 Verification
 Run all checks through Sail.
 
 Automated / scripted:
-- Re-run the risk scan after cleanup/reseed so the new baseline is explicit.
-- Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-- Fund the selected `testnet4` invoice addresses and confirm watcher observations through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
-- If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
+1. Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
+2. Fund the selected `testnet4` invoice addresses and confirm watcher observations through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+3. If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Manual QA:
-- Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
-- Confirm the deliberate duplicate-key fixture is isolated and clearly named.
-- Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
-- Confirm the working dataset is in the state we want before Phase 2 begins.
+1. Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
+2. Confirm the deliberate duplicate-key fixture is isolated and clearly named.
+3. Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
+4. Confirm the working dataset is in the state we want before Phase 2 begins.
 
 ### Phase 2 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and treat `wallet_settings` as the active key pointer.

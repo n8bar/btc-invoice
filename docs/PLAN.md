@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: begin MS14 with Phase 1 risk-mitigation work from the strategy doc: execute the wallet/invoice reset-and-reseed policy, preserve users, add explicit MS14 test scenarios, and establish the clean baseline before changing runtime lineage behavior.
+- Next action: begin MS14 with Phase 1 risk-mitigation work from the strategy doc: preserve users, reset/reseed wallet and invoice test data, rebuild the explicit MS14 invoice/payment scenario set, and fund only the selected `testnet4` cases needed for the clean baseline.
 - Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
