@@ -91,7 +91,11 @@ Automated / scripted:
 3. [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 4. [x] Confirm the deliberate duplicate-key fixture is isolated and clearly named.
 5. [x] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
-6. [x] Confirm the working dataset is in the state we want before Phase 2 begins.
+
+Browser QA:
+1. [ ] Review the seeded invoices in the browser and confirm the visible scenario set matches the intended MS14 baseline.
+2. [ ] Open the deliberate duplicate-address pair and confirm both invoices are visible as separate records while sharing the same receive address.
+3. [ ] Spot-check the funded invoices in the browser and confirm the current pre-MS14 states match expectations, including pending funded invoices and draft invoices with detected payments.
 
 ### Phase 2 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and remove legacy per-wallet cursor state.
