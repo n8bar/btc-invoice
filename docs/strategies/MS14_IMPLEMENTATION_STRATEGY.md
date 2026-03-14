@@ -56,45 +56,45 @@ Shared account xpub usage causes address collisions, so new invoices can inherit
 Address the current historical-data uncertainty before changing runtime lineage behavior.
 
 #### 1.1 Reset and reseed the MS14 baseline
-- [x] Create a database backup first, even though the current dataset is still test-only.
-- [x] Delete existing wallet configuration data, invoices, and invoice-linked payment/delivery test data while keeping existing `users`.
-- [x] Generate fresh `testnet4` account-key material for the reseeded wallet fixtures:
-  - [x] generate new public extended keys for all normal wallet fixtures
-  - [x] generate one deliberate duplicate-key pair for the collision fixture
-  - [x] generate any matching private keys through local developer tooling
-  - [x] store those private keys only in an untracked local path (for example under `.cybercreek/`) outside normal application flows
-  - [x] use only the public extended keys in tracked fixtures and app data
-- [x] Rebuild invoice fixtures around explicit MS14 scenarios:
-  - [x] unpaid sent invoice
-  - [x] exact-paid sent invoice
-  - [x] underpaid sent invoice
-  - [x] overpaid sent invoice
-  - [x] partial-to-paid sent invoice
-  - [x] draft invoice with payment edge cases
-  - [x] deliberate duplicate-key collision fixture
-- [x] Fund only the selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
-  - [x] select the invoice scenarios that actually need on-chain fixtures
-  - [x] derive or collect the target invoice receive addresses after reseeding
-  - [x] fund those addresses from local-only `testnet4` wallet material stored in an untracked path
-  - [x] broadcast the transactions for the selected funded scenarios
-- [x] Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
-- [x] Leave outbound mail out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
-- [x] Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
+1. [x] Create a database backup first, even though the current dataset is still test-only.
+2. [x] Delete existing wallet configuration data, invoices, and invoice-linked payment/delivery test data while keeping existing `users`.
+3. [x] Generate fresh `testnet4` account-key material for the reseeded wallet fixtures:
+   1. [x] generate new public extended keys for all normal wallet fixtures
+   2. [x] generate one deliberate duplicate-key pair for the collision fixture
+   3. [x] generate any matching private keys through local developer tooling
+   4. [x] store those private keys only in an untracked local path (for example under `.cybercreek/`) outside normal application flows
+   5. [x] use only the public extended keys in tracked fixtures and app data
+4. [x] Rebuild invoice fixtures around explicit MS14 scenarios:
+   1. [x] unpaid sent invoice
+   2. [x] exact-paid sent invoice
+   3. [x] underpaid sent invoice
+   4. [x] overpaid sent invoice
+   5. [x] partial-to-paid sent invoice
+   6. [x] draft invoice with payment edge cases
+   7. [x] deliberate duplicate-key collision fixture
+5. [x] Fund only the selected reseeded invoice addresses on `testnet4`, targeting roughly 6-12 total broadcasts across the scenario set. Payment/state expectations remain defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md).
+   1. [x] select the invoice scenarios that actually need on-chain fixtures
+   2. [x] derive or collect the target invoice receive addresses after reseeding
+   3. [x] fund those addresses from local-only `testnet4` wallet material stored in an untracked path
+   4. [x] broadcast the transactions for the selected funded scenarios
+6. [x] Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
+7. [x] Leave outbound mail out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
+8. [x] Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
 #### 1.2 Verify the reseeded MS14 baseline
 Run all checks through Sail.
 
 Automated / scripted:
-- [x] Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-- [ ] Confirm CryptoZing detects each funded `testnet4` payment, attaches it to the expected invoice, and updates payment/state behavior as defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
-  - Current local result on 2026-03-14: detection worked for all funded outputs, but the deliberate duplicate-address collision also attached the same funding tx to both invoices `57` and `58`. That known attribution failure remains Phase 2/3 work.
-- [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
+1. [x] Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
+2. [ ] Confirm CryptoZing detects each funded `testnet4` payment, attaches it to the expected invoice, and updates payment/state behavior as defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+   - Current local result on 2026-03-14: detection worked for all funded outputs, but the deliberate duplicate-address collision also attached the same funding tx to both invoices `57` and `58`. That known attribution failure remains Phase 2/3 work.
+3. [x] If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Human / Browser QA:
-- [ ] Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
-- [ ] Confirm the deliberate duplicate-key fixture is isolated and clearly named.
-- [ ] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
-- [ ] Confirm the working dataset is in the state we want before Phase 2 begins.
+1. [ ] Review the reseeded scenario set and confirm it matches the intended MS14 test matrix.
+2. [ ] Confirm the deliberate duplicate-key fixture is isolated and clearly named.
+3. [ ] Confirm any private keys used for local `testnet4` funding stay untracked and outside normal application flows.
+4. [ ] Confirm the working dataset is in the state we want before Phase 2 begins.
 
 ### Phase 2 - Key Lineage + Cursor Model
 Create a durable per-key cursor ledger and remove legacy per-wallet cursor state.
