@@ -74,8 +74,7 @@ Address the current historical-data uncertainty before changing runtime lineage 
    1. select the invoice scenarios that actually need on-chain fixtures
    2. derive or collect the target invoice receive addresses after reseeding
    3. fund those addresses from local-only `testnet4` wallet material stored in an untracked path
-   4. broadcast the transactions and record the txid for each funded scenario
-   5. carry those txids into `1.2` watcher verification
+   4. broadcast the transactions for the selected funded scenarios
 6. Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
 7. Treat outbound mail as out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
 8. Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
@@ -85,7 +84,7 @@ Run all checks through Sail.
 
 Automated / scripted:
 1. Verify reseeded wallet/invoice fixtures cover the intended MS14 scenario set.
-2. Confirm watcher observations for the funded `testnet4` invoices through the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
+2. Confirm CryptoZing detects each funded `testnet4` payment, attaches it to the expected invoice, and updates payment/state behavior as defined in [`docs/specs/PARTIAL_PAYMENTS.md`](../specs/PARTIAL_PAYMENTS.md), using the existing scheduler/manual paths already documented in [`AGENTS.md`](../../AGENTS.md) and [`docs/ops/DOCS_DX.md`](../ops/DOCS_DX.md).
 3. If cleanup/reseed tooling is added, verify it reports what it removed and what it recreated.
 
 Manual QA:
