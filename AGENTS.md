@@ -15,7 +15,7 @@
 - Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
-- Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs or local recovery files.
+- Keep `.cybercreek/` local-only and untracked; do not commit agent coordination logs, local recovery files, or other local-only helper artifacts. For local-only work under `.cybercreek/`, follow `.cybercreek/AGENTS_LOCAL.md` if present.
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
@@ -35,9 +35,7 @@
 - Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
 - Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
 - Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
-- Keep agent coordination logs local-only and untracked; use `Agents.comm` in the untracked `.cybercreek/` area for agent-to-agent notes/checkouts/checkins.
-- Checkout/checkin in `Agents.comm` is optional but recommended for high-conflict files; include agent, file paths, purpose, and lease/expiry so stale claims are obvious.
-- If you checkout files in `Agents.comm`, check them back in before any wait state (before asking the user a clarifying question, when blocked/waiting, before switching tasks, and before ending your session).
+- Keep agent coordination logs local-only and untracked. If you use coordination artifacts under `.cybercreek/` (for example `Agents.comm`), follow `.cybercreek/AGENTS_LOCAL.md`.
 - On checkin, leave a short handoff note: what changed, what remains, and any risks/tests to run.
 
 ## Handy Commands
@@ -58,6 +56,7 @@
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
+- For `.cybercreek/` changelog/findings handling, follow `.cybercreek/AGENTS_LOCAL.md`.
 - Whenever `docs/**` changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 

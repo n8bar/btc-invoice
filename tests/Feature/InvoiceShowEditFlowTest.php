@@ -5,12 +5,22 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\User;
+use App\Services\BtcRate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class InvoiceShowEditFlowTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        Cache::forget(BtcRate::CACHE_KEY);
+        parent::tearDown();
+    }
 
     public function test_invoice_index_empty_state_and_action_bar_are_visible(): void
     {
@@ -71,6 +81,44 @@ class InvoiceShowEditFlowTest extends TestCase
             ->assertOk()
             ->assertSee('md:table-cell">ID</th>', false)
             ->assertSee('md:table-cell">' . $invoice->id . '</td>', false);
+    }
+
+    public function test_invoice_index_derives_btc_from_current_rate_instead_of_stale_snapshot(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-03-14 18:00:00', 'UTC'));
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RATE-LIST',
+            'description' => 'Current-rate display test',
+            'amount_usd' => 100,
+            'btc_rate' => 100_000,
+            'amount_btc' => 0.001,
+            'payment_address' => 'tb1qq0exampleratedisplay',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 50_000.00,
+            'as_of' => Carbon::now(),
+            'source' => 'cache',
+        ], BtcRate::TTL);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.index'))
+            ->assertOk()
+            ->assertSee('0.002 BTC', false)
+            ->assertDontSee('0.001 BTC', false);
     }
 
     public function test_invoice_update_redirects_back_to_show_with_status_flash(): void
