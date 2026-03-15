@@ -126,7 +126,7 @@ class ReassignInvoiceAddresses extends Command
 
                 if ($apply) {
                     if ($this->option('use-next-index')) {
-                        $this->lineage->withNextAssignment($wallet, function (array $assignedLineage) use ($invoice) {
+                        $this->lineage->withPreparedAssignment($wallet, $expectedLineage, function (array $assignedLineage) use ($invoice) {
                             $invoice->update($assignedLineage);
                         });
                     } else {

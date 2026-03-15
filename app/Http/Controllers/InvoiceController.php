@@ -108,8 +108,9 @@ class InvoiceController extends Controller
 
         $data = $this->applyInvoiceDefaults($request->user(), $data);
 
+        $preparedLineage = null;
         try {
-            app(WalletKeyLineage::class)->previewCursor($wallet);
+            $preparedLineage = app(WalletKeyLineage::class)->previewNextAssignment($wallet);
         } catch (\Throwable $e) {
             $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return redirect()
@@ -119,7 +120,7 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice = $this->createInvoiceRecord($data, $wallet, $userId);
+            $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $preparedLineage);
             $invoiceCreatedMessage = 'Invoice created.';
         } catch (QueryException $e) {
             if ($this->isInvoiceNumberUniqueViolation($e)) {
@@ -133,7 +134,7 @@ class InvoiceController extends Controller
                 $data['number'] = Invoice::nextNumberForUser($userId);
 
                 try {
-                    $invoice = $this->createInvoiceRecord($data, $wallet, $userId);
+                    $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $preparedLineage);
                     $invoiceCreatedMessage = "Invoice created. Number adjusted to {$data['number']} due to a collision.";
                 } catch (QueryException $retryException) {
                     if ($this->isInvoiceNumberUniqueViolation($retryException)) {
@@ -720,9 +721,9 @@ class InvoiceController extends Controller
         return $data;
     }
 
-    private function createInvoiceRecord(array $data, $wallet, int $userId): Invoice
+    private function createInvoiceRecord(array $data, $wallet, int $userId, ?array $preparedLineage = null): Invoice
     {
-        return app(WalletKeyLineage::class)->withNextAssignment($wallet, function (array $lineage) use ($data, $userId) {
+        return app(WalletKeyLineage::class)->withPreparedAssignment($wallet, $preparedLineage, function (array $lineage) use ($data, $userId) {
             return Invoice::create($data + [
                 'user_id' => $userId,
             ] + $lineage);

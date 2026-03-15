@@ -11,11 +11,13 @@ use App\Models\WalletSetting;
 use App\Services\BtcRate;
 use App\Services\HdWallet;
 use App\Services\WalletKeyLineage;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 use Tests\TestCase;
 
 class UserSettingsTest extends TestCase
@@ -67,6 +69,10 @@ class UserSettingsTest extends TestCase
         $invoice = $owner->invoices()->latest('id')->first();
         $this->assertSame('Weekly retainer', $invoice->description);
         $this->assertSame('2025-01-11', Carbon::parse($invoice->due_date)->toDateString());
+        $this->assertSame('testnet', $invoice->wallet_network);
+        $this->assertSame($this->walletFingerprint('testnet', 'vpub-test-key'), $invoice->wallet_key_fingerprint);
+        $this->assertSame(0, (int) $invoice->derivation_index);
+        $this->assertSame(1, (int) $this->walletCursorFor($owner, 'vpub-test-key')->next_derivation_index);
     }
 
     public function test_invoice_store_forces_new_invoices_to_draft(): void
@@ -487,10 +493,21 @@ class UserSettingsTest extends TestCase
             'email' => 'billing@acme.test',
         ]);
 
-        $this->mock(HdWallet::class, function ($mock) use ($owner, $client): void {
-            $mock->shouldReceive('deriveAddress')
+        $lineage = [
+            'payment_address' => 'tb1qretryaddress00000000000000000000000',
+            'derivation_index' => 0,
+            'wallet_key_fingerprint' => app(WalletKeyLineage::class)->fingerprint('testnet', 'vpub-test-key'),
+            'wallet_network' => 'testnet',
+        ];
+        $collision = $this->invoiceNumberCollisionException();
+
+        $this->mock(WalletKeyLineage::class, function ($mock) use ($owner, $client, $lineage, $collision): void {
+            $mock->shouldReceive('previewNextAssignment')
                 ->once()
-                ->andReturnUsing(function () use ($owner, $client): string {
+                ->andReturn($lineage);
+            $mock->shouldReceive('withPreparedAssignment')
+                ->once()
+                ->andReturnUsing(function ($wallet, $prepared, $callback) use ($owner, $client, $collision): never {
                     Invoice::create([
                         'user_id' => $owner->id,
                         'client_id' => $client->id,
@@ -505,7 +522,22 @@ class UserSettingsTest extends TestCase
                         'invoice_date' => '2025-01-01',
                     ]);
 
-                    return 'tb1qretryaddress00000000000000000000000';
+                    throw $collision;
+                });
+            $mock->shouldReceive('withPreparedAssignment')
+                ->once()
+                ->andReturnUsing(function ($wallet, $prepared, $callback) use ($owner, $lineage) {
+                    $result = $callback($lineage);
+
+                    $owner->walletKeyCursors()->create([
+                        'network' => 'testnet',
+                        'key_fingerprint' => $lineage['wallet_key_fingerprint'],
+                        'next_derivation_index' => 1,
+                        'first_seen_at' => now(),
+                        'last_seen_at' => now(),
+                    ]);
+
+                    return $result;
                 });
         });
 
@@ -1115,7 +1147,25 @@ class UserSettingsTest extends TestCase
         return WalletKeyCursor::query()
             ->where('user_id', $user->id)
             ->where('network', $network)
-            ->where('key_fingerprint', app(WalletKeyLineage::class)->fingerprint($network, $xpub))
+            ->where('key_fingerprint', $this->walletFingerprint($network, $xpub))
             ->firstOrFail();
+    }
+
+    private function walletFingerprint(string $network, string $xpub): string
+    {
+        return hash('sha256', strtolower(trim($network)) . '|' . preg_replace('/\s+/', '', trim($xpub)));
+    }
+
+    private function invoiceNumberCollisionException(): QueryException
+    {
+        $previous = new PDOException('UNIQUE constraint failed: invoices.user_id, invoices.number');
+        $previous->errorInfo = ['23000', null, 'UNIQUE constraint failed: invoices.user_id, invoices.number'];
+
+        return new QueryException(
+            'sqlite',
+            'insert into "invoices" ("user_id", "number") values (?, ?)',
+            [],
+            $previous
+        );
     }
 }

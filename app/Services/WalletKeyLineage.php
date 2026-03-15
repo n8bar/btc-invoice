@@ -46,6 +46,13 @@ class WalletKeyLineage
         ];
     }
 
+    public function previewNextAssignment(WalletSetting $wallet): array
+    {
+        $preview = $this->previewCursor($wallet);
+
+        return $this->deriveInvoiceLineage($wallet, (int) $preview['next_derivation_index']);
+    }
+
     public function syncWalletCursor(WalletSetting $wallet): WalletKeyCursor
     {
         return DB::transaction(function () use ($wallet) {
@@ -70,9 +77,16 @@ class WalletKeyLineage
 
     public function withNextAssignment(WalletSetting $wallet, callable $callback): mixed
     {
-        return DB::transaction(function () use ($wallet, $callback) {
+        return $this->withPreparedAssignment($wallet, null, $callback);
+    }
+
+    public function withPreparedAssignment(WalletSetting $wallet, ?array $preparedLineage, callable $callback): mixed
+    {
+        return DB::transaction(function () use ($wallet, $preparedLineage, $callback) {
             [$cursor, $index] = $this->lockedCursorAndIndex($wallet);
-            $lineage = $this->deriveInvoiceLineage($wallet, $index);
+            $lineage = $this->preparedLineageIsCurrent($wallet, $preparedLineage, $index)
+                ? $preparedLineage
+                : $this->deriveInvoiceLineage($wallet, $index);
             $result = $callback($lineage);
 
             $cursor->next_derivation_index = $index + 1;
@@ -81,6 +95,19 @@ class WalletKeyLineage
 
             return $result;
         });
+    }
+
+    private function preparedLineageIsCurrent(WalletSetting $wallet, ?array $preparedLineage, int $index): bool
+    {
+        if ($preparedLineage === null) {
+            return false;
+        }
+
+        $network = $this->normalizeNetwork((string) $wallet->network);
+
+        return (int) ($preparedLineage['derivation_index'] ?? -1) === $index
+            && ($preparedLineage['wallet_network'] ?? null) === $network
+            && ($preparedLineage['wallet_key_fingerprint'] ?? null) === $this->fingerprint($network, (string) $wallet->bip84_xpub);
     }
 
     private function lockedCursorAndIndex(WalletSetting $wallet): array
