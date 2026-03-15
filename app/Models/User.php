@@ -98,6 +98,11 @@ class User extends Authenticatable
         return $this->hasMany(UserWalletAccount::class);
     }
 
+    public function walletKeyCursors()
+    {
+        return $this->hasMany(WalletKeyCursor::class);
+    }
+
     public function gettingStartedIsDone(): bool
     {
         return $this->getting_started_completed_at !== null;

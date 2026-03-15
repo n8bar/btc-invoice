@@ -7,6 +7,7 @@ use App\Models\InvoicePayment;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Services\BtcRate;
+use App\Services\WalletKeyLineage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -488,7 +489,6 @@ class WatchPaymentsCommandTest extends TestCase
         $user->walletSetting()->create([
             'network' => $network,
             'bip84_xpub' => 'tpubD6Nz...',
-            'next_derivation_index' => 0,
         ]);
 
         $client = Client::create([
@@ -506,6 +506,8 @@ class WatchPaymentsCommandTest extends TestCase
             'btc_rate' => 40000,
             'amount_btc' => 0.01,
             'payment_address' => 'tb1qq0exampleaddress0000000000000',
+            'wallet_key_fingerprint' => app(WalletKeyLineage::class)->fingerprint($network, 'tpubD6Nz...'),
+            'wallet_network' => $network,
             'status' => 'sent',
             'invoice_date' => Carbon::now()->toDateString(),
             'due_date' => Carbon::now()->addWeek()->toDateString(),

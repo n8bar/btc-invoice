@@ -6,9 +6,11 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Models\UserWalletAccount;
+use App\Models\WalletKeyCursor;
 use App\Models\WalletSetting;
 use App\Services\BtcRate;
 use App\Services\HdWallet;
+use App\Services\WalletKeyLineage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -530,8 +532,8 @@ class UserSettingsTest extends TestCase
         ]);
         $this->assertSame(2, $owner->invoices()->count());
 
-        $wallet = $owner->walletSetting()->firstOrFail();
-        $this->assertSame(1, (int) $wallet->next_derivation_index);
+        $cursor = $this->walletCursorFor($owner, 'vpub-test-key');
+        $this->assertSame(1, (int) $cursor->next_derivation_index);
     }
 
     public function test_user_can_add_and_remove_additional_wallet_accounts(): void
@@ -756,7 +758,6 @@ class UserSettingsTest extends TestCase
             'user_id' => $owner->id,
             'network' => 'testnet',
             'bip84_xpub' => $storedKey,
-            'next_derivation_index' => 0,
             'onboarded_at' => now(),
         ]);
 
@@ -859,7 +860,7 @@ class UserSettingsTest extends TestCase
         $response->assertSessionHas('status', 'Wallet settings saved.');
     }
 
-    public function test_wallet_settings_update_keeps_next_derivation_index_when_same_key_is_resaved(): void
+    public function test_wallet_settings_update_resumes_cursor_when_same_key_is_resaved(): void
     {
         Config::set('wallet.default_network', 'testnet');
         $owner = User::factory()->create();
@@ -867,8 +868,14 @@ class UserSettingsTest extends TestCase
             'user_id' => $owner->id,
             'network' => 'testnet',
             'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
-            'next_derivation_index' => 60000,
             'onboarded_at' => now()->subDay(),
+        ]);
+        $owner->walletKeyCursors()->create([
+            'network' => 'testnet',
+            'key_fingerprint' => app(WalletKeyLineage::class)->fingerprint('testnet', self::REALISTIC_TESTNET_TPUB),
+            'next_derivation_index' => 60000,
+            'first_seen_at' => now()->subDay(),
+            'last_seen_at' => now()->subDay(),
         ]);
 
         $this->mock(HdWallet::class, function ($mock) {
@@ -884,11 +891,11 @@ class UserSettingsTest extends TestCase
             ])
             ->assertRedirect(route('wallet.settings.edit'));
 
-        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
-        $this->assertSame(60000, (int) $wallet->next_derivation_index);
+        $cursor = $this->walletCursorFor($owner, self::REALISTIC_TESTNET_TPUB);
+        $this->assertSame(60000, (int) $cursor->next_derivation_index);
     }
 
-    public function test_wallet_settings_update_clamps_next_derivation_index_to_highest_assigned_invoice_index_plus_one(): void
+    public function test_wallet_settings_update_clamps_cursor_to_highest_assigned_invoice_index_plus_one(): void
     {
         Config::set('wallet.default_network', 'testnet');
         $owner = User::factory()->create();
@@ -902,9 +909,9 @@ class UserSettingsTest extends TestCase
             'user_id' => $owner->id,
             'network' => 'testnet',
             'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
-            'next_derivation_index' => 2,
             'onboarded_at' => now()->subDay(),
         ]);
+        $fingerprint = app(WalletKeyLineage::class)->fingerprint('testnet', self::REALISTIC_TESTNET_TPUB);
 
         Invoice::create([
             'user_id' => $owner->id,
@@ -916,6 +923,8 @@ class UserSettingsTest extends TestCase
             'amount_btc' => 0.002,
             'payment_address' => 'tb1qclampaddress000000000000000000001',
             'derivation_index' => 11,
+            'wallet_key_fingerprint' => $fingerprint,
+            'wallet_network' => 'testnet',
             'status' => 'draft',
             'invoice_date' => '2025-01-01',
         ]);
@@ -933,8 +942,8 @@ class UserSettingsTest extends TestCase
             ])
             ->assertRedirect(route('wallet.settings.edit'));
 
-        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
-        $this->assertSame(12, (int) $wallet->next_derivation_index);
+        $cursor = $this->walletCursorFor($owner, self::REALISTIC_TESTNET_TPUB);
+        $this->assertSame(12, (int) $cursor->next_derivation_index);
     }
 
     public function test_mainnet_rejects_testnet_wallet_key(): void
@@ -1098,7 +1107,15 @@ class UserSettingsTest extends TestCase
             'user_id' => $user->id,
             'network' => 'testnet',
             'bip84_xpub' => 'vpub-test-key',
-            'next_derivation_index' => 0,
         ]);
+    }
+
+    private function walletCursorFor(User $user, string $xpub, string $network = 'testnet'): WalletKeyCursor
+    {
+        return WalletKeyCursor::query()
+            ->where('user_id', $user->id)
+            ->where('network', $network)
+            ->where('key_fingerprint', app(WalletKeyLineage::class)->fingerprint($network, $xpub))
+            ->firstOrFail();
     }
 }

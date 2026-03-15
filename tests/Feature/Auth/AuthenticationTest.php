@@ -49,7 +49,6 @@ class AuthenticationTest extends TestCase
             'user_id' => $user->id,
             'network' => 'testnet',
             'bip84_xpub' => 'vpub-test-key',
-            'next_derivation_index' => 0,
             'onboarded_at' => now(),
         ]);
 

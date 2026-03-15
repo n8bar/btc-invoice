@@ -17,6 +17,7 @@ class Invoice extends Model
     protected $fillable = [
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
+        'wallet_key_fingerprint','wallet_network',
         'status','txid','invoice_date','due_date','paid_at',
         'delivery_message_draft',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
@@ -38,6 +39,8 @@ class Invoice extends Model
         'public_enabled'    => 'boolean',
         'public_expires_at' => 'datetime',
         'derivation_index' => 'integer',
+        'wallet_key_fingerprint' => 'string',
+        'wallet_network' => 'string',
         'payment_amount_sat' => 'integer',
         'payment_confirmations' => 'integer',
         'payment_confirmed_height' => 'integer',

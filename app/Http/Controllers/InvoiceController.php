@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
 use App\Services\GettingStartedFlow;
-use App\Services\HdWallet;
+use App\Services\WalletKeyLineage;
 
 class InvoiceController extends Controller
 {
@@ -109,11 +109,7 @@ class InvoiceController extends Controller
         $data = $this->applyInvoiceDefaults($request->user(), $data);
 
         try {
-            $address = app(HdWallet::class)->deriveAddress(
-                $wallet->bip84_xpub,
-                $wallet->next_derivation_index,
-                $wallet->network
-            );
+            app(WalletKeyLineage::class)->previewCursor($wallet);
         } catch (\Throwable $e) {
             $expected = $wallet->network === 'mainnet' ? 'xpub/zpub' : 'vpub/tpub';
             return redirect()
@@ -123,7 +119,7 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $address);
+            $invoice = $this->createInvoiceRecord($data, $wallet, $userId);
             $invoiceCreatedMessage = 'Invoice created.';
         } catch (QueryException $e) {
             if ($this->isInvoiceNumberUniqueViolation($e)) {
@@ -137,7 +133,7 @@ class InvoiceController extends Controller
                 $data['number'] = Invoice::nextNumberForUser($userId);
 
                 try {
-                    $invoice = $this->createInvoiceRecord($data, $wallet, $userId, $address);
+                    $invoice = $this->createInvoiceRecord($data, $wallet, $userId);
                     $invoiceCreatedMessage = "Invoice created. Number adjusted to {$data['number']} due to a collision.";
                 } catch (QueryException $retryException) {
                     if ($this->isInvoiceNumberUniqueViolation($retryException)) {
@@ -724,18 +720,12 @@ class InvoiceController extends Controller
         return $data;
     }
 
-    private function createInvoiceRecord(array $data, $wallet, int $userId, string $address): Invoice
+    private function createInvoiceRecord(array $data, $wallet, int $userId): Invoice
     {
-        return DB::transaction(function () use ($data, $wallet, $userId, $address) {
-            $invoice = Invoice::create($data + [
+        return app(WalletKeyLineage::class)->withNextAssignment($wallet, function (array $lineage) use ($data, $userId) {
+            return Invoice::create($data + [
                 'user_id' => $userId,
-                'payment_address' => $address,
-                'derivation_index' => $wallet->next_derivation_index,
-            ]);
-
-            $wallet->increment('next_derivation_index');
-
-            return $invoice;
+            ] + $lineage);
         });
     }
 
