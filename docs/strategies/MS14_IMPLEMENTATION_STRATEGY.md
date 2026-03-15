@@ -103,8 +103,9 @@ Browser QA:
    - invoice `56` owned by `antonina12@nospam.site`: draft invoice with partial payment edge, currently still `draft`
    - invoice `57` owned by `tester5@nospam.site`: deliberate duplicate-key source invoice, currently `pending`
    - invoice `58` owned by `invalid-user@nospam.site`: deliberate duplicate-key collision target invoice, currently `pending`
-7. [ ] Open invoices `57` and `58` and confirm both are visible as separate records while sharing the same receive address `tb1q5lpzjj7c3pthr6f3qy8tdd4vzjqr7gj487gzy6`.
-8. [ ] Spot-check the funded invoices in the browser and confirm the current pre-MS14 states match expectations:
+   - Current local note on 2026-03-14 19:44: invoices `51` and `55` were originally seeded as exact-payment fixtures under the discarded fixed `100000.00` rate. After restoring real/current-rate BTC display, they no longer represent exact-paid cases, but they remain useful browser fixtures and exact-paid behavior was already covered in earlier phases.
+7. [x] Open invoices `57` and `58` and confirm both are visible as separate records while sharing the same receive address `tb1q5lpzjj7c3pthr6f3qy8tdd4vzjqr7gj487gzy6`.
+8. [x] Spot-check the funded invoices in the browser and confirm the current pre-MS14 states match expectations:
    - invoices `51`, `52`, `53`, `54`, `57`, and `58` show detected payments and remain `pending`
    - invoices `55` and `56` remain `draft` even though payments were detected
    - invoice `50` remains the unfunded control case
