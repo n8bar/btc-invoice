@@ -27,6 +27,12 @@ class InvoiceController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
+        $rate = BtcRate::current();
+
+        if ($rate && isset($rate['as_of']) && !$rate['as_of'] instanceof Carbon) {
+            $rate['as_of'] = Carbon::parse($rate['as_of']);
+        }
+
         $invoices = Invoice::with('client')
             ->where('user_id', $request->user()->id)
             ->latest('id')
@@ -35,6 +41,7 @@ class InvoiceController extends Controller
 
         return view('invoices.index', [
             'invoices' => $invoices,
+            'rate' => $rate,
             'showInvoiceIds' => $request->user()->show_invoice_ids,
         ]);
     }
@@ -42,7 +49,7 @@ class InvoiceController extends Controller
     /**
      * Store a new invoice:
      * - validates client ownership
-     * - locks BTC rate and amount at creation
+     * - preserves USD as canonical while accepting a BTC snapshot fallback
      * - generates a unique invoice number after insert
      */
     public function store(Request $request)

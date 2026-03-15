@@ -52,8 +52,17 @@
                             $amountUsdDisplay = $inv->amount_usd !== null
                                 ? '$' . number_format((float) $inv->amount_usd, 2)
                                 : '—';
-                            $amountBtcDisplay = $inv->amount_btc !== null
-                                ? rtrim(rtrim(number_format((float) $inv->amount_btc, 5, '.', ''), '0'), '.') . ' BTC'
+                            $currentRateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
+                            $derivedBtcAmount = null;
+
+                            if ($currentRateUsd && $currentRateUsd > 0 && $inv->amount_usd !== null) {
+                                $derivedBtcAmount = round(((float) $inv->amount_usd) / $currentRateUsd, 8);
+                            } elseif ($inv->amount_btc !== null) {
+                                $derivedBtcAmount = (float) $inv->amount_btc;
+                            }
+
+                            $amountBtcDisplay = $derivedBtcAmount !== null
+                                ? ($inv->formatBitcoinAmount($derivedBtcAmount) . ' BTC')
                                 : '—';
                         @endphp
                         <tr>
