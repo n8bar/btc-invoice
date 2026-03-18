@@ -1,1 +1,58 @@
-
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryptoZing – Bitcoin Invoicing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00ff88',      // Teal/green accent (crypto/BTC vibe)
+            accent: '#fbbf24',       // Gold/orange for Bitcoin highlights
+            bgdark: '#0f0f1a',       // Deep dark background
+            textlight: '#e0e0ff',    // Light text
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bgdark text-textlight min-h-screen flex items-center justify-center font-sans antialiased">
+  <div class="text-center max-w-4xl px-6 py-12">
+    <!-- Logo/Brand (text-based for now; replace with <img> later if you add one) -->
+    <h1 class="text-6xl md:text-8xl font-extrabold text-primary mb-6 tracking-tight drop-shadow-lg">
+      CryptoZing
+    </h1>
+    
+    <p class="text-2xl md:text-3xl mb-8 text-gray-300 font-light">
+      Bitcoin invoicing, done right.
+    </p>
+    
+    <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed">
+      Generate secure invoices with live BTC/USD rates, unique BIP84-derived addresses, real-time mempool payment tracking, partial payment support, QR/BIP21 codes, automated Mailgun email receipts, and full branding controls. Built with Laravel 12, Tailwind, Docker/Sail, and centaur-coding workflow. Open-source and actively developed.
+    </p>
+    
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mt-12">
+      <a href="https://github.com/n8bar/btc-invoice" 
+         target="_blank" 
+         class="bg-primary hover:bg-green-500 text-black font-bold py-5 px-10 rounded-xl text-xl transition shadow-lg hover:shadow-xl">
+        View on GitHub →
+      </a>
+      
+      <a href="https://github.com/n8bar/btc-invoice/issues" 
+         target="_blank" 
+         class="border-2 border-primary text-primary hover:bg-primary/10 font-bold py-5 px-10 rounded-xl text-xl transition">
+        Feedback / Issues
+      </a>
+    </div>
+    
+    <p class="mt-16 text-sm text-gray-500">
+      Coming from the team behind btc-invoice • cryptozing.app
+    </p>
+  </div>
+</body>
+</html>
