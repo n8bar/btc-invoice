@@ -177,10 +177,11 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
    - Current implementation on 2026-03-18: wallet settings now persist `unsupported_configuration_active` plus `source` / `reason` / `details` / `flagged_at`; new invoices snapshot that state at creation time; replacing the primary wallet key clears the current wallet-level unsupported flag without retroactively changing older invoice snapshots.
 
 #### 3.2 Detect unsupported wallet activity proactively
-1. Inspect the saved primary wallet key for prior outside receive activity when the owner saves or replaces the wallet.
-2. Flag the wallet as unsupported when proactive detection finds prior activity that makes automatic tracking unreliable.
-3. Allow the owner to continue after save instead of hard-blocking the wallet flow.
-4. Treat outside receive activity as the trigger; spending elsewhere alone is not enough to flag the wallet unsupported.
+1. [x] Inspect the saved primary wallet key for prior outside receive activity when the owner saves or replaces the wallet.
+2. [x] Flag the wallet as unsupported when proactive detection finds prior activity that makes automatic tracking unreliable.
+3. [x] Allow the owner to continue after save instead of hard-blocking the wallet flow.
+4. [x] Treat outside receive activity as the trigger; spending elsewhere alone is not enough to flag the wallet unsupported.
+   - Current implementation on 2026-03-18: wallet save now scans a bounded window of derived external receive addresses through the existing mempool client, ignores receive history on addresses already owned by this same key lineage inside CryptoZing, flags the wallet when an unknown derived receive address shows prior incoming funds, and leaves spend-only history unflagged.
 
 #### 3.3 Detect unsupported cases from invoice/payment evidence
 1. Flag the wallet as unsupported when watcher or lineage evidence later shows collision-style activity that undermines automatic attribution.

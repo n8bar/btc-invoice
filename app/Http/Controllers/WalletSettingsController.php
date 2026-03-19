@@ -10,8 +10,10 @@ use App\Models\WalletSetting;
 use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
 use App\Services\WalletKeyLineage;
+use App\Services\WalletUnsupportedConfigurationDetector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class WalletSettingsController extends Controller
 {
@@ -94,6 +96,26 @@ class WalletSettingsController extends Controller
         }
 
         $lineage->syncWalletCursor($wallet);
+
+        try {
+            $finding = app(WalletUnsupportedConfigurationDetector::class)
+                ->detectProactiveOutsideReceiveActivity($wallet);
+
+            if ($finding) {
+                $wallet->markUnsupportedConfiguration(
+                    source: $finding['source'],
+                    reason: $finding['reason'],
+                    details: $finding['details'],
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('wallet.unsupported_configuration.proactive_detect_failed', [
+                'user_id' => $user->id,
+                'wallet_setting_id' => $wallet->id,
+                'network' => $wallet->network,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         if ($request->boolean('getting_started')) {
             $gettingStartedFlow->markReplayWalletVerified($user);
