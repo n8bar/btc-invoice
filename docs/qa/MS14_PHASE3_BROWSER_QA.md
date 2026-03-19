@@ -30,3 +30,9 @@ Date: 2026-03-18
 - After the create-screen follow-up shipped on 2026-03-19, `/invoices/create` now:
   - shows its own inline unsupported warning while the wallet is flagged
   - changes the primary CTA to `Create Unsupported Invoice`
+- Browser QA on 2026-03-19 also confirmed the full flagged flow works end-to-end in one pass:
+  - flagged wallet save remains non-blocking
+  - the repair path still works from the user-menu pill through `Settings` and `Wallet`
+  - the create screen warning is present before save
+  - the newly created invoice is marked unsupported
+  - older pre-flag invoices remain unflagged

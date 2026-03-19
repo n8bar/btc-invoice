@@ -205,13 +205,15 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
 
 #### 3.5 Verify Phase 3
 Automated / command verification:
-1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
-2. Add or expand automated coverage for:
-   1. proactive unsupported-state detection when a saved wallet shows prior outside receive activity
-   2. evidence-triggered wallet flagging from invoice/payment collisions
-   3. new invoices inheriting unsupported state while the wallet is flagged
-   4. existing invoices remaining unflagged unless invoice-specific evidence marks them
-   5. unsupported-state UI indicators appearing only when the wallet is actually flagged
+1. [x] Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 3 work.
+   - Current result on 2026-03-19: `222 passed`.
+2. [x] Add or expand automated coverage for:
+   1. [x] proactive unsupported-state detection when a saved wallet shows prior outside receive activity
+   2. [x] evidence-triggered wallet flagging from invoice/payment collisions
+   3. [x] new invoices inheriting unsupported state while the wallet is flagged
+   4. [x] existing invoices remaining unflagged unless invoice-specific evidence marks them
+   5. [x] unsupported-state UI indicators appearing only when the wallet is actually flagged
+   - Current result on 2026-03-19: automated coverage now also includes the flagged `/invoices/create` warning plus `Create Unsupported Invoice` CTA.
 
 Browser QA:
 3. [x] Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
