@@ -19,6 +19,16 @@ class AuthenticationTest extends TestCase
         $response->assertSee('CryptoZing - Login', false);
     }
 
+    public function test_login_screen_includes_password_visibility_toggle(): void
+    {
+        $response = $this->get('/login');
+
+        $response->assertStatus(200);
+        $response->assertSee('Show password');
+        $response->assertSee("x-bind:type=\"showPassword ? 'text' : 'password'\"", false);
+        $response->assertSee("x-bind:aria-label=\"showPassword ? 'Hide password' : 'Show password'\"", false);
+    }
+
     public function test_incomplete_users_are_redirected_to_getting_started_on_login(): void
     {
         $user = User::factory()->create();
