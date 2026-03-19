@@ -69,15 +69,15 @@
                     </button>
                 </div>
                 @auth
-                    @if ($walletUnsupported)
-                        <span data-user-menu-unsupported-label
-                              class="inline-flex items-center rounded-full border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-red-800 dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-200">
-                            Unsupported configuration
-                        </span>
-                    @endif
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
+                            <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
+                                @if ($walletUnsupported)
+                                    <span data-user-menu-unsupported-label
+                                          class="inline-flex max-w-[9.5rem] items-center justify-center rounded-full border border-red-500 bg-red-100 px-3.5 py-1 text-center text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] text-red-900 dark:border-red-400/80 dark:bg-red-950/80 dark:text-red-100">
+                                        Unsupported configuration
+                                    </span>
+                                @endif
                                 <div>{{ Auth::user()->name }}</div>
 
                                 <div class="ms-1">
@@ -223,7 +223,7 @@
                     @if ($walletUnsupported)
                         <div class="mt-2">
                             <span data-user-menu-unsupported-label
-                                  class="inline-flex items-center rounded-full border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-red-800 dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-200">
+                                  class="inline-flex max-w-[9.5rem] items-center justify-center rounded-full border border-red-500 bg-red-100 px-3.5 py-1 text-center text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] text-red-900 dark:border-red-400/80 dark:bg-red-950/80 dark:text-red-100">
                                 Unsupported configuration
                             </span>
                         </div>
