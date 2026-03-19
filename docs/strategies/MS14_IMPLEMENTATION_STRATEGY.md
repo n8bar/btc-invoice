@@ -163,8 +163,9 @@ Automated / command verification:
    - Current local result on 2026-03-18: after temporarily changing duplicate-fixture user `11`'s current wallet row from `testnet4` to `mainnet`, `./vendor/bin/sail artisan wallet:watch-payments --invoice=57` still resolved invoice `57` through its stored `wallet_network`/`wallet_key_fingerprint` lineage and preserved txid `84cf4ce7488f775a430f196227c8b4aba9f8241a8b3b9d4163ca0a8925062d93` with `80000` sats.
 
 Browser QA:
-5. [ ] Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
-6. [ ] Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
+5. [x] Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
+6. [x] Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
+   - Current local result on 2026-03-18: `Tester1` (`user_id=12`) switched to a second key and created invoice `61` at derivation index `0`, then switched back to the original key and created invoice `62` at derivation index `2`, advancing the original key cursor to `3` instead of reusing an older address.
 
 ### Phase 3 - Unsupported Configuration Detection + Flagging
 Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsupported state only where evidence supports it.
