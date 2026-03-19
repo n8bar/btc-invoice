@@ -29,6 +29,16 @@ class AuthenticationTest extends TestCase
         $response->assertSee("x-bind:aria-label=\"showPassword ? 'Hide password' : 'Show password'\"", false);
     }
 
+    public function test_support_login_screen_can_be_rendered(): void
+    {
+        $response = $this->get('/support/login');
+
+        $response->assertStatus(200);
+        $response->assertSee('Sign in to CryptoZing Support');
+        $response->assertSee('Configured support accounts only.');
+        $response->assertDontSee('Create a CryptoZing account');
+    }
+
     public function test_incomplete_users_are_redirected_to_getting_started_on_login(): void
     {
         $user = User::factory()->create();
@@ -104,6 +114,59 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_support_users_are_redirected_to_support_dashboard_on_standard_login(): void
+    {
+        config()->set('support.agent_emails', ['support@example.com']);
+
+        $user = User::factory()->create([
+            'email' => 'support@example.com',
+            'getting_started_completed_at' => now(),
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('support.dashboard'));
+    }
+
+    public function test_support_login_rejects_non_support_users(): void
+    {
+        config()->set('support.agent_emails', ['support@example.com']);
+
+        $user = User::factory()->create([
+            'getting_started_completed_at' => now(),
+        ]);
+
+        $response = $this->from('/support/login')->post('/support/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/support/login');
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_support_login_redirects_support_users_to_support_dashboard(): void
+    {
+        config()->set('support.agent_emails', ['support@example.com']);
+
+        $user = User::factory()->create([
+            'email' => 'support@example.com',
+        ]);
+
+        $response = $this->post('/support/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('support.dashboard'));
     }
 
     public function test_users_can_logout(): void

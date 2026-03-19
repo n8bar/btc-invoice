@@ -10,6 +10,11 @@ class DashboardController extends Controller
     public function __invoke(Request $request, DashboardSnapshot $snapshot)
     {
         $user = $request->user();
+
+        if ($user->isSupportAgent()) {
+            return redirect()->route('support.dashboard');
+        }
+
         $data = $snapshot->forUser($user);
 
         return view('dashboard', [

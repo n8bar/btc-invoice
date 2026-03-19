@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: implement the remaining `after-this-pr` items on a dedicated PR before starting MS14 Phase 4: temporary support access plus the overpayment note copy correction.
+- Next action: review PR `#47` for merge readiness, merge the remaining `after-this-pr` support/copy work if clean, then return to MS14 Phase 4.
 - Primary next doc: [`docs/specs/SUPPORT_ACCESS.md`](specs/SUPPORT_ACCESS.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)

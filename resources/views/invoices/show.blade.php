@@ -361,7 +361,7 @@
 
                         @if ($invoice->hasSignificantOverpayment())
                             <div class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-900" style="border-color: currentColor;">
-                                Tip detected — this invoice has received more BTC than requested. Consider crediting or refunding the surplus.
+                                Tip detected. If this overpayment was accidental, consider a refund or credit.
                             </div>
                         @endif
 

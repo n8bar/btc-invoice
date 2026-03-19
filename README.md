@@ -48,6 +48,7 @@ Execute the full suite via Sail:
 ## Configuration Notes
 - **Wallet watcher:** `./vendor/bin/sail artisan wallet:watch-payments` polls mempool.space and updates invoice/payment state. It runs automatically via the scheduler container once Sail is up.
 - **Mail aliasing:** Keep `MAIL_ALIAS_ENABLED` on while the product is in pre-production so all outgoing mail lands in the Mailgun catch-all route. Disable it (or clear the domain) before the RC deploy so recipients get their real email addresses.
+- **Support access:** `SUPPORT_AGENT_EMAILS` defines the comma-separated support-account allowlist, and `SUPPORT_ACCESS_HOURS` defines the fixed owner-grant duration for temporary read-only support access.
 - **Public links:** `APP_PUBLIC_URL` controls the base URL used in invoice emails/public share links. Set it per environment (localhost for dev, `https://cryptozing.app` for production).
 - **Placeholder site:** The temporary GitHub Pages placeholder for `cryptozing.app` lives under `site/` and is intended to deploy separately from the Laravel app surface. For local review on the existing app host, it is exposed at `/site/index.html` via the tracked `public/site` alias.
 

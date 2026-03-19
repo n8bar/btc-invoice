@@ -14,6 +14,11 @@ use App\Http\Controllers\InvoicePaymentAdjustmentController;
 use App\Http\Controllers\ThemePreferenceController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\GettingStartedController;
+use App\Http\Controllers\Support\SupportClientController;
+use App\Http\Controllers\Support\SupportDashboardController;
+use App\Http\Controllers\Support\SupportInvoiceController;
+use App\Http\Controllers\SupportAccessSettingsController;
+use App\Http\Middleware\EnsureSupportAgent;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/settings/support-access', [SupportAccessSettingsController::class, 'grant'])->name('settings.support-access.grant');
+    Route::delete('/settings/support-access', [SupportAccessSettingsController::class, 'revoke'])->name('settings.support-access.revoke');
     Route::get('/settings/invoice', [InvoiceSettingsController::class, 'edit'])->name('settings.invoice.edit');
     Route::patch('/settings/invoice', [InvoiceSettingsController::class, 'update'])->name('settings.invoice.update');
     Route::get('/settings/notifications', [NotificationSettingsController::class, 'edit'])->name('settings.notifications.edit');
@@ -122,6 +129,14 @@ Route::middleware(['auth'])->group(function () {
     // Standard CRUD
     Route::resource('clients', ClientController::class);
     Route::resource('invoices', InvoiceController::class);
+});
+
+Route::middleware(['auth', EnsureSupportAgent::class])->prefix('support')->name('support.')->group(function () {
+    Route::get('/', SupportDashboardController::class)->name('dashboard');
+    Route::get('/owners/{owner}/invoices', [SupportInvoiceController::class, 'index'])->name('owners.invoices.index');
+    Route::get('/owners/{owner}/invoices/{invoice}', [SupportInvoiceController::class, 'show'])->name('owners.invoices.show');
+    Route::get('/owners/{owner}/clients', [SupportClientController::class, 'index'])->name('owners.clients.index');
+    Route::get('/owners/{owner}/clients/{client}', [SupportClientController::class, 'show'])->name('owners.clients.show');
 });
 
 // Breeze auth scaffolding (login, register, password reset, etc.)
