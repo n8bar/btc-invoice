@@ -1,4 +1,5 @@
 @php
+    $walletUnsupported = (bool) (auth()->user()?->walletSetting?->unsupported_configuration_active ?? false);
     $tabs = [
         [
             'label' => 'Account',
@@ -33,7 +34,10 @@
                        'border-indigo-400 text-gray-900 focus:border-indigo-700 focus:text-gray-900' => $tab['active'],
                        'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700' => ! $tab['active'],
                    ])>
-                    {{ $tab['label'] }}
+                    <span>{{ $tab['label'] }}</span>
+                    @if ($walletUnsupported && $tab['label'] === 'Wallet')
+                        <span data-wallet-tab-alert-dot class="ml-2 inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    @endif
                 </a>
             </li>
         @endforeach

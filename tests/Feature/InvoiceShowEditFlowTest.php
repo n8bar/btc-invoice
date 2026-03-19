@@ -121,6 +121,69 @@ class InvoiceShowEditFlowTest extends TestCase
             ->assertDontSee('0.001 BTC', false);
     }
 
+    public function test_unsupported_invoice_state_is_visible_on_index_and_show(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $flaggedInvoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-UNSAFE-1',
+            'description' => 'Flagged invoice',
+            'amount_usd' => 150,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.003,
+            'payment_address' => 'tb1qq0unsupportedinvoice',
+            'unsupported_configuration_flagged' => true,
+            'unsupported_configuration_source' => 'proactive',
+            'unsupported_configuration_reason' => 'outside_receive_activity',
+            'unsupported_configuration_details' => 'Detected prior outside receive activity for this account.',
+            'unsupported_configuration_flagged_at' => now()->subMinute(),
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $cleanInvoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-SAFE-1',
+            'description' => 'Clean invoice',
+            'amount_usd' => 200,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0supportedinvoice',
+            'status' => 'draft',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.index'))
+            ->assertOk()
+            ->assertSee('data-unsupported-invoice-badge="' . $flaggedInvoice->id . '"', false)
+            ->assertDontSee('data-unsupported-invoice-badge="' . $cleanInvoice->id . '"', false);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $flaggedInvoice))
+            ->assertOk()
+            ->assertSee('data-unsupported-invoice-banner', false)
+            ->assertSee('Unsupported invoice', false)
+            ->assertSee('Connect a fresh dedicated account key for future invoices that need reliable automatic tracking.', false);
+
+        $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $cleanInvoice))
+            ->assertOk()
+            ->assertDontSee('data-unsupported-invoice-banner', false)
+            ->assertDontSee('Unsupported invoice', false);
+    }
+
     public function test_invoice_update_redirects_back_to_show_with_status_flash(): void
     {
         $owner = User::factory()->create();

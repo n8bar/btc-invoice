@@ -24,7 +24,8 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## Current Status
 - The MS13 wallet-settings baseline in this spec is shipped.
-- MS14 follow-on unsupported-configuration UX and Helpful Notes guidance in this spec are canonical upcoming requirements for active roadmap work.
+- MS14 unsupported-configuration warning surfaces and invoice unsupported-state visibility are shipped.
+- The Helpful Notes guidance in this spec remains upcoming roadmap work.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.
@@ -91,11 +92,12 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - Testnet: helper text renders; network is not selectable.
   - Invalid xpub: inline error appears, input preserved, submit stays enabled.
   - Successful validation: success message + sample address render.
-- When the MS14 unsupported-configuration UX ships, add coverage for:
+- Coverage now includes:
   - proactive unsupported-state detection surfacing the red warning/UI indicators only when the wallet is actually flagged
   - evidence-triggered unsupported-state behavior for an implicated invoice
   - invoices created while the wallet is flagged unsupported inheriting that flag
   - previously existing invoices remaining unflagged unless invoice-specific evidence marks them
+- Future coverage still needed for:
   - the Helpful Notes article surfacing the same dedicated-receive guidance in plain language
 - Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.

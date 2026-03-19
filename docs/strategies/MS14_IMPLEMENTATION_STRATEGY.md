@@ -191,16 +191,17 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
    - Current implementation on 2026-03-18: payment sync now treats a paid shared-address collision as invoice/payment evidence, marks each invoice using that paid address unsupported, flags the current wallet only when the invoice lineage still matches the owner's currently saved primary key, and leaves unrelated older invoices untouched.
 
 #### 3.4 Surface unsupported state in app chrome and wallet flows
-1. Show red attention UI only when the wallet is actually flagged unsupported:
-   1. an attention-grabbing label near the user menu
-   2. a red dot on the Settings nav item
-   3. a red dot on the Wallet settings tab
-   4. a red warning near the wallet account key field
-2. Keep the warning copy gentle and corrective:
-   1. explain that CryptoZing found wallet activity outside its dedicated receive flow
-   2. explain that automatic tracking is no longer reliable for this wallet account
-   3. direct the owner to connect a fresh dedicated account key
-3. Mark invoices created while the wallet is flagged unsupported as unsupported in their own UI/state so that replacing the wallet later does not silently make them look safe.
+1. [x] Show red attention UI only when the wallet is actually flagged unsupported:
+   1. [x] an attention-grabbing label near the user menu
+   2. [x] a red dot on the Settings nav item
+   3. [x] a red dot on the Wallet settings tab
+   4. [x] a red warning near the wallet account key field
+2. [x] Keep the warning copy gentle and corrective:
+   1. [x] explain that CryptoZing found wallet activity outside its dedicated receive flow
+   2. [x] explain that automatic tracking is no longer reliable for this wallet account
+   3. [x] direct the owner to connect a fresh dedicated account key
+3. [x] Mark invoices created while the wallet is flagged unsupported as unsupported in their own UI/state so that replacing the wallet later does not silently make them look safe.
+   - Current implementation on 2026-03-18: app chrome now shows an `Unsupported configuration` label near the user menu plus red dots on Settings and Wallet only while the wallet is flagged; wallet settings show a gentle corrective warning block; and flagged invoices now display unsupported markers in the invoice list and on the invoice detail page.
 
 #### 3.5 Verify Phase 3
 Automated / command verification:

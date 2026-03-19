@@ -69,6 +69,16 @@
                                 </div>
                             @endif
 
+                            @if (optional($wallet)->unsupported_configuration_active)
+                                <div data-wallet-unsupported-warning
+                                     class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-sm dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-100"
+                                     style="border-color: currentColor;">
+                                    <p class="font-semibold">We found wallet activity outside CryptoZing.</p>
+                                    <p class="mt-1">Automatic payment tracking is no longer reliable for this wallet account. Outside receive activity can lead to mistracked funds and other unreliable attribution behavior.</p>
+                                    <p class="mt-1">Connect a fresh dedicated account key to keep future invoices on a dedicated receive path.</p>
+                                </div>
+                            @endif
+
                             <div>
                                 @if ($isGettingStarted)
                                     <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $gettingStartedMarker }} Fill this field</p>

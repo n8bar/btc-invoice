@@ -854,6 +854,48 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_show_unsupported_warning_and_navigation_indicators_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('data-user-menu-unsupported-label', false);
+        $response->assertSee('data-settings-alert-dot', false);
+        $response->assertSee('data-wallet-tab-alert-dot', false);
+        $response->assertSee('data-wallet-unsupported-warning', false);
+        $response->assertSee('We found wallet activity outside CryptoZing.', false);
+        $response->assertSee('Automatic payment tracking is no longer reliable for this wallet account.', false);
+        $response->assertSee('Connect a fresh dedicated account key to keep future invoices on a dedicated receive path.', false);
+    }
+
+    public function test_wallet_settings_hide_unsupported_indicators_when_wallet_is_not_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('data-user-menu-unsupported-label', false);
+        $response->assertDontSee('data-settings-alert-dot', false);
+        $response->assertDontSee('data-wallet-tab-alert-dot', false);
+        $response->assertDontSee('data-wallet-unsupported-warning', false);
+        $response->assertDontSee('We found wallet activity outside CryptoZing.', false);
+    }
+
     public function test_wallet_settings_shows_getting_started_progress_strip_when_context_flag_present(): void
     {
         $owner = User::factory()->create();
