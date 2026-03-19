@@ -1,5 +1,5 @@
 # Backlog (Post-MVP)
-_Last updated: 2026-03-18_
+_Last updated: 2026-03-14_
 
 This is the canonical post-MVP backlog.
 
@@ -73,19 +73,12 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Re-enable the Additional wallets UI in `/wallet/settings` once multi-wallet selection is in scope.
    - Add an invoice-level wallet selector and migration guidance for existing invoices.
 
-14. **Quotes + quote-to-invoice conversion**
-   - Treat quotes as proposal documents and invoices as billing documents; do not collapse both concepts into one shared lifecycle.
-   - Keep quote status and invoice status as separate fields so proposal progress and billing/payment progress are modeled independently.
-   - Initial direction: quote lifecycle `draft`, `sent`, `accepted`, `declined`, `expired`; invoice lifecycle keeps its own `unsent`, `sent`, `pending`, `partial`, `paid`, `void` states.
-   - Converting an accepted quote into an invoice should create a linked billing record whose invoice lifecycle starts at `unsent`.
-   - During future spec work, decide whether quotes and invoices share physical storage or use separate tables, but preserve clear quote/invoice identity and relationship history either way.
-
-15. **Client balance tracking + credits**
+14. **Client balance tracking + credits**
    - Track per-client credit balances that can be issued manually (refunds, overpayments, goodwill adjustments) and applied to future invoices.
    - Show each client’s net outstanding balance as: total open invoice balances minus unspent credit balance.
    - Surface an owner-facing ledger so credit issuance, application, reversal, and remaining credit are auditable over time.
 
-16. **Spending-only companion wallet ecosystem idea**
+15. **Spending-only companion wallet ecosystem idea**
    - Separate product idea, not RC scope for CryptoZing itself.
    - Explore a companion wallet app that can spend/send but does not receive, and only shares public derivation material with CryptoZing.
    - Goal: reduce accidental outside receive activity on the same account namespace while keeping CryptoZing watch-only.
