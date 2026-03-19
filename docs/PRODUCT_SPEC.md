@@ -14,7 +14,7 @@ Use detailed docs under `docs/specs/` and `docs/milestones/` for local scope, ac
 - `docs/milestones/**`: milestone execution docs when a milestone is active or large enough to need detailed checklist tracking.
 - Feature and domain specs under `docs/specs/*.md`: canonical detailed requirements for their local domain.
 - `docs/ops/**`: rollout, contributor, and deployment runbooks.
-- [`docs/CHANGELOG.md`](CHANGELOG.md): append-only record of scope, requirement, and doc-structure changes.
+- [`docs/CHANGELOG.log`](CHANGELOG.log): append-only record of scope, requirement, and doc-structure changes.
 - `docs/strategies/**`: advisory working docs only; never canonical.
 - `docs/qa/**`: findings, verification, and archive/reference docs.
 
