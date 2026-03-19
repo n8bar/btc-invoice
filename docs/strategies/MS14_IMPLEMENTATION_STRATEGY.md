@@ -159,7 +159,8 @@ Automated / command verification:
    1. [x] `./vendor/bin/sail artisan wallet:watch-payments`
    2. [x] `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
    3. [x] the updated address-reassignment command path introduced during Phase 2
-4. [ ] Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
+4. [x] Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
+   - Current local result on 2026-03-18: after temporarily changing duplicate-fixture user `11`'s current wallet row from `testnet4` to `mainnet`, `./vendor/bin/sail artisan wallet:watch-payments --invoice=57` still resolved invoice `57` through its stored `wallet_network`/`wallet_key_fingerprint` lineage and preserved txid `84cf4ce7488f775a430f196227c8b4aba9f8241a8b3b9d4163ca0a8925062d93` with `80000` sats.
 
 Browser QA:
 5. [ ] Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.

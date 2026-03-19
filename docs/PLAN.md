@@ -1,5 +1,5 @@
 # PLAN
-_Last updated: 2026-03-14_
+_Last updated: 2026-03-18_
 
 This is the human-facing execution dashboard for Release Candidate work.
 
@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: finish the remaining Phase 2 verification from the strategy doc: rerun the shared-account collision check under the new invoice-lineage model, then complete the two Phase 2 Browser QA flows.
+- Next action: finish the remaining Phase 2 Browser QA from the strategy doc so PR `#41` can move from draft verification to merge review.
 - Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md), [`docs/qa/Finding1.md`](qa/Finding1.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
