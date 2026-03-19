@@ -6,11 +6,14 @@ use App\Http\Requests\WalletAccountRequest;
 use App\Http\Requests\WalletKeyPreviewRequest;
 use App\Http\Requests\WalletSettingRequest;
 use App\Models\UserWalletAccount;
+use App\Models\WalletSetting;
 use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
 use App\Services\WalletKeyLineage;
+use App\Services\WalletUnsupportedConfigurationDetector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class WalletSettingsController extends Controller
 {
@@ -61,6 +64,7 @@ class WalletSettingsController extends Controller
     {
         $user = $request->user();
         $network = Config::get('wallet.default_network', 'testnet');
+        $lineage = app(WalletKeyLineage::class);
 
         $payload = $request->validated();
         $payload['network'] = $network;
@@ -78,13 +82,40 @@ class WalletSettingsController extends Controller
                 ->withInput();
         }
 
+        $existingWallet = $user->walletSetting;
+        $replacedPrimaryWallet = $this->primaryWalletIdentityChanged($existingWallet, $payload, $lineage);
+
         $wallet = $user->walletSetting()->updateOrCreate(['user_id' => $user->id], [
             'network' => $payload['network'],
             'bip84_xpub' => $payload['bip84_xpub'],
             'onboarded_at' => now(),
         ]);
 
-        app(WalletKeyLineage::class)->syncWalletCursor($wallet);
+        if ($replacedPrimaryWallet && $wallet->unsupported_configuration_active) {
+            $wallet->clearUnsupportedConfiguration();
+        }
+
+        $lineage->syncWalletCursor($wallet);
+
+        try {
+            $finding = app(WalletUnsupportedConfigurationDetector::class)
+                ->detectProactiveOutsideReceiveActivity($wallet);
+
+            if ($finding) {
+                $wallet->markUnsupportedConfiguration(
+                    source: $finding['source'],
+                    reason: $finding['reason'],
+                    details: $finding['details'],
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('wallet.unsupported_configuration.proactive_detect_failed', [
+                'user_id' => $user->id,
+                'wallet_setting_id' => $wallet->id,
+                'network' => $wallet->network,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         if ($request->boolean('getting_started')) {
             $gettingStartedFlow->markReplayWalletVerified($user);
@@ -139,5 +170,15 @@ class WalletSettingsController extends Controller
 
         return redirect()->route('wallet.settings.edit')
             ->with('status', 'Wallet removed.');
+    }
+
+    private function primaryWalletIdentityChanged(?WalletSetting $existingWallet, array $payload, WalletKeyLineage $lineage): bool
+    {
+        if (! $existingWallet) {
+            return false;
+        }
+
+        return $lineage->normalizeNetwork((string) $existingWallet->network) !== $lineage->normalizeNetwork((string) ($payload['network'] ?? ''))
+            || $lineage->normalizeXpub((string) $existingWallet->bip84_xpub) !== $lineage->normalizeXpub((string) ($payload['bip84_xpub'] ?? ''));
     }
 }

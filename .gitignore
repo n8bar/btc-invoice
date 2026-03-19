@@ -1,4 +1,5 @@
 *.log
+!docs/CHANGELOG.log
 .DS_Store
 .env
 .env.backup

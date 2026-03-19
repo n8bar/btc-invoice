@@ -35,6 +35,7 @@
                     $themePreference = auth()->user()?->theme ?? 'system';
                     $themeEndpoint = auth()->check() ? route('theme.update') : '';
                     $authUser = Auth::user();
+                    $walletUnsupported = (bool) ($authUser?->walletSetting?->unsupported_configuration_active ?? false);
                     $requiresReplayConfirm = $authUser?->gettingStartedIsDone() && ! $authUser->gettingStartedWasDismissed();
                     $gettingStartedCompletedOn = $authUser?->getting_started_completed_at?->setTimezone(config('app.timezone'))->format('F j, Y');
                     $gettingStartedReplayConfirmMessage = $gettingStartedCompletedOn
@@ -70,7 +71,14 @@
                 @auth
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
+                            <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
+                                @if ($walletUnsupported)
+                                    <span data-user-menu-unsupported-label
+                                          class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-100 dark:bg-red-700 dark:text-white">
+                                        <span>Unsupported</span>
+                                        <span>Configuration</span>
+                                    </span>
+                                @endif
                                 <div>{{ Auth::user()->name }}</div>
 
                                 <div class="ms-1">
@@ -83,7 +91,12 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('settings.index')">
-                                {{ __('Settings') }}
+                                <span class="inline-flex items-center gap-2">
+                                    @if ($walletUnsupported)
+                                        <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                                    @endif
+                                    <span>{{ __('Settings') }}</span>
+                                </span>
                             </x-dropdown-link>
                             @if (Auth::user()->gettingStartedIsDone())
                                 <form method="POST"
@@ -208,11 +221,25 @@
                 <div class="px-4">
                     <div class="font-medium text-base text-gray-800 dark:text-slate-100">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500 dark:text-slate-300">{{ Auth::user()->email }}</div>
+                    @if ($walletUnsupported)
+                        <div class="mt-2">
+                            <span data-user-menu-unsupported-label
+                                  class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-100 dark:bg-red-700 dark:text-white">
+                                <span>Unsupported</span>
+                                <span>Configuration</span>
+                            </span>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('profile.edit', 'settings.invoice.*', 'wallet.settings.*', 'settings.notifications.*')">
-                        {{ __('Settings') }}
+                        <span class="inline-flex items-center gap-2">
+                            @if ($walletUnsupported)
+                                <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                            @endif
+                            <span>{{ __('Settings') }}</span>
+                        </span>
                     </x-responsive-nav-link>
                     @if (Auth::user()->gettingStartedIsDone())
                         <form method="POST"

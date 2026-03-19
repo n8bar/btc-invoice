@@ -80,6 +80,21 @@
                 </div>
             @endif
 
+            @if ($invoice->unsupported_configuration_flagged)
+                @php
+                    $unsupportedInvoiceMessage = $invoice->unsupported_configuration_reason === 'payment_collision'
+                        ? 'This invoice was implicated in shared payment-address activity, so automatic payment attribution may be unreliable for this invoice.'
+                        : 'This invoice was created while CryptoZing had already flagged this wallet account as unsupported, so automatic payment attribution may be unreliable for this invoice.';
+                @endphp
+                <div data-unsupported-invoice-banner
+                     class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-sm dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-100"
+                     style="border-color: currentColor;">
+                    <p class="font-semibold">Unsupported invoice</p>
+                    <p class="mt-1">{{ $unsupportedInvoiceMessage }}</p>
+                    <p class="mt-1">Connect a fresh dedicated account key for future invoices that need reliable automatic tracking.</p>
+                </div>
+            @endif
+
             @php
                 $hasDraftOnChainPayments = ($invoice->status ?? 'draft') === 'draft'
                     && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment);

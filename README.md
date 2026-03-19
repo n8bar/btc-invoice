@@ -55,7 +55,7 @@ Execute the full suite via Sail:
 - Plan: [`docs/PLAN.md`](docs/PLAN.md)
 - Product spec: [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
 - Backlog: [`docs/BACKLOG.md`](docs/BACKLOG.md)
-- Changelog: [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
+- Changelog: [`docs/CHANGELOG.log`](docs/CHANGELOG.log)
 - UX guardrails reference: [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md)
 - Docs & DX ops: [`docs/ops/DOCS_DX.md`](docs/ops/DOCS_DX.md)
 - Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)

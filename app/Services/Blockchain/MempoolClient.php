@@ -2,6 +2,7 @@
 
 namespace App\Services\Blockchain;
 
+use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,23 +16,57 @@ class MempoolClient
 
     public function transactions(string $network, string $address): array
     {
-        $url = $this->baseUrl($network) . '/address/' . $address . '/txs';
-        $response = Http::timeout($this->timeout())
-            ->acceptJson()
-            ->get($url);
+        return $this->transactionsForAddresses($network, [$address])[$address] ?? [];
+    }
 
-        if (!$response->ok()) {
-            Log::warning('Mempool transactions fetch failed', [
-                'network' => $network,
-                'address' => $address,
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
+    /**
+     * @param  array<int, string>  $addresses
+     * @return array<string, array<int, mixed>>
+     */
+    public function transactionsForAddresses(string $network, array $addresses): array
+    {
+        $addresses = array_values(array_unique(array_filter(array_map('strval', $addresses))));
 
+        if ($addresses === []) {
             return [];
         }
 
-        return $response->json() ?? [];
+        $baseUrl = $this->baseUrl($network);
+        $responses = Http::pool(function (Pool $pool) use ($addresses, $baseUrl) {
+            $requests = [];
+
+            foreach ($addresses as $address) {
+                $requests[$address] = $pool
+                    ->as($address)
+                    ->timeout($this->timeout())
+                    ->acceptJson()
+                    ->get($baseUrl . '/address/' . $address . '/txs');
+            }
+
+            return $requests;
+        });
+
+        $transactions = [];
+
+        foreach ($addresses as $address) {
+            $response = $responses[$address] ?? null;
+
+            if (! $response || ! $response->ok()) {
+                Log::warning('Mempool transactions fetch failed', [
+                    'network' => $network,
+                    'address' => $address,
+                    'status' => $response?->status(),
+                    'body' => $response?->body(),
+                ]);
+
+                $transactions[$address] = [];
+                continue;
+            }
+
+            $transactions[$address] = $response->json() ?? [];
+        }
+
+        return $transactions;
     }
 
     public function tipHeight(string $network): ?int

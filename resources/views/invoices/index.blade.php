@@ -71,6 +71,14 @@
                         @endif
                             <td class="px-6 py-3 text-sm font-medium text-gray-900">
                                 <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
+                                @if ($inv->unsupported_configuration_flagged)
+                                    <div class="mt-2">
+                                        <span data-unsupported-invoice-badge="{{ $inv->id }}"
+                                              class="inline-flex items-center rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-800 dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-200">
+                                            Unsupported
+                                        </span>
+                                    </div>
+                                @endif
                                 <div class="mt-1 text-xs font-normal text-gray-500 md:hidden">
                                     {{ $amountUsdDisplay }} / {{ $amountBtcDisplay }}
                                 </div>

@@ -11,7 +11,8 @@
   - `docs/specs/**` for detailed feature and domain requirements
   - `docs/ops/**` for rollout, contributor, and deployment runbooks
   - `docs/qa/**` for findings, test plans, verification notes, and archive material
-- Keep `docs/CHANGELOG.md` updated alongside canonical docs when scope or doc structure shifts.
+- Keep `docs/CHANGELOG.log` updated alongside canonical docs when scope or doc structure shifts.
+- Maintain `docs/CHANGELOG.log` as plain text in chronological order (oldest first); append new entries at the bottom instead of prepending.
 - Where dates are necessary in docs, use the date from the system you're running on.
 - When adding features, update or create migrations + tests, then run `./vendor/bin/sail artisan test`.
 - Also keep AGENTS.md updated to save on churn from session switching.
@@ -20,7 +21,7 @@
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
-- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like `docs/PLAN.md`/`docs/PRODUCT_SPEC.md`/`docs/BACKLOG.md`/`docs/CHANGELOG.md`; they may be deleted after implementation if they’re no longer useful.
+- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like `docs/PLAN.md`/`docs/PRODUCT_SPEC.md`/`docs/BACKLOG.md`/`docs/CHANGELOG.log`; they may be deleted after implementation if they’re no longer useful.
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.

@@ -10,6 +10,7 @@ use App\Models\WalletKeyCursor;
 use App\Models\WalletSetting;
 use App\Services\BtcRate;
 use App\Services\HdWallet;
+use App\Services\Blockchain\MempoolClient;
 use App\Services\WalletKeyLineage;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use PDOException;
 use Tests\TestCase;
 
@@ -30,6 +32,8 @@ class UserSettingsTest extends TestCase
     {
         parent::setUp();
         Config::set('wallet.default_network', 'testnet');
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_count', 0);
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_cap', 0);
     }
 
     public function test_invoice_store_applies_user_defaults(): void
@@ -110,6 +114,50 @@ class UserSettingsTest extends TestCase
         $this->assertSame('draft', $invoice->status);
     }
 
+    public function test_invoice_store_snapshots_unsupported_wallet_state_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-UNSUPPORTED-SNAPSHOT',
+                'description' => 'Flagged wallet snapshot',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'invoice_date' => '2025-01-01',
+            ])
+            ->assertRedirect(route('invoices.index'));
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+
+        $this->assertTrue($invoice->unsupported_configuration_flagged);
+        $this->assertSame('proactive', $invoice->unsupported_configuration_source);
+        $this->assertSame('outside_receive_activity', $invoice->unsupported_configuration_reason);
+        $this->assertSame('Detected prior outside receive activity for this account.', $invoice->unsupported_configuration_details);
+        $this->assertNotNull($invoice->unsupported_configuration_flagged_at);
+    }
+
     public function test_invoice_create_prefills_defaults(): void
     {
         $owner = User::factory()->create([
@@ -150,6 +198,36 @@ class UserSettingsTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('name="status"', false);
         $response->assertSee('Reset to my custom defaults', false);
+    }
+
+    public function test_invoice_create_shows_unsupported_warning_and_cta_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('data-unsupported-invoice-create-warning', false);
+        $response->assertSee('We found wallet activity outside CryptoZing.');
+        $response->assertSee('If you continue now, this invoice will be created as an unsupported invoice.');
+        $response->assertSee('Connect a fresh dedicated account key');
+        $response->assertSee('Create Unsupported Invoice');
+        $response->assertDontSee('>Save<', false);
     }
 
     public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void
@@ -806,6 +884,48 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_show_unsupported_warning_and_navigation_indicators_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('data-user-menu-unsupported-label', false);
+        $response->assertSee('data-settings-alert-dot', false);
+        $response->assertSee('data-wallet-tab-alert-dot', false);
+        $response->assertSee('data-wallet-unsupported-warning', false);
+        $response->assertSee('We found wallet activity outside CryptoZing.', false);
+        $response->assertSee('Automatic payment tracking is no longer reliable for this wallet account.', false);
+        $response->assertSee('Connect a fresh dedicated account key to keep future invoices on a dedicated receive path.', false);
+    }
+
+    public function test_wallet_settings_hide_unsupported_indicators_when_wallet_is_not_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWalletSetting($owner);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('data-user-menu-unsupported-label', false);
+        $response->assertDontSee('data-settings-alert-dot', false);
+        $response->assertDontSee('data-wallet-tab-alert-dot', false);
+        $response->assertDontSee('data-wallet-unsupported-warning', false);
+        $response->assertDontSee('We found wallet activity outside CryptoZing.', false);
+    }
+
     public function test_wallet_settings_shows_getting_started_progress_strip_when_context_flag_present(): void
     {
         $owner = User::factory()->create();
@@ -925,6 +1045,221 @@ class UserSettingsTest extends TestCase
 
         $cursor = $this->walletCursorFor($owner, self::REALISTIC_TESTNET_TPUB);
         $this->assertSame(60000, (int) $cursor->next_derivation_index);
+    }
+
+    public function test_wallet_settings_update_clears_unsupported_state_when_primary_key_changes(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+        $wallet = WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            'onboarded_at' => now()->subDay(),
+            'unsupported_configuration_active' => true,
+            'unsupported_configuration_source' => 'proactive',
+            'unsupported_configuration_reason' => 'outside_receive_activity',
+            'unsupported_configuration_details' => 'Detected prior outside receive activity for this account.',
+            'unsupported_configuration_flagged_at' => now()->subHour(),
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => 'vpub' . str_repeat('b', 40),
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet->refresh();
+
+        $this->assertFalse($wallet->unsupported_configuration_active);
+        $this->assertNull($wallet->unsupported_configuration_source);
+        $this->assertNull($wallet->unsupported_configuration_reason);
+        $this->assertNull($wallet->unsupported_configuration_details);
+        $this->assertNull($wallet->unsupported_configuration_flagged_at);
+    }
+
+    public function test_wallet_settings_update_flags_wallet_when_proactive_detection_finds_unknown_receive_activity(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_count', 3);
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_cap', 3);
+        config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet/api');
+        app()->forgetInstance(MempoolClient::class);
+
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->times(4)
+                ->andReturnUsing(function (string $xpub, int $index) {
+                    return match ($index) {
+                        0 => 'tb1qproactivescan0',
+                        1 => 'tb1qproactivescan1',
+                        2 => 'tb1qproactivescan2',
+                        default => 'tb1qproactivescanx',
+                    };
+                });
+        });
+
+        Http::fake([
+            'https://mempool.example/testnet/api/address/tb1qproactivescan0/txs' => Http::response([], 200),
+            'https://mempool.example/testnet/api/address/tb1qproactivescan1/txs' => Http::response([
+                [
+                    'txid' => 'proactive-tx-1',
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => 'tb1qproactivescan1',
+                            'value' => 125000,
+                        ],
+                    ],
+                ],
+            ], 200),
+            'https://mempool.example/testnet/api/address/tb1qproactivescan2/txs' => Http::response([], 200),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+
+        $this->assertTrue($wallet->unsupported_configuration_active);
+        $this->assertSame('proactive', $wallet->unsupported_configuration_source);
+        $this->assertSame('outside_receive_activity', $wallet->unsupported_configuration_reason);
+        $this->assertStringContainsString('tb1qproactivescan1', (string) $wallet->unsupported_configuration_details);
+        $this->assertStringContainsString('index 1', (string) $wallet->unsupported_configuration_details);
+        $this->assertStringContainsString('proactive-tx-1', (string) $wallet->unsupported_configuration_details);
+        $this->assertNotNull($wallet->unsupported_configuration_flagged_at);
+    }
+
+    public function test_wallet_settings_update_does_not_flag_wallet_for_known_invoice_receive_history(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_count', 1);
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_cap', 1);
+        config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet/api');
+        app()->forgetInstance(MempoolClient::class);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+        $wallet = WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            'onboarded_at' => now()->subDay(),
+        ]);
+        $fingerprint = app(WalletKeyLineage::class)->fingerprint('testnet', self::REALISTIC_TESTNET_TPUB);
+
+        Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-KNOWN-HISTORY-1',
+            'description' => 'Known invoice address',
+            'amount_usd' => 100,
+            'btc_rate' => 50000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qknowninvoice0',
+            'derivation_index' => 0,
+            'wallet_key_fingerprint' => $fingerprint,
+            'wallet_network' => 'testnet',
+            'status' => 'draft',
+            'invoice_date' => '2025-01-01',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->times(2)
+                ->andReturn('tb1qknowninvoice0');
+        });
+
+        Http::fake([
+            'https://mempool.example/testnet/api/address/tb1qknowninvoice0/txs' => Http::response([
+                [
+                    'txid' => 'known-invoice-tx-1',
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => 'tb1qknowninvoice0',
+                            'value' => 125000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet->refresh();
+
+        $this->assertFalse($wallet->unsupported_configuration_active);
+        $this->assertNull($wallet->unsupported_configuration_source);
+        $this->assertNull($wallet->unsupported_configuration_reason);
+        $this->assertNull($wallet->unsupported_configuration_details);
+        $this->assertNull($wallet->unsupported_configuration_flagged_at);
+    }
+
+    public function test_wallet_settings_update_does_not_flag_wallet_for_spend_only_history(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_count', 1);
+        config()->set('blockchain.unsupported_wallet_detection.proactive_address_scan_cap', 1);
+        config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet/api');
+        app()->forgetInstance(MempoolClient::class);
+
+        $owner = User::factory()->create();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->times(2)
+                ->andReturn('tb1qspendonly0');
+        });
+
+        Http::fake([
+            'https://mempool.example/testnet/api/address/tb1qspendonly0/txs' => Http::response([
+                [
+                    'txid' => 'spend-only-tx-1',
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => 'tb1qsomeoneelse',
+                            'value' => 125000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+
+        $this->assertFalse($wallet->unsupported_configuration_active);
+        $this->assertNull($wallet->unsupported_configuration_source);
+        $this->assertNull($wallet->unsupported_configuration_reason);
+        $this->assertNull($wallet->unsupported_configuration_details);
+        $this->assertNull($wallet->unsupported_configuration_flagged_at);
     }
 
     public function test_wallet_settings_update_clamps_cursor_to_highest_assigned_invoice_index_plus_one(): void

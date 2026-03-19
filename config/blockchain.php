@@ -7,6 +7,10 @@ return [
         'throttle_seconds' => (int) env('GETTING_STARTED_SYNC_THROTTLE_SECONDS', 60),
         'max_draft_invoices' => (int) env('GETTING_STARTED_SYNC_MAX_DRAFT_INVOICES', 5),
     ],
+    'unsupported_wallet_detection' => [
+        'proactive_address_scan_count' => (int) env('UNSUPPORTED_WALLET_PROACTIVE_ADDRESS_SCAN_COUNT', 10),
+        'proactive_address_scan_cap' => (int) env('UNSUPPORTED_WALLET_PROACTIVE_ADDRESS_SCAN_CAP', 25),
+    ],
     'mempool' => [
         'timeout' => (float) env('MEMPOOL_HTTP_TIMEOUT', 8.0),
         'mainnet_base' => env('MEMPOOL_MAINNET_URL', 'https://mempool.space/api'),

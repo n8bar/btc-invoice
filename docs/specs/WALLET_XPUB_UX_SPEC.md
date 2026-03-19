@@ -24,7 +24,10 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## Current Status
 - The MS13 wallet-settings baseline in this spec is shipped.
-- MS14 follow-on unsupported-configuration UX and Helpful Notes guidance in this spec are canonical upcoming requirements for active roadmap work.
+- MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
+- MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
+- MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
+- The Helpful Notes guidance in this spec remains upcoming roadmap work.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.
@@ -64,6 +67,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - red dot on the Settings nav item
   - red dot on the Wallet settings tab
   - red warning near the wallet account key field
+- Invoice creation should also warn inline when the wallet is flagged unsupported and use a more explicit primary action label such as `Create Unsupported Invoice` rather than a neutral save label.
 - The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
 - Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.
@@ -91,11 +95,12 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - Testnet: helper text renders; network is not selectable.
   - Invalid xpub: inline error appears, input preserved, submit stays enabled.
   - Successful validation: success message + sample address render.
-- When the MS14 unsupported-configuration UX ships, add coverage for:
+- Coverage now includes:
   - proactive unsupported-state detection surfacing the red warning/UI indicators only when the wallet is actually flagged
   - evidence-triggered unsupported-state behavior for an implicated invoice
   - invoices created while the wallet is flagged unsupported inheriting that flag
   - previously existing invoices remaining unflagged unless invoice-specific evidence marks them
+- Future coverage still needed for:
   - the Helpful Notes article surfacing the same dedicated-receive guidance in plain language
 - Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.

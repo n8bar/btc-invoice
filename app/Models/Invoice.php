@@ -18,6 +18,8 @@ class Invoice extends Model
         'user_id','client_id','number','description',
         'amount_usd','btc_rate','amount_btc','payment_address','derivation_index',
         'wallet_key_fingerprint','wallet_network',
+        'unsupported_configuration_flagged','unsupported_configuration_source',
+        'unsupported_configuration_reason','unsupported_configuration_details','unsupported_configuration_flagged_at',
         'status','txid','invoice_date','due_date','paid_at',
         'delivery_message_draft',
         'payment_amount_sat','payment_confirmations','payment_confirmed_height',
@@ -41,6 +43,11 @@ class Invoice extends Model
         'derivation_index' => 'integer',
         'wallet_key_fingerprint' => 'string',
         'wallet_network' => 'string',
+        'unsupported_configuration_flagged' => 'boolean',
+        'unsupported_configuration_source' => 'string',
+        'unsupported_configuration_reason' => 'string',
+        'unsupported_configuration_details' => 'string',
+        'unsupported_configuration_flagged_at' => 'datetime',
         'payment_amount_sat' => 'integer',
         'payment_confirmations' => 'integer',
         'payment_confirmed_height' => 'integer',
@@ -67,6 +74,17 @@ class Invoice extends Model
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
     public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
     public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
+
+    public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
+    {
+        $this->forceFill([
+            'unsupported_configuration_flagged' => true,
+            'unsupported_configuration_source' => $source,
+            'unsupported_configuration_reason' => $reason,
+            'unsupported_configuration_details' => $details,
+            'unsupported_configuration_flagged_at' => $flaggedAt ?? now(),
+        ])->save();
+    }
 
     public function scopeOwnedBy(Builder $query, User|int $user): Builder
     {
