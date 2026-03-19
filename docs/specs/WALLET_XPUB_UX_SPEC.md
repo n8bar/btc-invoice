@@ -25,7 +25,8 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 ## Current Status
 - The MS13 wallet-settings baseline in this spec is shipped.
 - MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
-- MS14 navigation repair-path indicators remain incomplete after Browser QA on 2026-03-18: the user-menu unsupported label needed a stronger actionable affordance, the intended Settings/Wallet red dots were not visibly surfacing in the browser, and the invoice create screen still lacks its own flagged-state warning/confirmation.
+- MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
+- The invoice create screen still lacks its own flagged-state warning/confirmation, which remains open follow-up work.
 - The Helpful Notes guidance in this spec remains upcoming roadmap work.
 
 ## Deferred (post-RC)

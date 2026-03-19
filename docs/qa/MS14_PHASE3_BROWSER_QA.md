@@ -15,12 +15,15 @@ Date: 2026-03-18
 - An older invoice created before the wallet was flagged remained unflagged.
 
 ## Findings
-1. The `Unsupported configuration` label near the user menu existed, but it was not clearly actionable during Browser QA. Clicking that label should open the user menu so the repair path is more obvious.
-2. No visible red dot surfaced on the `Settings` item in the user menu during Browser QA.
-3. No visible red dot surfaced on the `Wallet` tab within `Settings` during Browser QA.
-4. The invoice creation screen still allowed save while the wallet was flagged without showing a flagged-state warning or confirmation before save.
+1. The invoice creation screen still allowed save while the wallet was flagged without showing a flagged-state warning or confirmation before save.
 
 ## Disposition
-- The user-menu unsupported label affordance is being corrected on PR `#46`.
-- The Settings and Wallet red-dot repair cues remain open Phase 3 work.
+- The repair-path affordance and red-dot cues are corrected on PR `#46`.
 - The invoice-create flagged-state warning/confirmation remains open Phase 3 follow-up work.
+
+## Follow-up Verification
+- After the repair-path UI fixes and asset rebuild on 2026-03-18, Browser QA confirmed:
+  - clicking the `Unsupported configuration` pill opens the user menu
+  - the red dot is visible on `Settings`
+  - the red dot is visible on the `Wallet` tab
+  - the repair path leads cleanly to the wallet warning block

@@ -191,17 +191,17 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
    - Current implementation on 2026-03-18: payment sync now treats a paid shared-address collision as invoice/payment evidence, marks each invoice using that paid address unsupported, flags the current wallet only when the invoice lineage still matches the owner's currently saved primary key, and leaves unrelated older invoices untouched.
 
 #### 3.4 Surface unsupported state in app chrome and wallet flows
-1. [ ] Show red attention UI only when the wallet is actually flagged unsupported:
+1. [x] Show red attention UI only when the wallet is actually flagged unsupported:
    1. [x] an attention-grabbing label near the user menu
-   2. [ ] a red dot on the Settings nav item
-   3. [ ] a red dot on the Wallet settings tab
+   2. [x] a red dot on the Settings nav item
+   3. [x] a red dot on the Wallet settings tab
    4. [x] a red warning near the wallet account key field
 2. [x] Keep the warning copy gentle and corrective:
    1. [x] explain that CryptoZing found wallet activity outside its dedicated receive flow
    2. [x] explain that automatic tracking is no longer reliable for this wallet account
    3. [x] direct the owner to connect a fresh dedicated account key
 3. [x] Mark invoices created while the wallet is flagged unsupported as unsupported in their own UI/state so that replacing the wallet later does not silently make them look safe.
-   - Current implementation on 2026-03-18: wallet settings show a gentle corrective warning block and flagged invoices display unsupported markers in the invoice list and on the invoice detail page. Browser QA on 2026-03-18 found the user-menu unsupported label needed a stronger actionable affordance and the intended Settings/Wallet red dots were not visibly surfacing in the browser, so those navigation cues remain incomplete.
+   - Current implementation on 2026-03-18: wallet settings show a gentle corrective warning block and flagged invoices display unsupported markers in the invoice list and on the invoice detail page. Follow-up Browser QA on 2026-03-18 confirmed the repair path now works end-to-end through the user-menu pill, Settings red dot, Wallet red dot, and wallet warning block.
 
 #### 3.5 Verify Phase 3
 Automated / command verification:
@@ -214,8 +214,8 @@ Automated / command verification:
    5. unsupported-state UI indicators appearing only when the wallet is actually flagged
 
 Browser QA:
-3. [ ] Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
-   - Current Browser QA note on 2026-03-18: wallet save remained non-blocking and the wallet warning block rendered, but the red warning state was only partial. The user-menu unsupported label needed stronger affordance, the intended Settings and Wallet red dots did not visibly surface in the browser, and the invoice create screen still allowed save without any flagged-state warning or confirmation.
+3. [x] Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
+   - Current Browser QA note on 2026-03-18: wallet save remained non-blocking, the repair path now works through the user-menu unsupported pill plus visible red dots on Settings and Wallet, and the wallet warning block rendered as intended. The invoice create screen still allows save without any flagged-state warning or confirmation, but that remains a separate follow-up question rather than a blocker for the red warning-state path.
 4. [x] Confirm the wallet warning language stays gentle and points the owner toward connecting a new dedicated account key.
 5. [x] Create a new invoice while the wallet is flagged and confirm the invoice is marked unsupported at creation time.
 6. [x] Confirm an older invoice is not retroactively marked unsupported unless evidence for that specific invoice triggers it.
