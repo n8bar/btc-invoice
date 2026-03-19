@@ -201,6 +201,8 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSeeInOrder(['Need to update invoice details?', 'Summary'], false);
         $response->assertSee('>edit<', false);
         $response->assertSee(route('invoices.edit', $invoice), false);
+        $response->assertSee('dark:bg-indigo-950/30', false);
+        $response->assertSee('dark:text-indigo-200', false);
         $response->assertSee(route('invoices.destroy', $invoice), false);
         $response->assertSee('Delete', false);
     }
