@@ -92,10 +92,10 @@
                         <x-slot name="content">
                             <x-dropdown-link :href="route('settings.index')">
                                 <span class="inline-flex items-center gap-2">
-                                    <span>{{ __('Settings') }}</span>
                                     @if ($walletUnsupported)
                                         <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
                                     @endif
+                                    <span>{{ __('Settings') }}</span>
                                 </span>
                             </x-dropdown-link>
                             @if (Auth::user()->gettingStartedIsDone())
@@ -235,10 +235,10 @@
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('profile.edit', 'settings.invoice.*', 'wallet.settings.*', 'settings.notifications.*')">
                         <span class="inline-flex items-center gap-2">
-                            <span>{{ __('Settings') }}</span>
                             @if ($walletUnsupported)
                                 <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
                             @endif
+                            <span>{{ __('Settings') }}</span>
                         </span>
                     </x-responsive-nav-link>
                     @if (Auth::user()->gettingStartedIsDone())
