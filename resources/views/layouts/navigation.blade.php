@@ -74,7 +74,7 @@
                             <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-white/10">
                                 @if ($walletUnsupported)
                                     <span data-user-menu-unsupported-label
-                                          class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-300 dark:bg-red-900/80 dark:text-red-50">
+                                          class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-100 dark:bg-red-700 dark:text-white">
                                         <span>Unsupported</span>
                                         <span>Configuration</span>
                                     </span>
@@ -224,7 +224,7 @@
                     @if ($walletUnsupported)
                         <div class="mt-2">
                             <span data-user-menu-unsupported-label
-                                  class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-300 dark:bg-red-900/80 dark:text-red-50">
+                                  class="inline-flex min-w-[10.25rem] flex-col items-center justify-center rounded-full border border-red-500 bg-red-100 px-4 py-1.5 text-center text-xs font-semibold uppercase leading-[1.05rem] tracking-[0.14em] text-red-900 dark:border-red-100 dark:bg-red-700 dark:text-white">
                                 <span>Unsupported</span>
                                 <span>Configuration</span>
                             </span>
