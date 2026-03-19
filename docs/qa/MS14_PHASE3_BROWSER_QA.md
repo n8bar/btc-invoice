@@ -15,11 +15,11 @@ Date: 2026-03-18
 - An older invoice created before the wallet was flagged remained unflagged.
 
 ## Findings
-1. The invoice creation screen still allowed save while the wallet was flagged without showing a flagged-state warning or confirmation before save.
+- Initial Browser QA on 2026-03-18 found that the invoice creation screen still allowed save while the wallet was flagged without showing a flagged-state warning or confirmation before save.
 
 ## Disposition
 - The repair-path affordance and red-dot cues are corrected on PR `#46`.
-- The invoice-create flagged-state warning/confirmation remains open Phase 3 follow-up work.
+- The invoice-create follow-up is corrected on PR `#46` via an inline warning plus explicit CTA text rather than a modal confirmation.
 
 ## Follow-up Verification
 - After the repair-path UI fixes and asset rebuild on 2026-03-18, Browser QA confirmed:
@@ -27,3 +27,6 @@ Date: 2026-03-18
   - the red dot is visible on `Settings`
   - the red dot is visible on the `Wallet` tab
   - the repair path leads cleanly to the wallet warning block
+- After the create-screen follow-up shipped on 2026-03-19, `/invoices/create` now:
+  - shows its own inline unsupported warning while the wallet is flagged
+  - changes the primary CTA to `Create Unsupported Invoice`

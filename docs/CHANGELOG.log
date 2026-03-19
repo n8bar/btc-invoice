@@ -461,3 +461,6 @@ Recompiled the local Vite assets, strengthened the user-menu unsupported pill, m
 
 2026-03-19 | PLAN now assigns password-policy hardening to MS16 and flips completed milestone order
 Updated `docs/PLAN.md` so MS16 explicitly includes auth/password policy hardening alongside docs/test cleanup, and reversed the Completed Milestones table from descending milestone order (`13 -> 1`) to ascending order (`1 -> 13`).
+
+2026-03-19 | MS14 Phase 3 invoice-create warning follow-up implemented
+`/invoices/create` now shows an inline unsupported-state warning when the wallet is flagged, changes the primary CTA to `Create Unsupported Invoice`, adds feature coverage for the flagged create view, and closes the remaining Phase 3 follow-up docs/spec notes around invoice-create warning behavior.

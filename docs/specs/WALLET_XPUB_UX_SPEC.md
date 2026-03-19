@@ -26,7 +26,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - The MS13 wallet-settings baseline in this spec is shipped.
 - MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
 - MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
-- The invoice create screen still lacks its own flagged-state warning/confirmation, which remains open follow-up work.
+- MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
 - The Helpful Notes guidance in this spec remains upcoming roadmap work.
 
 ## Deferred (post-RC)
@@ -67,6 +67,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - red dot on the Settings nav item
   - red dot on the Wallet settings tab
   - red warning near the wallet account key field
+- Invoice creation should also warn inline when the wallet is flagged unsupported and use a more explicit primary action label such as `Create Unsupported Invoice` rather than a neutral save label.
 - The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
 - Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.

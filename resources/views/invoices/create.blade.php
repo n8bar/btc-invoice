@@ -11,6 +11,8 @@
                 $isGettingStartedContext = request()->boolean('getting_started');
                 $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
                 $gettingStartedMarker = '👉';
+                $walletUnsupported = (bool) (auth()->user()?->walletSetting?->unsupported_configuration_active ?? false);
+                $createInvoiceButtonText = $walletUnsupported ? 'Create Unsupported Invoice' : 'Save';
             @endphp
 
             @if ($showClientGate ?? false)
@@ -44,6 +46,21 @@
                 @php
                     $invoiceDefaults = $invoiceDefaults ?? ['description'=>null,'due_date'=>null,'terms_days'=>null];
                 @endphp
+
+                @if ($walletUnsupported)
+                    <div data-unsupported-invoice-create-warning
+                         class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-sm dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-100"
+                         style="border-color: currentColor;">
+                        <p class="font-semibold">We found wallet activity outside CryptoZing.</p>
+                        <p class="mt-1">Automatic payment tracking is no longer reliable for this wallet account. If you continue now, this invoice will be created as an unsupported invoice.</p>
+                        <p class="mt-1">
+                            <a href="{{ route('wallet.settings.edit') }}" class="font-medium underline underline-offset-2">
+                                Connect a fresh dedicated account key
+                            </a>
+                            to keep future invoices on a dedicated receive path.
+                        </p>
+                    </div>
+                @endif
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">
@@ -226,7 +243,7 @@
                     <x-primary-button
                         class="{{ $isGettingStartedContext ? $onboardingGlow : '' }}"
                         :data-getting-started-highlight="$isGettingStartedContext ? 'invoice-save' : null">
-                        {{ $isGettingStartedContext ? $gettingStartedMarker . ' Save' : 'Save' }}
+                        {{ $isGettingStartedContext ? $gettingStartedMarker . ' ' . $createInvoiceButtonText : $createInvoiceButtonText }}
                     </x-primary-button>
                 </div>
             </form>

@@ -200,6 +200,36 @@ class UserSettingsTest extends TestCase
         $response->assertSee('Reset to my custom defaults', false);
     }
 
+    public function test_invoice_create_shows_unsupported_warning_and_cta_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('data-unsupported-invoice-create-warning', false);
+        $response->assertSee('We found wallet activity outside CryptoZing.');
+        $response->assertSee('If you continue now, this invoice will be created as an unsupported invoice.');
+        $response->assertSee('Connect a fresh dedicated account key');
+        $response->assertSee('Create Unsupported Invoice');
+        $response->assertDontSee('>Save<', false);
+    }
+
     public function test_invoice_create_prefill_rate_is_rounded_to_two_decimals(): void
     {
         $owner = User::factory()->create();

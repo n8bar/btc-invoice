@@ -215,7 +215,7 @@ Automated / command verification:
 
 Browser QA:
 3. [x] Save a wallet key that triggers proactive unsupported-state detection and confirm the owner can continue while the app shows the red warning state only in the intended places.
-   - Current Browser QA note on 2026-03-18: wallet save remained non-blocking, the repair path now works through the user-menu unsupported pill plus visible red dots on Settings and Wallet, and the wallet warning block rendered as intended. The invoice create screen still allows save without any flagged-state warning or confirmation, but that remains a separate follow-up question rather than a blocker for the red warning-state path.
+   - Current implementation on 2026-03-19: wallet save remains non-blocking, the repair path works through the user-menu unsupported pill plus visible red dots on Settings and Wallet, the wallet warning block renders as intended, and `/invoices/create` now shows its own inline unsupported warning plus a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
 4. [x] Confirm the wallet warning language stays gentle and points the owner toward connecting a new dedicated account key.
 5. [x] Create a new invoice while the wallet is flagged and confirm the invoice is marked unsupported at creation time.
 6. [x] Confirm an older invoice is not retroactively marked unsupported unless evidence for that specific invoice triggers it.
