@@ -26,6 +26,23 @@ class ProfileTest extends TestCase
         $response->assertDontSee('Show QR refresh reminder to clients', false);
     }
 
+    public function test_profile_page_includes_password_visibility_toggles(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/profile');
+
+        $response->assertOk();
+        $response->assertSee('Show current password');
+        $response->assertSee('Show new password');
+        $response->assertSee('Show password confirmation');
+        $response->assertSee("x-bind:type=\"showCurrentPassword ? 'text' : 'password'\"", false);
+        $response->assertSee("x-bind:type=\"showNewPassword ? 'text' : 'password'\"", false);
+        $response->assertSee("x-bind:type=\"showPasswordConfirmation ? 'text' : 'password'\"", false);
+    }
+
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create([
