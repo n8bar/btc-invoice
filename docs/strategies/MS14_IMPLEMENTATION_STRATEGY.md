@@ -184,10 +184,11 @@ Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsu
    - Current implementation on 2026-03-18: wallet save now scans a bounded window of derived external receive addresses through the existing mempool client, ignores receive history on addresses already owned by this same key lineage inside CryptoZing, flags the wallet when an unknown derived receive address shows prior incoming funds, and leaves spend-only history unflagged.
 
 #### 3.3 Detect unsupported cases from invoice/payment evidence
-1. Flag the wallet as unsupported when watcher or lineage evidence later shows collision-style activity that undermines automatic attribution.
-2. Mark only the implicated existing invoice unsupported when the evidence is specific to that invoice.
-3. Do not retroactively bulk-mark older invoices unsupported without invoice-specific evidence.
-4. Mark every newly created invoice unsupported while the wallet remains flagged unsupported.
+1. [x] Flag the wallet as unsupported when watcher or lineage evidence later shows collision-style activity that undermines automatic attribution.
+2. [x] Mark only the implicated existing invoice unsupported when the evidence is specific to that invoice.
+3. [x] Do not retroactively bulk-mark older invoices unsupported without invoice-specific evidence.
+4. [x] Mark every newly created invoice unsupported while the wallet remains flagged unsupported.
+   - Current implementation on 2026-03-18: payment sync now treats a paid shared-address collision as invoice/payment evidence, marks each invoice using that paid address unsupported, flags the current wallet only when the invoice lineage still matches the owner's currently saved primary key, and leaves unrelated older invoices untouched.
 
 #### 3.4 Surface unsupported state in app chrome and wallet flows
 1. Show red attention UI only when the wallet is actually flagged unsupported:

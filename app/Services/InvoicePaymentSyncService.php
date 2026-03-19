@@ -12,7 +12,8 @@ class InvoicePaymentSyncService
 {
     public function __construct(
         private readonly InvoicePaymentDetector $detector,
-        private readonly InvoiceAlertService $alerts
+        private readonly InvoiceAlertService $alerts,
+        private readonly UnsupportedConfigurationEvidenceService $unsupportedEvidence,
     ) {
     }
 
@@ -198,11 +199,13 @@ class InvoicePaymentSyncService
             return $logs;
         });
 
-        $invoice->refresh();
-
         if ($checkAlerts) {
             $this->alerts->checkPaymentThresholds($invoice->fresh('payments'));
         }
+
+        $this->unsupportedEvidence->flagPaymentCollisionEvidence($invoice->fresh(), $logs);
+
+        $invoice->refresh();
 
         if ($droppedCount > 0) {
             Log::info('invoice.payment.dropped', [

@@ -544,6 +544,172 @@ class WatchPaymentsCommandTest extends TestCase
         $this->assertEquals(1, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_partial_warning')->count());
     }
 
+    public function test_command_flags_implicated_invoices_and_matching_wallets_when_payment_collision_evidence_is_detected(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-06 12:00:00', 'UTC'));
+        $address = 'tb1qcollisionshared0000000000000000000';
+        $ownerA = User::factory()->create();
+        $ownerB = User::factory()->create();
+        $ownerA->walletSetting()->create([
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub-collision-owner-a',
+        ]);
+        $ownerB->walletSetting()->create([
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub-collision-owner-b',
+        ]);
+
+        $invoiceA = $this->createInvoiceForUser(
+            $ownerA,
+            'INV-2001',
+            $address,
+            'vpub-collision-owner-a'
+        );
+        $invoiceB = $this->createInvoiceForUser(
+            $ownerB,
+            'INV-2002',
+            $address,
+            'vpub-collision-owner-b'
+        );
+        $unrelatedInvoice = $this->createInvoiceForUser(
+            $ownerA,
+            'INV-2003',
+            'tb1qunrelatedaddress0000000000000000000',
+            'vpub-collision-owner-a'
+        );
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 42_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$address}/txs" => Http::response([
+                [
+                    'txid' => 'collision-payment-1',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+            "{$base}/address/{$unrelatedInvoice->payment_address}/txs" => Http::response([], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $invoiceA->refresh();
+        $invoiceB->refresh();
+        $unrelatedInvoice->refresh();
+        $ownerA->walletSetting->refresh();
+        $ownerB->walletSetting->refresh();
+
+        $this->assertTrue($invoiceA->unsupported_configuration_flagged);
+        $this->assertSame('evidence', $invoiceA->unsupported_configuration_source);
+        $this->assertSame('payment_collision', $invoiceA->unsupported_configuration_reason);
+        $this->assertStringContainsString('collision-payment-1', (string) $invoiceA->unsupported_configuration_details);
+        $this->assertStringContainsString('INV-2002', (string) $invoiceA->unsupported_configuration_details);
+
+        $this->assertTrue($invoiceB->unsupported_configuration_flagged);
+        $this->assertSame('evidence', $invoiceB->unsupported_configuration_source);
+        $this->assertSame('payment_collision', $invoiceB->unsupported_configuration_reason);
+        $this->assertStringContainsString('INV-2001', (string) $invoiceB->unsupported_configuration_details);
+
+        $this->assertFalse($unrelatedInvoice->unsupported_configuration_flagged);
+
+        $this->assertTrue((bool) $ownerA->walletSetting->unsupported_configuration_active);
+        $this->assertSame('evidence', $ownerA->walletSetting->unsupported_configuration_source);
+        $this->assertSame('payment_collision', $ownerA->walletSetting->unsupported_configuration_reason);
+
+        $this->assertTrue((bool) $ownerB->walletSetting->unsupported_configuration_active);
+        $this->assertSame('evidence', $ownerB->walletSetting->unsupported_configuration_source);
+        $this->assertSame('payment_collision', $ownerB->walletSetting->unsupported_configuration_reason);
+    }
+
+    public function test_command_does_not_flag_current_wallet_when_collision_evidence_belongs_to_old_invoice_lineage(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-06 13:00:00', 'UTC'));
+        $address = 'tb1qoldlineagecollision000000000000000';
+        $ownerA = User::factory()->create();
+        $ownerB = User::factory()->create();
+        $ownerA->walletSetting()->create([
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub-owner-a-current',
+        ]);
+        $ownerB->walletSetting()->create([
+            'network' => 'testnet',
+            'bip84_xpub' => 'vpub-owner-b-current',
+        ]);
+
+        $invoiceA = $this->createInvoiceForUser(
+            $ownerA,
+            'INV-3001',
+            $address,
+            'vpub-owner-a-old'
+        );
+        $invoiceB = $this->createInvoiceForUser(
+            $ownerB,
+            'INV-3002',
+            $address,
+            'vpub-owner-b-current'
+        );
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 42_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$address}/txs" => Http::response([
+                [
+                    'txid' => 'collision-payment-old-lineage',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $invoiceA->refresh();
+        $invoiceB->refresh();
+        $ownerA->walletSetting->refresh();
+        $ownerB->walletSetting->refresh();
+
+        $this->assertTrue($invoiceA->unsupported_configuration_flagged);
+        $this->assertTrue($invoiceB->unsupported_configuration_flagged);
+
+        $this->assertFalse((bool) $ownerA->walletSetting->unsupported_configuration_active);
+        $this->assertNull($ownerA->walletSetting->unsupported_configuration_source);
+        $this->assertNull($ownerA->walletSetting->unsupported_configuration_reason);
+
+        $this->assertTrue((bool) $ownerB->walletSetting->unsupported_configuration_active);
+        $this->assertSame('evidence', $ownerB->walletSetting->unsupported_configuration_source);
+        $this->assertSame('payment_collision', $ownerB->walletSetting->unsupported_configuration_reason);
+    }
+
     private function makeInvoice(): Invoice
     {
         return $this->makeInvoiceWithNetwork('testnet');
@@ -578,5 +744,35 @@ class WatchPaymentsCommandTest extends TestCase
             'invoice_date' => Carbon::now()->toDateString(),
             'due_date' => Carbon::now()->addWeek()->toDateString(),
         ]);
+    }
+
+    private function createInvoiceForUser(User $user, string $number, string $address, string $xpub, string $network = 'testnet'): Invoice
+    {
+        $client = Client::create([
+            'user_id' => $user->id,
+            'name' => 'Acme',
+            'email' => "billing-{$number}@example.com",
+        ]);
+
+        return Invoice::create([
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'number' => $number,
+            'description' => 'Consulting',
+            'amount_usd' => 400,
+            'btc_rate' => 40000,
+            'amount_btc' => 0.01,
+            'payment_address' => $address,
+            'wallet_key_fingerprint' => $this->walletFingerprint($network, $xpub),
+            'wallet_network' => $network,
+            'status' => 'sent',
+            'invoice_date' => Carbon::now()->toDateString(),
+            'due_date' => Carbon::now()->addWeek()->toDateString(),
+        ]);
+    }
+
+    private function walletFingerprint(string $network, string $xpub): string
+    {
+        return app(WalletKeyLineage::class)->fingerprint($network, $xpub);
     }
 }
