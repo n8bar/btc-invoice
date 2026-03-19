@@ -473,3 +473,6 @@ Added a dedicated support-access spec covering support-only login, owner-granted
 
 2026-03-19 | Temporary support access and overpayment note polish implemented
 Added fixed-duration owner-granted support access with a dedicated `/support/login`, support-only read surfaces for invoices/clients, owner grant/revoke controls under Account settings, and config-driven support account allowlisting. Also softened the significant-overpayment owner note so it distinguishes accidental overpayments from intentional tips without sounding overly prescriptive, and synced README/PLAN/AGENTS/spec docs to the new support-access config and copy behavior.
+
+2026-03-19 | AGENTS now requires review of new implementation-shaping docs
+Added an AGENTS rule that if a new doc/spec is created and it shapes future implementation scope, it must be reviewed by the user before it is treated as approved implementation direction.
