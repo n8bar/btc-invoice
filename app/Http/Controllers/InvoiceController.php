@@ -723,10 +723,10 @@ class InvoiceController extends Controller
 
     private function createInvoiceRecord(array $data, $wallet, int $userId, ?array $preparedLineage = null): Invoice
     {
-        return app(WalletKeyLineage::class)->withPreparedAssignment($wallet, $preparedLineage, function (array $lineage) use ($data, $userId) {
+        return app(WalletKeyLineage::class)->withPreparedAssignment($wallet, $preparedLineage, function (array $lineage) use ($data, $userId, $wallet) {
             return Invoice::create($data + [
                 'user_id' => $userId,
-            ] + $lineage);
+            ] + $lineage + $wallet->invoiceUnsupportedConfigurationSnapshot());
         });
     }
 

@@ -110,6 +110,50 @@ class UserSettingsTest extends TestCase
         $this->assertSame('draft', $invoice->status);
     }
 
+    public function test_invoice_store_snapshots_unsupported_wallet_state_when_wallet_is_flagged(): void
+    {
+        $owner = User::factory()->create();
+        $wallet = $this->createWalletSetting($owner);
+        $wallet->markUnsupportedConfiguration(
+            source: 'proactive',
+            reason: 'outside_receive_activity',
+            details: 'Detected prior outside receive activity for this account.',
+            flaggedAt: now()->subMinute(),
+        );
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('invoices.store'), [
+                'client_id' => $client->id,
+                'number' => 'INV-UNSUPPORTED-SNAPSHOT',
+                'description' => 'Flagged wallet snapshot',
+                'amount_usd' => 100,
+                'btc_rate' => 50_000,
+                'amount_btc' => 0.002,
+                'invoice_date' => '2025-01-01',
+            ])
+            ->assertRedirect(route('invoices.index'));
+
+        $invoice = $owner->invoices()->latest('id')->firstOrFail();
+
+        $this->assertTrue($invoice->unsupported_configuration_flagged);
+        $this->assertSame('proactive', $invoice->unsupported_configuration_source);
+        $this->assertSame('outside_receive_activity', $invoice->unsupported_configuration_reason);
+        $this->assertSame('Detected prior outside receive activity for this account.', $invoice->unsupported_configuration_details);
+        $this->assertNotNull($invoice->unsupported_configuration_flagged_at);
+    }
+
     public function test_invoice_create_prefills_defaults(): void
     {
         $owner = User::factory()->create([
@@ -925,6 +969,44 @@ class UserSettingsTest extends TestCase
 
         $cursor = $this->walletCursorFor($owner, self::REALISTIC_TESTNET_TPUB);
         $this->assertSame(60000, (int) $cursor->next_derivation_index);
+    }
+
+    public function test_wallet_settings_update_clears_unsupported_state_when_primary_key_changes(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+        $wallet = WalletSetting::create([
+            'user_id' => $owner->id,
+            'network' => 'testnet',
+            'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+            'onboarded_at' => now()->subDay(),
+            'unsupported_configuration_active' => true,
+            'unsupported_configuration_source' => 'proactive',
+            'unsupported_configuration_reason' => 'outside_receive_activity',
+            'unsupported_configuration_details' => 'Detected prior outside receive activity for this account.',
+            'unsupported_configuration_flagged_at' => now()->subHour(),
+        ]);
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => 'vpub' . str_repeat('b', 40),
+            ])
+            ->assertRedirect(route('wallet.settings.edit'));
+
+        $wallet->refresh();
+
+        $this->assertFalse($wallet->unsupported_configuration_active);
+        $this->assertNull($wallet->unsupported_configuration_source);
+        $this->assertNull($wallet->unsupported_configuration_reason);
+        $this->assertNull($wallet->unsupported_configuration_details);
+        $this->assertNull($wallet->unsupported_configuration_flagged_at);
     }
 
     public function test_wallet_settings_update_clamps_cursor_to_highest_assigned_invoice_index_plus_one(): void

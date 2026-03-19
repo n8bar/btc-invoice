@@ -171,9 +171,10 @@ Browser QA:
 Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsupported state only where evidence supports it.
 
 #### 3.1 Persist unsupported wallet and invoice state
-1. Add wallet-level unsupported-state fields that capture whether the primary wallet is currently flagged plus enough metadata to explain why it was flagged.
-2. Add invoice-level unsupported-state fields so newly created invoices can snapshot wallet unsupported state and existing invoices can be flagged individually when direct evidence implicates them.
-3. Keep unsupported-state metadata explicit enough to distinguish proactive detection from evidence-triggered detection.
+1. [x] Add wallet-level unsupported-state fields that capture whether the primary wallet is currently flagged plus enough metadata to explain why it was flagged.
+2. [x] Add invoice-level unsupported-state fields so newly created invoices can snapshot wallet unsupported state and existing invoices can be flagged individually when direct evidence implicates them.
+3. [x] Keep unsupported-state metadata explicit enough to distinguish proactive detection from evidence-triggered detection.
+   - Current implementation on 2026-03-18: wallet settings now persist `unsupported_configuration_active` plus `source` / `reason` / `details` / `flagged_at`; new invoices snapshot that state at creation time; replacing the primary wallet key clears the current wallet-level unsupported flag without retroactively changing older invoice snapshots.
 
 #### 3.2 Detect unsupported wallet activity proactively
 1. Inspect the saved primary wallet key for prior outside receive activity when the owner saves or replaces the wallet.
