@@ -458,3 +458,6 @@ Browser QA confirmed the gentle wallet warning copy, unsupported invoice snapsho
 
 2026-03-18 | MS14 Phase 3 repair path completed after Browser QA follow-up
 Recompiled the local Vite assets, strengthened the user-menu unsupported pill, moved the Settings and Wallet red dots before their labels, and reran Browser QA to confirm the unsupported repair path now works end-to-end from the user-menu pill through Settings, Wallet, and the wallet warning block. The invoice create screen still lacks its own flagged-state warning/confirmation and remains follow-up work.
+
+2026-03-19 | PLAN now assigns password-policy hardening to MS16 and flips completed milestone order
+Updated `docs/PLAN.md` so MS16 explicitly includes auth/password policy hardening alongside docs/test cleanup, and reversed the Completed Milestones table from descending milestone order (`13 -> 1`) to ascending order (`1 -> 13`).
