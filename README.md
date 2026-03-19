@@ -64,6 +64,7 @@ Execute the full suite via Sail:
 - MS13 UX Overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](docs/milestones/MS13_UX_OVERHAUL.md)
 - Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
+- Support access spec: [`docs/specs/SUPPORT_ACCESS.md`](docs/specs/SUPPORT_ACCESS.md)
 - Print/Public polish spec: [`docs/specs/PRINT_PUBLIC_POLISH.md`](docs/specs/PRINT_PUBLIC_POLISH.md)
 - Rate handling rules: [`docs/specs/RATES.md`](docs/specs/RATES.md)
 - Partial payments, confirmations, and adjustments spec: [`docs/specs/PARTIAL_PAYMENTS.md`](docs/specs/PARTIAL_PAYMENTS.md)

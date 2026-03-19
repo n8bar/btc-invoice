@@ -1,5 +1,5 @@
 # Product Spec
-_Last updated: 2026-03-14_
+_Last updated: 2026-03-19_
 
 This is the canonical product-level spec for CryptoZing.
 
@@ -51,6 +51,8 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 ## Cross-Feature Requirements
 ### Ownership and access
 - Client and invoice data are owner-scoped.
+- Temporary support access may exist only when the owner explicitly grants CryptoZing tech support time-limited read-only access to that owner's invoices and clients.
+- Support access must expire automatically, remain revocable by the owner at any time, and must not broaden into wallet/settings/write access.
 - Public links are the only intended unauthenticated invoice surface and must remain public-safe.
 - Denied or missing-resource states must avoid leaking owner data and should preserve a clear, friendly recovery path.
 
@@ -105,6 +107,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - MS13 UX overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
 - Onboarding flow: [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md)
 - Wallet import and wallet UX: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
+- Support access: [`docs/specs/SUPPORT_ACCESS.md`](specs/SUPPORT_ACCESS.md)
 - Cross-cutting UX and accessibility rules: [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)
 - Docs and contributor-experience scope: [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md)
 - Rollout verification: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)

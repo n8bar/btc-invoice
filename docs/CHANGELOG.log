@@ -467,3 +467,6 @@ Updated `docs/PLAN.md` so MS16 explicitly includes auth/password policy hardenin
 
 2026-03-19 | MS14 Phase 3 verification completed
 Checked off the remaining Phase 3 automated verification items after `./vendor/bin/sail artisan test` passed with 222 tests, and recorded final Browser QA proving the full flagged flow now works end-to-end from wallet save through repair path, flagged invoice creation, and non-retroactive older invoices.
+
+2026-03-19 | Scoped temporary support access before after-this-pr implementation
+Added a dedicated support-access spec covering support-only login, owner-granted read-only invoice/client access, fixed-duration expiration, and owner revocation. Updated the product spec, PLAN, and README so the remaining after-this-pr work now has a canonical doc target before code.
