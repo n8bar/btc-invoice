@@ -12,7 +12,6 @@ class WalletSetting extends Model
         'user_id',
         'network',
         'bip84_xpub',
-        'next_derivation_index',
         'onboarded_at',
     ];
 

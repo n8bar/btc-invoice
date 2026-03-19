@@ -7,6 +7,8 @@ use App\Models\InvoicePayment;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Services\BtcRate;
+use App\Services\Blockchain\MempoolClient;
+use App\Services\WalletKeyLineage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -24,6 +26,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet/api');
         config()->set('blockchain.mempool.testnet4_base', 'https://mempool.example/testnet4/api');
+        app()->forgetInstance(MempoolClient::class);
 
         $base = config('blockchain.mempool.testnet4_base');
 
@@ -74,6 +77,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         config()->set('blockchain.mempool.testnet_base', 'https://mempool.example/testnet4/api');
         config()->set('blockchain.mempool.testnet3_base', 'https://mempool.example/testnet3/api');
+        app()->forgetInstance(MempoolClient::class);
 
         $base = config('blockchain.mempool.testnet3_base');
 
@@ -115,6 +119,69 @@ class WatchPaymentsCommandTest extends TestCase
             'txid' => 'abc123',
             'sats_received' => 1_000_000,
         ]);
+    }
+
+    public function test_command_uses_invoice_lineage_even_when_current_wallet_network_differs(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00', 'UTC'));
+        $invoice = $this->makeInvoiceWithNetwork('testnet4');
+        $invoice->user->walletSetting()->update([
+            'network' => 'mainnet',
+        ]);
+
+        config()->set('blockchain.mempool.mainnet_base', 'https://mempool.example/mainnet/api');
+        config()->set('blockchain.mempool.testnet4_base', 'https://mempool.example/testnet4/api');
+        app()->forgetInstance(MempoolClient::class);
+        $base = config('blockchain.mempool.testnet4_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'lineage123',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $invoice->refresh();
+        $this->assertSame('lineage123', $invoice->txid);
+        $this->assertSame('pending', $invoice->status);
+    }
+
+    public function test_command_skips_invoice_that_lacks_wallet_lineage(): void
+    {
+        $invoice = $this->makeInvoice();
+        $invoice->forceFill([
+            'wallet_key_fingerprint' => null,
+            'wallet_network' => null,
+        ])->save();
+
+        Http::fake();
+
+        $this->artisan('wallet:watch-payments')
+            ->expectsOutput("Invoice {$invoice->id} lacks wallet lineage and was skipped.")
+            ->assertExitCode(0);
+
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('invoice_payments', 0);
     }
 
     public function test_command_marks_invoice_paid_when_unconfirmed_payment_detected(): void
@@ -488,7 +555,6 @@ class WatchPaymentsCommandTest extends TestCase
         $user->walletSetting()->create([
             'network' => $network,
             'bip84_xpub' => 'tpubD6Nz...',
-            'next_derivation_index' => 0,
         ]);
 
         $client = Client::create([
@@ -506,6 +572,8 @@ class WatchPaymentsCommandTest extends TestCase
             'btc_rate' => 40000,
             'amount_btc' => 0.01,
             'payment_address' => 'tb1qq0exampleaddress0000000000000',
+            'wallet_key_fingerprint' => app(WalletKeyLineage::class)->fingerprint($network, 'tpubD6Nz...'),
+            'wallet_network' => $network,
             'status' => 'sent',
             'invoice_date' => Carbon::now()->toDateString(),
             'due_date' => Carbon::now()->addWeek()->toDateString(),

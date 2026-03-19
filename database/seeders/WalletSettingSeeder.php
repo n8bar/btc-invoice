@@ -15,7 +15,6 @@ class WalletSettingSeeder extends Seeder
             $user->walletSetting()->create([
                 'network' => 'testnet',
                 'bip84_xpub' => $testXpub,
-                'next_derivation_index' => 0,
                 'onboarded_at' => now(),
             ]);
         });

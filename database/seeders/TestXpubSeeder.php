@@ -15,7 +15,6 @@ class TestXpubSeeder extends Seeder
             $user->walletSetting()->updateOrCreate([], [
                 'network' => 'testnet',
                 'bip84_xpub' => $testXpub,
-                'next_derivation_index' => 0,
                 'onboarded_at' => now(),
             ]);
         });

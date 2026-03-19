@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Invoice;
-use App\Services\HdWallet;
+use App\Services\WalletKeyLineage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -15,11 +15,11 @@ class ReassignInvoiceAddresses extends Command
         {--apply : Persist the corrected addresses (otherwise dry-run)}
         {--include-paid : Include invoices that have payments or are paid/partial}
         {--reset-payments : Remove payment logs and reset status to sent when reassigning paid/partial invoices}
-        {--use-next-index : Derive from each wallet\'s next_derivation_index and bump indexes forward (instead of reusing invoice derivation_index)}';
+        {--use-next-index : Derive from each wallet\'s cursor ledger and bump indexes forward (instead of reusing invoice derivation_index)}';
 
     protected $description = 'Re-derive invoice payment addresses using BIP84 external chain and optionally persist them.';
 
-    public function __construct(private readonly HdWallet $wallet)
+    public function __construct(private readonly WalletKeyLineage $lineage)
     {
         parent::__construct();
     }
@@ -56,9 +56,8 @@ class ReassignInvoiceAddresses extends Command
         ];
 
         $nextIndexes = [];
-        $walletsTouched = [];
 
-        $query->chunkById(50, function ($invoices) use (&$summary, $apply, $includePaid, &$nextIndexes, &$walletsTouched) {
+        $query->chunkById(50, function ($invoices) use (&$summary, $apply, $includePaid, &$nextIndexes) {
             foreach ($invoices as $invoice) {
                 $summary['checked']++;
                 $wallet = $invoice->user->walletSetting;
@@ -66,10 +65,10 @@ class ReassignInvoiceAddresses extends Command
                 $index = $invoice->derivation_index ?? 0;
                 if ($this->option('use-next-index')) {
                     $walletId = $wallet->id;
-                    $nextIndexes[$walletId] = $nextIndexes[$walletId] ?? $wallet->next_derivation_index;
+                    $nextIndexes[$walletId] = $nextIndexes[$walletId]
+                        ?? $this->lineage->previewCursor($wallet)['next_derivation_index'];
                     $index = $nextIndexes[$walletId];
                     $nextIndexes[$walletId]++;
-                    $walletsTouched[$walletId] = $wallet;
                 }
 
                 // Avoid touching invoices with recorded payments or paid status.
@@ -83,18 +82,19 @@ class ReassignInvoiceAddresses extends Command
                 }
 
                 try {
-                    $expected = $this->wallet->deriveAddress(
-                        $wallet->bip84_xpub,
-                        $index,
-                        $wallet->network
-                    );
+                    $expectedLineage = $this->lineage->deriveInvoiceLineage($wallet, $index);
                 } catch (\Throwable $e) {
                     $summary['errors']++;
                     $this->error("Invoice {$invoice->id} failed derive: {$e->getMessage()}");
                     continue;
                 }
 
-                if ($expected === $invoice->payment_address) {
+                $matchesAddress = $expectedLineage['payment_address'] === $invoice->payment_address;
+                $matchesLineage = $expectedLineage['wallet_key_fingerprint'] === $invoice->wallet_key_fingerprint
+                    && $expectedLineage['wallet_network'] === $invoice->wallet_network
+                    && $index === (int) ($invoice->derivation_index ?? 0);
+
+                if ($matchesAddress && $matchesLineage) {
                     $summary['matched']++;
 
                     if (
@@ -122,15 +122,18 @@ class ReassignInvoiceAddresses extends Command
                     continue;
                 }
 
-                $this->warn("Invoice {$invoice->id} user {$invoice->user_id}: {$invoice->payment_address} -> {$expected} (index {$index}, {$wallet->network})");
+                $this->warn("Invoice {$invoice->id} user {$invoice->user_id}: {$invoice->payment_address} -> {$expectedLineage['payment_address']} (index {$index}, {$wallet->network})");
 
                 if ($apply) {
-                    DB::transaction(function () use ($invoice, $expected, &$summary, $index) {
-                        $invoice->update([
-                            'payment_address' => $expected,
-                            'derivation_index' => $index,
-                        ]);
-                    });
+                    if ($this->option('use-next-index')) {
+                        $this->lineage->withPreparedAssignment($wallet, $expectedLineage, function (array $assignedLineage) use ($invoice) {
+                            $invoice->update($assignedLineage);
+                        });
+                    } else {
+                        DB::transaction(function () use ($invoice, $expectedLineage) {
+                            $invoice->update($expectedLineage);
+                        });
+                    }
                     $summary['updated']++;
 
                     if ($this->option('reset-payments') && $invoice->payments()->exists()) {
@@ -153,18 +156,6 @@ class ReassignInvoiceAddresses extends Command
                 }
             }
         });
-
-        if ($apply && $this->option('use-next-index') && !empty($walletsTouched)) {
-            foreach ($walletsTouched as $walletId => $wallet) {
-                $next = $nextIndexes[$walletId] ?? $wallet->next_derivation_index;
-                if ($next !== $wallet->next_derivation_index) {
-                    $wallet->next_derivation_index = $next;
-                    $wallet->save();
-                    $summary['wallets_advanced']++;
-                    $this->line("Advanced wallet {$wallet->id} next_derivation_index to {$next}.");
-                }
-            }
-        }
 
         $this->info(($apply ? 'Applied' : 'Dry run') . ' complete.');
         $this->info(json_encode($summary, JSON_PRETTY_PRINT));

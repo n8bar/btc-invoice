@@ -16,7 +16,6 @@ class UserWalletAccount extends Model
         'label',
         'network',
         'bip84_xpub',
-        'next_derivation_index',
         'active',
     ];
 

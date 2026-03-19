@@ -114,56 +114,58 @@ Browser QA:
 Create a durable per-key cursor ledger and remove legacy per-wallet cursor state.
 
 #### 2.1 Add the lineage schema
-1. Create `wallet_key_cursors` with `user_id`, `network`, `key_fingerprint`, `next_derivation_index`, `first_seen_at`, and `last_seen_at`.
-2. Add a unique index on (`user_id`, `network`, `key_fingerprint`).
-3. Add `wallet_key_fingerprint` and `wallet_network` to `invoices` so every newly assigned invoice stores its key lineage snapshot.
-4. Drop `wallet_settings.next_derivation_index` so `wallet_key_cursors` becomes the only derivation-state source.
-5. Drop `user_wallet_accounts.next_derivation_index` so additional wallet rows remain saved public-key metadata only.
-6. Implement key fingerprinting consistently:
-   1. normalize xpub input the same way validation does (trim/remove whitespace)
-   2. compute `key_fingerprint = sha256("<network>|<normalized_xpub>")`
-   3. store the hex digest without storing plaintext xpub outside the existing encrypted columns
+1. [x] Create `wallet_key_cursors` with `user_id`, `network`, `key_fingerprint`, `next_derivation_index`, `first_seen_at`, and `last_seen_at`.
+2. [x] Add a unique index on (`user_id`, `network`, `key_fingerprint`).
+3. [x] Add `wallet_key_fingerprint` and `wallet_network` to `invoices` so every newly assigned invoice stores its key lineage snapshot.
+4. [x] Drop `wallet_settings.next_derivation_index` so `wallet_key_cursors` becomes the only derivation-state source.
+5. [x] Drop `user_wallet_accounts.next_derivation_index` so additional wallet rows remain saved public-key metadata only.
+6. [x] Implement key fingerprinting consistently:
+   1. [x] normalize xpub input the same way validation does (trim/remove whitespace)
+   2. [x] compute `key_fingerprint = sha256("<network>|<normalized_xpub>")`
+   3. [x] store the hex digest without storing plaintext xpub outside the existing encrypted columns
 
 #### 2.2 Persist active-key lineage on wallet save and invoice creation
-1. Compute the active key fingerprint whenever the primary wallet is saved.
-2. Upsert the active key's cursor row when saving wallet settings.
-3. Initialize a brand-new key cursor at `0`.
-4. Resume from the existing cursor row when a previously used key is saved again.
-5. Clamp the active cursor to the safety floor `highest_assigned_for_same_key + 1` before issuing new assignments.
-6. Derive each new invoice address from the active key plus the active cursor row.
-7. Persist `derivation_index`, `wallet_key_fingerprint`, and `wallet_network` when creating the invoice.
-8. Increment only `wallet_key_cursors.next_derivation_index` after a successful invoice create.
+1. [x] Compute the active key fingerprint whenever the primary wallet is saved.
+2. [x] Upsert the active key's cursor row when saving wallet settings.
+3. [x] Initialize a brand-new key cursor at `0`.
+4. [x] Resume from the existing cursor row when a previously used key is saved again.
+5. [x] Clamp the active cursor to the safety floor `highest_assigned_for_same_key + 1` before issuing new assignments.
+6. [x] Derive each new invoice address from the active key plus the active cursor row.
+7. [x] Persist `derivation_index`, `wallet_key_fingerprint`, and `wallet_network` when creating the invoice.
+8. [x] Increment only `wallet_key_cursors.next_derivation_index` after a successful invoice create.
 
 #### 2.3 Switch runtime and command paths to invoice-bound lineage
-1. Update payment watch/sync to resolve network from `invoices.wallet_network` first.
-2. Update payment watch/sync to use `invoices.wallet_key_fingerprint` as the invoice-bound lineage context instead of whichever wallet is currently saved.
-3. Log and skip any invoice that still lacks key lineage instead of guessing.
-4. Update `wallet:assign-invoice-addresses` to allocate from `wallet_key_cursors` and persist invoice lineage columns with each assignment.
-5. Update `reassign-invoice-addresses` so any rewritten address/index also rewrites `wallet_key_fingerprint` and `wallet_network` from the selected key lineage instead of relying on removed wallet-row counters.
+1. [x] Update payment watch/sync to resolve network from `invoices.wallet_network` first.
+2. [x] Update payment watch/sync to use `invoices.wallet_key_fingerprint` as the invoice-bound lineage context instead of whichever wallet is currently saved.
+3. [x] Log and skip any invoice that still lacks key lineage instead of guessing.
+4. [x] Update `wallet:assign-invoice-addresses` to allocate from `wallet_key_cursors` and persist invoice lineage columns with each assignment.
+5. [x] Update `reassign-invoice-addresses` so any rewritten address/index also rewrites `wallet_key_fingerprint` and `wallet_network` from the selected key lineage instead of relying on removed wallet-row counters.
 
 #### 2.4 Remove legacy cursor assumptions from tests, fixtures, and notes
-1. Update factories and seeders to stop setting removed `next_derivation_index` columns on wallet rows.
-2. Update feature and unit tests to assert cursor-ledger behavior instead of wallet-row counters.
-3. Remove or update any docs and ops notes that still describe wallet rows as owning derivation state.
+1. [x] Update factories and seeders to stop setting removed `next_derivation_index` columns on wallet rows.
+2. [x] Update feature and unit tests to assert cursor-ledger behavior instead of wallet-row counters.
+3. [x] Remove or update any docs and ops notes that still describe wallet rows as owning derivation state.
 
 #### 2.5 Verify Phase 2
 Automated / command verification:
-1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 2 work.
-2. Add or expand automated coverage for:
-   1. saving a new key creates the expected cursor row
-   2. saving a previously used key resumes that key's historical cursor
-   3. invoice creation persists key identity and increments only the cursor ledger
-   4. watcher behavior uses invoice-bound network/lineage
-   5. address-assignment and reassignment commands use the cursor ledger and keep lineage columns in sync
-3. Sanity-run:
-   1. `./vendor/bin/sail artisan wallet:watch-payments`
-   2. `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
-   3. the updated address-reassignment command path introduced during Phase 2
-4. Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
+1. [x] Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 2 work.
+2. [x] Add or expand automated coverage for:
+   1. [x] saving a new key creates the expected cursor row
+   2. [x] saving a previously used key resumes that key's historical cursor
+   3. [x] invoice creation persists key identity and increments only the cursor ledger
+   4. [x] watcher behavior uses invoice-bound network/lineage
+   5. [x] address-assignment and reassignment commands use the cursor ledger and keep lineage columns in sync
+3. [x] Sanity-run:
+   1. [x] `./vendor/bin/sail artisan wallet:watch-payments`
+   2. [x] `./vendor/bin/sail artisan wallet:assign-invoice-addresses --dry-run`
+   3. [x] the updated address-reassignment command path introduced during Phase 2
+4. [x] Re-run the shared-account collision fixture from the Phase 1 dataset and confirm Phase 2 behavior follows invoice-bound lineage instead of whichever wallet is currently saved.
+   - Current local result on 2026-03-18: after temporarily changing duplicate-fixture user `11`'s current wallet row from `testnet4` to `mainnet`, `./vendor/bin/sail artisan wallet:watch-payments --invoice=57` still resolved invoice `57` through its stored `wallet_network`/`wallet_key_fingerprint` lineage and preserved txid `84cf4ce7488f775a430f196227c8b4aba9f8241a8b3b9d4163ca0a8925062d93` with `80000` sats.
 
 Browser QA:
-5. Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
-6. Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
+5. [x] Save a fresh wallet key through `/wallet/settings` and create an invoice through the browser; confirm the flow still works end-to-end after the legacy wallet-row cursor fields are removed.
+6. [x] Save a previously used wallet key again through `/wallet/settings`, create another invoice, and confirm the app resumes that key's assignment history instead of reusing an old address.
+   - Current local result on 2026-03-18: `Tester1` (`user_id=12`) switched to a second key and created invoice `61` at derivation index `0`, then switched back to the original key and created invoice `62` at derivation index `2`, advancing the original key cursor to `3` instead of reusing an older address.
 
 ### Phase 3 - Unsupported Configuration Detection + Flagging
 Detect risky wallet reuse, flag the wallet gently but clearly, and snapshot unsupported state only where evidence supports it.

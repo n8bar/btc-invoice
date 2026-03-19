@@ -4,9 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Invoice;
 use App\Models\User;
-use App\Services\HdWallet;
+use App\Services\WalletKeyLineage;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class AssignInvoiceAddresses extends Command
 {
@@ -17,7 +16,7 @@ class AssignInvoiceAddresses extends Command
     public function handle(): int
     {
         $dryRun = $this->option('dry-run');
-        $hdWallet = app(HdWallet::class);
+        $lineage = app(WalletKeyLineage::class);
         $total = 0;
 
         $users = User::with('walletSetting')->get();
@@ -38,26 +37,26 @@ class AssignInvoiceAddresses extends Command
             }
 
             $this->info("Assigning addresses for user {$user->id} ({$user->email})");
+            $preview = $lineage->previewCursor($wallet);
+            $nextIndex = $preview['next_derivation_index'];
 
             foreach ($invoices as $invoice) {
-                $address = $hdWallet->deriveAddress(
-                    $wallet->bip84_xpub,
-                    $wallet->next_derivation_index,
-                    $wallet->network
-                );
+                $draftLineage = $dryRun
+                    ? $lineage->deriveInvoiceLineage($wallet, $nextIndex)
+                    : null;
+                $line = $draftLineage ?? [];
+                $index = $dryRun ? $nextIndex : null;
 
-                $this->line(" - Invoice {$invoice->id} gets {$address} (index {$wallet->next_derivation_index})");
+                if ($dryRun) {
+                    $this->line(" - Invoice {$invoice->id} gets {$line['payment_address']} (index {$index})");
+                }
 
                 if (!$dryRun) {
-                    DB::transaction(function () use ($invoice, $wallet, $address) {
-                        $invoice->update([
-                            'payment_address' => $address,
-                            'derivation_index' => $wallet->next_derivation_index,
-                        ]);
-                        $wallet->increment('next_derivation_index');
+                    $lineage->withNextAssignment($wallet, function (array $assignedLineage) use ($invoice) {
+                        $invoice->update($assignedLineage);
                     });
                 } else {
-                    $wallet->next_derivation_index++;
+                    $nextIndex++;
                 }
 
                 $total++;

@@ -39,8 +39,7 @@ class InvoicePaymentSyncService
 
         $resolvedNetwork = $network;
         if (! $resolvedNetwork) {
-            $invoice->loadMissing('user.walletSetting');
-            $resolvedNetwork = $invoice->user?->walletSetting?->network;
+            $resolvedNetwork = $invoice->wallet_network;
         }
 
         if (! $resolvedNetwork) {

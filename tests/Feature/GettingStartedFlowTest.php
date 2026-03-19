@@ -567,7 +567,6 @@ class GettingStartedFlowTest extends TestCase
             'user_id' => $user->id,
             'network' => 'testnet',
             'bip84_xpub' => 'vpub' . str_repeat('a', 40),
-            'next_derivation_index' => 0,
             'onboarded_at' => now(),
         ]);
     }

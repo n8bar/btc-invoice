@@ -22,9 +22,7 @@ class WatchInvoicePayments extends Command
     public function handle(): int
     {
         $query = Invoice::query()
-            ->with(['user.walletSetting'])
             ->whereNotNull('payment_address')
-            ->whereHas('user.walletSetting')
             ->where('status', '!=', 'void')
             ->orderBy('id');
 
@@ -38,15 +36,14 @@ class WatchInvoicePayments extends Command
         $query->chunkById(50, function ($invoices) use (&$processed, &$updated) {
             foreach ($invoices as $invoice) {
                 $processed++;
-                $wallet = $invoice->user->walletSetting;
-                if (!$wallet) {
-                    $this->warn("Invoice {$invoice->id} has no wallet setting.");
+                if (! $invoice->wallet_network || ! $invoice->wallet_key_fingerprint) {
+                    $this->warn("Invoice {$invoice->id} lacks wallet lineage and was skipped.");
                     continue;
                 }
 
                 $result = $this->syncService->syncInvoice(
                     $invoice,
-                    network: $wallet->network,
+                    network: $invoice->wallet_network,
                     force: true,
                     checkAlerts: true
                 );

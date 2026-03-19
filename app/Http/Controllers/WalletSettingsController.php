@@ -8,6 +8,7 @@ use App\Http\Requests\WalletSettingRequest;
 use App\Models\UserWalletAccount;
 use App\Services\GettingStartedFlow;
 use App\Services\HdWallet;
+use App\Services\WalletKeyLineage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
@@ -60,7 +61,6 @@ class WalletSettingsController extends Controller
     {
         $user = $request->user();
         $network = Config::get('wallet.default_network', 'testnet');
-        $previousNextDerivationIndex = (int) ($user->walletSetting?->next_derivation_index ?? 0);
 
         $payload = $request->validated();
         $payload['network'] = $network;
@@ -84,20 +84,7 @@ class WalletSettingsController extends Controller
             'onboarded_at' => now(),
         ]);
 
-        $maxAssignedIndex = $user->invoices()
-            ->whereNotNull('derivation_index')
-            ->max('derivation_index');
-        $safeFloor = $maxAssignedIndex === null ? 0 : ((int) $maxAssignedIndex + 1);
-        $targetNextDerivationIndex = max(
-            (int) $wallet->next_derivation_index,
-            $previousNextDerivationIndex,
-            $safeFloor
-        );
-
-        if ((int) $wallet->next_derivation_index !== $targetNextDerivationIndex) {
-            $wallet->next_derivation_index = $targetNextDerivationIndex;
-            $wallet->save();
-        }
+        app(WalletKeyLineage::class)->syncWalletCursor($wallet);
 
         if ($request->boolean('getting_started')) {
             $gettingStartedFlow->markReplayWalletVerified($user);

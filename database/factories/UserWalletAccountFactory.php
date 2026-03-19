@@ -17,7 +17,6 @@ class UserWalletAccountFactory extends Factory
             'label' => 'Wallet ' . fake()->unique()->word(),
             'network' => 'testnet',
             'bip84_xpub' => 'vpub' . fake()->regexify('[A-Za-z0-9]{10}'),
-            'next_derivation_index' => 0,
             'active' => true,
         ];
     }
