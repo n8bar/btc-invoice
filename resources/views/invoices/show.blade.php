@@ -205,8 +205,8 @@
             </div>
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
-                <div class="border-b border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-indigo-900" style="border-color: currentColor;">
-                    Need to update invoice details? <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold underline hover:text-indigo-700">edit</a> this invoice.
+                <div class="border-b border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-indigo-900 dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
+                    Need to update invoice details? <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold underline hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100">edit</a> this invoice.
                 </div>
                 <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
                     <div class="p-6 border-b md:border-b-0 md:border-r">
