@@ -35,6 +35,10 @@
 
 ## Multi-Agent Coordination
 - Primary and secondary agents are role-based, not capability-limited: secondaries can work docs, code, tests, or modules within their stated task.
+- Use subagents when the work can be split into independent, path-scoped tasks that materially reduce cycle time, especially for parallel code/doc/test updates or targeted read-only investigation.
+- Keep the critical path with the primary agent: do not delegate the next blocking step just to use a subagent; the primary agent owns integration, final verification, and the user-facing summary.
+- Assign each subagent a concrete deliverable plus clear file or module ownership; avoid overlapping write scopes, duplicated research, and broad "review the whole repo" style delegation.
+- Prefer subagents for bounded sidecar work such as spec/doc sync, isolated test fixes, narrow codebase exploration, or risk review of a specific area while the primary agent continues non-overlapping work.
 - Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
 - Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
 - Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
