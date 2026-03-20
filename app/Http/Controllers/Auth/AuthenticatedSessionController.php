@@ -29,13 +29,16 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
+        if ($user && $user->isSupportAgent()) {
+            return redirect()->route('support.dashboard');
+        }
+
         if ($user && $user->gettingStartedNeedsAutoShow()) {
             return redirect()->route('getting-started.start');
         }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
-
     /**
      * Destroy an authenticated session.
      */

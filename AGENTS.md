@@ -25,6 +25,7 @@
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
+- If you create a new doc/spec that shapes future implementation scope, pause for user review before treating that doc as approved implementation direction.
 - If asked to merge a PR while there are uncommitted changes, unpushed commits, or any other local state that makes the tree non-clean or potentially misleading, pause and get explicit confirmation before merging.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
 - Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
@@ -34,6 +35,10 @@
 
 ## Multi-Agent Coordination
 - Primary and secondary agents are role-based, not capability-limited: secondaries can work docs, code, tests, or modules within their stated task.
+- Use subagents when the work can be split into independent, path-scoped tasks that materially reduce cycle time, especially for parallel code/doc/test updates or targeted read-only investigation.
+- Keep the critical path with the primary agent: do not delegate the next blocking step just to use a subagent; the primary agent owns integration, final verification, and the user-facing summary.
+- Assign each subagent a concrete deliverable plus clear file or module ownership; avoid overlapping write scopes, duplicated research, and broad "review the whole repo" style delegation.
+- Prefer subagents for bounded sidecar work such as spec/doc sync, isolated test fixes, narrow codebase exploration, or risk review of a specific area while the primary agent continues non-overlapping work.
 - Expect a dirty worktree during multi-agent sessions; do not stop for unrelated file changes outside your scoped paths.
 - Pause only when unexpected changes appear in the same file you need to edit, or when a destructive/revert action would be required.
 - Use path-scoped staging/commits (`git add <paths>`) so unrelated agent work is never swept into your commit.
@@ -54,6 +59,7 @@
 - **Data hygiene:** As of 2025-11-16 the app only holds seed/test data—no real customers yet. Remove this note (and treat production emails accordingly) once live customer data exists.
 - CryptoZing must remain watch-only: never put private keys or seed phrases into tracked repo files, app config, database seeders, fixtures, tests, or normal application flows. If local testnet funding keys are needed for developer-only scenario setup, keep them only in untracked local storage (for example under `.cybercreek/`) and outside the product boundary.
 - Email delivery currently rewrites recipients to the CryptoZing catch-all via `MAIL_ALIAS_ENABLED/MAIL_ALIAS_DOMAIN` (set to `mailer.cryptozing.app` so Mailgun routes everything to Proton). Disable the aliasing before RC or any real-customer deployment.
+- `SUPPORT_AGENT_EMAILS` controls which accounts are treated as support accounts, and `SUPPORT_ACCESS_HOURS` should remain the fixed server-side expiration window for temporary owner-granted support access.
 - The CryptoZing.app domain is reserved solely for this project; feel free to provision DNS/subdomains/mail for app needs without saving it for other products.
 - Set `APP_PUBLIC_URL` to whatever domain should appear in public invoice links (localhost for dev, `https://cryptozing.app` for production) so emails never point at the wrong host.
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.

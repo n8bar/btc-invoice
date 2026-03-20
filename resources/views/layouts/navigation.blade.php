@@ -1,3 +1,8 @@
+@php
+    $navUser = auth()->user();
+    $supportAgent = (bool) ($navUser?->isSupportAgent() ?? false);
+    $dashboardRoute = $supportAgent ? route('support.dashboard') : route('dashboard');
+@endphp
 <nav x-data="{ open: false }" class="sticky top-0 z-30 bg-white border-b border-gray-100 dark:bg-slate-900 dark:border-white/10">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -5,7 +10,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ auth()->check() ? route('dashboard') : url('/') }}">
+                    <a href="{{ auth()->check() ? $dashboardRoute : url('/') }}">
                         <img src="{{ asset('images/CZ.png') }}" alt="CryptoZing" class="block h-20 w-auto">
                     </a>
                 </div>
@@ -13,15 +18,21 @@
                 <!-- Navigation Links -->
 		                <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex">
                         @auth
-	                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-	                            {{ __('Dashboard') }}
-	                        </x-nav-link>
-	                        <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
-	                            Clients
-	                        </x-nav-link>
-	                        <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
-	                            Invoices
-	                        </x-nav-link>
+                            @if ($supportAgent)
+	                            <x-nav-link :href="route('support.dashboard')" :active="request()->routeIs('support.*')">
+	                                Support
+	                            </x-nav-link>
+                            @else
+	                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+	                                {{ __('Dashboard') }}
+	                            </x-nav-link>
+	                            <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+	                                Clients
+	                            </x-nav-link>
+	                            <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+	                                Invoices
+	                            </x-nav-link>
+                            @endif
                         @endauth
 	                    <x-nav-link :href="route('help')" :active="request()->routeIs('help')">
 	                        Helpful Notes
@@ -92,13 +103,13 @@
                         <x-slot name="content">
                             <x-dropdown-link :href="route('settings.index')">
                                 <span class="inline-flex items-center gap-2">
-                                    @if ($walletUnsupported)
+                                    @if ($walletUnsupported && ! $supportAgent)
                                         <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
                                     @endif
                                     <span>{{ __('Settings') }}</span>
                                 </span>
                             </x-dropdown-link>
-                            @if (Auth::user()->gettingStartedIsDone())
+                            @if (! $supportAgent && Auth::user()->gettingStartedIsDone())
                                 <form method="POST"
                                       action="{{ route('getting-started.reopen') }}"
                                       data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"
@@ -113,7 +124,7 @@
                                         {{ __('Getting started') }}
                                     </button>
                                 </form>
-                            @else
+                            @elseif (! $supportAgent)
                                 <x-dropdown-link :href="route('getting-started.start')">
                                     {{ __('Getting started') }}
                                 </x-dropdown-link>
@@ -158,15 +169,21 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
 	        <div class="pt-2 pb-3 space-y-1">
                 @auth
-	                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-	                    {{ __('Dashboard') }}
-	                </x-responsive-nav-link>
-	                <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
-	                    Clients
-	                </x-responsive-nav-link>
-	                <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
-	                    Invoices
-	                </x-responsive-nav-link>
+                    @if ($supportAgent)
+	                    <x-responsive-nav-link :href="route('support.dashboard')" :active="request()->routeIs('support.*')">
+	                        Support
+	                    </x-responsive-nav-link>
+                    @else
+	                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+	                        {{ __('Dashboard') }}
+	                    </x-responsive-nav-link>
+	                    <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+	                        Clients
+	                    </x-responsive-nav-link>
+	                    <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+	                        Invoices
+	                    </x-responsive-nav-link>
+                    @endif
                 @endauth
 	            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')">
 	                Helpful Notes
@@ -235,13 +252,13 @@
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('profile.edit', 'settings.invoice.*', 'wallet.settings.*', 'settings.notifications.*')">
                         <span class="inline-flex items-center gap-2">
-                            @if ($walletUnsupported)
+                            @if ($walletUnsupported && ! $supportAgent)
                                 <span data-settings-alert-dot class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
                             @endif
                             <span>{{ __('Settings') }}</span>
                         </span>
                     </x-responsive-nav-link>
-                    @if (Auth::user()->gettingStartedIsDone())
+                    @if (! $supportAgent && Auth::user()->gettingStartedIsDone())
                         <form method="POST"
                               action="{{ route('getting-started.reopen') }}"
                               data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"
@@ -256,7 +273,7 @@
                                 {{ __('Getting started') }}
                             </button>
                         </form>
-                    @else
+                    @elseif (! $supportAgent)
                         <x-responsive-nav-link :href="route('getting-started.start')" :active="request()->routeIs('getting-started.*')">
                             {{ __('Getting started') }}
                         </x-responsive-nav-link>

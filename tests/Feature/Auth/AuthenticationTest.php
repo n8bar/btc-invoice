@@ -106,6 +106,29 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_support_users_are_redirected_to_support_dashboard_on_standard_login(): void
+    {
+        config()->set('support.agent_emails', ['support@example.com']);
+
+        $user = User::factory()->create([
+            'email' => 'support@example.com',
+            'getting_started_completed_at' => now(),
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('support.dashboard'));
+    }
+
+    public function test_support_login_path_is_not_available(): void
+    {
+        $this->get('/support/login')->assertNotFound();
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();

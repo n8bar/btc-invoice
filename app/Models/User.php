@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -34,6 +36,9 @@ class User extends Authenticatable
         'invoice_default_description',
         'invoice_default_terms_days',
         'theme',
+        'support_access_granted_at',
+        'support_access_expires_at',
+        'support_access_terms_version',
         'getting_started_completed_at',
         'getting_started_dismissed',
         'getting_started_replay_started_at',
@@ -70,6 +75,9 @@ class User extends Authenticatable
             'branding_heading' => 'string',
             'invoice_default_terms_days' => 'integer',
             'theme' => 'string',
+            'support_access_granted_at' => 'datetime',
+            'support_access_expires_at' => 'datetime',
+            'support_access_terms_version' => 'string',
             'getting_started_completed_at' => 'datetime',
             'getting_started_dismissed' => 'boolean',
             'getting_started_replay_started_at' => 'datetime',
@@ -122,5 +130,39 @@ class User extends Authenticatable
     {
         return $this->getting_started_completed_at === null
             && $this->getting_started_replay_started_at !== null;
+    }
+
+    public function isSupportAgent(): bool
+    {
+        $email = Str::lower(trim((string) $this->email));
+
+        return in_array($email, config('support.agent_emails', []), true);
+    }
+
+    public function hasActiveSupportAccessGrant(): bool
+    {
+        return $this->support_access_granted_at !== null
+            && $this->support_access_expires_at !== null
+            && $this->support_access_expires_at->isFuture();
+    }
+
+    public function grantSupportAccess(?Carbon $grantedAt = null): void
+    {
+        $grantedAt ??= now();
+
+        $this->forceFill([
+            'support_access_granted_at' => $grantedAt,
+            'support_access_expires_at' => $grantedAt->copy()->addHours((int) config('support.grant_hours', 72)),
+            'support_access_terms_version' => (string) config('support.terms_version', 'v1'),
+        ])->save();
+    }
+
+    public function revokeSupportAccess(): void
+    {
+        $this->forceFill([
+            'support_access_granted_at' => null,
+            'support_access_expires_at' => null,
+            'support_access_terms_version' => null,
+        ])->save();
     }
 }
