@@ -482,3 +482,6 @@ Removed the dedicated `/support/login` requirement from `docs/specs/SUPPORT_ACCE
 
 2026-03-19 | Support access now uses the standard login surface
 Removed the separate `/support/login` implementation so support accounts now authenticate through the standard login page and still land on `/support` after sign-in. Synced the support-access spec to the approved “same login as owners for now” wording and updated auth coverage accordingly.
+
+2026-03-19 | MS14 focus returned to Phase 4 dedicated-wallet UX hardening
+Merged the after-this-pr support/copy follow-up and updated `docs/PLAN.md` so the current MS14 next action now points at Phase 4 wallet-settings guidance, onboarding reinforcement, and the Helpful Notes explainer.
