@@ -38,6 +38,19 @@ class HelpfulNotesTest extends TestCase
         $response->assertSee('<link rel="canonical" href="' . route('help') . '">', false);
     }
 
+    public function test_help_page_shows_back_link_when_linked_from_getting_started_wallet_step(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('help', ['from' => 'getting-started-wallet']));
+
+        $response->assertOk();
+        $response->assertSee('Back to Getting Started');
+        $response->assertSee(route('getting-started.step', ['step' => 'wallet']));
+    }
+
     public function test_wallet_settings_links_to_specific_help_note(): void
     {
         $user = User::factory()->create();
@@ -48,5 +61,18 @@ class HelpfulNotesTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('href="' . route('help', ['from' => 'wallet-settings']) . '#import-wallet-key"', false);
+    }
+
+    public function test_help_page_includes_dedicated_receiving_account_guidance(): void
+    {
+        $response = $this->get(route('help'));
+
+        $response->assertOk();
+        $response->assertSee('Why CryptoZing needs a dedicated receiving account', false);
+        $response->assertSee('What breaks automatic tracking?', false);
+        $response->assertSee('What do I still use my wallet app for?', false);
+        $response->assertSee('CryptoZing only watches for invoice receives.', false);
+        $response->assertSee('What does unsupported configuration mean?', false);
+        $response->assertSee('Connect a fresh dedicated account key', false);
     }
 }

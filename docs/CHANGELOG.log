@@ -482,3 +482,30 @@ Removed the dedicated `/support/login` requirement from `docs/specs/SUPPORT_ACCE
 
 2026-03-19 | Support access now uses the standard login surface
 Removed the separate `/support/login` implementation so support accounts now authenticate through the standard login page and still land on `/support` after sign-in. Synced the support-access spec to the approved “same login as owners for now” wording and updated auth coverage accordingly.
+
+2026-03-19 | MS14 focus returned to Phase 4 dedicated-wallet UX hardening
+Merged the after-this-pr support/copy follow-up and updated `docs/PLAN.md` so the current MS14 next action now points at Phase 4 wallet-settings guidance, onboarding reinforcement, and the Helpful Notes explainer.
+
+2026-03-19 | MS16 now explicitly owns the minimum viable support UI pass
+Updated `docs/PLAN.md` milestone 16 from `Docs & DX` to `Docs, DX & Support UX` and tightened its short intent so the RC roadmap clearly assigns the minimum viable support UI and access-flow pass to MS16 alongside the existing docs, auth-hardening, and test-rationalization work without implying a full support console.
+
+2026-03-19 | MS14 Phase 4.1 wallet settings copy now reinforces dedicated receiving accounts
+Added a dedicated receiving-account guidance block to `/wallet/settings` that explicitly requires a dedicated account key for invoice receives, warns that reusing the same account for receives elsewhere can attach payments to the wrong invoice, clarifies that viewing/spending elsewhere is fine, adds focused feature coverage for that copy, and advances `docs/PLAN.md` / `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` toward Phase 4 onboarding and Helpful Notes work.
+
+2026-03-19 | MS14 Phase 4 onboarding and Helpful Notes now reinforce dedicated receiving accounts
+Updated the getting-started wallet step with a concise dedicated-account warning block and direct Helpful Notes link, added a dedicated receiving-account article to the public `Helpful Notes` page that explains what breaks tracking, what remains safe, what unsupported configuration means, and how to fix it with a fresh key, added back-link handling for onboarding-driven help visits, and advanced Phase 4 docs so the next action is verification and Browser QA.
+
+2026-03-19 | MS14 Phase 4.4 traceability and automated verification are complete
+Linked the wallet-settings dedicated-account guidance block directly to the matching Helpful Notes anchor, tied the wallet key field to the guidance/helper/feedback regions for clearer keyboard and assistive-tech behavior, added a support-safe `wallet.settings.saved_with_dedicated_guidance` log entry that excludes wallet-key material, expanded feature coverage for the wallet/help link and save-log emission, and ran `./vendor/bin/sail artisan test` with `236 passed`. Updated `docs/PLAN.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/specs/WALLET_XPUB_UX_SPEC.md` so Browser QA is now the remaining Phase 4 gate.
+
+2026-03-19 | Drafted the canonical Phase 5 payment-corrections spec
+Added `docs/specs/PAYMENT_CORRECTIONS.md` to define owner-only ignore/restore behavior for wrongly attributed on-chain payments, including correction metadata, recalculation rules, watcher survival requirements, public-vs-owner visibility, and audit/logging expectations. Synced `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, `docs/specs/PARTIAL_PAYMENTS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `README.md` so the new spec is the primary next doc pending review before implementation.
+
+2026-03-19 | Phase 4 copy guidance now treats external wallet use as normal and keeps wallet-prefix hints env-aware
+Updated the onboarding and wallet UX specs so dedicated-account guidance now says the owner's wallet app remains the normal place to view balances and spend/sweep funds because CryptoZing is watch-only. The wallet settings surface should use generic key labels plus one env-aware “usually starts with …” hint (`xpub/zpub` on mainnet, `vpub/tpub` on testnet), while Helpful Notes may keep mainnet-style prefix examples in its explanatory import guidance.
+
+2026-03-19 | Shipped the Phase 4 Browser QA copy follow-up for wallet guidance
+Updated wallet settings, onboarding, and Helpful Notes so the watch-only model now explicitly says the owner's wallet app remains the normal place to view balances, sweep funds, and spend, while wallet settings now use generic key labels plus an env-aware “usually starts with …” hint and omit `vpub/tpub` on mainnet surfaces. Added focused mainnet/non-mainnet coverage and reran `./vendor/bin/sail artisan test` with `237 passed`.
+
+2026-03-19 | MS14 Phase 4 Browser QA is complete and Phase 5 is now the active next step
+Checked off all three Browser QA items in `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` after the approved Phase 4 copy follow-up, added `docs/qa/MS14_PHASE4_BROWSER_QA.md` with the final verification note and disposition, and updated `docs/PLAN.md` so the active next action is Phase 5 correction-tooling implementation against the approved `docs/specs/PAYMENT_CORRECTIONS.md` spec.

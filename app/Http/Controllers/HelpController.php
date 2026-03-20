@@ -16,6 +16,10 @@ class HelpController extends Controller
                 'label' => 'Back to Wallet Settings',
                 'url' => route('wallet.settings.edit'),
             ],
+            'getting-started-wallet' => [
+                'label' => 'Back to Getting Started',
+                'url' => route('getting-started.step', ['step' => 'wallet']),
+            ],
         ];
 
         if (is_string($from) && array_key_exists($from, $knownSources)) {

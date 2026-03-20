@@ -7,7 +7,7 @@ Purpose: define the guided onboarding flow that helps a signed-in owner reach fi
 - The flow links into existing wallet/invoice pages; it does not replace policy checks or controller authorization.
 - The wizard can be dismissed or completed.
 - Empty states (no wallet / no invoices) should point into the onboarding flow with clear CTAs.
-- The wallet step should reinforce the dedicated receiving-account requirement in plain language and link into the Helpful Notes explainer when that content ships.
+- The wallet step should reinforce the dedicated receiving-account requirement in plain language and link into the matching Helpful Notes explainer.
 
 ## Wizard Steps
 1. Connect wallet.
@@ -101,7 +101,12 @@ If any step proves too broad during implementation, split it into explicit subst
   - `Getting started complete.`
 - Step shell examples (what the getting-started page shows):
   - Wallet title: `Connect your wallet`
-  - Wallet body: `Add a dedicated wallet account key so CryptoZing can generate a payment address for each invoice. Need help? Review why CryptoZing needs a dedicated receiving account key.`
+  - Wallet body: `Add your wallet account key so CryptoZing can generate a payment address for each invoice. Use a dedicated receiving account so payment tracking stays reliable.`
+  - Wallet warning block:
+    - `Use a dedicated receiving account key.`
+    - `If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.`
+    - `You’ll still use your wallet app to view balances and spend from this account.`
+    - link: `Why CryptoZing needs a dedicated receiving account`
   - Wallet CTA: `Open wallet settings`
   - Invoice title: `Create your first invoice`
   - Invoice body: `Create an invoice to continue getting started.`

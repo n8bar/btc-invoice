@@ -69,6 +69,7 @@ Execute the full suite via Sail:
 - Print/Public polish spec: [`docs/specs/PRINT_PUBLIC_POLISH.md`](docs/specs/PRINT_PUBLIC_POLISH.md)
 - Rate handling rules: [`docs/specs/RATES.md`](docs/specs/RATES.md)
 - Partial payments, confirmations, and adjustments spec: [`docs/specs/PARTIAL_PAYMENTS.md`](docs/specs/PARTIAL_PAYMENTS.md)
+- Payment correction / ignore-restore spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
 - Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
 - MS14 implementation strategy: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md)

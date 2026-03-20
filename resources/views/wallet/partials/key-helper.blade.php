@@ -1,5 +1,7 @@
 @php
     $onboarding = $onboarding ?? false;
+    $defaultNetwork = $defaultNetwork ?? config('wallet.default_network', 'testnet');
+    $prefixExamples = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
     $gettingStartedMarker = '👉';
     $detailsClasses = $onboarding
         ? 'rounded border border-indigo-200 bg-indigo-50/70 p-3 text-xs text-slate-700 shadow-sm ring-1 ring-indigo-200/80 dark:border-indigo-400/35 dark:bg-indigo-950/30 dark:text-slate-200 dark:ring-indigo-400/25'
@@ -21,7 +23,7 @@
         <ol class="list-decimal space-y-1 pl-4">
             <li>Open your wallet and choose the account you want payments to land in.</li>
             <li>Go to Receive (or Account details) -> Advanced/export.</li>
-            <li>Copy the account public key (often labeled xpub/zpub/vpub/tpub). Do not copy a single address.</li>
+            <li>Copy the account public key from your wallet. Do not copy a single address. It usually starts with {{ $prefixExamples }}.</li>
             <li>Paste here. You can verify below before saving.</li>
         </ol>
         <div class="grid gap-2 sm:grid-cols-2">

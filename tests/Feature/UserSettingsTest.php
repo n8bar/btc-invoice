@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Mockery;
 use PDOException;
 use Tests\TestCase;
 
@@ -884,6 +886,55 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_explains_dedicated_receiving_account_requirement(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Use a dedicated receiving account key here.', false);
+        $response->assertSee('CryptoZing expects a dedicated account key for invoice receives.', false);
+        $response->assertSee('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.', false);
+        $response->assertSee('You’ll still view balances and spend from this account in your wallet app. CryptoZing does not show balances or send bitcoin.', false);
+        $response->assertSee('Usually starts with', false);
+        $response->assertSee('vpub or tpub', false);
+    }
+
+    public function test_wallet_settings_mainnet_surface_omits_testnet_prefixes(): void
+    {
+        Config::set('wallet.default_network', 'mainnet');
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('vpub', false);
+        $response->assertDontSee('tpub', false);
+        $response->assertSee('Usually starts with', false);
+        $response->assertSee('xpub or zpub', false);
+    }
+
+    public function test_wallet_settings_links_to_dedicated_receiving_account_helpful_notes(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee(
+            'href="' . route('help', ['from' => 'wallet-settings']) . '#dedicated-receiving-account"',
+            false
+        );
+        $response->assertSee('Read why CryptoZing needs a dedicated receiving account.', false);
+    }
+
     public function test_wallet_settings_show_unsupported_warning_and_navigation_indicators_when_wallet_is_flagged(): void
     {
         $owner = User::factory()->create();
@@ -1010,6 +1061,46 @@ class UserSettingsTest extends TestCase
 
         $response->assertRedirect(route('getting-started.start'));
         $response->assertSessionHas('status', 'Wallet settings saved.');
+    }
+
+    public function test_wallet_settings_update_logs_dedicated_guidance_save_context(): void
+    {
+        Config::set('wallet.default_network', 'testnet');
+        $owner = User::factory()->create();
+        Log::spy();
+
+        $this->mock(HdWallet::class, function ($mock) {
+            $mock->shouldReceive('deriveAddress')
+                ->once()
+                ->andReturn('tb1qtestaddress00000000000000000000000');
+        });
+
+        $this
+            ->actingAs($owner)
+            ->post(route('wallet.settings.update'), [
+                'bip84_xpub' => self::REALISTIC_TESTNET_TPUB,
+                'getting_started' => 1,
+            ])
+            ->assertRedirect(route('getting-started.start'));
+
+        $wallet = WalletSetting::where('user_id', $owner->id)->firstOrFail();
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->with('wallet.settings.saved_with_dedicated_guidance', Mockery::on(
+                function (array $context) use ($owner, $wallet): bool {
+                    return $context['user_id'] === $owner->id
+                        && $context['wallet_setting_id'] === $wallet->id
+                        && $context['network'] === 'testnet'
+                        && $context['surface'] === 'getting_started'
+                        && $context['getting_started'] === true
+                        && $context['wallet_key_replaced'] === false
+                        && $context['unsupported_configuration_previously_active'] === false
+                        && $context['unsupported_configuration_active'] === false
+                        && $context['unsupported_configuration_source'] === null
+                        && ! array_key_exists('bip84_xpub', $context);
+                }
+            ));
     }
 
     public function test_wallet_settings_update_resumes_cursor_when_same_key_is_resaved(): void

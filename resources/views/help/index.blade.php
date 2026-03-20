@@ -64,11 +64,11 @@
                                 It’s a <span class="font-medium">receive-only</span> key that lets software derive many Bitcoin addresses for a single wallet account. Different wallets label them as <span class="font-medium">xpub</span> or <span class="font-medium">zpub</span>, but they’re both extended public keys.
                             </dd>
                         </div>
-                        <div>
-                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Why do we ask for it?</dt>
-                            <dd class="mt-1">
-                                To generate a fresh address per invoice (better bookkeeping and less address reuse) and to automatically detect payments sent to those addresses.
-                            </dd>
+	                        <div>
+	                            <dt class="font-semibold text-gray-900 dark:text-slate-100">Why do we ask for it?</dt>
+	                            <dd class="mt-1">
+	                                To generate a fresh address per invoice (better bookkeeping and less address reuse) and to automatically detect payments sent to those addresses.
+	                            </dd>
                         </div>
                         <div>
                             <dt class="font-semibold text-gray-900 dark:text-slate-100">What can’t it do?</dt>
@@ -96,6 +96,46 @@
 	                        </div>
 	                    </dl>
 	                </article>
+
+                    <article id="dedicated-receiving-account" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
+                        <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Why CryptoZing needs a dedicated receiving account</h3>
+                        <p class="mt-1 text-base text-gray-700 dark:text-slate-200">
+                            CryptoZing can reliably track invoice payments only when the account key you connect here is used for CryptoZing invoice receives and not for unrelated receives elsewhere.
+                        </p>
+
+                        <dl class="mt-4 space-y-4 text-base text-gray-700 dark:text-slate-200">
+                            <div>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">What breaks automatic tracking?</dt>
+                                <dd class="mt-1">
+                                    If the same account also receives payments in another wallet app, from a shared QR, or from manually generated receive addresses, CryptoZing can no longer safely tell which receives belong to which invoices.
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">What do I still use my wallet app for?</dt>
+                                <dd class="mt-1">
+                                    You will use your wallet app to view balances, sweep funds, and spend from this account. CryptoZing only watches for invoice receives. The risky part is using the same account for additional receives outside CryptoZing.
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">What does unsupported configuration mean?</dt>
+                                <dd class="mt-1">
+                                    It means CryptoZing found evidence that this account is receiving funds outside the app, so automatic payment attribution is no longer reliable for new invoices on that account.
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">How do I fix it?</dt>
+                                <dd class="mt-1">
+                                    Connect a fresh dedicated account key and use that account only for CryptoZing invoice receives going forward.
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">Safest setup</dt>
+                                <dd class="mt-1">
+                                    Use one dedicated receive account or app for CryptoZing, then sweep or spend from a separate account or wallet. That keeps invoice receives isolated and easier to trust.
+                                </dd>
+                            </div>
+                        </dl>
+                    </article>
 
 	                <article id="import-wallet-key" class="scroll-mt-24 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/60">
 	                    <h3 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-slate-100">Importing your wallet account key (xpub / zpub)</h3>

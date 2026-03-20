@@ -37,6 +37,20 @@
                             </p>
                         </div>
 
+                        @if ($currentStepKey === 'wallet')
+                            <div data-getting-started-wallet-guidance
+                                 class="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-950 dark:border-indigo-400/30 dark:bg-indigo-950/35 dark:text-indigo-100"
+                                 style="border-color: currentColor;">
+                                <p class="font-semibold">Use a dedicated receiving account key.</p>
+                                <p class="mt-1">If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.</p>
+                                <p class="mt-1">You’ll still use your wallet app to view balances and spend from this account.</p>
+                                <a href="{{ route('help', ['from' => 'getting-started-wallet']) }}#dedicated-receiving-account"
+                                   class="mt-2 inline-flex items-center font-semibold text-indigo-900 underline underline-offset-2 hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100">
+                                    Why CryptoZing needs a dedicated receiving account
+                                </a>
+                            </div>
+                        @endif
+
                         <div class="rounded-lg border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-900 dark:border-indigo-400/25 dark:bg-indigo-950/35 dark:text-indigo-100" style="border-color: currentColor;">
                             <p class="font-semibold">Success criteria</p>
                             <p class="mt-1">{{ $currentStep['criteria'] }}</p>
