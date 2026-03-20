@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: review the draft Phase 5 payment-corrections spec before implementation and do a quick browser spot-check on the shipped Phase 4 copy follow-up.
+- Next action: implement Phase 5 correction tooling per the approved payment-corrections spec.
 - Primary next doc: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)

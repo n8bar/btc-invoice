@@ -260,9 +260,12 @@ Automated / command verification:
    - Current result on 2026-03-19: feature coverage now asserts `wallet.settings.saved_with_dedicated_guidance` is emitted with support-safe context only.
 
 Browser QA:
-4. [ ] Verify dedicated-account warning clarity on wallet settings.
-5. [ ] Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
-6. [ ] Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
+4. [x] Verify dedicated-account warning clarity on wallet settings.
+   - Current result on 2026-03-19: Browser QA confirmed the warning is clear after the watch-only copy follow-up and that wallet settings now uses generic key labels plus an env-aware “Usually starts with …” hint without exposing `vpub/tpub` on mainnet.
+5. [x] Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
+   - Current result on 2026-03-19: Browser QA confirmed the getting-started wallet warning remains understandable after the copy follow-up and no layout-shift or focus regressions were called out.
+6. [x] Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
+   - Current result on 2026-03-19: Browser QA confirmed the Helpful Notes dedicated receiving-account explainer matches the in-app warning language and reads clearly with the stronger watch-only explanation.
 
 ### Phase 5 - Correction Tooling + Safeguards
 
