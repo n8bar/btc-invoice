@@ -515,3 +515,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-19 | Attribution vs unsupported-wallet docs clarified
 `docs/PRODUCT_SPEC.md`, `docs/specs/PAYMENT_CORRECTIONS.md`, and `docs/specs/WALLET_XPUB_UX_SPEC.md` now distinguish stale-address wrong-invoice attribution from unsupported shared-wallet evidence; `docs/specs/NOTIFICATIONS.md` now requires owner validation before second-or-later payment-triggered mail on already-funded invoices.
+
+2026-03-19 | Phase 5 correction scope expanded to include reattribution
+`docs/PLAN.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/specs/PAYMENT_CORRECTIONS.md` now keep MS14 Phase 5 open for planned same-owner invoice-to-invoice reattribution, rewrite the Phase 5 verification/Browser QA around ignore/restore/reattribute, and clarify the distinction between detected-payment interpretation tools and separate manual adjustment entries.

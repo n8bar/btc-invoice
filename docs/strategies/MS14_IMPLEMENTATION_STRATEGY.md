@@ -271,7 +271,7 @@ Browser QA:
 
 Canonical requirements for Phase 5 now live in [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md). Use this strategy section for milestone sequencing only.
 
-Current implementation on 2026-03-19: correction metadata now lives on `invoice_payments`; owner-only ignore/restore actions ship from the invoice payment-history table with inline confirmation; ignored rows stay visible and marked in owner/support audit views while public/print/dashboard math excludes them; watcher sync preserves ignored rows; and queued receipts/paid notices/underpay/partial deliveries are skipped when a correction makes them untruthful.
+Current implementation on 2026-03-19: correction metadata now lives on `invoice_payments`; owner-only ignore/restore actions ship from the invoice payment-history table with inline confirmation; ignored rows stay visible and marked in owner/support audit views while public/print/dashboard math excludes them; watcher sync preserves ignored rows; and queued receipts/paid notices/underpay/partial deliveries are skipped when a correction makes them untruthful. Phase 5 remains open because invoice-to-invoice reattribution is still planned work in the same correction track.
 
 #### 5.1 Add correction metadata
 Add correction metadata to `invoice_payments` (or companion audit table):
@@ -293,7 +293,20 @@ Re-run payment state recomputation after ignore/restore.
 2. Disallow ignoring manual adjustment rows.
 3. Log every ignore/restore action with invoice/payment/user IDs.
 
-#### 5.4 Verify Phase 5
+#### 5.4 Add invoice-to-invoice reattribution
+1. Let the owner move a detected payment's accounting credit from invoice A to invoice B when the payment was real but the business intent belongs to B.
+2. Keep this correction same-owner only in RC so reattribution cannot move money between unrelated owners.
+3. Preserve provenance and auditability:
+   1. keep the original detected payment record
+   2. record that CryptoZing now counts it toward a different invoice
+   3. preserve who performed the reassignment, when, and why
+4. Recompute both source and destination invoices immediately after reattribution so status, paid/outstanding totals, QR/BIP21 targets, and queued payment-triggered deliveries all stay truthful.
+5. Keep wallet trust separate:
+   1. reattribution fixes wrong-invoice bookkeeping
+   2. reattribution does not by itself clear unsupported wallet or invoice evidence
+6. Treat stale-address wrong-invoice reuse as a primary reattribution use case, not unsupported-wallet evidence by itself.
+
+#### 5.5 Verify Phase 5
 Automated / command verification:
 1. [x] Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
    - Current result on 2026-03-19: `246 passed`.
@@ -303,17 +316,26 @@ Automated / command verification:
    3. [x] audit logging and metadata persistence
    4. [x] public/print/dashboard exclusion of ignored rows
    5. [x] watcher persistence of ignored rows and skipped queued deliveries when corrections change truth
-3. [x] Verify raw tx history remains present after ignore/restore.
+3. [ ] Add or expand automated coverage for:
+   1. [ ] reattributing a payment from invoice A to invoice B recomputes both invoices truthfully
+   2. [ ] same-owner guardrails and destination-invoice validation
+   3. [ ] provenance and audit-log persistence for reattribution
+   4. [ ] later payment-triggered deliveries stay held or skipped appropriately after reattribution
+   5. [ ] stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts
+4. [x] Verify raw tx history remains present after ignore/restore.
    - Current result on 2026-03-19: owner and support payment-history views keep the original tx rows visible with ignored-state context while public/print surfaces exclude them.
 
 Browser QA:
-4. [ ] Exercise the correction flow in the browser and confirm visible invoice state recovers as expected.
-5. [ ] Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
-6. [ ] Confirm manual adjustment rows cannot be ignored.
+5. [ ] Exercise ignore, restore, and reattribute in the browser and confirm visible invoice state recovers truthfully.
+6. [ ] Confirm ignored rows are excluded from paid/outstanding calculations, restore reverses that cleanly, and reattribute updates both source and destination invoices immediately.
+7. [ ] Confirm owner-visible audit/provenance context remains understandable after reattribution while public/print surfaces only reflect the truthful active accounting.
+8. [ ] Confirm later payment-triggered mail stays held pending owner validation on already-funded invoices affected by second-or-later payments.
+9. [ ] Confirm stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves.
+10. [ ] Confirm manual adjustment rows cannot be ignored or reattributed through the payment-correction flow.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
 2. Unsupported wallet reuse can be detected and flagged without hard-blocking the owner, and unsupported invoice state is applied only where creation-time state or invoice-specific evidence supports it.
 3. Wallet/onboarding/help UX clearly communicates the dedicated-account requirement.
-4. Operators and owners can recover from shared-account mistakes through auditable correction tooling.
+4. Operators and owners can recover from shared-account mistakes and wrong-invoice attribution through auditable correction tooling.
 5. QA can reproduce the prior failure mode and confirm the flagging/recovery path.
