@@ -521,3 +521,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-20 | Reattribution docs now cover dual-history visibility and delete safeguards
 `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/PRODUCT_SPEC.md` now require owner-visible reattribution history on both source and destination invoices, relax the destination-picker wording so current-invoice selection can collapse to no change, and block force delete for invoices participating in active reattributions while directing owners back to the source invoice for manual resolution.
+
+2026-03-20 | Payment-correction docs now require a purge-only hard-delete path with DB backstop
+`docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/PRODUCT_SPEC.md` now treat force delete as a purge-only path blocked while bookkeeping history remains, require both app-layer guidance and a persistence-layer backstop for destructive deletes, and allow owner/support correction history to link to related invoices while keeping those links off public/print surfaces.

@@ -38,13 +38,15 @@ Wrong-invoice cases include stale-address reuse: an old valid CryptoZing invoice
 6. Invoice-to-invoice reattribution is same-owner only in RC.
 7. Owner auditability takes precedence over convenience: correction actions require explicit intent and leave a trace.
 8. Ignore/restore/reattribute are bookkeeping interpretation tools for detected payments; manual adjustments are separate owner-created ledger entries.
-9. Soft delete may remain available for invoices involved in reattribution because the invoice record and provenance still exist.
-10. Force delete must be blocked for any invoice participating in an active reattribution until that reattribution is resolved from the source invoice.
+9. Soft delete may remain available even when bookkeeping history exists because the invoice record and provenance still exist.
+10. Force delete is a purge-only action and must be blocked while any bookkeeping history remains on the invoice.
+11. Bookkeeping-history delete guards must be enforced in both the application flow and a persistence-layer backstop so hard deletes cannot bypass them.
 
 ## Scope Boundary
 - Legitimate later payments to a correctly assigned old CryptoZing invoice address are correction candidates when the business intent belongs elsewhere, but they do not by themselves prove outside receive activity or a shared wallet namespace.
 - Reattribution is internal CryptoZing bookkeeping with preserved provenance and audit trail. It must not claim to mutate or reinterpret blockchain history itself.
 - Manual adjustments remain a separate tool for creating an owner-entered accounting fact rather than changing how an existing detected payment is counted.
+- This spec defines the product rule for destructive delete blocking, but not the exact database mechanism; implementation may use the persistence-layer shape that best enforces the invariant.
 
 ## Data Model
 Shipped ignore/restore metadata lives directly on `invoice_payments`:
@@ -138,6 +140,8 @@ UX guardrails:
 - Owner invoice views keep ignored or reattributed rows visible for audit, clearly marked with their current accounting state.
 - Reattributed payments must appear in the owner-visible payment histories of both the source and destination invoices.
 - The source invoice may render a reattributed-out row with strike-through or similar de-emphasis to show that the payment no longer counts there; the destination invoice should show the corresponding reattributed-in state as active credit.
+- Owner/support payment-history rows that reference another invoice may link to that related source or destination invoice when it is still available.
+- Related-invoice links for correction history must never appear on public or print surfaces.
 - Support read-only surfaces may show the owner-visible ignored state if they already render payment history, but must never expose correction controls.
 
 ## Authorization and Routing
@@ -152,11 +156,14 @@ Preferred route shape:
 - `PATCH /invoices/{invoice}/payments/{payment}/reattribute`
 
 ## Deletion Safeguards
-- Soft delete may remain allowed for invoices that are a reattribution source or destination because the invoice record still exists for audit/provenance.
-- Force delete must be blocked for any invoice that is currently the source or destination of an active reattribution.
-- If the blocked invoice is a reattribution destination, the owner must resolve that reattribution from the source invoice first by converting it to an ignore there or reattributing it elsewhere.
-- If the blocked invoice is a reattribution source, the owner must resolve its outgoing reattributions before force delete is allowed.
+- Soft delete may remain allowed even when bookkeeping history exists because the invoice record still exists for audit/provenance.
+- Force delete is a purge-only action and must be blocked while any bookkeeping history remains on the invoice.
+- Bookkeeping history for this guard includes detected payment rows, ignored payment interpretations, manual adjustments, and active reattribution references touching the invoice.
+- The owner may reach a hard-delete state only after intentionally removing or resolving that bookkeeping history first.
+- If the block is caused by an active reattribution and the invoice is the destination, the owner must resolve that reattribution from the source invoice first by converting it to an ignore there or reattributing it elsewhere.
+- If the block is caused by an active reattribution and the invoice is the source, the owner must resolve its outgoing reattributions before force delete is allowed.
 - The delete flow may link to the implicated source or destination invoices, but it must not auto-convert or offer one-click cleanup inside the destructive delete action.
+- The exact persistence-layer backstop may vary, but it must prevent force-delete bypass while bookkeeping history still exists.
 
 ## Logging and Audit
 Every correction action must emit a structured log entry:
@@ -209,12 +216,13 @@ Automated coverage should include:
 - structured audit log emission for ignore and restore
 - provenance/audit persistence for reattribution
 - owner-visible source/destination payment histories both preserve the reattribution with the correct active/inactive state
+- owner/support correction rows may link to related invoices without exposing those links publicly
 - ignored rows remain in owner payment history but disappear from public/print settlement views
 - dashboard totals/recent payments exclude ignored rows
 - watcher sync does not delete or auto-restore ignored rows
 - queued payment-related deliveries that become untruthful are marked skipped, not deleted
 - stale-address wrong-invoice cases remain invoice-scoped correction work and do not become unsupported-wallet evidence without additional facts
-- force delete is blocked for invoices participating in active reattributions, while soft delete remains allowed
+- force delete is blocked while bookkeeping history remains, with app-level guidance and a persistence-layer backstop
 
 Browser QA should include:
 - owner can ignore a row with a reason and immediately see totals/status change
@@ -225,12 +233,12 @@ Browser QA should include:
 - later payment-triggered mail stays held or skipped appropriately after reattribution
 - stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves
 - manual adjustment rows never show correction controls
-- force delete is blocked with resolution guidance when the invoice is an active reattribution source or destination, and the delete flow does not auto-convert anything
+- force delete is blocked with resolution guidance while bookkeeping history remains, including active reattributions, and the delete flow does not auto-convert anything
 
 ## Definition of Done
 - Owners can ignore, restore, and reattribute detected payment rows from the invoice show page with explicit confirmation.
 - Corrected rows remain auditable with their provenance intact.
 - Invoice/payment/dashboard/public math reflects the truthful active accounting after ignore/restore/reattribute.
 - Manual adjustments remain untouched by the correction flow.
-- Force delete no longer allows owners to silently erase active reattribution provenance.
+- Force delete no longer allows owners to silently erase bookkeeping history or active reattribution provenance.
 - Logs and tests cover the correction actions and their recalculation effects.
