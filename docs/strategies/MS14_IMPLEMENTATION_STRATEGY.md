@@ -315,7 +315,7 @@ Re-run payment state recomputation after ignore/restore.
    3. the purge path requires the owner to intentionally remove or resolve that history first
    4. if the block is caused by an active reattribution, destination delete attempts must direct the owner back to the source invoice to resolve it first
    5. delete flows may link to implicated invoices but must not auto-convert anything
-   6. add a persistence-layer hard-delete backstop so destructive deletes cannot bypass the bookkeeping-history rule
+   6. choose and implement the persistence-layer hard-delete backstop, then route every force-delete path through the same preflight guard so destructive deletes cannot bypass the bookkeeping-history rule
 9. Allow owner/support history rows that reference another invoice to link to that invoice when it is still available, while keeping those links off public/print surfaces.
 
 #### 5.5 Verify Phase 5
@@ -336,7 +336,7 @@ Automated / command verification:
    5. [ ] stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts
    6. [ ] source and destination histories both preserve the reattribution with the correct active/inactive presentation
    7. [ ] owner/support correction history can link to related invoices without exposing those links on public/print surfaces
-   8. [ ] force delete is blocked while bookkeeping history remains, with app-level guidance and a persistence-layer backstop
+   8. [ ] force delete is blocked while bookkeeping history remains across detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases, with app-level guidance and a persistence-layer backstop
 4. [x] Verify raw tx history remains present after ignore/restore.
    - Current result on 2026-03-19: owner and support payment-history views keep the original tx rows visible with ignored-state context while public/print surfaces exclude them.
 

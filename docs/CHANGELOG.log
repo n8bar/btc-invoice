@@ -524,3 +524,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-20 | Payment-correction docs now require a purge-only hard-delete path with DB backstop
 `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/PRODUCT_SPEC.md` now treat force delete as a purge-only path blocked while bookkeeping history remains, require both app-layer guidance and a persistence-layer backstop for destructive deletes, and allow owner/support correction history to link to related invoices while keeping those links off public/print surfaces.
+
+2026-03-20 | Phase 5 checklist now names the shared delete guard and blocker classes
+`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` now sharpens the existing Phase 5 delete-safeguard checklist so one implementation bullet explicitly covers choosing the persistence-layer backstop and routing all force-delete paths through a shared preflight guard, while one verification bullet now names the blocker classes that must be covered.
