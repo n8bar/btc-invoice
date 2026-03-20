@@ -53,7 +53,7 @@ CryptoZing needs a narrowly scoped way for tech support to inspect an owner's in
 ## Support Accounts
 - Support accounts are normal authenticated users identified by a configured allowlist of support email addresses.
 - Support users should land on a support dashboard rather than the normal owner dashboard after login.
-- The exact support-account login entrypoint should be treated as UX scope, not assumed by this spec unless explicitly approved.
+- For the time being, the login entry for support staff can be the same login as the owner-facing login.
 
 ## Owner Setting Behavior
 - The owner-facing support section should live under authenticated settings.

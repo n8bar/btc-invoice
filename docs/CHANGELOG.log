@@ -479,3 +479,6 @@ Added an AGENTS rule that if a new doc/spec is created and it shapes future impl
 
 2026-03-19 | Support access spec no longer presumes a dedicated support login
 Removed the dedicated `/support/login` requirement from `docs/specs/SUPPORT_ACCESS.md` and neutralized the matching AGENTS environment note so the docs do not pre-approve a separate support-login surface before the UX direction is explicitly reviewed.
+
+2026-03-19 | Support access now uses the standard login surface
+Removed the separate `/support/login` implementation so support accounts now authenticate through the standard login page and still land on `/support` after sign-in. Synced the support-access spec to the approved “same login as owners for now” wording and updated auth coverage accordingly.
