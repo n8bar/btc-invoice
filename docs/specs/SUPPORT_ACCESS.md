@@ -3,14 +3,14 @@ _Last updated: 2026-03-19_
 
 This spec defines the temporary tech-support access flow for CryptoZing.
 
-Use this doc for support login behavior, owner-granted support access, expiration/revocation rules, and support-only read surfaces.
+Use this doc for support-account access behavior, owner-granted support access, expiration/revocation rules, and support-only read surfaces.
 Use [`../PRODUCT_SPEC.md`](../PRODUCT_SPEC.md) for global ownership and trust boundaries.
 
 ## Purpose
 CryptoZing needs a narrowly scoped way for tech support to inspect an owner's invoices and clients during troubleshooting without weakening the product's owner-scoped data model.
 
 ## Scope
-- Dedicated tech-support login entrypoint.
+- Support-account access and landing behavior.
 - Owner-controlled support access grant from authenticated settings.
 - Fixed automatic expiration on the support grant.
 - Owner revocation at any time.
@@ -52,8 +52,8 @@ CryptoZing needs a narrowly scoped way for tech support to inspect an owner's in
 
 ## Support Accounts
 - Support accounts are normal authenticated users identified by a configured allowlist of support email addresses.
-- The product should provide a dedicated `/support/login` entrypoint so support does not need to use the standard owner-oriented login framing.
 - Support users should land on a support dashboard rather than the normal owner dashboard after login.
+- The exact support-account login entrypoint should be treated as UX scope, not assumed by this spec unless explicitly approved.
 
 ## Owner Setting Behavior
 - The owner-facing support section should live under authenticated settings.
@@ -100,7 +100,7 @@ Optional audit fields may be added later if support usage grows, but they are no
 ## Verification Targets
 - Owner can grant support access and see the expiration timestamp.
 - Owner can revoke support access immediately.
-- Support login is separate and only succeeds for configured support users.
+- Only configured support users can reach support-only surfaces.
 - Support dashboard lists only owners with active grants.
 - Support can view granted owners' invoices and clients in read-only surfaces.
 - Support loses access immediately after revocation or expiry.

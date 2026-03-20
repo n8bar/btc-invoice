@@ -476,3 +476,6 @@ Added fixed-duration owner-granted support access with a dedicated `/support/log
 
 2026-03-19 | AGENTS now requires review of new implementation-shaping docs
 Added an AGENTS rule that if a new doc/spec is created and it shapes future implementation scope, it must be reviewed by the user before it is treated as approved implementation direction.
+
+2026-03-19 | Support access spec no longer presumes a dedicated support login
+Removed the dedicated `/support/login` requirement from `docs/specs/SUPPORT_ACCESS.md` and neutralized the matching AGENTS environment note so the docs do not pre-approve a separate support-login surface before the UX direction is explicitly reviewed.
