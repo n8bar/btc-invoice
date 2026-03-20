@@ -305,6 +305,15 @@ Re-run payment state recomputation after ignore/restore.
    1. reattribution fixes wrong-invoice bookkeeping
    2. reattribution does not by itself clear unsupported wallet or invoice evidence
 6. Treat stale-address wrong-invoice reuse as a primary reattribution use case, not unsupported-wallet evidence by itself.
+7. Keep owner-visible history on both invoices:
+   1. source invoice shows the payment as reattributed out and no longer counting there
+   2. destination invoice shows the payment as reattributed in and counting there
+   3. source styling may use strike-through or similar de-emphasis, but visibility is mandatory
+8. Add destructive-delete safeguards:
+   1. soft delete may remain allowed because provenance survives
+   2. force delete must be blocked for invoices participating in active reattributions
+   3. destination delete attempts must direct the owner back to the source invoice to resolve the reattribution first
+   4. delete flows may link to the source invoice but must not auto-convert anything
 
 #### 5.5 Verify Phase 5
 Automated / command verification:
@@ -322,6 +331,8 @@ Automated / command verification:
    3. [ ] provenance and audit-log persistence for reattribution
    4. [ ] later payment-triggered deliveries stay held or skipped appropriately after reattribution
    5. [ ] stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts
+   6. [ ] source and destination histories both preserve the reattribution with the correct active/inactive presentation
+   7. [ ] force delete is blocked for active reattribution source/destination invoices while soft delete remains allowed
 4. [x] Verify raw tx history remains present after ignore/restore.
    - Current result on 2026-03-19: owner and support payment-history views keep the original tx rows visible with ignored-state context while public/print surfaces exclude them.
 
@@ -332,6 +343,7 @@ Browser QA:
 8. [ ] Confirm later payment-triggered mail stays held pending owner validation on already-funded invoices affected by second-or-later payments.
 9. [ ] Confirm stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves.
 10. [ ] Confirm manual adjustment rows cannot be ignored or reattributed through the payment-correction flow.
+11. [ ] Confirm force delete is blocked with source-invoice resolution guidance when the invoice participates in an active reattribution, without auto-converting anything for the owner.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.

@@ -38,6 +38,8 @@ Wrong-invoice cases include stale-address reuse: an old valid CryptoZing invoice
 6. Invoice-to-invoice reattribution is same-owner only in RC.
 7. Owner auditability takes precedence over convenience: correction actions require explicit intent and leave a trace.
 8. Ignore/restore/reattribute are bookkeeping interpretation tools for detected payments; manual adjustments are separate owner-created ledger entries.
+9. Soft delete may remain available for invoices involved in reattribution because the invoice record and provenance still exist.
+10. Force delete must be blocked for any invoice participating in an active reattribution until that reattribution is resolved from the source invoice.
 
 ## Scope Boundary
 - Legitimate later payments to a correctly assigned old CryptoZing invoice address are correction candidates when the business intent belongs elsewhere, but they do not by themselves prove outside receive activity or a shared wallet namespace.
@@ -118,7 +120,8 @@ For eligible detected payment rows:
 - Show a `Reattribute` action that lets the owner choose another invoice they own as the destination.
 - The confirmation step must explain that CryptoZing will stop counting the payment toward the current invoice and start counting it toward the selected invoice instead.
 - Require a short reason field for reattribution.
-- Destination choices must be constrained to the same owner and must never include the current invoice as a no-op option.
+- Destination choices must be constrained to the same owner.
+- If the UI ever allows selecting the current invoice, treat that as cancel/no change rather than recording a meaningless reattribution event.
 
 For manual adjustment rows:
 - Do not render ignore/restore/reattribute controls.
@@ -133,6 +136,8 @@ UX guardrails:
 ## Public, Print, and Support Surfaces
 - Public and print invoice views must exclude ignored rows from payment history and totals entirely.
 - Owner invoice views keep ignored or reattributed rows visible for audit, clearly marked with their current accounting state.
+- Reattributed payments must appear in the owner-visible payment histories of both the source and destination invoices.
+- The source invoice may render a reattributed-out row with strike-through or similar de-emphasis to show that the payment no longer counts there; the destination invoice should show the corresponding reattributed-in state as active credit.
 - Support read-only surfaces may show the owner-visible ignored state if they already render payment history, but must never expose correction controls.
 
 ## Authorization and Routing
@@ -145,6 +150,13 @@ Preferred route shape:
 - `PATCH /invoices/{invoice}/payments/{payment}/ignore`
 - `PATCH /invoices/{invoice}/payments/{payment}/restore`
 - `PATCH /invoices/{invoice}/payments/{payment}/reattribute`
+
+## Deletion Safeguards
+- Soft delete may remain allowed for invoices that are a reattribution source or destination because the invoice record still exists for audit/provenance.
+- Force delete must be blocked for any invoice that is currently the source or destination of an active reattribution.
+- If the blocked invoice is a reattribution destination, the owner must resolve that reattribution from the source invoice first by converting it to an ignore there or reattributing it elsewhere.
+- If the blocked invoice is a reattribution source, the owner must resolve its outgoing reattributions before force delete is allowed.
+- The delete flow may link to the implicated source or destination invoices, but it must not auto-convert or offer one-click cleanup inside the destructive delete action.
 
 ## Logging and Audit
 Every correction action must emit a structured log entry:
@@ -167,6 +179,7 @@ Reattribute logs should also include:
 - `source_invoice_id`
 - `destination_invoice_id`
 - `reattribute_reason`
+- whether the row is now shown as reattributed-out on the source invoice and reattributed-in on the destination invoice
 
 Do not log wallet keys, raw xpubs, seed phrases, or other sensitive wallet material.
 
@@ -195,11 +208,13 @@ Automated coverage should include:
 - correction metadata persistence (`ignored_at`, `ignored_by_user_id`, `ignore_reason`)
 - structured audit log emission for ignore and restore
 - provenance/audit persistence for reattribution
+- owner-visible source/destination payment histories both preserve the reattribution with the correct active/inactive state
 - ignored rows remain in owner payment history but disappear from public/print settlement views
 - dashboard totals/recent payments exclude ignored rows
 - watcher sync does not delete or auto-restore ignored rows
 - queued payment-related deliveries that become untruthful are marked skipped, not deleted
 - stale-address wrong-invoice cases remain invoice-scoped correction work and do not become unsupported-wallet evidence without additional facts
+- force delete is blocked for invoices participating in active reattributions, while soft delete remains allowed
 
 Browser QA should include:
 - owner can ignore a row with a reason and immediately see totals/status change
@@ -210,10 +225,12 @@ Browser QA should include:
 - later payment-triggered mail stays held or skipped appropriately after reattribution
 - stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves
 - manual adjustment rows never show correction controls
+- force delete is blocked with resolution guidance when the invoice is an active reattribution source or destination, and the delete flow does not auto-convert anything
 
 ## Definition of Done
 - Owners can ignore, restore, and reattribute detected payment rows from the invoice show page with explicit confirmation.
 - Corrected rows remain auditable with their provenance intact.
 - Invoice/payment/dashboard/public math reflects the truthful active accounting after ignore/restore/reattribute.
 - Manual adjustments remain untouched by the correction flow.
+- Force delete no longer allows owners to silently erase active reattribution provenance.
 - Logs and tests cover the correction actions and their recalculation effects.
