@@ -12,9 +12,9 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: continue MS14 Phase 4 with onboarding reinforcement and the Helpful Notes explainer now that wallet settings copy explicitly calls for a dedicated receiving account key.
-- Primary next doc: [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md)
-- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md), [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
+- Next action: run Phase 4 verification and Browser QA now that wallet settings, onboarding, and Helpful Notes all reinforce the dedicated receiving-account requirement.
+- Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
+- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
 - Milestone-doc note: MS14 does not have a dedicated milestone doc yet; create one only if the work grows beyond the current strategy-backed scope.
 

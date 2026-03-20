@@ -38,7 +38,7 @@ class GettingStartedFlow
     {
         $walletBody = $replayMode
             ? 'Review your current wallet account key and confirm the settings look correct.'
-            : 'Add your wallet account key so CryptoZing can generate a payment address for each invoice.';
+            : 'Add your wallet account key so CryptoZing can generate a payment address for each invoice. Use a dedicated receiving account so payment tracking stays reliable.';
         $walletCriteria = $replayMode
             ? 'Confirm your wallet settings in this setup run.'
             : 'Save a valid wallet account key.';

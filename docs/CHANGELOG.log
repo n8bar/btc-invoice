@@ -491,3 +491,6 @@ Updated `docs/PLAN.md` milestone 16 from `Docs & DX` to `Docs, DX & Support UX` 
 
 2026-03-19 | MS14 Phase 4.1 wallet settings copy now reinforces dedicated receiving accounts
 Added a dedicated receiving-account guidance block to `/wallet/settings` that explicitly requires a dedicated account key for invoice receives, warns that reusing the same account for receives elsewhere can attach payments to the wrong invoice, clarifies that viewing/spending elsewhere is fine, adds focused feature coverage for that copy, and advances `docs/PLAN.md` / `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` toward Phase 4 onboarding and Helpful Notes work.
+
+2026-03-19 | MS14 Phase 4 onboarding and Helpful Notes now reinforce dedicated receiving accounts
+Updated the getting-started wallet step with a concise dedicated-account warning block and direct Helpful Notes link, added a dedicated receiving-account article to the public `Helpful Notes` page that explains what breaks tracking, what remains safe, what unsupported configuration means, and how to fix it with a fresh key, added back-link handling for onboarding-driven help visits, and advanced Phase 4 docs so the next action is verification and Browser QA.

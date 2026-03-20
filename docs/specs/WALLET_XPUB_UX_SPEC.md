@@ -28,7 +28,8 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
 - MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
 - MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
-- The Helpful Notes guidance in this spec remains upcoming roadmap work.
+- MS14 onboarding now reinforces the dedicated receiving-account requirement and links to a matching Helpful Notes anchor.
+- The Helpful Notes guidance for dedicated receiving accounts and unsupported configuration is shipped on the public `Helpful Notes` page.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.

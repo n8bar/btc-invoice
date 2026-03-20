@@ -231,15 +231,17 @@ Browser QA:
    - Current implementation on 2026-03-19: `/wallet/settings` now includes a dedicated receiving-account guidance block in the form intro that states the dedicated-account requirement, warns about wrong-invoice attribution when the same account receives elsewhere, and clarifies that viewing/spending elsewhere is fine.
 
 #### 4.2 Reinforce the dedicated-account requirement in onboarding
-1. Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
-2. Add an explicit acknowledgment checkbox only if Browser QA shows the warning copy is being ignored.
+1. [x] Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
+2. [x] Add an explicit acknowledgment checkbox only if Browser QA shows the warning copy is being ignored.
+   - Current implementation on 2026-03-19: the getting-started wallet step now carries a dedicated-account warning block plus a direct link to the dedicated receiving-account Helpful Notes anchor. No acknowledgment checkbox shipped because Browser QA has not shown a need for one.
 
 #### 4.3 Publish a Helpful Notes explainer for less technical users
-1. Add a public Helpful Notes article that explains CryptoZing's watch-only model in plain language.
-2. Explain why automatic payment tracking needs a dedicated receiving account key.
-3. Explain that spending elsewhere is fine, but receiving elsewhere with the same account key makes automatic attribution unreliable.
-4. Explain what unsupported configuration means and why the recommended fix is to connect a fresh dedicated account key.
-5. Recommend separate receive and spend apps or accounts as the safest pattern without making separate apps a hard product requirement.
+1. [x] Add a public Helpful Notes article that explains CryptoZing's watch-only model in plain language.
+2. [x] Explain why automatic payment tracking needs a dedicated receiving account key.
+3. [x] Explain that spending elsewhere is fine, but receiving elsewhere with the same account key makes automatic attribution unreliable.
+4. [x] Explain what unsupported configuration means and why the recommended fix is to connect a fresh dedicated account key.
+5. [x] Recommend separate receive and spend apps or accounts as the safest pattern without making separate apps a hard product requirement.
+   - Current implementation on 2026-03-19: `Helpful Notes` now includes a dedicated receiving-account article that explains the receive-only requirement, what breaks tracking, what remains safe, what unsupported configuration means, how to fix it with a fresh dedicated key, and the recommended separate receive/spend setup. The existing xpub guidance already covers the watch-only model in plain language.
 
 #### 4.4 Keep dedicated-wallet guidance usable and traceable
 1. Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.

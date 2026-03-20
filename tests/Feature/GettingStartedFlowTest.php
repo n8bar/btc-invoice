@@ -561,6 +561,22 @@ class GettingStartedFlowTest extends TestCase
         $response->assertSessionHas('status', 'Getting started hidden.');
     }
 
+    public function test_wallet_step_shows_dedicated_account_guidance_and_help_link(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this->actingAs($owner)->get(route('getting-started.step', ['step' => 'wallet']));
+
+        $response->assertOk();
+        $response->assertSee('Use a dedicated receiving account key.', false);
+        $response->assertSee('If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.', false);
+        $response->assertSee('Viewing balances or spending from that account elsewhere is fine.', false);
+        $response->assertSee(
+            'href="' . route('help', ['from' => 'getting-started-wallet']) . '#dedicated-receiving-account"',
+            false
+        );
+    }
+
     private function createWallet(User $user): WalletSetting
     {
         return WalletSetting::create([
