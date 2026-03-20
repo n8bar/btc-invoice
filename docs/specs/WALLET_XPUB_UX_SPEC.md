@@ -24,12 +24,12 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## Current Status
 - The MS13 wallet-settings baseline in this spec is shipped.
-- MS14 wallet settings now explain the dedicated receiving-account requirement directly in the form intro copy.
+- MS14 wallet settings now use a generic `Wallet account key` label, dedicated-account guidance without cross-network prefix leakage, and an env-aware “Usually starts with …” hint (`xpub/zpub` on mainnet, `vpub/tpub` on testnet).
 - MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
 - MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
 - MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
-- MS14 onboarding now reinforces the dedicated receiving-account requirement and links to a matching Helpful Notes anchor.
-- The Helpful Notes guidance for dedicated receiving accounts and unsupported configuration is shipped on the public `Helpful Notes` page.
+- MS14 onboarding now reinforces the dedicated receiving-account requirement, explicitly states that the wallet app remains the normal place to view balances and spend from that account, and links to a matching Helpful Notes anchor.
+- The Helpful Notes guidance for dedicated receiving accounts and unsupported configuration is shipped on the public `Helpful Notes` page, using stronger watch-only wording while keeping mainnet-style prefix examples in the explanatory import guidance.
 - MS14 wallet settings now link directly from the dedicated-account guidance block to the matching Helpful Notes anchor and emit a support-safe save log after that guidance is shown.
 
 ## Deferred (post-RC)

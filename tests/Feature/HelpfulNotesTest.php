@@ -70,7 +70,8 @@ class HelpfulNotesTest extends TestCase
         $response->assertOk();
         $response->assertSee('Why CryptoZing needs a dedicated receiving account', false);
         $response->assertSee('What breaks automatic tracking?', false);
-        $response->assertSee('What is still fine?', false);
+        $response->assertSee('What do I still use my wallet app for?', false);
+        $response->assertSee('CryptoZing only watches for invoice receives.', false);
         $response->assertSee('What does unsupported configuration mean?', false);
         $response->assertSee('Connect a fresh dedicated account key', false);
     }

@@ -228,12 +228,12 @@ Browser QA:
 1. [x] Update wallet settings copy to explicitly state that CryptoZing expects a dedicated account xpub for receives.
 2. [x] Explain that sharing the same account for receives elsewhere can cause false payment attribution.
 3. [x] Clarify that viewing or spending from that account elsewhere is fine.
-   - Current implementation on 2026-03-19: `/wallet/settings` now includes a dedicated receiving-account guidance block in the form intro that states the dedicated-account requirement, warns about wrong-invoice attribution when the same account receives elsewhere, and clarifies that viewing/spending elsewhere is fine.
+   - Current implementation on 2026-03-19: `/wallet/settings` now includes a dedicated receiving-account guidance block in the form intro that states the dedicated-account requirement, warns about wrong-invoice attribution when the same account receives elsewhere, uses a generic wallet-account-key label, keeps its concrete prefix hint env-aware (`xpub/zpub` on mainnet, `vpub/tpub` on testnet), and explicitly says the owner's wallet app remains the normal place to view balances and spend because CryptoZing is watch-only.
 
 #### 4.2 Reinforce the dedicated-account requirement in onboarding
 1. [x] Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.
 2. [x] Add an explicit acknowledgment checkbox only if Browser QA shows the warning copy is being ignored.
-   - Current implementation on 2026-03-19: the getting-started wallet step now carries a dedicated-account warning block plus a direct link to the dedicated receiving-account Helpful Notes anchor. No acknowledgment checkbox shipped because Browser QA has not shown a need for one.
+   - Current implementation on 2026-03-19: the getting-started wallet step now carries a dedicated-account warning block plus a direct link to the dedicated receiving-account Helpful Notes anchor, and it now explicitly says the owner will still use their wallet app to view balances and spend from that account. No acknowledgment checkbox shipped because Browser QA has not shown a need for one.
 
 #### 4.3 Publish a Helpful Notes explainer for less technical users
 1. [x] Add a public Helpful Notes article that explains CryptoZing's watch-only model in plain language.
@@ -241,7 +241,7 @@ Browser QA:
 3. [x] Explain that spending elsewhere is fine, but receiving elsewhere with the same account key makes automatic attribution unreliable.
 4. [x] Explain what unsupported configuration means and why the recommended fix is to connect a fresh dedicated account key.
 5. [x] Recommend separate receive and spend apps or accounts as the safest pattern without making separate apps a hard product requirement.
-   - Current implementation on 2026-03-19: `Helpful Notes` now includes a dedicated receiving-account article that explains the receive-only requirement, what breaks tracking, what remains safe, what unsupported configuration means, how to fix it with a fresh dedicated key, and the recommended separate receive/spend setup. The existing xpub guidance already covers the watch-only model in plain language.
+   - Current implementation on 2026-03-19: `Helpful Notes` now includes a dedicated receiving-account article that explains the receive-only requirement, what breaks tracking, what unsupported configuration means, how to fix it with a fresh dedicated key, and that the owner's wallet app remains the normal place to view balances, sweep, and spend because CryptoZing is watch-only. The existing import guidance keeps mainnet-style `xpub/zpub` examples in plain language.
 
 #### 4.4 Keep dedicated-wallet guidance usable and traceable
 1. [x] Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.

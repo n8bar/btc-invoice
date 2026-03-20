@@ -503,3 +503,6 @@ Added `docs/specs/PAYMENT_CORRECTIONS.md` to define owner-only ignore/restore be
 
 2026-03-19 | Phase 4 copy guidance now treats external wallet use as normal and keeps wallet-prefix hints env-aware
 Updated the onboarding and wallet UX specs so dedicated-account guidance now says the owner's wallet app remains the normal place to view balances and spend/sweep funds because CryptoZing is watch-only. The wallet settings surface should use generic key labels plus one env-aware “usually starts with …” hint (`xpub/zpub` on mainnet, `vpub/tpub` on testnet), while Helpful Notes may keep mainnet-style prefix examples in its explanatory import guidance.
+
+2026-03-19 | Shipped the Phase 4 Browser QA copy follow-up for wallet guidance
+Updated wallet settings, onboarding, and Helpful Notes so the watch-only model now explicitly says the owner's wallet app remains the normal place to view balances, sweep funds, and spend, while wallet settings now use generic key labels plus an env-aware “usually starts with …” hint and omit `vpub/tpub` on mainnet surfaces. Added focused mainnet/non-mainnet coverage and reran `./vendor/bin/sail artisan test` with `237 passed`.

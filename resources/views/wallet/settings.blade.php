@@ -14,7 +14,7 @@
     @php
         $oldXpub = old('bip84_xpub');
         $xpubValue = ($oldXpub !== null && $oldXpub !== '') ? $oldXpub : (optional($wallet)->bip84_xpub ?? '');
-        $expectedPrefix = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
+        $prefixExamples = $defaultNetwork === 'mainnet' ? 'xpub or zpub' : 'vpub or tpub';
         $isTestnet = $defaultNetwork !== 'mainnet';
         $isGettingStarted = request()->boolean('getting_started');
         $isGettingStartedReplay = (bool) ($isGettingStartedReplay ?? false);
@@ -37,9 +37,9 @@
                              id="wallet-dedicated-guidance"
                              style="border-color: currentColor;">
                             <p class="font-semibold">{{ __('Use a dedicated receiving account key here.') }}</p>
-                            <p class="mt-1">{{ __('CryptoZing expects a dedicated account key (xpub/zpub/vpub/tpub) for invoice receives.') }}</p>
+                            <p class="mt-1">{{ __('CryptoZing expects a dedicated account key for invoice receives.') }}</p>
                             <p class="mt-1">{{ __('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.') }}</p>
-                            <p class="mt-1">{{ __('Viewing balances or spending from that account elsewhere is fine.') }}</p>
+                            <p class="mt-1">{{ __('You’ll still view balances and spend from this account in your wallet app. CryptoZing does not show balances or send bitcoin.') }}</p>
                             <p class="mt-2">
                                 <a href="{{ route('help', ['from' => 'wallet-settings']) }}#dedicated-receiving-account"
                                    class="font-medium text-indigo-800 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:text-indigo-100">
@@ -67,7 +67,7 @@
                               x-data="walletValidation({
                                   validationUrl: '{{ route('wallet.settings.validate') }}',
                                   initialValue: @js($xpubValue),
-                                  expectedPrefix: @js($expectedPrefix),
+                                  expectedPrefix: @js($prefixExamples),
                                   hasServerError: @js($errors->has('bip84_xpub')),
                               })"
                               x-init="init()"
@@ -97,7 +97,7 @@
                                 @if ($isGettingStarted)
                                     <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $gettingStartedMarker }} Fill this field</p>
                                 @endif
-                                <x-input-label for="bip84_xpub" :value="__('Wallet account key (xpub/zpub/vpub/tpub)')" />
+                                <x-input-label for="bip84_xpub" :value="__('Wallet account key')" />
                                 <p class="mt-1 text-xs text-gray-500" id="bip84_xpub_help">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
@@ -123,7 +123,7 @@
                                           @blur="handleBlur">{{ $xpubValue }}</textarea>
                                 <div class="mt-2 min-h-[4.5rem] space-y-2 text-xs" id="bip84_xpub_feedback" aria-live="polite">
                                     <div class="flex flex-wrap items-center gap-2 text-slate-600 dark:text-slate-300">
-                                        <span>Expected format: <span class="font-medium text-slate-900 dark:text-slate-100">{{ $expectedPrefix }}</span></span>
+                                        <span>Usually starts with <span class="font-medium text-slate-900 dark:text-slate-100">{{ $prefixExamples }}</span></span>
                                         <button type="button"
                                                 class="text-indigo-600 hover:text-indigo-500 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                                                 @click="validate({ force: true })">
@@ -177,7 +177,10 @@
                             </div>
 
                             <div>
-                                @include('wallet.partials.key-helper', ['onboarding' => request()->boolean('getting_started')])
+                                @include('wallet.partials.key-helper', [
+                                    'onboarding' => request()->boolean('getting_started'),
+                                    'defaultNetwork' => $defaultNetwork,
+                                ])
                             </div>
                         </form>
                     </div>

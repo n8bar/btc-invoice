@@ -570,7 +570,7 @@ class GettingStartedFlowTest extends TestCase
         $response->assertOk();
         $response->assertSee('Use a dedicated receiving account key.', false);
         $response->assertSee('If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.', false);
-        $response->assertSee('Viewing balances or spending from that account elsewhere is fine.', false);
+        $response->assertSee('You’ll still use your wallet app to view balances and spend from this account.', false);
         $response->assertSee(
             'href="' . route('help', ['from' => 'getting-started-wallet']) . '#dedicated-receiving-account"',
             false

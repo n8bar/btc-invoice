@@ -43,7 +43,7 @@
                                  style="border-color: currentColor;">
                                 <p class="font-semibold">Use a dedicated receiving account key.</p>
                                 <p class="mt-1">If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.</p>
-                                <p class="mt-1">Viewing balances or spending from that account elsewhere is fine.</p>
+                                <p class="mt-1">You’ll still use your wallet app to view balances and spend from this account.</p>
                                 <a href="{{ route('help', ['from' => 'getting-started-wallet']) }}#dedicated-receiving-account"
                                    class="mt-2 inline-flex items-center font-semibold text-indigo-900 underline underline-offset-2 hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100">
                                     Why CryptoZing needs a dedicated receiving account

@@ -111,9 +111,9 @@
                                 </dd>
                             </div>
                             <div>
-                                <dt class="font-semibold text-gray-900 dark:text-slate-100">What is still fine?</dt>
+                                <dt class="font-semibold text-gray-900 dark:text-slate-100">What do I still use my wallet app for?</dt>
                                 <dd class="mt-1">
-                                    Viewing balances or spending from that account elsewhere is fine. The risky part is using the same account for additional receives outside CryptoZing.
+                                    You will use your wallet app to view balances, sweep funds, and spend from this account. CryptoZing only watches for invoice receives. The risky part is using the same account for additional receives outside CryptoZing.
                                 </dd>
                             </div>
                             <div>

@@ -896,9 +896,27 @@ class UserSettingsTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Use a dedicated receiving account key here.', false);
-        $response->assertSee('CryptoZing expects a dedicated account key (xpub/zpub/vpub/tpub) for invoice receives.', false);
+        $response->assertSee('CryptoZing expects a dedicated account key for invoice receives.', false);
         $response->assertSee('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.', false);
-        $response->assertSee('Viewing balances or spending from that account elsewhere is fine.', false);
+        $response->assertSee('You’ll still view balances and spend from this account in your wallet app. CryptoZing does not show balances or send bitcoin.', false);
+        $response->assertSee('Usually starts with', false);
+        $response->assertSee('vpub or tpub', false);
+    }
+
+    public function test_wallet_settings_mainnet_surface_omits_testnet_prefixes(): void
+    {
+        Config::set('wallet.default_network', 'mainnet');
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('vpub', false);
+        $response->assertDontSee('tpub', false);
+        $response->assertSee('Usually starts with', false);
+        $response->assertSee('xpub or zpub', false);
     }
 
     public function test_wallet_settings_links_to_dedicated_receiving_account_helpful_notes(): void
