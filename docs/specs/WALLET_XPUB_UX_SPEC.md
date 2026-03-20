@@ -74,6 +74,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - “Automatic payment tracking is no longer reliable for this wallet account.”
   - “To keep using automatic tracking, connect a new dedicated wallet account key.”
 - Spending from the same wallet elsewhere is not the warning trigger by itself; the warning is about outside receive activity or collision evidence in the same account namespace.
+- Legitimate later payments to a correctly assigned old CryptoZing invoice address are not, by themselves, unsupported-wallet evidence. Treat those as invoice-level correction and mail-safety cases instead of telling the owner to replace the key.
 - Red attention UI should appear only when the wallet is actually flagged unsupported:
   - attention-grabbing label near the user menu
   - red dot on the Settings nav item
@@ -81,6 +82,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - red warning near the wallet account key field
 - Invoice creation should also warn inline when the wallet is flagged unsupported and use a more explicit primary action label such as `Create Unsupported Invoice` rather than a neutral save label.
 - The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
+- Unsupported-state copy must stay reserved for outside receive activity or collision evidence. Wrong-invoice attribution on an old but legitimate CryptoZing invoice address should not use unsupported-wallet language by itself.
 - Saving wallet settings after the dedicated-account guidance is shown should emit a support/debug log entry with safe context only (user, wallet setting, flow surface, unsupported-state flags), never the wallet key itself.
 - Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.

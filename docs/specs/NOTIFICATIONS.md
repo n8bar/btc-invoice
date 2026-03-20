@@ -12,6 +12,7 @@ This doc is canonical for outbound invoice communication:
 - Automatically send a paid receipt email once the watcher marks an invoice paid.
 - Ensure both owners and clients receive email alerts for key invoice events without relying on manual follow-up.
 - Surface automated emails when an invoice is paid, becomes past due, or when on-chain payments deviate from the invoice total by more than the defined tolerance.
+- Prevent payment-triggered mail from claiming certainty after a later on-chain payment on an already-funded invoice when that payment may be semantically ambiguous.
 - Preserve existing delivery infrastructure (queued mail, Mailgun aliasing, `invoice_deliveries` log) so every outbound email is auditable.
 
 ## Base Communication Flows
@@ -64,6 +65,10 @@ This doc is canonical for outbound invoice communication:
 - Profile setting for automatic paid receipts remains part of the owner communication model.
 - A global feature flag may disable outbound invoice communication entirely when mail is not configured.
 - Delivery jobs should surface queued, sent, and failed outcomes through the shared delivery log.
+- Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
+- For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail must be held pending owner validation before send.
+- This later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
+- Manual invoice sends and past-due reminders are outside this safeguard.
 
 ## Mailables, Routes, and Jobs
 - Base communication classes:
@@ -102,6 +107,7 @@ This doc is canonical for outbound invoice communication:
   - failure paths record delivery errors
   - `InvoicePaid` dispatch triggers owner notice plus client receipt exactly once
   - automated alert classes respect cooldown and delivery-log rules
+  - second-or-later payment-triggered deliveries on an already-funded invoice are held until owner validation
 - Optional Blade/mail snapshot tests can be used for the invoice-ready and receipt mailables.
 
 ## Open Questions

@@ -69,15 +69,17 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Outstanding payment requests target the current outstanding balance rather than the original invoice BTC snapshot.
 - Small-balance resolution, adjustment handling, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
 - Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
-- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); ignored rows must remain auditable while being excluded from active settlement math, owner/support audit views may still show the ignored state, public/print and dashboard settlement surfaces must exclude ignored rows, and queued payment-related deliveries that become untruthful after a correction must be skipped rather than deleted.
+- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); this includes wrong-invoice cases caused by later use of an old valid CryptoZing invoice address. Ignored rows must remain auditable while being excluded from active settlement math, owner/support audit views may still show the ignored state, public/print and dashboard settlement surfaces must exclude ignored rows, and queued payment-related deliveries that become untruthful after a correction must be skipped rather than deleted.
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
 - CryptoZing remains watch-only: wallet setup uses public derivation material only, and no normal product flow may require or accept seed phrases or private keys.
 - Reliable automatic attribution requires a dedicated account xpub or derivation namespace for CryptoZing receives.
 - Users may view or spend from that account in other wallets, but they should not use that same account for additional receives or address generation outside CryptoZing if they want reliable invoice tracking.
+- CryptoZing-issued invoice addresses remain valid indefinitely on-chain; later inbound BTC to an old valid invoice address may still be attributed to that invoice even when the sender intended a different invoice or business purpose.
 - Wallet settings, onboarding guidance, unsupported-state warnings, and public Helpful Notes content are all valid ways to communicate this requirement; Helpful Notes is one reinforcing surface, not the whole safeguard.
 - CryptoZing may flag a wallet configuration as unsupported when it detects outside receive activity or invoice-specific collision evidence that makes automatic payment attribution unreliable.
+- Later use of a correctly assigned old CryptoZing invoice address is an invoice-attribution problem by default, not unsupported-wallet evidence by itself.
 - Unsupported configuration handling is warning/escalation behavior, not a hard block; the product should direct the user to connect a fresh dedicated account key for continued automatic tracking.
 - Invoices created while a wallet is flagged unsupported inherit unsupported state at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported; mark an existing invoice unsupported only when invoice-specific evidence implicates that invoice.
@@ -96,8 +98,8 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Viewer-facing time localization may differ from server calculation time where explicitly documented.
 
 ### Active plan-linked requirements
-- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
-- Mailer and alerts hardening must add duplicate-send safeguards, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email.
+- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, distinguish unsupported shared-wallet evidence from stale-address wrong-invoice reuse, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
+- Mailer and alerts hardening must add duplicate-send safeguards, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email, including owner validation gates for later payment-triggered mail on already-funded invoices.
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 
 ## Canonical Spec Map

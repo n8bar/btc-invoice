@@ -7,8 +7,11 @@ This doc is canonical for:
 - correction-specific audit metadata and logs
 - recalculation requirements after ignore/restore
 - UI/authorization rules for payment correction actions
+- the boundary between shipped ignore/restore behavior and any future invoice-to-invoice reassignment work
 
 This doc complements [`docs/specs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md). Manual adjustments remain a separate ledger feature; this spec covers correction of detected on-chain rows that should no longer count toward an invoice.
+
+Wrong-invoice cases include stale-address reuse: an old valid CryptoZing invoice address may receive later funds that were intended for a different invoice or business purpose. That is an invoice-attribution problem, not unsupported-wallet evidence by itself.
 
 ## Goals
 - Give the owner an explicit way to exclude a wrongly attributed on-chain payment from an invoice without deleting the underlying ledger row.
@@ -22,6 +25,7 @@ This doc complements [`docs/specs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md). Ma
 - Replacing the existing manual-adjustment flow.
 - Bulk ignore/restore operations across multiple invoices in RC.
 - Granting support agents or public users any correction ability.
+- Defining full invoice-to-invoice reassignment mechanics in RC Phase 5.
 
 ## Core Decisions
 1. Corrections target individual non-adjustment `invoice_payments` rows only.
@@ -29,6 +33,12 @@ This doc complements [`docs/specs/PARTIAL_PAYMENTS.md`](PARTIAL_PAYMENTS.md). Ma
 3. Restoring a payment reverses the ignore and returns the row to normal settlement math.
 4. Manual adjustment rows (`is_adjustment = true`) are never eligible for ignore/restore.
 5. Owner auditability takes precedence over convenience: correction actions require explicit intent and leave a trace.
+6. Ignore/restore changes whether a row counts toward its current invoice; it is not the same as invoice-to-invoice reassignment.
+
+## Scope Boundary
+- Legitimate later payments to a correctly assigned old CryptoZing invoice address are correction candidates when the business intent belongs elsewhere, but they do not by themselves prove outside receive activity or a shared wallet namespace.
+- Shipped Phase 5 behavior is ignore/restore only.
+- If invoice-to-invoice reassignment ships later, it must be defined as internal CryptoZing bookkeeping with preserved provenance and audit trail. It must not claim to mutate or reinterpret blockchain history itself.
 
 ## Data Model
 Add correction metadata directly to `invoice_payments`:
@@ -74,6 +84,7 @@ Correction metadata must survive watcher runs:
 - Ignored rows must not be deleted by dropped-unconfirmed cleanup.
 - If the watcher refreshes sats/confirmation metadata for an ignored row, that row remains ignored until the owner restores it.
 - Unsupported-configuration evidence already attached to the invoice/wallet is not automatically cleared by ignore/restore in Phase 5.
+- A later payment to a legitimate old CryptoZing invoice address should be treated as an invoice-level correction scenario unless separate outside-receive or collision evidence exists.
 
 ## Owner UI
 The owner correction surface lives on the invoice show page payment-history table.
@@ -156,6 +167,7 @@ Automated coverage should include:
 - dashboard totals/recent payments exclude ignored rows
 - watcher sync does not delete or auto-restore ignored rows
 - queued payment-related deliveries that become untruthful are marked skipped, not deleted
+- stale-address wrong-invoice cases remain invoice-scoped correction work and do not become unsupported-wallet evidence without additional facts
 
 Browser QA should include:
 - owner can ignore a row with a reason and immediately see totals/status change
