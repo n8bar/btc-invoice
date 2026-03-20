@@ -12,9 +12,9 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: run and record Phase 4 Browser QA now that automated verification passed (`./vendor/bin/sail artisan test`, `236 passed`) and wallet settings, onboarding, and Helpful Notes all reinforce the dedicated receiving-account requirement.
-- Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
-- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
+- Next action: finish Phase 4 Browser QA and review the draft Phase 5 payment-corrections spec before implementation.
+- Primary next doc: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md)
+- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
 - Milestone-doc note: MS14 does not have a dedicated milestone doc yet; create one only if the work grows beyond the current strategy-backed scope.
 

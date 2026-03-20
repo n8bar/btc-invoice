@@ -69,6 +69,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Outstanding payment requests target the current outstanding balance rather than the original invoice BTC snapshot.
 - Small-balance resolution, adjustment handling, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
 - Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
+- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); ignored rows must remain auditable while being excluded from active settlement math.
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
@@ -102,6 +103,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 ## Canonical Spec Map
 - Rates and BTC/USD behavior: [`docs/specs/RATES.md`](specs/RATES.md)
 - Partial payments, confirmations, adjustments, and outstanding summaries: [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md)
+- Payment correction / ignore-restore behavior: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md)
 - Outbound invoice communication, receipts, and alerts: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md)
 - Print/public behavior: [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md)
 - MS13 UX overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)

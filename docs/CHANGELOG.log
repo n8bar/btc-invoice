@@ -497,3 +497,6 @@ Updated the getting-started wallet step with a concise dedicated-account warning
 
 2026-03-19 | MS14 Phase 4.4 traceability and automated verification are complete
 Linked the wallet-settings dedicated-account guidance block directly to the matching Helpful Notes anchor, tied the wallet key field to the guidance/helper/feedback regions for clearer keyboard and assistive-tech behavior, added a support-safe `wallet.settings.saved_with_dedicated_guidance` log entry that excludes wallet-key material, expanded feature coverage for the wallet/help link and save-log emission, and ran `./vendor/bin/sail artisan test` with `236 passed`. Updated `docs/PLAN.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/specs/WALLET_XPUB_UX_SPEC.md` so Browser QA is now the remaining Phase 4 gate.
+
+2026-03-19 | Drafted the canonical Phase 5 payment-corrections spec
+Added `docs/specs/PAYMENT_CORRECTIONS.md` to define owner-only ignore/restore behavior for wrongly attributed on-chain payments, including correction metadata, recalculation rules, watcher survival requirements, public-vs-owner visibility, and audit/logging expectations. Synced `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, `docs/specs/PARTIAL_PAYMENTS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `README.md` so the new spec is the primary next doc pending review before implementation.

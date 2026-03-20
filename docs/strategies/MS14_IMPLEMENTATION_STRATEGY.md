@@ -266,6 +266,8 @@ Browser QA:
 
 ### Phase 5 - Correction Tooling + Safeguards
 
+Canonical requirements for Phase 5 now live in [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md). Use this strategy section for milestone sequencing only.
+
 #### 5.1 Add correction metadata
 Add correction metadata to `invoice_payments` (or companion audit table):
 - `ignored_at`, `ignored_by_user_id`, `ignore_reason`.

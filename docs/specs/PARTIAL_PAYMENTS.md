@@ -7,6 +7,8 @@ This doc is canonical for:
 - RBF and dropped-transaction cleanup
 - manual adjustments and over/underpayment handling
 
+Ignore/restore correction handling for wrongly attributed on-chain rows is defined separately in [`docs/specs/PAYMENT_CORRECTIONS.md`](PAYMENT_CORRECTIONS.md). That flow preserves original `invoice_payments` rows for audit and is distinct from manual adjustments.
+
 ## Goals
 - Record every on-chain payment that hits an invoice address, even if the amount is below the invoice total.
 - Surface a `partial` status so owners/clients know funds have arrived but more is due.
