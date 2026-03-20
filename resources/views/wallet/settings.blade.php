@@ -34,11 +34,18 @@
                     <div class="space-y-3 text-sm text-gray-600">
                         <p>{{ __('Connect a wallet account key so CryptoZing can generate a unique Bitcoin address for every invoice.') }}</p>
                         <div class="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-900 shadow-sm dark:border-indigo-400/40 dark:bg-indigo-950/40 dark:text-indigo-100"
+                             id="wallet-dedicated-guidance"
                              style="border-color: currentColor;">
                             <p class="font-semibold">{{ __('Use a dedicated receiving account key here.') }}</p>
                             <p class="mt-1">{{ __('CryptoZing expects a dedicated account key (xpub/zpub/vpub/tpub) for invoice receives.') }}</p>
                             <p class="mt-1">{{ __('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.') }}</p>
                             <p class="mt-1">{{ __('Viewing balances or spending from that account elsewhere is fine.') }}</p>
+                            <p class="mt-2">
+                                <a href="{{ route('help', ['from' => 'wallet-settings']) }}#dedicated-receiving-account"
+                                   class="font-medium text-indigo-800 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:text-indigo-100">
+                                    {{ __('Read why CryptoZing needs a dedicated receiving account.') }}
+                                </a>
+                            </p>
                         </div>
                         <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800" style="border-color: currentColor;">
                             {{ __('Privacy note: this key lets anyone derive and monitor addresses for that account. Keep it private and avoid sharing screenshots or logs.') }}
@@ -91,7 +98,7 @@
                                     <p class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{{ $gettingStartedMarker }} Fill this field</p>
                                 @endif
                                 <x-input-label for="bip84_xpub" :value="__('Wallet account key (xpub/zpub/vpub/tpub)')" />
-                                <p class="mt-1 text-xs text-gray-500">
+                                <p class="mt-1 text-xs text-gray-500" id="bip84_xpub_help">
                                     Paste the account-level public key from your wallet. Never paste a seed phrase.
                                 </p>
                                 @if ($isGettingStarted && $isGettingStartedReplay)
@@ -107,13 +114,14 @@
                                           autocorrect="off"
                                           spellcheck="false"
                                           required
+                                          aria-describedby="wallet-dedicated-guidance bip84_xpub_help bip84_xpub_feedback"
                                           @if ($errors->has('bip84_xpub')) autofocus @endif
                                           @if ($isGettingStarted) data-getting-started-highlight="wallet-key-input" @endif
                                           x-ref="input"
                                           x-model="value"
                                           @input="handleInput"
                                           @blur="handleBlur">{{ $xpubValue }}</textarea>
-                                <div class="mt-2 min-h-[4.5rem] space-y-2 text-xs" aria-live="polite">
+                                <div class="mt-2 min-h-[4.5rem] space-y-2 text-xs" id="bip84_xpub_feedback" aria-live="polite">
                                     <div class="flex flex-wrap items-center gap-2 text-slate-600 dark:text-slate-300">
                                         <span>Expected format: <span class="font-medium text-slate-900 dark:text-slate-100">{{ $expectedPrefix }}</span></span>
                                         <button type="button"

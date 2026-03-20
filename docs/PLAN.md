@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: run Phase 4 verification and Browser QA now that wallet settings, onboarding, and Helpful Notes all reinforce the dedicated receiving-account requirement.
+- Next action: run and record Phase 4 Browser QA now that automated verification passed (`./vendor/bin/sail artisan test`, `236 passed`) and wallet settings, onboarding, and Helpful Notes all reinforce the dedicated receiving-account requirement.
 - Primary next doc: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 - Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md), [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)

@@ -244,21 +244,25 @@ Browser QA:
    - Current implementation on 2026-03-19: `Helpful Notes` now includes a dedicated receiving-account article that explains the receive-only requirement, what breaks tracking, what remains safe, what unsupported configuration means, how to fix it with a fresh dedicated key, and the recommended separate receive/spend setup. The existing xpub guidance already covers the watch-only model in plain language.
 
 #### 4.4 Keep dedicated-wallet guidance usable and traceable
-1. Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.
-2. Preserve wallet input on validation failures.
-3. Keep keyboard and focus behavior sane for any new guidance controls.
-4. Add event or log entries when users save wallet settings after seeing dedicated-account guidance if support/debug traceability proves necessary.
+1. [x] Apply `docs/UX_GUARDRAILS.md` so dedicated-wallet guidance does not introduce layout shift.
+2. [x] Preserve wallet input on validation failures.
+3. [x] Keep keyboard and focus behavior sane for any new guidance controls.
+4. [x] Add event or log entries when users save wallet settings after seeing dedicated-account guidance if support/debug traceability proves necessary.
+   - Current implementation on 2026-03-19: `/wallet/settings` keeps its reserved helper/error space, preserves pasted wallet input on validation failures, ties the wallet key textarea to the guidance/helper/feedback regions for sane focus and screen-reader context, links the guidance block directly to the dedicated receiving-account Helpful Notes anchor, and emits `wallet.settings.saved_with_dedicated_guidance` without logging the wallet key itself.
 
 #### 4.5 Verify Phase 4
 Automated / command verification:
-1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
-2. Add or expand automated coverage for wallet-settings copy/flow changes, any onboarding reinforcement that ships, and any Helpful Notes linkage or rendering that ships with this phase.
-3. Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
+1. [x] Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 4 work.
+   - Current result on 2026-03-19: `236 passed`.
+2. [x] Add or expand automated coverage for wallet-settings copy/flow changes, any onboarding reinforcement that ships, and any Helpful Notes linkage or rendering that ships with this phase.
+   - Current result on 2026-03-19: coverage now includes the wallet-settings dedicated-account help link, the Helpful Notes dedicated receiving-account explainer rendering, the onboarding help link, and wallet-settings save-log emission.
+3. [x] Confirm any telemetry or logging added for guidance acknowledgment is emitted as expected.
+   - Current result on 2026-03-19: feature coverage now asserts `wallet.settings.saved_with_dedicated_guidance` is emitted with support-safe context only.
 
 Browser QA:
-4. Verify dedicated-account warning clarity on wallet settings.
-5. Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
-6. Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
+4. [ ] Verify dedicated-account warning clarity on wallet settings.
+5. [ ] Verify onboarding reinforcement is understandable and does not introduce layout shift or focus regressions.
+6. [ ] Verify the Helpful Notes explainer is understandable to a less technical audience and matches the in-app warning language.
 
 ### Phase 5 - Correction Tooling + Safeguards
 

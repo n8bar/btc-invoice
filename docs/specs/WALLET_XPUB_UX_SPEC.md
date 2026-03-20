@@ -30,6 +30,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
 - MS14 onboarding now reinforces the dedicated receiving-account requirement and links to a matching Helpful Notes anchor.
 - The Helpful Notes guidance for dedicated receiving accounts and unsupported configuration is shipped on the public `Helpful Notes` page.
+- MS14 wallet settings now link directly from the dedicated-account guidance block to the matching Helpful Notes anchor and emit a support-safe save log after that guidance is shown.
 
 ## Deferred (post-RC)
 - Additional wallets UI and multi-wallet selection (backend storage remains; UI will return once the selector is in scope). Tracked in `docs/BACKLOG.md`.
@@ -40,6 +41,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - says CryptoZing expects a dedicated account key (`xpub` / `zpub` / `vpub` / `tpub`) for invoice receives
   - warns that reusing that same account for receives elsewhere can cause false payment attribution
   - clarifies that viewing balances or spending from that account elsewhere is fine
+  - links directly to the matching Helpful Notes dedicated receiving-account explainer
 - Field: label as “Wallet account key (xpub/zpub/vpub/tpub)” with a sub-label “Paste the account-level public key from your wallet. Never paste a seed phrase.”
 - Helper links:
   - Inline link: “Where do I find this?” opens a small accordion.
@@ -75,6 +77,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - red warning near the wallet account key field
 - Invoice creation should also warn inline when the wallet is flagged unsupported and use a more explicit primary action label such as `Create Unsupported Invoice` rather than a neutral save label.
 - The wallet settings warning should explain that unrelated outside wallet activity can lead to mistracked funds and other unreliable automatic attribution behavior, and that the recommended fix is to connect a new dedicated account key.
+- Saving wallet settings after the dedicated-account guidance is shown should emit a support/debug log entry with safe context only (user, wallet setting, flow surface, unsupported-state flags), never the wallet key itself.
 - Invoices created while the wallet is flagged unsupported should be marked unsupported at creation time.
 - Existing invoices must not be bulk retroactively marked unsupported. An existing invoice may be marked unsupported only when invoice-specific evidence implicates that invoice.
 - Publish a matching Helpful Notes article in plain language that explains:
@@ -94,6 +97,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 - Visible focus rings on input, helper links, and buttons in light/dark themes.
 - Accordion is keyboard navigable; content is readable on mobile with no horizontal scroll.
 - Reserve helper space to prevent layout jumps when showing validation.
+- The wallet key field should describe the dedicated-account guidance, helper copy, and validation-feedback region so focus/error handling stays understandable for keyboard and assistive-tech users.
 
 ## Testing Notes
 - Feature tests:
@@ -106,8 +110,9 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
   - evidence-triggered unsupported-state behavior for an implicated invoice
   - invoices created while the wallet is flagged unsupported inheriting that flag
   - previously existing invoices remaining unflagged unless invoice-specific evidence marks them
-- Future coverage still needed for:
   - the Helpful Notes article surfacing the same dedicated-receive guidance in plain language
+  - the wallet-settings dedicated-account help link
+  - wallet-settings save-log emission with support-safe context
 - Additional wallet enforcement remains covered via request validation while the UI is deferred.
 - View/Blade coverage can use snapshot-style assertions for helper/accordion visibility.
 

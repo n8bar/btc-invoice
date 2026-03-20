@@ -84,6 +84,7 @@ class WalletSettingsController extends Controller
 
         $existingWallet = $user->walletSetting;
         $replacedPrimaryWallet = $this->primaryWalletIdentityChanged($existingWallet, $payload, $lineage);
+        $unsupportedConfigurationPreviouslyActive = (bool) optional($existingWallet)->unsupported_configuration_active;
 
         $wallet = $user->walletSetting()->updateOrCreate(['user_id' => $user->id], [
             'network' => $payload['network'],
@@ -116,6 +117,14 @@ class WalletSettingsController extends Controller
                 'error' => $e->getMessage(),
             ]);
         }
+
+        $this->logDedicatedGuidanceSave(
+            wallet: $wallet,
+            userId: $user->id,
+            gettingStarted: $request->boolean('getting_started'),
+            replacedPrimaryWallet: $replacedPrimaryWallet,
+            unsupportedConfigurationPreviouslyActive: $unsupportedConfigurationPreviouslyActive,
+        );
 
         if ($request->boolean('getting_started')) {
             $gettingStartedFlow->markReplayWalletVerified($user);
@@ -180,5 +189,25 @@ class WalletSettingsController extends Controller
 
         return $lineage->normalizeNetwork((string) $existingWallet->network) !== $lineage->normalizeNetwork((string) ($payload['network'] ?? ''))
             || $lineage->normalizeXpub((string) $existingWallet->bip84_xpub) !== $lineage->normalizeXpub((string) ($payload['bip84_xpub'] ?? ''));
+    }
+
+    private function logDedicatedGuidanceSave(
+        WalletSetting $wallet,
+        int $userId,
+        bool $gettingStarted,
+        bool $replacedPrimaryWallet,
+        bool $unsupportedConfigurationPreviouslyActive,
+    ): void {
+        Log::info('wallet.settings.saved_with_dedicated_guidance', [
+            'user_id' => $userId,
+            'wallet_setting_id' => $wallet->id,
+            'network' => $wallet->network,
+            'surface' => $gettingStarted ? 'getting_started' : 'wallet_settings',
+            'getting_started' => $gettingStarted,
+            'wallet_key_replaced' => $replacedPrimaryWallet,
+            'unsupported_configuration_previously_active' => $unsupportedConfigurationPreviouslyActive,
+            'unsupported_configuration_active' => (bool) $wallet->unsupported_configuration_active,
+            'unsupported_configuration_source' => $wallet->unsupported_configuration_source,
+        ]);
     }
 }
