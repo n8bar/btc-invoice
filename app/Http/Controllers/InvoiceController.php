@@ -490,7 +490,7 @@ class InvoiceController extends Controller
     {
         return $invoice->load([
             'client',
-            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'payments' => fn ($query) => $query->active()->orderBy('detected_at')->orderBy('id'),
             'user',
         ]);
     }

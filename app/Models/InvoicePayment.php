@@ -21,6 +21,9 @@ class InvoicePayment extends Model
         'usd_rate',
         'fiat_amount',
         'note',
+        'ignored_at',
+        'ignored_by_user_id',
+        'ignore_reason',
         'meta',
         'is_adjustment',
     ];
@@ -29,6 +32,7 @@ class InvoicePayment extends Model
         'sats_received' => 'int',
         'detected_at' => 'datetime',
         'confirmed_at' => 'datetime',
+        'ignored_at' => 'datetime',
         'block_height' => 'int',
         'usd_rate' => 'decimal:2',
         'fiat_amount' => 'decimal:2',
@@ -39,6 +43,11 @@ class InvoicePayment extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function ignoredByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ignored_by_user_id');
     }
 
     public function scopeForUserInvoices(Builder $query, User|int $user): Builder
@@ -59,5 +68,20 @@ class InvoicePayment extends Model
                         ->whereBetween('invoice_payments.created_at', [$from, $to]);
                 });
         });
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('invoice_payments.ignored_at');
+    }
+
+    public function scopeIgnored(Builder $query): Builder
+    {
+        return $query->whereNotNull('invoice_payments.ignored_at');
+    }
+
+    public function isIgnored(): bool
+    {
+        return $this->ignored_at !== null;
     }
 }

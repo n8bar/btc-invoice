@@ -346,6 +346,61 @@ class DashboardSnapshotTest extends TestCase
         $response->assertDontSee('>Profile<', false);
     }
 
+    public function test_dashboard_excludes_ignored_payments_from_recent_activity_and_totals(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-04-02 12:00:00', config('app.timezone')));
+
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, 'Ignored Co');
+
+        $activeInvoice = $this->makeInvoice($owner, $client, [
+            'status' => 'sent',
+            'amount_usd' => 150,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.003,
+        ]);
+
+        $ignoredInvoice = $this->makeInvoice($owner, $client, [
+            'status' => 'sent',
+            'amount_usd' => 150,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.003,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $activeInvoice->id,
+            'txid' => 'tx-active-dashboard',
+            'sats_received' => 100_000,
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+            'detected_at' => Carbon::now()->subDay(),
+            'confirmed_at' => Carbon::now()->subDay(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $ignoredInvoice->id,
+            'txid' => 'tx-ignored-dashboard',
+            'sats_received' => 100_000,
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+            'detected_at' => Carbon::now()->subHours(12),
+            'confirmed_at' => Carbon::now()->subHours(12),
+            'ignored_at' => Carbon::now()->subHour(),
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('1 payment', false);
+        $response->assertSee('$50.00', false);
+        $response->assertSee($activeInvoice->number, false);
+        $response->assertDontSee($ignoredInvoice->number, false);
+        $response->assertDontSee('tx-ignored-dashboard', false);
+
+        Carbon::setTestNow();
+    }
+
     private int $invoiceSequence = 0;
 
     private function makeClient(User $owner, string $name = 'Client'): Client

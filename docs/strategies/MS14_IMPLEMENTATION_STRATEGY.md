@@ -271,6 +271,8 @@ Browser QA:
 
 Canonical requirements for Phase 5 now live in [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md). Use this strategy section for milestone sequencing only.
 
+Current implementation on 2026-03-19: correction metadata now lives on `invoice_payments`; owner-only ignore/restore actions ship from the invoice payment-history table with inline confirmation; ignored rows stay visible and marked in owner/support audit views while public/print/dashboard math excludes them; watcher sync preserves ignored rows; and queued receipts/paid notices/underpay/partial deliveries are skipped when a correction makes them untruthful.
+
 #### 5.1 Add correction metadata
 Add correction metadata to `invoice_payments` (or companion audit table):
 - `ignored_at`, `ignored_by_user_id`, `ignore_reason`.
@@ -293,17 +295,21 @@ Re-run payment state recomputation after ignore/restore.
 
 #### 5.4 Verify Phase 5
 Automated / command verification:
-1. Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
-2. Add or expand automated coverage for:
-   1. ignore/restore payment recalculation
-   2. authorization and owner-only safeguards
-   3. audit logging and metadata persistence
-3. Verify raw tx history remains present after ignore/restore.
+1. [x] Run `./vendor/bin/sail artisan test` at minimum for merge-ready Phase 5 work.
+   - Current result on 2026-03-19: `246 passed`.
+2. [x] Add or expand automated coverage for:
+   1. [x] ignore/restore payment recalculation
+   2. [x] authorization and owner-only safeguards
+   3. [x] audit logging and metadata persistence
+   4. [x] public/print/dashboard exclusion of ignored rows
+   5. [x] watcher persistence of ignored rows and skipped queued deliveries when corrections change truth
+3. [x] Verify raw tx history remains present after ignore/restore.
+   - Current result on 2026-03-19: owner and support payment-history views keep the original tx rows visible with ignored-state context while public/print surfaces exclude them.
 
 Browser QA:
-4. Exercise the correction flow in the browser and confirm visible invoice state recovers as expected.
-5. Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
-6. Confirm manual adjustment rows cannot be ignored.
+4. [ ] Exercise the correction flow in the browser and confirm visible invoice state recovers as expected.
+5. [ ] Confirm ignored rows are excluded from paid/outstanding calculations and restore reverses that cleanly.
+6. [ ] Confirm manual adjustment rows cannot be ignored.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.

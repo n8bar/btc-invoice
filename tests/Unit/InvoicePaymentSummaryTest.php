@@ -62,4 +62,57 @@ class InvoicePaymentSummaryTest extends TestCase
         $this->assertSame(0, $summary['outstanding_sats']);
         $this->assertSame(0.0, $summary['outstanding_usd']);
     }
+
+    public function test_ignored_payments_are_excluded_from_summary_math(): void
+    {
+        $user = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $user->id,
+            'name' => 'Acme',
+            'email' => 'billing@acme.test',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $user->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1003',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qexample',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-active',
+            'sats_received' => 100_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-ignored',
+            'sats_received' => 100_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+            'ignored_at' => now(),
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        $invoice->refresh()->refreshPaymentLedger();
+        $summary = $invoice->paymentSummary(['rate_usd' => 50_000]);
+
+        $this->assertSame('partial', $invoice->status);
+        $this->assertSame(100_000, $summary['confirmed_sats']);
+        $this->assertSame(50.0, $summary['confirmed_usd']);
+        $this->assertSame(100_000, $summary['outstanding_sats']);
+        $this->assertSame(50.0, $summary['outstanding_usd']);
+    }
 }

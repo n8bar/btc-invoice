@@ -18,7 +18,10 @@ class InvoiceAlertService
             return;
         }
 
-        if ($invoice->deliveries()->where('type', 'owner_paid_notice')->exists()) {
+        if ($invoice->deliveries()
+            ->where('type', 'owner_paid_notice')
+            ->whereIn('status', ['queued', 'sent'])
+            ->exists()) {
             return;
         }
 
@@ -36,6 +39,33 @@ class InvoiceAlertService
         }
 
         $this->maybeSendPartialWarning($invoice);
+    }
+
+    public function skipInvalidQueuedDeliveries(Invoice $invoice, string $reasonPrefix = 'Skipped after invoice state change.'): void
+    {
+        if ($invoice->status !== 'paid') {
+            $this->skipQueuedDeliveries(
+                $invoice,
+                ['receipt', 'owner_paid_notice'],
+                "{$reasonPrefix} Invoice no longer paid."
+            );
+        }
+
+        if (! $invoice->requiresClientUnderpayAlert()) {
+            $this->skipQueuedDeliveries(
+                $invoice,
+                ['client_underpay_alert', 'owner_underpay_alert'],
+                "{$reasonPrefix} Underpayment alert no longer applies."
+            );
+        }
+
+        if (! $invoice->shouldWarnAboutPartialPayments()) {
+            $this->skipQueuedDeliveries(
+                $invoice,
+                ['client_partial_warning', 'owner_partial_warning'],
+                "{$reasonPrefix} Partial-payment warning no longer applies."
+            );
+        }
     }
 
     public function sendPastDueAlerts(Invoice $invoice): void
@@ -164,5 +194,16 @@ class InvoiceAlertService
 
         $invoice->last_partial_warning_sent_at = now();
         $invoice->save();
+    }
+
+    private function skipQueuedDeliveries(Invoice $invoice, array $types, string $reason): void
+    {
+        $invoice->deliveries()
+            ->whereIn('type', $types)
+            ->where('status', 'queued')
+            ->update([
+                'status' => 'skipped',
+                'error_message' => $reason,
+            ]);
     }
 }

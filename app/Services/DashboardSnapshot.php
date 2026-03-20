@@ -37,6 +37,7 @@ class DashboardSnapshot
 
         $paymentsLast7d = InvoicePayment::query()
             ->forUserInvoices($user)
+            ->active()
             ->recentBetween($windowStart, $windowEnd)
             ->count();
 
@@ -67,6 +68,7 @@ class DashboardSnapshot
                     'fiat_amount',
                     'detected_at',
                     'confirmed_at',
+                    'ignored_at',
                     'is_adjustment',
                     'created_at'
                 );
@@ -107,6 +109,7 @@ class DashboardSnapshot
 
         $paymentsLast7dUsd = InvoicePayment::query()
             ->forUserInvoices($user)
+            ->active()
             ->recentBetween($today->copy()->subDays(7), $today->copy()->addDay())
             ->where(function ($query) {
                 $query->whereNotNull('invoice_payments.confirmed_at')
@@ -143,6 +146,7 @@ class DashboardSnapshot
             ->join('invoices', 'invoices.id', '=', 'invoice_payments.invoice_id')
             ->where('invoices.user_id', $user->id)
             ->whereNull('invoices.deleted_at')
+            ->active()
             ->orderByRaw('COALESCE(invoice_payments.detected_at, invoice_payments.created_at) DESC')
             ->orderByDesc('invoice_payments.id')
             ->limit(5)

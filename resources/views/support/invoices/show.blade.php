@@ -86,6 +86,7 @@
                                     <th class="py-2 pr-4">Detected</th>
                                     <th class="py-2 pr-4">Sats</th>
                                     <th class="py-2 pr-4">USD snapshot</th>
+                                    <th class="py-2 pr-4">Status</th>
                                     <th class="py-2 pr-4">Txid</th>
                                     <th class="py-2 pr-4">Note</th>
                                 </tr>
@@ -95,7 +96,19 @@
                                     <tr>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->detected_at?->setTimezone(config('app.timezone'))->toDayDateTimeString() ?? '—' }}</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ number_format((int) $payment->sats_received) }}</td>
-                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->usd_amount !== null ? '$' . number_format((float) $payment->usd_amount, 2) : '—' }}</td>
+                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->fiat_amount !== null ? '$' . number_format((float) $payment->fiat_amount, 2) : '—' }}</td>
+                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">
+                                            @if ($payment->is_adjustment)
+                                                {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
+                                            @elseif ($payment->isIgnored())
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">Ignored</span>
+                                                    <div class="text-xs text-amber-800 dark:text-amber-200">{{ $payment->ignore_reason }}</div>
+                                                </div>
+                                            @else
+                                                {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                            @endif
+                                        </td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">@if ($payment->txid)<span class="break-all">{{ $payment->txid }}</span>@else—@endif</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->note ?: '—' }}</td>
                                     </tr>

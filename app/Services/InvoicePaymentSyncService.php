@@ -70,6 +70,7 @@ class InvoicePaymentSyncService
         }
 
         $hasUnconfirmed = $invoice->payments()
+            ->whereNull('ignored_at')
             ->whereNull('confirmed_at')
             ->where('is_adjustment', false)
             ->exists();
@@ -117,6 +118,7 @@ class InvoicePaymentSyncService
 
             $droppedCount = InvoicePayment::query()
                 ->where('invoice_id', $invoice->id)
+                ->whereNull('ignored_at')
                 ->whereNull('confirmed_at')
                 ->where('is_adjustment', false)
                 ->when(! empty($liveTxids), fn ($query) => $query->whereNotIn('txid', $liveTxids))
@@ -133,6 +135,9 @@ class InvoicePaymentSyncService
 
                 $payment->sats_received = $result['sats'];
                 $payment->detected_at = $payment->detected_at ?: $result['detected_at'];
+                $payment->meta = array_merge($payment->meta ?? [], [
+                    'confirmations' => max((int) ($result['confirmations'] ?? 0), 0),
+                ]);
 
                 if ($payment->usd_rate !== null) {
                     $payment->fiat_amount = round(
@@ -165,36 +170,7 @@ class InvoicePaymentSyncService
                 ];
             }
 
-            $invoice->load('payments');
-            $invoice->payment_amount_sat = $invoice->sumPaymentSats(true);
-
-            $latestConfirmed = $invoice->payments
-                ->filter(fn (InvoicePayment $payment) => $payment->confirmed_at !== null)
-                ->sortBy('confirmed_at')
-                ->last();
-
-            $latestDetected = $invoice->payments->sortBy('detected_at')->last();
-
-            if ($invoice->payments->isEmpty()) {
-                $invoice->txid = null;
-                $invoice->payment_confirmations = 0;
-                $invoice->payment_confirmed_height = null;
-                $invoice->payment_detected_at = null;
-                $invoice->payment_confirmed_at = null;
-            } else {
-                $invoice->txid = $latestConfirmed?->txid ?? $latestDetected?->txid ?? $invoice->txid;
-                $maxConfirmations = collect($results)->max('confirmations');
-                $invoice->payment_confirmations = $maxConfirmations !== null
-                    ? $maxConfirmations
-                    : ($invoice->payment_confirmations ?? 0);
-                $invoice->payment_confirmed_height = $latestConfirmed?->block_height;
-                $invoice->payment_detected_at = $invoice->payment_detected_at ?: $latestDetected?->detected_at;
-                if ($latestConfirmed?->confirmed_at) {
-                    $invoice->payment_confirmed_at = $latestConfirmed->confirmed_at;
-                }
-            }
-
-            $invoice->refreshPaymentState($latestReference);
+            $invoice->refreshPaymentLedger($latestReference);
 
             return $logs;
         });

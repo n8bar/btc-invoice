@@ -97,7 +97,7 @@
 
             @php
                 $hasDraftOnChainPayments = ($invoice->status ?? 'draft') === 'draft'
-                    && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment);
+                    && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment && !$payment->isIgnored());
             @endphp
 
             @if ($hasDraftOnChainPayments)
@@ -686,10 +686,14 @@
                                             <th class="px-2 py-2 text-right">USD</th>
                                             <th class="px-2 py-2 text-left">Status</th>
                                             <th class="px-2 py-2 text-left">Note</th>
+                                            <th class="px-2 py-2 text-left">Correction</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100">
                                         @foreach ($invoice->payments as $payment)
+                                            @php
+                                                $showIgnoreForm = (string) old('correction_payment_id') === (string) $payment->id && $errors->has('ignore_reason');
+                                            @endphp
                                             <tr>
                                                 <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
                                                 <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
@@ -713,6 +717,15 @@
                                                         <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
                                                             {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
                                                         </span>
+                                                    @elseif ($payment->isIgnored())
+                                                        <div class="space-y-1">
+                                                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                                                                Ignored
+                                                            </span>
+                                                            <div class="text-xs text-amber-800">
+                                                                {{ $payment->confirmed_at ? 'Confirmed row excluded from totals.' : 'Pending row excluded from totals.' }}
+                                                            </div>
+                                                        </div>
                                                     @else
                                                         {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
                                                     @endif
@@ -737,6 +750,69 @@
                                                             </x-secondary-button>
                                                         </div>
                                                     </form>
+                                                </td>
+                                                <td class="px-2 py-2 align-top">
+                                                    @if ($payment->is_adjustment)
+                                                        <span class="text-xs text-gray-500">Manual adjustments stay outside correction tooling.</span>
+                                                    @elseif ($payment->isIgnored())
+                                                        <div class="space-y-2 text-xs text-gray-700">
+                                                            <div>
+                                                                <p class="font-semibold text-amber-900">Ignored for invoice math</p>
+                                                                <p class="mt-1">Reason: {{ $payment->ignore_reason }}</p>
+                                                                <p class="mt-1">Ignored {{ optional($payment->ignored_at)->toDayDateTimeString() ?? '—' }}</p>
+                                                            </div>
+                                                            <details>
+                                                                <summary class="cursor-pointer font-semibold text-indigo-700 hover:text-indigo-900">Restore payment</summary>
+                                                                <form method="POST"
+                                                                      action="{{ route('invoices.payments.restore', [$invoice, $payment]) }}"
+                                                                      class="mt-2 space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <p class="text-xs text-indigo-900">
+                                                                        Restore this payment so it counts toward invoice totals and status again.
+                                                                    </p>
+                                                                    <div class="flex justify-end">
+                                                                        <x-secondary-button type="submit" class="text-xs px-3 py-1">
+                                                                            Confirm restore
+                                                                        </x-secondary-button>
+                                                                    </div>
+                                                                </form>
+                                                            </details>
+                                                        </div>
+                                                    @else
+                                                        <details @if ($showIgnoreForm) open @endif>
+                                                            <summary class="cursor-pointer text-xs font-semibold text-red-700 hover:text-red-800">
+                                                                Ignore payment
+                                                            </summary>
+                                                            <form method="POST"
+                                                                  action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
+                                                                  class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                <p class="text-xs text-red-900">
+                                                                    This removes the payment from invoice totals and status without deleting the raw ledger row.
+                                                                </p>
+                                                                <div>
+                                                                    <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900">Reason</label>
+                                                                    <textarea id="ignore_reason_{{ $payment->id }}"
+                                                                              name="ignore_reason"
+                                                                              rows="2"
+                                                                              class="mt-1 w-full rounded border-red-200 text-sm"
+                                                                              placeholder="Why should this payment stop counting toward this invoice?"
+                                                                              @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
+                                                                    @if ($showIgnoreForm)
+                                                                        <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="flex justify-end">
+                                                                    <x-danger-button type="submit" class="text-xs px-3 py-1">
+                                                                        Confirm ignore
+                                                                    </x-danger-button>
+                                                                </div>
+                                                            </form>
+                                                        </details>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach

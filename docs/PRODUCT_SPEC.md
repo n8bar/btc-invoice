@@ -69,7 +69,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Outstanding payment requests target the current outstanding balance rather than the original invoice BTC snapshot.
 - Small-balance resolution, adjustment handling, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
 - Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
-- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); ignored rows must remain auditable while being excluded from active settlement math.
+- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); ignored rows must remain auditable while being excluded from active settlement math, owner/support audit views may still show the ignored state, public/print and dashboard settlement surfaces must exclude ignored rows, and queued payment-related deliveries that become untruthful after a correction must be skipped rather than deleted.
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
