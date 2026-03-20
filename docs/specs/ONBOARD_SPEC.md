@@ -105,7 +105,7 @@ If any step proves too broad during implementation, split it into explicit subst
   - Wallet warning block:
     - `Use a dedicated receiving account key.`
     - `If this same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.`
-    - `Viewing balances or spending from that account elsewhere is fine.`
+    - `You’ll still use your wallet app to view balances and spend from this account.`
     - link: `Why CryptoZing needs a dedicated receiving account`
   - Wallet CTA: `Open wallet settings`
   - Invoice title: `Create your first invoice`

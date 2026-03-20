@@ -500,3 +500,6 @@ Linked the wallet-settings dedicated-account guidance block directly to the matc
 
 2026-03-19 | Drafted the canonical Phase 5 payment-corrections spec
 Added `docs/specs/PAYMENT_CORRECTIONS.md` to define owner-only ignore/restore behavior for wrongly attributed on-chain payments, including correction metadata, recalculation rules, watcher survival requirements, public-vs-owner visibility, and audit/logging expectations. Synced `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, `docs/specs/PARTIAL_PAYMENTS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `README.md` so the new spec is the primary next doc pending review before implementation.
+
+2026-03-19 | Phase 4 copy guidance now treats external wallet use as normal and keeps wallet-prefix hints env-aware
+Updated the onboarding and wallet UX specs so dedicated-account guidance now says the owner's wallet app remains the normal place to view balances and spend/sweep funds because CryptoZing is watch-only. The wallet settings surface should use generic key labels plus one env-aware “usually starts with …” hint (`xpub/zpub` on mainnet, `vpub/tpub` on testnet), while Helpful Notes may keep mainnet-style prefix examples in its explanatory import guidance.
