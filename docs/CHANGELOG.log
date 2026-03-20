@@ -486,5 +486,5 @@ Removed the separate `/support/login` implementation so support accounts now aut
 2026-03-19 | MS14 focus returned to Phase 4 dedicated-wallet UX hardening
 Merged the after-this-pr support/copy follow-up and updated `docs/PLAN.md` so the current MS14 next action now points at Phase 4 wallet-settings guidance, onboarding reinforcement, and the Helpful Notes explainer.
 
-2026-03-19 | MS16 now explicitly owns the full support UX pass
-Updated `docs/PLAN.md` milestone 16 from `Docs & DX` to `Docs, DX & Support UX` and expanded its short intent so the RC roadmap clearly assigns the complete tech-support UX pass to MS16 alongside the existing docs, auth-hardening, and test-rationalization work.
+2026-03-19 | MS16 now explicitly owns the minimum viable support UI pass
+Updated `docs/PLAN.md` milestone 16 from `Docs & DX` to `Docs, DX & Support UX` and tightened its short intent so the RC roadmap clearly assigns the minimum viable support UI and access-flow pass to MS16 alongside the existing docs, auth-hardening, and test-rationalization work without implying a full support console.
