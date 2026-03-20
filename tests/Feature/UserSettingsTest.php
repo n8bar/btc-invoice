@@ -884,6 +884,21 @@ class UserSettingsTest extends TestCase
         );
     }
 
+    public function test_wallet_settings_explains_dedicated_receiving_account_requirement(): void
+    {
+        $owner = User::factory()->create();
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('wallet.settings.edit'));
+
+        $response->assertOk();
+        $response->assertSee('Use a dedicated receiving account key here.', false);
+        $response->assertSee('CryptoZing expects a dedicated account key (xpub/zpub/vpub/tpub) for invoice receives.', false);
+        $response->assertSee('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.', false);
+        $response->assertSee('Viewing balances or spending from that account elsewhere is fine.', false);
+    }
+
     public function test_wallet_settings_show_unsupported_warning_and_navigation_indicators_when_wallet_is_flagged(): void
     {
         $owner = User::factory()->create();

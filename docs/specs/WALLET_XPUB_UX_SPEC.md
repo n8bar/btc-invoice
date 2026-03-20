@@ -24,6 +24,7 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## Current Status
 - The MS13 wallet-settings baseline in this spec is shipped.
+- MS14 wallet settings now explain the dedicated receiving-account requirement directly in the form intro copy.
 - MS14 wallet warning copy and invoice unsupported-state visibility are shipped.
 - MS14 navigation repair-path indicators are now working end-to-end after Browser QA follow-up on 2026-03-18.
 - MS14 invoice creation now shows its own unsupported-state warning and uses a `Create Unsupported Invoice` primary CTA while the wallet is flagged.
@@ -34,6 +35,10 @@ Purpose: make wallet setup mainnet-first and approachable for non-technical user
 
 ## UI & Interaction
 - Layout: keep the primary wallet form above the fold on laptop screens; reserve space under the field for helper/validation so the layout does not shift.
+- Wallet settings should include a static guidance block near the top of the form that:
+  - says CryptoZing expects a dedicated account key (`xpub` / `zpub` / `vpub` / `tpub`) for invoice receives
+  - warns that reusing that same account for receives elsewhere can cause false payment attribution
+  - clarifies that viewing balances or spending from that account elsewhere is fine
 - Field: label as “Wallet account key (xpub/zpub/vpub/tpub)” with a sub-label “Paste the account-level public key from your wallet. Never paste a seed phrase.”
 - Helper links:
   - Inline link: “Where do I find this?” opens a small accordion.

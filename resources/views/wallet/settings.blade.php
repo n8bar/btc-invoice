@@ -31,8 +31,15 @@
 
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 space-y-6 text-gray-900">
-                    <div class="space-y-2 text-sm text-gray-600">
+                    <div class="space-y-3 text-sm text-gray-600">
                         <p>{{ __('Connect a wallet account key so CryptoZing can generate a unique Bitcoin address for every invoice.') }}</p>
+                        <div class="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-900 shadow-sm dark:border-indigo-400/40 dark:bg-indigo-950/40 dark:text-indigo-100"
+                             style="border-color: currentColor;">
+                            <p class="font-semibold">{{ __('Use a dedicated receiving account key here.') }}</p>
+                            <p class="mt-1">{{ __('CryptoZing expects a dedicated account key (xpub/zpub/vpub/tpub) for invoice receives.') }}</p>
+                            <p class="mt-1">{{ __('If the same account receives payments elsewhere, CryptoZing can attach a payment to the wrong invoice.') }}</p>
+                            <p class="mt-1">{{ __('Viewing balances or spending from that account elsewhere is fine.') }}</p>
+                        </div>
                         <div class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800" style="border-color: currentColor;">
                             {{ __('Privacy note: this key lets anyone derive and monitor addresses for that account. Keep it private and avoid sharing screenshots or logs.') }}
                         </div>

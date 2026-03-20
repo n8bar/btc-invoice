@@ -225,9 +225,10 @@ Browser QA:
 ### Phase 4 - Dedicated-Wallet UX Hardening
 
 #### 4.1 Update wallet settings copy
-1. Update wallet settings copy to explicitly state that CryptoZing expects a dedicated account xpub for receives.
-2. Explain that sharing the same account for receives elsewhere can cause false payment attribution.
-3. Clarify that viewing or spending from that account elsewhere is fine.
+1. [x] Update wallet settings copy to explicitly state that CryptoZing expects a dedicated account xpub for receives.
+2. [x] Explain that sharing the same account for receives elsewhere can cause false payment attribution.
+3. [x] Clarify that viewing or spending from that account elsewhere is fine.
+   - Current implementation on 2026-03-19: `/wallet/settings` now includes a dedicated receiving-account guidance block in the form intro that states the dedicated-account requirement, warns about wrong-invoice attribution when the same account receives elsewhere, and clarifies that viewing/spending elsewhere is fine.
 
 #### 4.2 Reinforce the dedicated-account requirement in onboarding
 1. Add onboarding reinforcement in the wallet step with a concise warning block and link to the Helpful Notes anchor.

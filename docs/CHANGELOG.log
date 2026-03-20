@@ -488,3 +488,6 @@ Merged the after-this-pr support/copy follow-up and updated `docs/PLAN.md` so th
 
 2026-03-19 | MS16 now explicitly owns the minimum viable support UI pass
 Updated `docs/PLAN.md` milestone 16 from `Docs & DX` to `Docs, DX & Support UX` and tightened its short intent so the RC roadmap clearly assigns the minimum viable support UI and access-flow pass to MS16 alongside the existing docs, auth-hardening, and test-rationalization work without implying a full support console.
+
+2026-03-19 | MS14 Phase 4.1 wallet settings copy now reinforces dedicated receiving accounts
+Added a dedicated receiving-account guidance block to `/wallet/settings` that explicitly requires a dedicated account key for invoice receives, warns that reusing the same account for receives elsewhere can attach payments to the wrong invoice, clarifies that viewing/spending elsewhere is fine, adds focused feature coverage for that copy, and advances `docs/PLAN.md` / `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` toward Phase 4 onboarding and Helpful Notes work.
