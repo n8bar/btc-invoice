@@ -296,27 +296,33 @@ Re-run payment state recomputation after ignore/restore.
 #### 5.4 Add invoice-to-invoice reattribution
 1. Let the owner move a detected payment's accounting credit from invoice A to invoice B when the payment was real but the business intent belongs to B.
 2. Keep this correction same-owner only in RC so reattribution cannot move money between unrelated owners.
-3. Preserve provenance and auditability:
-   1. keep the original detected payment record
-   2. record that CryptoZing now counts it toward a different invoice
-   3. preserve who performed the reassignment, when, and why
-4. Recompute both source and destination invoices immediately after reattribution so status, paid/outstanding totals, QR/BIP21 targets, and queued payment-triggered deliveries all stay truthful.
-5. Keep wallet trust separate:
+3. Use an `invoice_payments`-centric storage model for RC:
+   1. keep the original detected payment row as the canonical fact
+   2. keep `invoice_id` as the immutable source/detected invoice while the row exists
+   3. add one current accounting-destination field on that same row so only one active accounting destination exists at a time
+4. Preserve provenance and auditability:
+   1. record the current destination, if any, on the canonical payment row
+   2. preserve who performed the current reassignment, when, and why
+   3. rely on structured logs as the append-only history of reattribution events
+5. Recompute both source and destination invoices immediately after reattribution so status, paid/outstanding totals, QR/BIP21 targets, and queued payment-triggered deliveries all stay truthful.
+6. Keep wallet trust separate:
    1. reattribution fixes wrong-invoice bookkeeping
    2. reattribution does not by itself clear unsupported wallet or invoice evidence
-6. Treat stale-address wrong-invoice reuse as a primary reattribution use case, not unsupported-wallet evidence by itself.
-7. Keep owner-visible history on both invoices:
+7. Treat stale-address wrong-invoice reuse as a primary reattribution use case, not unsupported-wallet evidence by itself.
+8. Keep owner-visible history on both invoices:
    1. source invoice shows the payment as reattributed out and no longer counting there
    2. destination invoice shows the payment as reattributed in and counting there
    3. source styling may use strike-through or similar de-emphasis, but visibility is mandatory
-8. Add destructive-delete safeguards:
+9. Add destructive-delete safeguards:
    1. soft delete may remain allowed because provenance survives
-   2. force delete must be blocked while bookkeeping history remains on the invoice, not just during active reattribution
-   3. the purge path requires the owner to intentionally remove or resolve that history first
-   4. if the block is caused by an active reattribution, destination delete attempts must direct the owner back to the source invoice to resolve it first
-   5. delete flows may link to implicated invoices but must not auto-convert anything
-   6. choose and implement the persistence-layer hard-delete backstop, then route every force-delete path through the same preflight guard so destructive deletes cannot bypass the bookkeeping-history rule
-9. Allow owner/support history rows that reference another invoice to link to that invoice when it is still available, while keeping those links off public/print surfaces.
+   2. force delete must be blocked while unresolved bookkeeping blockers remain on or against the invoice
+   3. the purge path requires the owner to intentionally remove or resolve each blocker class first
+   4. detected payment rows, ignored rows, and manual adjustments remain blockers until intentionally removed as part of purge
+   5. if the block is caused by an active reattribution, destination delete attempts must direct the owner back to the source invoice to resolve it first
+   6. once an active reattribution is resolved, any remaining retained payment row still blocks source force delete until purged
+   7. delete flows may link to implicated invoices but must not auto-convert anything
+   8. choose and implement the persistence-layer hard-delete backstop, then route every force-delete path through the same preflight guard so destructive deletes cannot bypass the bookkeeping-history rule
+10. Allow owner/support history rows that reference another invoice to link to that invoice when it is still available, while keeping those links off public/print surfaces.
 
 #### 5.5 Verify Phase 5
 Automated / command verification:
@@ -331,12 +337,13 @@ Automated / command verification:
 3. [ ] Add or expand automated coverage for:
    1. [ ] reattributing a payment from invoice A to invoice B recomputes both invoices truthfully
    2. [ ] same-owner guardrails and destination-invoice validation
-   3. [ ] provenance and audit-log persistence for reattribution
-   4. [ ] later payment-triggered deliveries stay held or skipped appropriately after reattribution
-   5. [ ] stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts
-   6. [ ] source and destination histories both preserve the reattribution with the correct active/inactive presentation
-   7. [ ] owner/support correction history can link to related invoices without exposing those links on public/print surfaces
-   8. [ ] force delete is blocked while bookkeeping history remains across detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases, with app-level guidance and a persistence-layer backstop
+   3. [ ] the canonical payment row keeps immutable source provenance while updating only the current accounting destination and current reattribution metadata
+   4. [ ] provenance and audit-log persistence for reattribution
+   5. [ ] queued payment-triggered deliveries affected by reattribution are skipped or otherwise suppressed when they would become untruthful, without relying on the deferred MS15 later-payment hold
+   6. [ ] stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts
+   7. [ ] source and destination histories both preserve the reattribution with the correct active/inactive presentation
+   8. [ ] owner/support correction history can link to related invoices without exposing those links on public/print surfaces
+   9. [ ] force delete is blocked while unresolved bookkeeping blockers remain across detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases, with app-level guidance and a persistence-layer backstop
 4. [x] Verify raw tx history remains present after ignore/restore.
    - Current result on 2026-03-19: owner and support payment-history views keep the original tx rows visible with ignored-state context while public/print surfaces exclude them.
 
@@ -344,10 +351,10 @@ Browser QA:
 5. [ ] Exercise ignore, restore, and reattribute in the browser and confirm visible invoice state recovers truthfully.
 6. [ ] Confirm ignored rows are excluded from paid/outstanding calculations, restore reverses that cleanly, and reattribute updates both source and destination invoices immediately.
 7. [ ] Confirm owner-visible audit/provenance context remains understandable after reattribution while public/print surfaces only reflect the truthful active accounting.
-8. [ ] Confirm later payment-triggered mail stays held pending owner validation on already-funded invoices affected by second-or-later payments.
+8. [ ] Confirm reattribution does not allow untruthful queued payment-triggered mail to send, without depending on the deferred MS15 later-payment validation gate.
 9. [ ] Confirm stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves.
 10. [ ] Confirm manual adjustment rows cannot be ignored or reattributed through the payment-correction flow.
-11. [ ] Confirm force delete is blocked with clear resolution guidance while bookkeeping history remains, including source-invoice guidance for active reattributions, without auto-converting anything for the owner.
+11. [ ] Confirm force delete is blocked with clear resolution guidance while unresolved bookkeeping blockers remain, including source-invoice guidance for active reattributions, without auto-converting anything for the owner.
 
 ## Exit Criteria for MS14
 1. False attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
