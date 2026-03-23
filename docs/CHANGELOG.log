@@ -545,3 +545,6 @@ Added `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` as the phase-level
 
 2026-03-23 | MS14 milestone doc now lets the phase checkbox carry status
 `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now avoids restating open/closed status in prose under phase items; the phase checkbox carries the status while the supporting text only describes outcome or remaining work.
+
+2026-03-23 | MS14 milestone doc now omits direct strategy references
+`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now stays at the milestone/phase layer without naming the unsplit MS14 strategy doc directly; the strategy references can be added back after the strategy is split into phase-specific docs.
