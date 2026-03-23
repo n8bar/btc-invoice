@@ -536,3 +536,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-23 | Doc-role guidance now preserves strategies as the sequencing owner
 `AGENTS.md` now defines `docs/milestones/**` as milestone-level execution docs and `docs/strategies/**` as the ordered “do this in this order” checklist docs for active execution, while keeping specs canonical for behavior/scope and requiring one obvious checklist owner whenever both a milestone doc and strategy doc exist.
+
+2026-03-23 | Doc-role guidance now spells out checklist depth by layer
+`AGENTS.md` now makes the hierarchy explicit: `docs/PLAN.md` owns milestone-level checkoffs, milestone docs own phase-level checkoffs, and strategy docs own the ordered checklist for one phase. Higher-level docs should roll up lower-level completion with a single checkoff instead of duplicating lower-level checklist items.
