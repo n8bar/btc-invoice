@@ -533,3 +533,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-23 | Reattribution docs now spell out source vs destination visibility rules
 `docs/specs/PAYMENT_CORRECTIONS.md` now makes the public/print rule explicit: reattributed-out payments stay visible only in owner history on the source invoice, never show or count on the source invoice’s public/print surfaces, and show/count only on the destination invoice’s public/print surfaces without source-provenance links or labels. `docs/PRODUCT_SPEC.md` now carries the same source-vs-destination visibility invariant.
+
+2026-03-23 | Doc-role guidance now preserves strategies as the sequencing owner
+`AGENTS.md` now defines `docs/milestones/**` as milestone-level execution docs and `docs/strategies/**` as the ordered “do this in this order” checklist docs for active execution, while keeping specs canonical for behavior/scope and requiring one obvious checklist owner whenever both a milestone doc and strategy doc exist.

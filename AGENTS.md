@@ -7,8 +7,9 @@
   - `docs/PRODUCT_SPEC.md` for global product behavior and invariants
   - `docs/BACKLOG.md` for post-MVP and deferred work only
 - Keep the docs structure roles straight:
-  - `docs/milestones/**` for checklist-bearing milestone execution docs when a milestone is active or large enough to need one
+  - `docs/milestones/**` for milestone-level execution docs: objective/status summary, phase rollup, current focus, primary linked specs/strategies, and milestone exit criteria
   - `docs/specs/**` for detailed feature and domain requirements
+  - `docs/strategies/**` for ordered implementation checklists, sequencing, and verification steps within a workstream; these are the “do this in this order” docs for active execution
   - `docs/ops/**` for rollout, contributor, and deployment runbooks
   - `docs/qa/**` for findings, test plans, verification notes, and archive material
 - Keep `docs/CHANGELOG.log` updated alongside canonical docs when scope or doc structure shifts.
@@ -21,7 +22,8 @@
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
-- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like `docs/PLAN.md`/`docs/PRODUCT_SPEC.md`/`docs/BACKLOG.md`/`docs/CHANGELOG.log`; they may be deleted after implementation if they’re no longer useful.
+- Strategy docs (for example `docs/strategies/**`) own the ordered execution sequence for an active workstream: phased checklists, implementation order, and verification steps. They are authoritative for “what do we do next?” and resumption context, but they are not canonical for product scope or behavior; canonical requirements still live in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and the relevant docs under `docs/specs/**`. Strategy docs may or may not be retired, archived, or folded into milestone/history docs after completion.
+- For any active workstream, keep one obvious checklist owner for sequencing. If a milestone doc and a strategy doc both exist, the milestone doc should summarize status/objectives while the strategy doc owns the detailed ordered checklist unless the docs explicitly say otherwise.
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
