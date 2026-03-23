@@ -14,9 +14,9 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 - Status: `active`
 - Next action: implement invoice-to-invoice reattribution, then rerun the rewritten Phase 5 Browser QA.
 - Primary next doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
-- Supporting docs: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md)
+- Supporting docs: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
-- Milestone-doc note: detailed MS14 phase sequencing currently remains in [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](strategies/MS14_IMPLEMENTATION_STRATEGY.md) until the strategy is split into phase-specific checklist docs.
+- Milestone-doc note: phase-specific MS14 strategies now live under `docs/strategies/`; the current active checklist is [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md).
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |

@@ -548,3 +548,9 @@ Added `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` as the phase-level
 
 2026-03-23 | MS14 milestone doc now omits direct strategy references
 `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now stays at the milestone/phase layer without naming the unsplit MS14 strategy doc directly; the strategy references can be added back after the strategy is split into phase-specific docs.
+
+2026-03-23 | MS14 strategy sequencing is now split by phase
+Replaced the monolithic `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` with phase-specific strategy docs for MS14 Phases 1-5, kept the ordered checklists with their existing completion state in those phase docs, updated `docs/PLAN.md` and `README.md` to point at the active Phase 5 strategy, and removed the old monolith instead of leaving a redirect stub.
+
+2026-03-23 | MS14 strategy split now uses terse phase summaries
+Removed repeated strategy-role boilerplate from the new MS14 phase docs and tightened `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` so the phase rollup now uses checkbox plus one short sentence per phase instead of multi-line outcome/status prose.

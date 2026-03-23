@@ -20,16 +20,15 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
 
 ## Phase Rollup
 1. [x] Phase 1 - Historical Data Risk Mitigation
-   - Outcome: the local MS14 baseline was reset/reseeded with a controlled duplicate-key collision fixture plus funded `testnet4` scenarios for later attribution and correction verification.
+   Reset/reseeded the controlled MS14 baseline with funded `testnet4` scenarios and the duplicate-key collision fixture.
 2. [x] Phase 2 - Key Lineage + Cursor Model
-   - Outcome: per-key cursor tracking shipped, invoices now persist wallet lineage snapshots, and watcher/address-assignment flows use invoice-bound lineage instead of the currently saved wallet row.
+   Shipped per-key cursor tracking and invoice-bound lineage for invoice creation, reassignment, and watcher flows.
 3. [x] Phase 3 - Unsupported Configuration Detection + Flagging
-   - Outcome: proactive and evidence-driven unsupported-state handling shipped with invoice-level scoping, warning UI, and safe repair guidance.
+   Shipped proactive and evidence-based unsupported-state handling with invoice-level scoping, warning UI, and repair guidance.
 4. [x] Phase 4 - Dedicated-Wallet UX Hardening
-   - Outcome: wallet, onboarding, and Helpful Notes surfaces now reinforce the dedicated receiving-account requirement with completed Browser QA follow-up.
+   Shipped dedicated-account guidance across wallet, onboarding, and Helpful Notes, with Browser QA complete.
 5. [ ] Phase 5 - Correction Tooling + Safeguards
-   - Outcome target: owner correction flows support ignore, restore, and reattribute with truthful recalculation, auditable history, and destructive-delete safeguards.
-   - Remaining work: same-owner reattribution, the remaining destructive-delete backstop/guidance work, and the final Phase 5 automated/Browser QA.
+   Finish correction tooling so ignore, restore, and reattribute all work with truthful recalculation, auditability, and delete safeguards.
 
 ## Exit Criteria
 - False-attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.
