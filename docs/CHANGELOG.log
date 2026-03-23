@@ -542,3 +542,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-23 | MS14 now has a milestone doc above the current strategy checklist
 Added `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` as the phase-level rollup for MS14, updated `docs/PLAN.md` so MS14 now points to that milestone doc as the primary next doc while the current detailed sequencing still lives in `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, moved the active next action from Phase 5 scope review into reattribution implementation after the approved doc pass, and updated the README documentation map to link the new milestone doc.
+
+2026-03-23 | MS14 milestone doc now lets the phase checkbox carry status
+`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now avoids restating open/closed status in prose under phase items; the phase checkbox carries the status while the supporting text only describes outcome or remaining work.

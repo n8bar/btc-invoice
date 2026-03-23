@@ -35,7 +35,7 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
    - Detailed ordered checklist: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](../strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 5. [ ] Phase 5 - Correction Tooling + Safeguards
    - Outcome target: owner correction flows support ignore, restore, and reattribute with truthful recalculation, auditable history, and destructive-delete safeguards.
-   - Current status: ignore/restore shipped; same-owner reattribution, the remaining destructive-delete backstop/guidance work, and the final Phase 5 automated/Browser QA are still open.
+   - Remaining work: same-owner reattribution, the remaining destructive-delete backstop/guidance work, and the final Phase 5 automated/Browser QA.
    - Detailed ordered checklist: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](../strategies/MS14_IMPLEMENTATION_STRATEGY.md)
 
 ## Exit Criteria
