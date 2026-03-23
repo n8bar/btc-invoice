@@ -539,3 +539,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-23 | Doc-role guidance now spells out checklist depth by layer
 `AGENTS.md` now makes the hierarchy explicit: `docs/PLAN.md` owns milestone-level checkoffs, milestone docs own phase-level checkoffs, and strategy docs own the ordered checklist for one phase. Higher-level docs should roll up lower-level completion with a single checkoff instead of duplicating lower-level checklist items.
+
+2026-03-23 | MS14 now has a milestone doc above the current strategy checklist
+Added `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` as the phase-level rollup for MS14, updated `docs/PLAN.md` so MS14 now points to that milestone doc as the primary next doc while the current detailed sequencing still lives in `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, moved the active next action from Phase 5 scope review into reattribution implementation after the approved doc pass, and updated the README documentation map to link the new milestone doc.
