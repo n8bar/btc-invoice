@@ -530,3 +530,6 @@ Added auditable payment-correction metadata on `invoice_payments`, shipped owner
 
 2026-03-20 | Reattribution docs now lock the RC storage model and defer the mail-hold gate to MS15
 `docs/specs/PAYMENT_CORRECTIONS.md` now defines an `invoice_payments`-centric RC storage model with immutable source provenance plus one active accounting destination at a time, replaces the blunt delete wording with a blocker-resolution matrix, and limits Phase 5 mail behavior to suppressing untruthful sends after reattribution. `docs/specs/NOTIFICATIONS.md` now marks the broader later-payment owner-validation hold as planned MS15 work, and `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` now aligns Phase 5 implementation/verification with that storage model and deferral.
+
+2026-03-23 | Reattribution docs now spell out source vs destination visibility rules
+`docs/specs/PAYMENT_CORRECTIONS.md` now makes the public/print rule explicit: reattributed-out payments stay visible only in owner history on the source invoice, never show or count on the source invoice’s public/print surfaces, and show/count only on the destination invoice’s public/print surfaces without source-provenance links or labels. `docs/PRODUCT_SPEC.md` now carries the same source-vs-destination visibility invariant.

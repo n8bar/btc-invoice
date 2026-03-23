@@ -144,6 +144,8 @@ UX guardrails:
 
 ## Public, Print, and Support Surfaces
 - Public and print invoice views must exclude ignored rows from payment history and totals entirely.
+- Public and print views for the source invoice must not show a reattributed-out payment in payment history or totals.
+- Public and print views for the destination invoice must show the active payment in payment history and totals without exposing source-invoice provenance, related-invoice links, or reattribution-specific labels.
 - Owner invoice views keep ignored or reattributed rows visible for audit, clearly marked with their current accounting state.
 - Reattributed payments must appear in the owner-visible payment histories of both the source and destination invoices.
 - The source invoice may render a reattributed-out row with strike-through or similar de-emphasis to show that the payment no longer counts there; the destination invoice should show the corresponding reattributed-in state as active credit.
@@ -240,7 +242,9 @@ Browser QA should include:
 - owner can restore the row and see totals/status recover
 - owner can reattribute a row to another owned invoice and immediately see both invoices recalculate truthfully
 - ignored or reattributed rows remain visible and clearly marked in owner history
-- ignored rows do not appear in public/print payment history, and reattributed rows only count on the destination invoice
+- ignored rows do not appear in public/print payment history
+- reattributed-out rows remain visible in owner history on the source invoice but do not count there
+- reattributed rows appear in public/print payment history and count only on the destination invoice, without exposing source-invoice provenance or related-invoice links
 - payment-triggered mail made untruthful by reattribution is skipped or otherwise suppressed, without relying on the deferred MS15 later-payment hold
 - stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves
 - manual adjustment rows never show correction controls
