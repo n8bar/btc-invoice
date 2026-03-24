@@ -587,3 +587,6 @@ Removed the duplicate closeout section from `docs/strategies/MS14_PHASE5_CORRECT
 
 2026-03-23 | MS14 Phase 5 strategy now treats prep and browser work as peer steps
 Collapsed the separate automated-coverage build/verify pair in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into one completed item, then promoted `BQA Prep` and `Browser QA` into top-level Phase 5 steps so the remaining manual work now reads as `5.7` prepare and `5.8` run.
+
+2026-03-24 | MS14 Phase 5 BQA prep now carries concrete run details
+Checked off the completed `Prepare Browser QA` work in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, changed Phase 5 status to browser-only, and replaced the generic Browser QA placeholders with the actual local scenario invoice IDs, payment rows, delivery-log rows, and public URLs for this run.

@@ -1,6 +1,6 @@
 # MS14 Phase 5 Strategy - Correction Tooling + Safeguards
 
-Status: Active. Remaining work is BQA prep plus the human Browser QA pass.
+Status: Active. Remaining work is the human Browser QA pass.
 Parent milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](../milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
@@ -55,51 +55,54 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 1. [x] Start the local stack with `./vendor/bin/sail up -d` and leave the `scheduler` service running.
 2. [x] Confirm the controlled MS14 baseline from [`docs/strategies/MS14_PHASE1_BASELINE_RESEED.md`](MS14_PHASE1_BASELINE_RESEED.md) is present. If invoices `50` through `58` are missing, stop and rebuild that baseline first.
 3. [x] Leave queue jobs undrained while testing payment-correction suppression. This stack has a scheduler but no always-on queue worker, so use the invoice delivery log as the source of truth for `queued` -> `skipped`.
-4. [ ] Prepare Scenario A for ignore/paid rollback:
+4. [x] Prepare Scenario A for ignore/paid rollback:
    1. [x] Create a sent invoice with a client email and enable its public link.
    2. [x] Turn on `Settings > Notifications > Auto email paid receipts`.
    3. [x] Send one `testnet4` payment that fully pays the invoice from local-only funding material stored outside the repo boundary (for example under `.cybercreek/`).
-   4. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice becomes `paid`.
-   5. [ ] Open the invoice delivery log and verify `receipt` and `owner_paid_notice` rows are `Queued`.
-5. [ ] Prepare Scenario B for restore/underpay cleanup:
+   4. [x] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice becomes `paid`.
+   5. [x] Open the invoice delivery log and verify `receipt` and `owner_paid_notice` rows are `Queued`.
+5. [x] Prepare Scenario B for restore/underpay cleanup:
    1. [x] Create a second sent invoice with the same owner and a client email.
-   2. [ ] Send three confirmed `testnet4` payments so the invoice reaches `paid`.
-   3. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice shows `paid`.
-   4. [ ] Prepare one payment row in the ignored state so the invoice falls back to `partial` while at least two active payments remain.
-   5. [ ] Reopen the invoice delivery log and verify `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows are `Queued`.
-6. [ ] Prepare Scenario C for same-owner reattribution:
+   2. [x] Send three confirmed `testnet4` payments so the invoice reaches `paid`.
+   3. [x] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice shows `paid`.
+   4. [x] Prepare one payment row in the ignored state so the invoice falls back to `partial` while at least two active payments remain.
+   5. [x] Reopen the invoice delivery log and verify `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows are `Queued`.
+6. [x] Prepare Scenario C for same-owner reattribution:
    1. [x] Create source invoice A and destination invoice B for the same owner.
    2. [x] Enable the public link on both invoices.
-   3. [ ] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
+   3. [x] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
    4. [x] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
-7. [ ] Update items 1 through 8 in section 8 below with the actual Scenario A/B/C invoice IDs, payment rows, and expected queued delivery-log rows from prep.
+7. [x] Update items 1 through 8 in section 8 below with the actual Scenario A/B/C invoice IDs, payment rows, and expected queued delivery-log rows from prep.
 
 ## 8. Run Browser QA
-1. [ ] Log in as `antonina12@nospam.site` with password `password` and use the scenario details filled in during item 7 of section 7.
+1. [ ] Log in as `antonina12@nospam.site` with password `password`.
+   Scenario A: invoice `67` / `INV-0003`, payment row `39` (`b03c10f72550ff2219e3537168e64e9b95446cc62c758aec0a55d1cb3d9e2e0b`, `10,000 sats`), delivery rows `6624` (`receipt`) and `6625` (`owner_paid_notice`), public URL `http://192.168.68.25/p/WwzL9gBjLjwgsuUhIqdiiFPajpupv8jC6KlPGskPECAoFwFP`.
+   Scenario B: invoice `68` / `INV-0004`, ignored payment row `44` (`777961b56075033e6c8a905576fd43f5514d00259825cd293911cebc16dc2af2`, `40,000 sats`), queued delivery rows `6616`-`6619` (`client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, `owner_partial_warning`), public URL `http://192.168.68.25/p/zzWOMQZhEigBcumiLC7yphiZxhGD8chueFPOwHCy26vYSFvW`.
+   Scenario C: source invoice `69` / `INV-0005`, first/source payment row `85` (`51cabfecb8e2d38241bf0c980e46607ef4f8725dd734f91ae26e4eddc8cb5be0`, `30,000 sats`), later payment row `84` (`0705721bf4b671a0d528cc3e4a2d7cf925e409018080c0b1a6513ccfafd2ebc5`, `40,000 sats`), destination invoice `70` / `INV-0006`, source public URL `http://192.168.68.25/p/QQiGx6nid7P5Vvnm1SbnyUrvAPEi0RHCE0fhHAg3WleEaDUl`, destination public URL `http://192.168.68.25/p/y1HYkdrhcczUAOsfIaXMqTpYvIN5d1AZJnpc065evYaTV7TN`.
 2. [ ] Ignore a paid payment and verify paid-state rollback:
-   1. [ ] Open Scenario A's invoice and click `Ignore` on the detected payment.
+   1. [ ] Open invoice `67` (`INV-0003`) and click `Ignore` on payment row `39`.
    2. [ ] Enter a reason and submit.
-   3. [ ] Verify the invoice leaves `paid`, settlement math reopens truthfully, the payment row remains visible in owner history as ignored, and the `receipt` / `owner_paid_notice` rows change from `Queued` to `Skipped`.
-   4. [ ] Open print/public surfaces and verify the ignored payment does not appear in payment history or totals.
+   3. [ ] Verify invoice `67` leaves `paid`, settlement math reopens truthfully, payment row `39` remains visible in owner history as ignored, and delivery rows `6624` and `6625` change from `Queued` to `Skipped`.
+   4. [ ] Open invoice `67` print/public surfaces and verify payment row `39` does not appear in payment history or totals.
 3. [ ] Restore an ignored payment and verify alert suppression cleanup:
-   1. [ ] Open Scenario B's invoice and click `Restore` on the ignored payment.
-   2. [ ] Verify the invoice returns to the truthful paid state, ignore metadata clears, and the queued `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows change to `Skipped`.
+   1. [ ] Open invoice `68` (`INV-0004`) and click `Restore` on ignored payment row `44`.
+   2. [ ] Verify invoice `68` returns to the truthful paid state, payment row `44` clears its ignore metadata, and delivery rows `6616` through `6619` change from `Queued` to `Skipped`.
 4. [ ] Reattribute a payment to a same-owner destination invoice:
-   1. [ ] On Scenario C source invoice A, click `Reattribute`, choose destination invoice B, enter a reason, and submit.
-   2. [ ] Verify source owner history shows the payment as reattributed out and no longer counting there.
-   3. [ ] Verify destination owner history shows the same payment as reattributed in and counting there.
+   1. [ ] On source invoice `69` (`INV-0005`), click `Reattribute` on payment row `85`, choose destination invoice `70` (`INV-0006`), enter a reason, and submit.
+   2. [ ] Verify source invoice `69` owner history shows payment row `85` as reattributed out and no longer counting there.
+   3. [ ] Verify destination invoice `70` owner history shows payment row `85` as reattributed in and counting there.
 5. [ ] Verify public and print surfaces after reattribution:
-   1. [ ] Open source invoice A public/print surfaces and verify the reattributed payment is absent.
-   2. [ ] Open destination invoice B public/print surfaces and verify the payment is present and counted there.
+   1. [ ] Open source invoice `69` public/print surfaces and verify payment row `85` is absent there while the later payment row `84` still appears as the active source payment.
+   2. [ ] Open destination invoice `70` public/print surfaces and verify payment row `85` is present and counted there.
    3. [ ] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
 6. [ ] Verify the stale-address wrong-invoice boundary:
-   1. [ ] Use the later payment row created in Scenario C.
-   2. [ ] Verify the later payment appears as a normal correction candidate on source invoice A.
+   1. [ ] Use later payment row `84` on source invoice `69`.
+   2. [ ] Verify payment row `84` appears as a normal correction candidate on source invoice `69`.
    3. [ ] Verify unsupported-wallet UI does not appear solely because of that later payment.
-   4. [ ] Reattribute that later payment to destination invoice B and re-check owner/public behavior.
+   4. [ ] Reattribute payment row `84` to destination invoice `70` and re-check the same owner/public behavior there.
 7. [ ] Verify manual-adjustment guardrails:
-   1. [ ] Create a manual adjustment row through the existing adjustment flow on any owned invoice.
+   1. [ ] Create a manual adjustment row through the existing adjustment flow on invoice `67`, `68`, `69`, or `70`.
    2. [ ] Verify that row shows no `Ignore`, `Restore`, or `Reattribute` controls.
 8. [ ] Verify force-delete guidance:
-   1. [ ] Attempt force delete on an invoice that still has one unresolved blocker class: detected payment row, ignored row, manual adjustment, or active reattribution.
-   2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance appears for active reattributions, and the flow offers no one-click auto-conversion or cleanup.
+   1. [ ] After reattributing payment row `85` or `84`, attempt force delete on destination invoice `70`.
+   2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance points back to invoice `69`, and the flow offers no one-click auto-conversion or cleanup.
