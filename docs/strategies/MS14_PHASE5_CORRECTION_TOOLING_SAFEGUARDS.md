@@ -14,36 +14,36 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 
 ## Remaining Sequence
 1. [ ] Add reattribution state to `invoice_payments`.
-   - Add `accounting_invoice_id`, `reattributed_at`, `reattributed_by_user_id`, and `reattribute_reason`.
-   - Keep `invoice_id` as immutable source provenance and use `accounting_invoice_id` as the sole active accounting destination.
+   1. [ ] Add `accounting_invoice_id`, `reattributed_at`, `reattributed_by_user_id`, and `reattribute_reason`.
+   2. [ ] Keep `invoice_id` as immutable source provenance and use `accounting_invoice_id` as the sole active accounting destination.
 2. [ ] Implement reattribution ledger behavior and recomputation.
-   - Recompute both source and destination invoices immediately after reattribution.
-   - Re-run the same post-payment truthfulness checks so queued payment-triggered deliveries are suppressed when reattribution makes them untruthful.
-   - Keep stale-address wrong-invoice cases as correction work, not unsupported-wallet evidence by default.
+   1. [ ] Recompute both source and destination invoices immediately after reattribution.
+   2. [ ] Re-run the same post-payment truthfulness checks so queued payment-triggered deliveries are suppressed when reattribution makes them untruthful.
+   3. [ ] Keep stale-address wrong-invoice cases as correction work, not unsupported-wallet evidence by default.
 3. [ ] Ship the owner reattribute flow.
-   - Add owner-only route/controller/form handling for `PATCH /invoices/{invoice}/payments/{payment}/reattribute`.
-   - Enforce same-owner destination validation and keep manual adjustment rows out of the correction flow.
-   - Preserve selected destination and typed reason on validation failure.
+   1. [ ] Add owner-only route/controller/form handling for `PATCH /invoices/{invoice}/payments/{payment}/reattribute`.
+   2. [ ] Enforce same-owner destination validation and keep manual adjustment rows out of the correction flow.
+   3. [ ] Preserve selected destination and typed reason on validation failure.
 4. [ ] Render reattribution truthfully across surfaces.
-   - Source owner history shows reattributed-out rows without counting them.
-   - Destination owner history shows reattributed-in rows as active credit.
-   - Public/print show the payment only on the destination invoice, without source provenance, related-invoice links, or reattribution labels.
-   - Owner/support related-invoice links stay off public/print surfaces.
+   1. [ ] Source owner history shows reattributed-out rows without counting them.
+   2. [ ] Destination owner history shows reattributed-in rows as active credit.
+   3. [ ] Public/print show the payment only on the destination invoice, without source provenance, related-invoice links, or reattribution labels.
+   4. [ ] Owner/support related-invoice links stay off public/print surfaces.
 5. [ ] Finish destructive-delete safeguards.
-   - Add one shared preflight guard for force delete.
-   - Choose and implement the persistence-layer hard-delete backstop.
-   - Keep detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases blocking force delete until intentionally resolved.
+   1. [ ] Add one shared preflight guard for force delete.
+   2. [ ] Choose and implement the persistence-layer hard-delete backstop.
+   3. [ ] Keep detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases blocking force delete until intentionally resolved.
 6. [ ] Add the remaining automated coverage.
-   - Reattribution recomputes source and destination invoices truthfully.
-   - Same-owner validation, immutable source provenance, and current-state reattribution metadata behave as specified.
-   - Reattribution audit logs, surface behavior, queued-delivery suppression, and stale-address unsupported-wallet boundaries hold.
-   - Force delete blocking covers every unresolved bookkeeping blocker class with both app-layer guidance and the persistence-layer backstop.
+   1. [ ] Reattribution recomputes source and destination invoices truthfully.
+   2. [ ] Same-owner validation, immutable source provenance, and current-state reattribution metadata behave as specified.
+   3. [ ] Reattribution audit logs, surface behavior, queued-delivery suppression, and stale-address unsupported-wallet boundaries hold.
+   4. [ ] Force delete blocking covers every unresolved bookkeeping blocker class with both app-layer guidance and the persistence-layer backstop.
 7. [ ] Run the closing Browser QA and final Phase 5 test pass.
-   - Ignore, restore, and reattribute all recover truthful visible invoice state.
-   - Source/destination owner history and public/print visibility rules match the spec.
-   - Manual adjustment rows expose no correction controls.
-   - Force delete guidance stays clear and never auto-converts anything.
-   - Finish with `./vendor/bin/sail artisan test`.
+   1. [ ] Ignore, restore, and reattribute all recover truthful visible invoice state.
+   2. [ ] Source/destination owner history and public/print visibility rules match the spec.
+   3. [ ] Manual adjustment rows expose no correction controls.
+   4. [ ] Force delete guidance stays clear and never auto-converts anything.
+   5. [ ] Finish with `./vendor/bin/sail artisan test`.
 
 ## Closure Proof
 ### Automated

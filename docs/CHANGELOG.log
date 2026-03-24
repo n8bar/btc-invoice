@@ -560,3 +560,6 @@ Renamed `docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`, `docs/strategies/T
 
 2026-03-23 | MS14 Phase 5 strategy now focuses on route-to-done
 Reshaped `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` so it now centers on completed checked items, the remaining ordered execution sequence, and the closure-proof checklist instead of carrying legacy `5.1`-style subsection framing and spec-like restatement.
+
+2026-03-23 | MS14 Phase 5 substeps now use numbered checklists
+Converted the `Remaining Sequence` substeps in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` from plain bullets to numbered checkbox items so execution depth stays explicit at both checklist levels.
