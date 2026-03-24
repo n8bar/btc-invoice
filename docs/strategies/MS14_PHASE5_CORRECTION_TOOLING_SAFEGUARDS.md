@@ -79,30 +79,30 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 
 ## 8. Run Browser QA
 1. [x] Log in as `antonina12@nospam.site` with password `password`.
-2. [ ] Ignore a paid payment and verify paid-state rollback:
+2. [x] Ignore a paid payment and verify paid-state rollback:
    1. [x] Open invoice `67` (`INV-0003`) and click `Ignore` on payment row `39`.
    2. [x] Enter a reason and submit.
    3. [x] Verify invoice `67` leaves `paid`, settlement math reopens truthfully, payment row `39` remains visible in owner history as ignored, and delivery rows `6624` and `6625` change from `Queued` to `Skipped`.
-   4. [ ] Open invoice `67` print/public surfaces and verify payment row `39` does not appear in payment history or totals.
-3. [ ] Restore an ignored payment and verify alert suppression cleanup:
-   1. [ ] Open invoice `68` (`INV-0004`) and click `Restore` on ignored payment row `44`.
-   2. [ ] Verify invoice `68` returns to the truthful paid state, payment row `44` clears its ignore metadata, and delivery rows `6616` through `6619` change from `Queued` to `Skipped`.
+   4. [x] Open invoice `67` print/public surfaces and verify payment row `39` does not appear in payment history or totals.
+3. [x] Restore an ignored payment and verify alert suppression cleanup:
+   1. [x] Open invoice `68` (`INV-0004`) and click `Restore` on ignored payment row `44`.
+   2. [x] Verify invoice `68` returns to the truthful paid state, payment row `44` clears its ignore metadata, and delivery rows `6616` through `6619` change from `Queued` to `Skipped`.
 4. [ ] Reattribute a payment to a same-owner destination invoice:
-   1. [ ] On source invoice `69` (`INV-0005`), click `Reattribute` on payment row `85`, choose destination invoice `70` (`INV-0006`), enter a reason, and submit.
-   2. [ ] Verify source invoice `69` owner history shows payment row `85` as reattributed out and no longer counting there.
-   3. [ ] Verify destination invoice `70` owner history shows payment row `85` as reattributed in and counting there.
+   1. [ ] On source invoice `69` (`INV-0005`), click `Reattribute` on the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` (`INV-0006`), enter a reason, and submit.
+   2. [ ] Verify source invoice `69` owner history shows that `30,000 sats` / `$21.06` payment as reattributed out and no longer counting there.
+   3. [ ] Verify destination invoice `70` owner history shows that same `30,000 sats` / `$21.06` payment as reattributed in and counting there.
 5. [ ] Verify public and print surfaces after reattribution:
-   1. [ ] Open source invoice `69` public/print surfaces and verify payment row `85` is absent there while the later payment row `84` still appears as the active source payment.
-   2. [ ] Open destination invoice `70` public/print surfaces and verify payment row `85` is present and counted there.
+   1. [ ] Open source invoice `69` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is absent there while the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` still appears as the active source payment.
+   2. [ ] Open destination invoice `70` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is present and counted there.
    3. [ ] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
 6. [ ] Verify the stale-address wrong-invoice boundary:
-   1. [ ] Use later payment row `84` on source invoice `69`.
-   2. [ ] Verify payment row `84` appears as a normal correction candidate on source invoice `69`.
+   1. [ ] Use the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` on source invoice `69`.
+   2. [ ] Verify that `40,000 sats` / `$28.08` payment appears as a normal correction candidate on source invoice `69`.
    3. [ ] Verify unsupported-wallet UI does not appear solely because of that later payment.
-   4. [ ] Reattribute payment row `84` to destination invoice `70` and re-check the same owner/public behavior there.
+   4. [ ] Reattribute that `40,000 sats` / `$28.08` payment to destination invoice `70` and re-check the same owner/public behavior there.
 7. [ ] Verify manual-adjustment guardrails:
    1. [ ] Create a manual adjustment row through the existing adjustment flow on invoice `67`, `68`, `69`, or `70`.
    2. [ ] Verify that row shows no `Ignore`, `Restore`, or `Reattribute` controls.
 8. [ ] Verify force-delete guidance:
-   1. [ ] After reattributing payment row `85` or `84`, attempt force delete on destination invoice `70`.
+   1. [ ] After reattributing either the `30,000 sats` / `$21.06` payment or the `40,000 sats` / `$28.08` payment from source invoice `69`, attempt force delete on destination invoice `70` (`INV-0006`).
    2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance points back to invoice `69`, and the flow offers no one-click auto-conversion or cleanup.

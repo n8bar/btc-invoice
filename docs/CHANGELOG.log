@@ -599,3 +599,6 @@ Checked off the first exercised ignore-flow Browser QA steps in `docs/strategies
 
 2026-03-24 | MS14 Phase 5 findings now avoid duplicate checklist ownership
 Removed the checkbox from the finding entry in `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` so findings stay descriptive while the eventual fix sequence remains the only checklist in that doc.
+
+2026-03-24 | MS14 Phase 5 Browser QA now identifies remaining payments by visible cues
+Rewrote the unchecked reattribution/public-surface Browser QA items in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to use the visible Scenario C payment timestamps and sats/USD amounts instead of internal payment-row IDs, so the tester can match the correct rows directly in the UI.
