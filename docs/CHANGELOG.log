@@ -569,3 +569,6 @@ Removed checkboxes from the completed recap bullets in `docs/strategies/MS14_PHA
 
 2026-03-23 | MS14 Phase 5 verification section now stays phase-scoped
 Renamed the closing section in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` from `Closure Proof` to `Verify Phase 5` and tightened the automated/browser bullets so they read as Phase 5 verification checklists instead of a second pass at spec wording.
+
+2026-03-23 | MS14 Phase 5 Browser QA now includes setup and action steps
+Expanded the Browser QA portion of `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into concrete setup and action checklists that name the local stack prerequisites, seeded-owner login, `testnet4` funding/watcher steps, queue/delivery-log expectations, and the exact ignore/restore/reattribute/force-delete behaviors to verify in the browser.

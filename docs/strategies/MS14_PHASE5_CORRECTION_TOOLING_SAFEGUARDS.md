@@ -63,11 +63,57 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 - [ ] Force delete stays blocked across all unresolved bookkeeping blocker classes.
 - [ ] `./vendor/bin/sail artisan test`
 
-### Browser QA
-- [ ] Ignore, restore, and reattribute recover truthful visible invoice state.
-- [ ] Ignore and reattribute settlement math update immediately on the correct invoice or invoices.
-- [ ] Owner history remains understandable after reattribution while public/print reflects only the active accounting.
-- [ ] Reattribution does not allow untruthful queued payment-triggered mail to send.
-- [ ] Stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves.
-- [ ] Manual adjustment rows expose no correction controls through the payment-correction flow.
-- [ ] Force delete shows clear resolution guidance, including source-invoice guidance for active reattributions, without auto-converting anything for the owner.
+### Browser QA Setup
+1. [ ] Start the local stack with `./vendor/bin/sail up -d` and leave the `scheduler` service running.
+2. [ ] Confirm the controlled MS14 baseline from [`docs/strategies/MS14_PHASE1_BASELINE_RESEED.md`](MS14_PHASE1_BASELINE_RESEED.md) is present. If invoices `50` through `58` are missing, stop and rebuild that baseline first.
+3. [ ] Leave queue jobs undrained while testing payment-correction suppression. This stack has a scheduler but no always-on queue worker, so use the invoice delivery log as the source of truth for `queued` -> `skipped`.
+4. [ ] Log in as `antonina12@nospam.site` with password `password`.
+5. [ ] Prepare Scenario A for ignore/paid rollback:
+   1. [ ] Create a sent invoice with a client email and enable its public link.
+   2. [ ] Turn on `Settings > Notifications > Auto email paid receipts`.
+   3. [ ] Send one `testnet4` payment that fully pays the invoice from local-only funding material stored outside the repo boundary (for example under `.cybercreek/`).
+   4. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice becomes `paid`.
+   5. [ ] Open the invoice delivery log and verify `receipt` and `owner_paid_notice` rows are `Queued`.
+6. [ ] Prepare Scenario B for restore/underpay cleanup:
+   1. [ ] Create a second sent invoice with the same owner and a client email.
+   2. [ ] Send three confirmed `testnet4` payments so the invoice reaches `paid`.
+   3. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice shows `paid`.
+   4. [ ] Ignore the last detected payment so the invoice falls back to `partial` while at least two active payments remain.
+   5. [ ] Reopen the invoice delivery log and verify `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows are now `Queued`.
+7. [ ] Prepare Scenario C for same-owner reattribution:
+   1. [ ] Create source invoice A and destination invoice B for the same owner.
+   2. [ ] Enable the public link on both invoices.
+   3. [ ] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
+   4. [ ] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
+
+### Browser QA Actions
+1. [ ] Ignore a paid payment and verify paid-state rollback:
+   1. [ ] Open Scenario A's invoice and click `Ignore` on the detected payment.
+   2. [ ] Enter a reason and submit.
+   3. [ ] Verify the invoice leaves `paid`, settlement math reopens truthfully, the payment row remains visible in owner history as ignored, and the `receipt` / `owner_paid_notice` rows change from `Queued` to `Skipped`.
+   4. [ ] Open print/public surfaces and verify the ignored payment does not appear in payment history or totals.
+2. [ ] Restore an ignored payment and verify alert suppression cleanup:
+   1. [ ] Open Scenario B's invoice and click `Restore` on the ignored payment.
+   2. [ ] Verify the invoice returns to the truthful paid state, ignore metadata clears, and the queued `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows change to `Skipped`.
+3. [ ] Reattribute a payment to a same-owner destination invoice:
+   1. [ ] On Scenario C source invoice A, click `Reattribute`, choose destination invoice B, enter a reason, and submit.
+   2. [ ] Verify source owner history shows the payment as reattributed out and no longer counting there.
+   3. [ ] Verify destination owner history shows the same payment as reattributed in and counting there.
+4. [ ] Verify public and print surfaces after reattribution:
+   1. [ ] Open source invoice A public/print surfaces and verify the reattributed payment is absent.
+   2. [ ] Open destination invoice B public/print surfaces and verify the payment is present and counted there.
+   3. [ ] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
+5. [ ] Verify the stale-address wrong-invoice boundary:
+   1. [ ] Use the later payment row created in Scenario C.
+   2. [ ] Verify the later payment appears as a normal correction candidate on source invoice A.
+   3. [ ] Verify unsupported-wallet UI does not appear solely because of that later payment.
+   4. [ ] Reattribute that later payment to destination invoice B and re-check owner/public behavior.
+6. [ ] Verify manual-adjustment guardrails:
+   1. [ ] Create a manual adjustment row through the existing adjustment flow on any owned invoice.
+   2. [ ] Verify that row shows no `Ignore`, `Restore`, or `Reattribute` controls.
+7. [ ] Verify force-delete guidance:
+   1. [ ] Attempt force delete on an invoice that still has one unresolved blocker class: detected payment row, ignored row, manual adjustment, or active reattribution.
+   2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance appears for active reattributions, and the flow offers no one-click auto-conversion or cleanup.
+8. [ ] Optionally drain one queue job after suppression checks:
+   1. [ ] Only after the relevant delivery rows already show `Skipped`, run `./vendor/bin/sail artisan queue:work --once`.
+   2. [ ] Verify the skipped rows remain unsent.
