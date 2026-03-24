@@ -73,12 +73,12 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
    3. [x] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
    4. [x] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
 7. [x] Update items 1 through 8 in section 8 below with the actual Scenario A/B/C invoice IDs, payment rows, and expected queued delivery-log rows from prep.
-
-## 8. Run Browser QA
-1. [ ] Log in as `antonina12@nospam.site` with password `password`.
    Scenario A: invoice `67` / `INV-0003`, payment row `39` (`b03c10f72550ff2219e3537168e64e9b95446cc62c758aec0a55d1cb3d9e2e0b`, `10,000 sats`), delivery rows `6624` (`receipt`) and `6625` (`owner_paid_notice`), public URL `http://192.168.68.25/p/WwzL9gBjLjwgsuUhIqdiiFPajpupv8jC6KlPGskPECAoFwFP`.
    Scenario B: invoice `68` / `INV-0004`, ignored payment row `44` (`777961b56075033e6c8a905576fd43f5514d00259825cd293911cebc16dc2af2`, `40,000 sats`), queued delivery rows `6616`-`6619` (`client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, `owner_partial_warning`), public URL `http://192.168.68.25/p/zzWOMQZhEigBcumiLC7yphiZxhGD8chueFPOwHCy26vYSFvW`.
    Scenario C: source invoice `69` / `INV-0005`, first/source payment row `85` (`51cabfecb8e2d38241bf0c980e46607ef4f8725dd734f91ae26e4eddc8cb5be0`, `30,000 sats`), later payment row `84` (`0705721bf4b671a0d528cc3e4a2d7cf925e409018080c0b1a6513ccfafd2ebc5`, `40,000 sats`), destination invoice `70` / `INV-0006`, source public URL `http://192.168.68.25/p/QQiGx6nid7P5Vvnm1SbnyUrvAPEi0RHCE0fhHAg3WleEaDUl`, destination public URL `http://192.168.68.25/p/y1HYkdrhcczUAOsfIaXMqTpYvIN5d1AZJnpc065evYaTV7TN`.
+
+## 8. Run Browser QA
+1. [x] Log in as `antonina12@nospam.site` with password `password`.
 2. [ ] Ignore a paid payment and verify paid-state rollback:
    1. [ ] Open invoice `67` (`INV-0003`) and click `Ignore` on payment row `39`.
    2. [ ] Enter a reason and submit.
