@@ -575,3 +575,6 @@ Expanded the Browser QA portion of `docs/strategies/MS14_PHASE5_CORRECTION_TOOLI
 
 2026-03-23 | MS14 Phase 5 now separates scenario prep from Browser QA
 Split the closing manual verification in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into `Scenario Prep` and `Browser QA` so the browser section now stays browser-only while funding, watcher, and queue-state setup live outside it.
+
+2026-03-23 | MS14 Phase 5 now treats BQA prep as agent-owned setup
+Renamed `Scenario Prep` in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to `BQA Prep`, made it explicit that the agent owns the funding/watcher/queue-state setup, and added a handoff checklist so the human Browser QA pass starts from prepared invoice IDs and payment rows instead of terminal work.
