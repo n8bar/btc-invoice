@@ -50,24 +50,24 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 4. [ ] Force delete guidance stays clear and never auto-converts anything.
 5. [ ] Finish with `./vendor/bin/sail artisan test`.
 
-## Closure Proof
+## Verify Phase 5
 ### Automated
-- [ ] Reattributing a payment from invoice A to invoice B recomputes both invoices truthfully.
-- [ ] Same-owner guardrails and destination validation hold.
-- [ ] The canonical payment row keeps immutable source provenance while only the active accounting destination and current-state reattribution metadata change.
-- [ ] Reattribution audit logs and metadata persist correctly.
-- [ ] Queued payment-triggered deliveries affected by reattribution are skipped or otherwise suppressed when they would become untruthful.
-- [ ] Stale-address wrong-invoice cases do not become unsupported-wallet evidence without separate facts.
-- [ ] Source and destination histories both preserve the reattribution with the correct active/inactive presentation.
-- [ ] Owner/support correction history can link to related invoices without exposing those links on public/print surfaces.
-- [ ] Force delete is blocked while unresolved bookkeeping blockers remain across detected payments, ignored rows, manual adjustments, and active reattribution source/destination cases.
+- [ ] Reattribution recomputes source and destination invoices truthfully.
+- [ ] Same-owner destination validation holds.
+- [ ] `invoice_payments` keeps immutable source provenance while only the active accounting destination and current reattribution state change.
+- [ ] Reattribution audit logs and metadata persist.
+- [ ] Reattribution suppresses queued payment-triggered deliveries that would become untruthful.
+- [ ] Stale-address wrong-invoice cases stay outside unsupported-wallet evidence without separate facts.
+- [ ] Source and destination histories preserve the correct reattributed-out / reattributed-in presentation.
+- [ ] Owner/support related-invoice links stay off public/print surfaces.
+- [ ] Force delete stays blocked across all unresolved bookkeeping blocker classes.
 - [ ] `./vendor/bin/sail artisan test`
 
 ### Browser QA
 - [ ] Ignore, restore, and reattribute recover truthful visible invoice state.
-- [ ] Ignored rows are excluded from paid/outstanding calculations, restore reverses that cleanly, and reattribute updates both source and destination invoices immediately.
-- [ ] Owner-visible audit/provenance context remains understandable after reattribution while public/print surfaces reflect only the truthful active accounting.
+- [ ] Ignore and reattribute settlement math update immediately on the correct invoice or invoices.
+- [ ] Owner history remains understandable after reattribution while public/print reflects only the active accounting.
 - [ ] Reattribution does not allow untruthful queued payment-triggered mail to send.
 - [ ] Stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves.
-- [ ] Manual adjustment rows cannot be ignored or reattributed through the payment-correction flow.
-- [ ] Force delete is blocked with clear resolution guidance while unresolved bookkeeping blockers remain, including source-invoice guidance for active reattributions, without auto-converting anything for the owner.
+- [ ] Manual adjustment rows expose no correction controls through the payment-correction flow.
+- [ ] Force delete shows clear resolution guidance, including source-invoice guidance for active reattributions, without auto-converting anything for the owner.
