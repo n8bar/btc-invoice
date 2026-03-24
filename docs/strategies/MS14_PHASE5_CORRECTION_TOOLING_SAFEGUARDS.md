@@ -52,26 +52,26 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 ## 7. Prepare Browser QA
 - Agent-run only. Complete this prep before handing the browser pass to a human.
 
-1. [ ] Start the local stack with `./vendor/bin/sail up -d` and leave the `scheduler` service running.
-2. [ ] Confirm the controlled MS14 baseline from [`docs/strategies/MS14_PHASE1_BASELINE_RESEED.md`](MS14_PHASE1_BASELINE_RESEED.md) is present. If invoices `50` through `58` are missing, stop and rebuild that baseline first.
-3. [ ] Leave queue jobs undrained while testing payment-correction suppression. This stack has a scheduler but no always-on queue worker, so use the invoice delivery log as the source of truth for `queued` -> `skipped`.
+1. [x] Start the local stack with `./vendor/bin/sail up -d` and leave the `scheduler` service running.
+2. [x] Confirm the controlled MS14 baseline from [`docs/strategies/MS14_PHASE1_BASELINE_RESEED.md`](MS14_PHASE1_BASELINE_RESEED.md) is present. If invoices `50` through `58` are missing, stop and rebuild that baseline first.
+3. [x] Leave queue jobs undrained while testing payment-correction suppression. This stack has a scheduler but no always-on queue worker, so use the invoice delivery log as the source of truth for `queued` -> `skipped`.
 4. [ ] Prepare Scenario A for ignore/paid rollback:
-   1. [ ] Create a sent invoice with a client email and enable its public link.
-   2. [ ] Turn on `Settings > Notifications > Auto email paid receipts`.
-   3. [ ] Send one `testnet4` payment that fully pays the invoice from local-only funding material stored outside the repo boundary (for example under `.cybercreek/`).
+   1. [x] Create a sent invoice with a client email and enable its public link.
+   2. [x] Turn on `Settings > Notifications > Auto email paid receipts`.
+   3. [x] Send one `testnet4` payment that fully pays the invoice from local-only funding material stored outside the repo boundary (for example under `.cybercreek/`).
    4. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice becomes `paid`.
    5. [ ] Open the invoice delivery log and verify `receipt` and `owner_paid_notice` rows are `Queued`.
 5. [ ] Prepare Scenario B for restore/underpay cleanup:
-   1. [ ] Create a second sent invoice with the same owner and a client email.
+   1. [x] Create a second sent invoice with the same owner and a client email.
    2. [ ] Send three confirmed `testnet4` payments so the invoice reaches `paid`.
    3. [ ] Run `./vendor/bin/sail artisan wallet:watch-payments --invoice={invoiceId}` until the invoice shows `paid`.
    4. [ ] Prepare one payment row in the ignored state so the invoice falls back to `partial` while at least two active payments remain.
    5. [ ] Reopen the invoice delivery log and verify `client_underpay_alert`, `owner_underpay_alert`, `client_partial_warning`, and `owner_partial_warning` rows are `Queued`.
 6. [ ] Prepare Scenario C for same-owner reattribution:
-   1. [ ] Create source invoice A and destination invoice B for the same owner.
-   2. [ ] Enable the public link on both invoices.
+   1. [x] Create source invoice A and destination invoice B for the same owner.
+   2. [x] Enable the public link on both invoices.
    3. [ ] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
-   4. [ ] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
+   4. [x] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
 7. [ ] Update items 1 through 8 in section 8 below with the actual Scenario A/B/C invoice IDs, payment rows, and expected queued delivery-log rows from prep.
 
 ## 8. Run Browser QA
