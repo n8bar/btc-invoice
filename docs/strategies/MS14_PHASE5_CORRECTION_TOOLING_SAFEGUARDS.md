@@ -43,14 +43,7 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 3. [x] Reattribution audit logs, surface behavior, queued-delivery suppression, and stale-address unsupported-wallet boundaries hold.
 4. [x] Force delete blocking covers every unresolved bookkeeping blocker class with both app-layer guidance and the persistence-layer backstop.
 
-## 7. Run the closing Browser QA and final Phase 5 test pass
-1. [ ] Ignore, restore, and reattribute all recover truthful visible invoice state.
-2. [ ] Source/destination owner history and public/print visibility rules match the spec.
-3. [ ] Manual adjustment rows expose no correction controls.
-4. [ ] Force delete guidance stays clear and never auto-converts anything.
-5. [x] Finish with `./vendor/bin/sail artisan test`.
-
-## 8. Verify Phase 5
+## 7. Verify Phase 5
 ### Automated
 1. [x] Reattribution recomputes source and destination invoices truthfully.
 2. [x] Same-owner destination validation holds.
