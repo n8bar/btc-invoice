@@ -563,3 +563,6 @@ Reshaped `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` so it no
 
 2026-03-23 | MS14 Phase 5 substeps now use numbered checklists
 Converted the `Remaining Sequence` substeps in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` from plain bullets to numbered checkbox items so execution depth stays explicit at both checklist levels.
+
+2026-03-23 | MS14 Phase 5 strategy now promotes parent steps to section headings
+Removed checkboxes from the completed recap bullets in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, dropped the `Remaining Sequence` wrapper heading, and promoted each remaining parent step into its own `##` section while keeping numbered checkbox substeps beneath it.
