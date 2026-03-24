@@ -15,7 +15,7 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
 
 ## Current Focus
 - Active phase: **Phase 5 - Correction Tooling + Safeguards**
-- Current objective: finish same-owner invoice-to-invoice reattribution, complete the remaining bookkeeping delete safeguards, and rerun the rewritten Phase 5 Browser QA.
+- Current objective: finish agent-owned BQA prep, then rerun the rewritten Phase 5 Browser QA.
 - Canonical Phase 5 requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
 ## Phase Rollup
@@ -28,7 +28,7 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
 4. [x] Phase 4 - Dedicated-Wallet UX Hardening
    Shipped dedicated-account guidance across wallet, onboarding, and Helpful Notes, with Browser QA complete.
 5. [ ] Phase 5 - Correction Tooling + Safeguards
-   Finish correction tooling so ignore, restore, and reattribute all work with truthful recalculation, auditability, and delete safeguards.
+   Finish BQA prep and Browser QA for the shipped ignore, restore, and reattribute correction tooling.
 
 ## Exit Criteria
 - False-attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.

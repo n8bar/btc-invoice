@@ -36,13 +36,21 @@ class SupportInvoiceController extends Controller
 
         $invoice = $invoice->load([
             'client',
-            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'payments' => fn ($query) => $query
+                ->with('sourceInvoice:id,user_id,number')
+                ->orderBy('detected_at')
+                ->orderBy('id'),
+            'sourcePayments' => fn ($query) => $query
+                ->with('accountingInvoice:id,user_id,number')
+                ->orderBy('detected_at')
+                ->orderBy('id'),
             'deliveries' => fn ($query) => $query->latest('id')->limit(10),
         ]);
 
         return view('support.invoices.show', [
             'owner' => $owner,
             'invoice' => $invoice,
+            'paymentHistory' => $invoice->paymentHistory(),
             'supportAccessExpiresAt' => $owner->support_access_expires_at,
         ]);
     }

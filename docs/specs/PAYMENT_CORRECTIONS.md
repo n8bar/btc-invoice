@@ -4,7 +4,7 @@ Purpose: define the owner-only correction flow for wrongly attributed on-chain p
 
 This doc is canonical for:
 - ignoring/restoring on-chain `invoice_payments` rows
-- planned invoice-to-invoice reattribution of detected payments
+- invoice-to-invoice reattribution of detected payments
 - correction-specific audit metadata and logs
 - recalculation requirements after ignore/restore/reattribute
 - UI/authorization rules for payment correction actions
@@ -54,7 +54,7 @@ Shipped ignore/restore metadata lives directly on `invoice_payments`:
 - `ignored_by_user_id` foreign ID nullable, `nullOnDelete()`
 - `ignore_reason` string(500) nullable
 
-Planned reattribution state also lives directly on `invoice_payments`:
+Reattribution state also lives directly on `invoice_payments`:
 - `accounting_invoice_id` foreign ID nullable
 - `reattributed_at` timestamp nullable
 - `reattributed_by_user_id` foreign ID nullable, `nullOnDelete()`

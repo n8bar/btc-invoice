@@ -73,8 +73,29 @@ class Invoice extends Model
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
-    public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
+    public function payments(): HasMany { return $this->hasMany(InvoicePayment::class, 'accounting_invoice_id'); }
+    public function sourcePayments(): HasMany { return $this->hasMany(InvoicePayment::class, 'invoice_id'); }
     public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
+
+    public function paymentHistory(): Collection
+    {
+        $this->loadMissing(['payments', 'sourcePayments']);
+
+        $history = $this->sourcePayments->concat(
+            $this->payments->filter(
+                fn (InvoicePayment $payment) => ! $payment->belongsToSourceInvoice($this)
+            )
+        );
+
+        return $history
+            ->unique('id')
+            ->sortBy(function (InvoicePayment $payment): string {
+                $timestamp = ($payment->detected_at ?? $payment->created_at)?->getTimestamp() ?? 0;
+
+                return sprintf('%020d-%020d', $timestamp, $payment->id);
+            })
+            ->values();
+    }
 
     public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
     {

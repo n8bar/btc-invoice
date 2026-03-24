@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.payments.ignore');
     Route::patch('invoices/{invoice}/payments/{payment}/restore', [InvoicePaymentCorrectionController::class, 'restore'])
         ->name('invoices.payments.restore');
+    Route::patch('invoices/{invoice}/payments/{payment}/reattribute', [InvoicePaymentCorrectionController::class, 'reattribute'])
+        ->name('invoices.payments.reattribute');
     Route::post('invoices/{invoice}/payments/adjustments', [InvoicePaymentAdjustmentController::class, 'store'])
         ->name('invoices.payments.adjustments.store');
     Route::post('invoices/{invoice}/payments/resolve-small-balance', [InvoicePaymentAdjustmentController::class, 'resolve'])

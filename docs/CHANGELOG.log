@@ -578,3 +578,6 @@ Split the closing manual verification in `docs/strategies/MS14_PHASE5_CORRECTION
 
 2026-03-23 | MS14 Phase 5 now treats BQA prep as agent-owned setup
 Renamed `Scenario Prep` in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to `BQA Prep`, made it explicit that the agent owns the funding/watcher/queue-state setup, and added a handoff checklist so the human Browser QA pass starts from prepared invoice IDs and payment rows instead of terminal work.
+
+2026-03-23 | Phase 5 reattribution and delete safeguards now ship in code
+`invoice_payments` now carries the reattribution state fields plus immutable source provenance, owner/support payment history now preserves reattributed source/destination context while public/print/dashboard math follows the active accounting destination, force delete now has blocker guidance plus a foreign-key backstop, and the automated coverage now includes reattribution math, visibility, dashboard ownership, and hard-delete blockers. `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, and `docs/PLAN.md` now reflect that implementation is done and that the remaining Phase 5 work is BQA prep plus human Browser QA.

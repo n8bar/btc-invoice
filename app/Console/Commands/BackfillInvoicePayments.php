@@ -22,7 +22,7 @@ class BackfillInvoicePayments extends Command
             ->whereNotNull('payment_amount_sat')
             ->chunkById(100, function ($invoices) use (&$created, &$skipped) {
                 foreach ($invoices as $invoice) {
-                    if ($invoice->payments()->exists()) {
+                    if ($invoice->sourcePayments()->exists()) {
                         $skipped++;
                         continue;
                     }

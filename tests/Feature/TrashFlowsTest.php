@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\InvoicePayment;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -117,6 +119,104 @@ class TrashFlowsTest extends TestCase
         $response->assertRedirect(route('invoices.trash'));
         $response->assertSessionHas('status', 'Invoice permanently deleted.');
         $this->assertDatabaseMissing('invoices', ['id' => $invoice->id]);
+    }
+
+    public function test_force_delete_is_blocked_for_trashed_invoice_with_ignored_payment_history(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, ['number' => 'INV-BLOCK-IGNORED']);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-block-ignored',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+            'ignored_at' => now(),
+            'ignored_by_user_id' => $owner->id,
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        $invoice->delete();
+
+        $response = $this
+            ->actingAs($owner)
+            ->delete(route('invoices.force-destroy', ['invoiceId' => $invoice->id]));
+
+        $response->assertRedirect(route('invoices.trash'));
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('invoices', ['id' => $invoice->id]);
+        $this->assertDatabaseHas('invoice_payments', ['invoice_id' => $invoice->id, 'txid' => 'tx-block-ignored']);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.trash'))
+            ->assertOk()
+            ->assertSee('Permanent delete is currently blocked.', false)
+            ->assertSee('ignored payment row', false);
+    }
+
+    public function test_force_delete_is_blocked_for_trashed_invoice_with_incoming_reattribution(): void
+    {
+        $owner = User::factory()->create();
+        $sourceInvoice = $this->makeInvoice($owner, ['number' => 'INV-BLOCK-SRC']);
+        $destinationInvoice = $this->makeInvoice($owner, ['number' => 'INV-BLOCK-DEST']);
+
+        InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'accounting_invoice_id' => $destinationInvoice->id,
+            'txid' => 'tx-block-incoming',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+            'reattributed_at' => now(),
+            'reattributed_by_user_id' => $owner->id,
+            'reattribute_reason' => 'Belonged elsewhere',
+        ]);
+
+        $destinationInvoice->delete();
+
+        $response = $this
+            ->actingAs($owner)
+            ->delete(route('invoices.force-destroy', ['invoiceId' => $destinationInvoice->id]));
+
+        $response->assertRedirect(route('invoices.trash'));
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('invoices', ['id' => $destinationInvoice->id]);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.trash'))
+            ->assertOk()
+            ->assertSee('incoming reattribution', false)
+            ->assertSee($sourceInvoice->number, false);
+    }
+
+    public function test_force_delete_backstop_rejects_direct_delete_when_source_payment_rows_still_exist(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, ['number' => 'INV-BLOCK-BACKSTOP']);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-block-backstop',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $invoice->delete();
+
+        try {
+            Invoice::withTrashed()->findOrFail($invoice->id)->forceDelete();
+            $this->fail('Expected the foreign-key backstop to block the force delete.');
+        } catch (QueryException $exception) {
+            $this->assertDatabaseHas('invoices', ['id' => $invoice->id]);
+        }
     }
 
     private function makeClient(User $owner, array $overrides = []): Client

@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class InvoicePaymentCorrectionController extends Controller
 {
@@ -39,20 +40,25 @@ class InvoicePaymentCorrectionController extends Controller
         ]);
 
         $statusBefore = $invoice->status;
+        $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
 
-        DB::transaction(function () use ($data, $invoice, $payment, $request, $statusBefore) {
+        DB::transaction(function () use ($data, $invoice, $payment, $request, $statusBefore, $previousAccountingInvoiceId) {
             $payment->forceFill([
                 'ignored_at' => now(),
                 'ignored_by_user_id' => $request->user()->id,
                 'ignore_reason' => $data['ignore_reason'],
+                'accounting_invoice_id' => null,
+                'reattributed_at' => null,
+                'reattributed_by_user_id' => null,
+                'reattribute_reason' => null,
             ])->save();
 
-            $invoice->refreshPaymentLedger();
-            $invoice->refresh();
-            $invoice->load(['payments', 'client', 'user']);
-
-            $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after payment correction.');
-            $this->alerts->checkPaymentThresholds($invoice);
+            $refreshed = $this->refreshCorrectionTargets(
+                $invoice,
+                $previousAccountingInvoiceId && $previousAccountingInvoiceId !== $invoice->id
+                    ? Invoice::query()->find($previousAccountingInvoiceId)
+                    : null
+            );
 
             Log::info('invoice.payment.ignored', [
                 'invoice_id' => $invoice->id,
@@ -60,7 +66,7 @@ class InvoicePaymentCorrectionController extends Controller
                 'user_id' => $request->user()->id,
                 'txid' => $payment->txid,
                 'status_before' => $statusBefore,
-                'status_after' => $invoice->status,
+                'status_after' => $refreshed[$invoice->id]->status,
                 'ignore_reason' => $payment->ignore_reason,
             ]);
         });
@@ -88,14 +94,13 @@ class InvoicePaymentCorrectionController extends Controller
                 'ignored_at' => null,
                 'ignored_by_user_id' => null,
                 'ignore_reason' => null,
+                'accounting_invoice_id' => $invoice->id,
+                'reattributed_at' => null,
+                'reattributed_by_user_id' => null,
+                'reattribute_reason' => null,
             ])->save();
 
-            $invoice->refreshPaymentLedger();
-            $invoice->refresh();
-            $invoice->load(['payments', 'client', 'user']);
-
-            $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after payment correction.');
-            $this->alerts->checkPaymentThresholds($invoice);
+            $refreshed = $this->refreshCorrectionTargets($invoice);
 
             Log::info('invoice.payment.restored', [
                 'invoice_id' => $invoice->id,
@@ -103,10 +108,138 @@ class InvoicePaymentCorrectionController extends Controller
                 'user_id' => $request->user()->id,
                 'txid' => $payment->txid,
                 'status_before' => $statusBefore,
-                'status_after' => $invoice->status,
+                'status_after' => $refreshed[$invoice->id]->status,
             ]);
         });
 
         return back()->with('status', 'Payment restored. Invoice totals refreshed.');
+    }
+
+    public function reattribute(Request $request, Invoice $invoice, InvoicePayment $payment): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+        abort_if($payment->invoice_id !== $invoice->id, 404);
+
+        if ($payment->is_adjustment) {
+            return back()->with('error', 'Manual adjustments cannot be reattributed through payment corrections.');
+        }
+
+        if ($payment->isIgnored()) {
+            return back()->with('error', 'Restore this payment before reattributing it.');
+        }
+
+        $request->merge([
+            'reattribute_reason' => trim((string) $request->input('reattribute_reason', '')),
+        ]);
+
+        $data = $request->validate([
+            'destination_invoice_id' => [
+                'required',
+                'integer',
+                Rule::exists('invoices', 'id')->where(function ($query) use ($invoice) {
+                    $query->where('user_id', $invoice->user_id)
+                        ->whereNull('deleted_at');
+                }),
+            ],
+            'reattribute_reason' => ['required', 'string', 'max:500'],
+            'correction_payment_id' => ['nullable', 'integer'],
+        ]);
+
+        $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
+        $destinationInvoiceId = (int) $data['destination_invoice_id'];
+
+        if ($previousAccountingInvoiceId === $destinationInvoiceId) {
+            return back()->with('status', 'Payment already counts toward that invoice.');
+        }
+
+        $destination = Invoice::query()
+            ->ownedBy($invoice->user_id)
+            ->findOrFail($destinationInvoiceId);
+
+        $sourceStatusBefore = $invoice->status;
+        $destinationStatusBefore = $destination->status;
+
+        DB::transaction(function () use (
+            $data,
+            $destination,
+            $destinationInvoiceId,
+            $invoice,
+            $payment,
+            $previousAccountingInvoiceId,
+            $request,
+            $sourceStatusBefore,
+            $destinationStatusBefore
+        ) {
+            $movingBackToSource = $destinationInvoiceId === $invoice->id;
+
+            $payment->forceFill([
+                'accounting_invoice_id' => $destinationInvoiceId,
+                'reattributed_at' => $movingBackToSource ? null : now(),
+                'reattributed_by_user_id' => $movingBackToSource ? null : $request->user()->id,
+                'reattribute_reason' => $movingBackToSource ? null : $data['reattribute_reason'],
+            ])->save();
+
+            $refreshed = $this->refreshCorrectionTargets(
+                $invoice,
+                $destination,
+                $previousAccountingInvoiceId
+                    && !in_array($previousAccountingInvoiceId, [$invoice->id, $destination->id], true)
+                    ? Invoice::query()->find($previousAccountingInvoiceId)
+                    : null
+            );
+
+            Log::info('invoice.payment.reattributed', [
+                'invoice_id' => $invoice->id,
+                'payment_id' => $payment->id,
+                'user_id' => $request->user()->id,
+                'txid' => $payment->txid,
+                'status_before' => $sourceStatusBefore,
+                'status_after' => $refreshed[$invoice->id]->status,
+                'source_invoice_id' => $invoice->id,
+                'source_status_before' => $sourceStatusBefore,
+                'source_status_after' => $refreshed[$invoice->id]->status,
+                'destination_invoice_id' => $destination->id,
+                'destination_status_before' => $destinationStatusBefore,
+                'destination_status_after' => $refreshed[$destination->id]->status,
+                'previous_accounting_invoice_id' => $previousAccountingInvoiceId,
+                'reattribute_reason' => $data['reattribute_reason'],
+                'shown_as_reattributed_out' => $payment->isReattributedOutFrom($invoice),
+                'shown_as_reattributed_in' => $destination->id !== $invoice->id,
+            ]);
+        });
+
+        return back()->with('status', 'Payment reattributed. Invoice totals refreshed.');
+    }
+
+    /**
+     * @return array<int, Invoice>
+     */
+    private function refreshCorrectionTargets(?Invoice ...$invoices): array
+    {
+        $refreshed = [];
+
+        foreach ($invoices as $invoice) {
+            if (!$invoice) {
+                continue;
+            }
+
+            if (array_key_exists($invoice->id, $refreshed)) {
+                continue;
+            }
+
+            $invoice->refreshPaymentLedger();
+
+            $freshInvoice = $invoice->fresh(['payments', 'client', 'user', 'deliveries']);
+            if (!$freshInvoice) {
+                continue;
+            }
+
+            $this->alerts->skipInvalidQueuedDeliveries($freshInvoice, 'Skipped after payment correction.');
+            $this->alerts->checkPaymentThresholds($freshInvoice->fresh('payments'));
+
+            $refreshed[$invoice->id] = $freshInvoice->fresh(['payments', 'client', 'user', 'deliveries']);
+        }
+
+        return $refreshed;
     }
 }

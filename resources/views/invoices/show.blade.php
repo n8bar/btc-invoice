@@ -22,6 +22,7 @@
             ];
         @endphp
         @php $billingDetails = $billingDetails ?? $invoice->billingDetails(); @endphp
+        @php $paymentHistory = $paymentHistory ?? $invoice->paymentHistory(); @endphp
         @if (!empty($billingDetails['heading']))
             <p class="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
                 {{ $billingDetails['heading'] }}
@@ -672,7 +673,7 @@
                     </div>
                 @endif
 
-                @if ($invoice->payments->isNotEmpty())
+                @if ($paymentHistory->isNotEmpty())
                     <div class="rounded-lg bg-white shadow">
                         <div class="p-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
@@ -690,9 +691,19 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100">
-                                        @foreach ($invoice->payments as $payment)
+                                        @foreach ($paymentHistory as $payment)
                                             @php
                                                 $showIgnoreForm = (string) old('correction_payment_id') === (string) $payment->id && $errors->has('ignore_reason');
+                                                $showReattributeForm = (string) old('correction_payment_id') === (string) $payment->id
+                                                    && ($errors->has('destination_invoice_id') || $errors->has('reattribute_reason'));
+                                                $isSourcePayment = $payment->belongsToSourceInvoice($invoice);
+                                                $isOutgoingReattribution = $payment->isReattributedOutFrom($invoice);
+                                                $isInboundReattribution = $payment->isReattributedInto($invoice);
+                                                $relatedSourceInvoice = $payment->sourceInvoice;
+                                                $relatedDestinationInvoice = $payment->accountingInvoice;
+                                                $selectedDestinationId = $showReattributeForm
+                                                    ? old('destination_invoice_id')
+                                                    : ($isOutgoingReattribution ? $payment->activeAccountingInvoiceId() : null);
                                             @endphp
                                             <tr>
                                                 <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
@@ -726,34 +737,73 @@
                                                                 {{ $payment->confirmed_at ? 'Confirmed row excluded from totals.' : 'Pending row excluded from totals.' }}
                                                             </div>
                                                         </div>
+                                                    @elseif ($isOutgoingReattribution)
+                                                        <div class="space-y-1">
+                                                            <span class="inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-900">
+                                                                Reattributed out
+                                                            </span>
+                                                            <div class="text-xs text-sky-800">
+                                                                No longer counts on this invoice.
+                                                            </div>
+                                                        </div>
+                                                    @elseif ($isInboundReattribution)
+                                                        <div class="space-y-1">
+                                                            <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900">
+                                                                Reattributed in
+                                                            </span>
+                                                            <div class="text-xs text-emerald-800">
+                                                                Counts on this invoice.
+                                                            </div>
+                                                        </div>
                                                     @else
                                                         {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
                                                     <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
-                                                    <form method="POST"
-                                                          action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                          class="mt-2 space-y-2">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
-                                                        <textarea name="note" rows="2"
-                                                                  class="w-full rounded border-gray-300 text-sm"
-                                                                  placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
-                                                        @if ($errors->has('note') && old('source_payment_id') == $payment->id)
-                                                            <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
-                                                        @endif
-                                                        <div class="flex justify-end">
-                                                            <x-secondary-button type="submit" class="text-xs px-3 py-1">
-                                                                Save
-                                                            </x-secondary-button>
-                                                        </div>
-                                                    </form>
+                                                    @if ($isSourcePayment)
+                                                        <form method="POST"
+                                                              action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
+                                                              class="mt-2 space-y-2">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
+                                                            <textarea name="note" rows="2"
+                                                                      class="w-full rounded border-gray-300 text-sm"
+                                                                      placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                            @if ($errors->has('note') && old('source_payment_id') == $payment->id)
+                                                                <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
+                                                            @endif
+                                                            <div class="flex justify-end">
+                                                                <x-secondary-button type="submit" class="text-xs px-3 py-1">
+                                                                    Save
+                                                                </x-secondary-button>
+                                                            </div>
+                                                        </form>
+                                                    @elseif ($relatedSourceInvoice)
+                                                        <p class="mt-2 text-xs text-gray-500">
+                                                            Edit notes on
+                                                            <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
+                                                                {{ $relatedSourceInvoice->number }}
+                                                            </a>.
+                                                        </p>
+                                                    @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
                                                     @if ($payment->is_adjustment)
                                                         <span class="text-xs text-gray-500">Manual adjustments stay outside correction tooling.</span>
+                                                    @elseif (! $isSourcePayment)
+                                                        <div class="space-y-2 text-xs text-gray-700">
+                                                            <p class="font-semibold text-emerald-900">Counting here via reattribution</p>
+                                                            @if ($relatedSourceInvoice)
+                                                                <p>
+                                                                    Source invoice:
+                                                                    <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
+                                                                        {{ $relatedSourceInvoice->number }}
+                                                                    </a>
+                                                                </p>
+                                                            @endif
+                                                        </div>
                                                     @elseif ($payment->isIgnored())
                                                         <div class="space-y-2 text-xs text-gray-700">
                                                             <div>
@@ -780,38 +830,118 @@
                                                             </details>
                                                         </div>
                                                     @else
-                                                        <details @if ($showIgnoreForm) open @endif>
-                                                            <summary class="cursor-pointer text-xs font-semibold text-red-700 hover:text-red-800">
-                                                                Ignore payment
-                                                            </summary>
-                                                            <form method="POST"
-                                                                  action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
-                                                                  class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
-                                                                <p class="text-xs text-red-900">
-                                                                    This removes the payment from invoice totals and status without deleting the raw ledger row.
-                                                                </p>
+                                                        <div class="space-y-2 text-xs text-gray-700">
+                                                            @if ($isOutgoingReattribution)
                                                                 <div>
-                                                                    <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900">Reason</label>
-                                                                    <textarea id="ignore_reason_{{ $payment->id }}"
-                                                                              name="ignore_reason"
-                                                                              rows="2"
-                                                                              class="mt-1 w-full rounded border-red-200 text-sm"
-                                                                              placeholder="Why should this payment stop counting toward this invoice?"
-                                                                              @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
-                                                                    @if ($showIgnoreForm)
-                                                                        <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
+                                                                    <p class="font-semibold text-sky-900">
+                                                                        Reattributed to
+                                                                        @if ($relatedDestinationInvoice)
+                                                                            <a href="{{ route('invoices.show', $relatedDestinationInvoice) }}" class="text-indigo-700 hover:text-indigo-900">
+                                                                                {{ $relatedDestinationInvoice->number }}
+                                                                            </a>
+                                                                        @else
+                                                                            another invoice
+                                                                        @endif
+                                                                    </p>
+                                                                    @if ($payment->reattribute_reason)
+                                                                        <p class="mt-1">Reason: {{ $payment->reattribute_reason }}</p>
                                                                     @endif
+                                                                    <p class="mt-1">Updated {{ optional($payment->reattributed_at)->toDayDateTimeString() ?? '—' }}</p>
                                                                 </div>
-                                                                <div class="flex justify-end">
-                                                                    <x-danger-button type="submit" class="text-xs px-3 py-1">
-                                                                        Confirm ignore
-                                                                    </x-danger-button>
-                                                                </div>
-                                                            </form>
-                                                        </details>
+                                                            @endif
+                                                            <details @if ($showReattributeForm) open @endif>
+                                                                <summary class="cursor-pointer text-xs font-semibold text-indigo-700 hover:text-indigo-900">
+                                                                    {{ $isOutgoingReattribution ? 'Change reattribution' : 'Reattribute payment' }}
+                                                                </summary>
+                                                                <form method="POST"
+                                                                      action="{{ route('invoices.payments.reattribute', [$invoice, $payment]) }}"
+                                                                      class="mt-2 space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/70 p-3">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                    <p class="text-xs text-indigo-900">
+                                                                        Stop counting this payment toward {{ $invoice->number }} and count it toward another invoice you own.
+                                                                    </p>
+                                                                    <div>
+                                                                        <label for="destination_invoice_id_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900">Destination invoice</label>
+                                                                        <select id="destination_invoice_id_{{ $payment->id }}"
+                                                                                name="destination_invoice_id"
+                                                                                class="mt-1 w-full rounded border-indigo-200 text-sm"
+                                                                                @if ($showReattributeForm && $errors->has('destination_invoice_id')) autofocus @endif>
+                                                                            @unless ($isOutgoingReattribution)
+                                                                                <option value="" @selected($selectedDestinationId === null)>Select an invoice</option>
+                                                                            @endunless
+                                                                            @if ($isOutgoingReattribution)
+                                                                                <option value="{{ $invoice->id }}" @selected((string) $selectedDestinationId === (string) $invoice->id)>
+                                                                                    Return credit to {{ $invoice->number }}
+                                                                                </option>
+                                                                            @endif
+                                                                            @foreach ($reattributeDestinations as $destinationInvoice)
+                                                                                <option value="{{ $destinationInvoice->id }}" @selected((string) $selectedDestinationId === (string) $destinationInvoice->id)>
+                                                                                    {{ $destinationInvoice->number }}
+                                                                                    @if ($destinationInvoice->client?->name)
+                                                                                        — {{ $destinationInvoice->client->name }}
+                                                                                    @endif
+                                                                                    ({{ ucfirst($destinationInvoice->status) }})
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                        @if ($showReattributeForm && $errors->has('destination_invoice_id'))
+                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('destination_invoice_id') }}</p>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div>
+                                                                        <label for="reattribute_reason_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900">Reason</label>
+                                                                        <textarea id="reattribute_reason_{{ $payment->id }}"
+                                                                                  name="reattribute_reason"
+                                                                                  rows="2"
+                                                                                  class="mt-1 w-full rounded border-indigo-200 text-sm"
+                                                                                  placeholder="Why should this payment count toward another invoice?"
+                                                                                  @if ($showReattributeForm && !$errors->has('destination_invoice_id')) autofocus @endif>{{ $showReattributeForm ? old('reattribute_reason') : ($isOutgoingReattribution ? $payment->reattribute_reason : '') }}</textarea>
+                                                                        @if ($showReattributeForm && $errors->has('reattribute_reason'))
+                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('reattribute_reason') }}</p>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div class="flex justify-end">
+                                                                        <x-secondary-button type="submit" class="text-xs px-3 py-1">
+                                                                            Confirm reattribution
+                                                                        </x-secondary-button>
+                                                                    </div>
+                                                                </form>
+                                                            </details>
+                                                            <details @if ($showIgnoreForm) open @endif>
+                                                                <summary class="cursor-pointer text-xs font-semibold text-red-700 hover:text-red-800">
+                                                                    Ignore payment
+                                                                </summary>
+                                                                <form method="POST"
+                                                                      action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
+                                                                      class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                    <p class="text-xs text-red-900">
+                                                                        This removes the payment from invoice totals and status without deleting the raw ledger row.
+                                                                    </p>
+                                                                    <div>
+                                                                        <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900">Reason</label>
+                                                                        <textarea id="ignore_reason_{{ $payment->id }}"
+                                                                                  name="ignore_reason"
+                                                                                  rows="2"
+                                                                                  class="mt-1 w-full rounded border-red-200 text-sm"
+                                                                                  placeholder="Why should this payment stop counting toward this invoice?"
+                                                                                  @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
+                                                                        @if ($showIgnoreForm)
+                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div class="flex justify-end">
+                                                                        <x-danger-button type="submit" class="text-xs px-3 py-1">
+                                                                            Confirm ignore
+                                                                        </x-danger-button>
+                                                                    </div>
+                                                                </form>
+                                                            </details>
+                                                        </div>
                                                     @endif
                                                 </td>
                                             </tr>

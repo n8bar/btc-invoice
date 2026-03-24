@@ -69,7 +69,7 @@ class InvoicePaymentSyncService
             return $this->emptyResult(false, $invoice);
         }
 
-        $hasUnconfirmed = $invoice->payments()
+        $hasUnconfirmed = $invoice->sourcePayments()
             ->whereNull('ignored_at')
             ->whereNull('confirmed_at')
             ->where('is_adjustment', false)

@@ -245,6 +245,152 @@ class InvoicePaymentCorrectionTest extends TestCase
             ->once();
     }
 
+    public function test_owner_can_reattribute_payment_to_another_owned_invoice_and_public_surfaces_follow_active_destination(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-12 10:00:00', 'UTC'));
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 50_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+        Http::fake([
+            'https://api.coinbase.com/*' => Http::response([
+                'data' => ['amount' => '50000.00'],
+            ], 200),
+        ]);
+        Log::spy();
+
+        [$owner, $client, $sourceInvoice] = $this->makeInvoice([
+            'number' => 'INV-REATTR-SRC',
+            'amount_usd' => 50,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.001,
+            'public_enabled' => true,
+            'public_token' => 'tok-reattr-src',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ]);
+        [, , $destinationInvoice] = $this->makeInvoice([
+            'number' => 'INV-REATTR-DEST',
+            'amount_usd' => 50,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.001,
+            'public_enabled' => true,
+            'public_token' => 'tok-reattr-dest',
+            'public_expires_at' => Carbon::now()->addDay(),
+        ], $owner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'tx-reattribute-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now()->subMinutes(5),
+            'confirmed_at' => Carbon::now()->subMinutes(4),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+        ]);
+
+        $sourceInvoice->refresh()->refreshPaymentLedger();
+        $destinationInvoice->refresh()->refreshPaymentLedger();
+        $sourceInvoice->refresh();
+        $destinationInvoice->refresh();
+
+        $receipt = $sourceInvoice->deliveries()->create([
+            'invoice_id' => $sourceInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'dispatched_at' => now(),
+        ]);
+
+        $ownerNotice = $sourceInvoice->deliveries()->create([
+            'invoice_id' => $sourceInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'owner_paid_notice',
+            'status' => 'queued',
+            'recipient' => $owner->email,
+            'dispatched_at' => now(),
+        ]);
+
+        $this->actingAs($owner)
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'destination_invoice_id' => $destinationInvoice->id,
+                'reattribute_reason' => 'Later payment belonged to the newer invoice.',
+            ])
+            ->assertRedirect();
+
+        $payment->refresh();
+        $sourceInvoice->refresh();
+        $destinationInvoice->refresh();
+        $receipt->refresh();
+        $ownerNotice->refresh();
+
+        $this->assertSame($destinationInvoice->id, $payment->accounting_invoice_id);
+        $this->assertNotNull($payment->reattributed_at);
+        $this->assertSame($owner->id, $payment->reattributed_by_user_id);
+        $this->assertSame('Later payment belonged to the newer invoice.', $payment->reattribute_reason);
+        $this->assertSame('sent', $sourceInvoice->status);
+        $this->assertNull($sourceInvoice->paid_at);
+        $this->assertSame(0, $sourceInvoice->payment_amount_sat);
+        $this->assertNull($sourceInvoice->txid);
+        $this->assertSame('paid', $destinationInvoice->status);
+        $this->assertSame(100_000, $destinationInvoice->payment_amount_sat);
+        $this->assertSame('tx-reattribute-1', $destinationInvoice->txid);
+        $this->assertSame('skipped', $receipt->status);
+        $this->assertSame('skipped', $ownerNotice->status);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.show', $sourceInvoice))
+            ->assertOk()
+            ->assertSee('Reattributed out', false)
+            ->assertSee($destinationInvoice->number, false)
+            ->assertSee('No longer counts on this invoice.', false);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.show', $destinationInvoice))
+            ->assertOk()
+            ->assertSee('Reattributed in', false)
+            ->assertSee($sourceInvoice->number, false)
+            ->assertSee('Edit notes on', false);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.print', $sourceInvoice))
+            ->assertOk()
+            ->assertDontSee('tx-reattribute-1', false);
+
+        $this->actingAs($owner)
+            ->get(route('invoices.print', $destinationInvoice))
+            ->assertOk()
+            ->assertSee('tx-reattribute-1', false);
+
+        $this->get(route('invoices.public-print', ['token' => 'tok-reattr-src']))
+            ->assertOk()
+            ->assertDontSee('tx-reattribute-1', false);
+
+        $this->get(route('invoices.public-print', ['token' => 'tok-reattr-dest']))
+            ->assertOk()
+            ->assertSee('tx-reattribute-1', false);
+
+        Log::shouldHaveReceived('info')
+            ->with('invoice.payment.reattributed', \Mockery::on(function (array $context) use ($owner, $payment, $sourceInvoice, $destinationInvoice): bool {
+                return $context['invoice_id'] === $sourceInvoice->id
+                    && $context['payment_id'] === $payment->id
+                    && $context['user_id'] === $owner->id
+                    && $context['txid'] === 'tx-reattribute-1'
+                    && $context['source_invoice_id'] === $sourceInvoice->id
+                    && $context['destination_invoice_id'] === $destinationInvoice->id
+                    && $context['source_status_before'] === 'paid'
+                    && $context['source_status_after'] === 'sent'
+                    && $context['destination_status_before'] === 'sent'
+                    && $context['destination_status_after'] === 'paid'
+                    && $context['reattribute_reason'] === 'Later payment belonged to the newer invoice.'
+                    && $context['shown_as_reattributed_out'] === true
+                    && $context['shown_as_reattributed_in'] === true;
+            }))
+            ->once();
+    }
+
     public function test_non_owner_cannot_ignore_payment(): void
     {
         [$owner, , $invoice] = $this->makeInvoice();
@@ -270,6 +416,63 @@ class InvoicePaymentCorrectionTest extends TestCase
         $this->assertNull($payment->ignored_at);
     }
 
+    public function test_non_owner_cannot_reattribute_payment(): void
+    {
+        [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-FORBID-SRC']);
+        [, , $destinationInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-FORBID-DEST'], $owner);
+        $other = User::factory()->create();
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'tx-forbidden-reattribute',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $this->actingAs($other)
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'destination_invoice_id' => $destinationInvoice->id,
+                'reattribute_reason' => 'Not my invoice',
+            ])
+            ->assertForbidden();
+
+        $payment->refresh();
+        $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
+        $this->assertNull($payment->reattributed_at);
+    }
+
+    public function test_reattribution_requires_destination_invoice_owned_by_the_same_owner(): void
+    {
+        [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-OWNER-SRC']);
+        $otherOwner = User::factory()->create(['email' => 'other-owner@example.com']);
+        [, , $foreignDestination] = $this->makeInvoice(['number' => 'INV-REATTR-FOREIGN'], $otherOwner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'tx-foreign-destination',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $this->actingAs($owner)
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'destination_invoice_id' => $foreignDestination->id,
+                'reattribute_reason' => 'Should fail',
+            ])
+            ->assertSessionHasErrors('destination_invoice_id');
+
+        $payment->refresh();
+        $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
+        $this->assertNull($payment->reattributed_at);
+    }
+
     public function test_payment_correction_returns_404_for_mismatched_invoice_payment_pair(): void
     {
         [$owner, , $invoiceA] = $this->makeInvoice(['number' => 'INV-CORRECT-A']);
@@ -288,6 +491,29 @@ class InvoicePaymentCorrectionTest extends TestCase
         $this->actingAs($owner)
             ->patch(route('invoices.payments.ignore', [$invoiceA, $payment]), [
                 'ignore_reason' => 'Wrong pair',
+            ])
+            ->assertNotFound();
+    }
+
+    public function test_payment_reattribution_returns_404_for_mismatched_invoice_payment_pair(): void
+    {
+        [$owner, , $invoiceA] = $this->makeInvoice(['number' => 'INV-REATTR-A']);
+        [, , $invoiceB] = $this->makeInvoice(['number' => 'INV-REATTR-B'], $owner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoiceB->id,
+            'txid' => 'tx-reattr-wrong-parent',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $this->actingAs($owner)
+            ->patch(route('invoices.payments.reattribute', [$invoiceA, $payment]), [
+                'destination_invoice_id' => $invoiceA->id,
+                'reattribute_reason' => 'Wrong pair',
             ])
             ->assertNotFound();
     }
@@ -316,6 +542,35 @@ class InvoicePaymentCorrectionTest extends TestCase
 
         $payment->refresh();
         $this->assertNull($payment->ignored_at);
+    }
+
+    public function test_manual_adjustments_cannot_be_reattributed(): void
+    {
+        [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-MANUAL-REATTR-SRC']);
+        [, , $destinationInvoice] = $this->makeInvoice(['number' => 'INV-MANUAL-REATTR-DEST'], $owner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'manual-reattribute-attempt',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+            'is_adjustment' => true,
+        ]);
+
+        $this->actingAs($owner)
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'destination_invoice_id' => $destinationInvoice->id,
+                'reattribute_reason' => 'Should fail',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('error', 'Manual adjustments cannot be reattributed through payment corrections.');
+
+        $payment->refresh();
+        $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
+        $this->assertNull($payment->reattributed_at);
     }
 
     private function makeInvoice(array $invoiceOverrides = [], ?User $owner = null): array

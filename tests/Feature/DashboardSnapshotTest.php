@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\BtcRate;
+use App\Services\DashboardSnapshot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -399,6 +400,49 @@ class DashboardSnapshotTest extends TestCase
         $response->assertDontSee('tx-ignored-dashboard', false);
 
         Carbon::setTestNow();
+    }
+
+    public function test_dashboard_recent_payments_use_active_accounting_destination_after_reattribution(): void
+    {
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, 'Reattribute Co');
+
+        $sourceInvoice = $this->makeInvoice($owner, $client, [
+            'number' => 'INV-DASH-SRC',
+            'status' => 'sent',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+        ]);
+
+        $destinationInvoice = $this->makeInvoice($owner, $client, [
+            'number' => 'INV-DASH-DEST',
+            'status' => 'sent',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'accounting_invoice_id' => $destinationInvoice->id,
+            'txid' => 'tx-dashboard-reattributed',
+            'sats_received' => 200_000,
+            'usd_rate' => 50_000,
+            'fiat_amount' => 100.00,
+            'detected_at' => Carbon::now()->subHour(),
+            'confirmed_at' => Carbon::now()->subHour(),
+            'reattributed_at' => Carbon::now()->subMinutes(30),
+            'reattributed_by_user_id' => $owner->id,
+            'reattribute_reason' => 'Belonged to newer invoice',
+        ]);
+
+        $snapshot = app(DashboardSnapshot::class)->forUser($owner);
+
+        $this->assertCount(1, $snapshot['recent_payments']);
+        $this->assertSame($destinationInvoice->id, $snapshot['recent_payments'][0]['invoice_id']);
+        $this->assertSame('INV-DASH-DEST', $snapshot['recent_payments'][0]['invoice_number']);
+        $this->assertSame(100.0, $snapshot['recent_payments'][0]['amount_usd']);
     }
 
     private int $invoiceSequence = 0;
