@@ -86,14 +86,10 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
    2. [ ] Enable the public link on both invoices.
    3. [ ] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
    4. [ ] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
-17. [ ] Leave a handoff note for Browser QA with:
-   1. [ ] Scenario A invoice ID and the payment row to ignore.
-   2. [ ] Scenario B invoice ID and the ignored payment row to restore.
-   3. [ ] Scenario C source invoice ID, destination invoice ID, and the payment row to reattribute.
-   4. [ ] Any delivery-log rows the human should expect to see as `Queued` before Browser QA starts.
+17. [ ] Update items 18 through 25 below with the actual Scenario A/B/C invoice IDs, payment rows, and expected queued delivery-log rows from prep.
 
 ### Browser QA
-18. [ ] Log in as `antonina12@nospam.site` with password `password`.
+18. [ ] Log in as `antonina12@nospam.site` with password `password` and use the scenario details filled in during item 17.
 19. [ ] Ignore a paid payment and verify paid-state rollback:
    1. [ ] Open Scenario A's invoice and click `Ignore` on the detected payment.
    2. [ ] Enter a reason and submit.
