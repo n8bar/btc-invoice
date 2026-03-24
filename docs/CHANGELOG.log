@@ -584,3 +584,6 @@ Renamed `Scenario Prep` in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEG
 
 2026-03-23 | MS14 Phase 5 strategy now uses one verification section
 Removed the duplicate closeout section from `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` so Phase 5 verification now lives in one place with `Automated`, `BQA Prep`, and `Browser QA` instead of a second blurred Browser-QA/test-pass wrapper above it.
+
+2026-03-23 | MS14 Phase 5 strategy now treats prep and browser work as peer steps
+Collapsed the separate automated-coverage build/verify pair in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into one completed item, then promoted `BQA Prep` and `Browser QA` into top-level Phase 5 steps so the remaining manual work now reads as `5.7` prepare and `5.8` run.
