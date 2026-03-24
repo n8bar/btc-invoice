@@ -593,3 +593,6 @@ Checked off the completed `Prepare Browser QA` work in `docs/strategies/MS14_PHA
 
 2026-03-24 | AGENTS checklist-checkoff exception wording is now explicit
 Updated `AGENTS.md` so the docs-push rule now says single-item checklist checkoffs in the same active workstream do not need to be pushed right away, instead of describing them with softer batching language.
+
+2026-03-24 | MS14 Phase 5 Browser QA findings now have a dedicated strategy doc
+Checked off the first exercised ignore-flow Browser QA steps in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` and added `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` so live Browser QA findings now have one place to capture repros and expected-vs-actual behavior before we turn them into an ordered fix sequence.

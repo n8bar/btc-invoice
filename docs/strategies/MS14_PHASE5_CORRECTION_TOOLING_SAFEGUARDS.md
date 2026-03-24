@@ -80,9 +80,9 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 ## 8. Run Browser QA
 1. [x] Log in as `antonina12@nospam.site` with password `password`.
 2. [ ] Ignore a paid payment and verify paid-state rollback:
-   1. [ ] Open invoice `67` (`INV-0003`) and click `Ignore` on payment row `39`.
-   2. [ ] Enter a reason and submit.
-   3. [ ] Verify invoice `67` leaves `paid`, settlement math reopens truthfully, payment row `39` remains visible in owner history as ignored, and delivery rows `6624` and `6625` change from `Queued` to `Skipped`.
+   1. [x] Open invoice `67` (`INV-0003`) and click `Ignore` on payment row `39`.
+   2. [x] Enter a reason and submit.
+   3. [x] Verify invoice `67` leaves `paid`, settlement math reopens truthfully, payment row `39` remains visible in owner history as ignored, and delivery rows `6624` and `6625` change from `Queued` to `Skipped`.
    4. [ ] Open invoice `67` print/public surfaces and verify payment row `39` does not appear in payment history or totals.
 3. [ ] Restore an ignored payment and verify alert suppression cleanup:
    1. [ ] Open invoice `68` (`INV-0004`) and click `Restore` on ignored payment row `44`.
