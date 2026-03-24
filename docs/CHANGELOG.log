@@ -554,3 +554,6 @@ Replaced the monolithic `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` with p
 
 2026-03-23 | MS14 strategy split now uses terse phase summaries
 Removed repeated strategy-role boilerplate from the new MS14 phase docs and tightened `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` so the phase rollup now uses checkbox plus one short sentence per phase instead of multi-line outcome/status prose.
+
+2026-03-23 | Task 11 strategy docs now carry the MS13 prefix
+Renamed `docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`, `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`, and `docs/strategies/TASK11_UX_ENGINEERING_PASS2.md` to `docs/strategies/MS13_TASK11_*`, and updated README plus intra-doc links to match.

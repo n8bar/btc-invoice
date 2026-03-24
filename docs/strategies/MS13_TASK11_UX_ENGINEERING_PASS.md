@@ -6,7 +6,7 @@ This document is a temporary working strategy. It is not a source of truth like 
 
 ## Purpose
 - Collect browser-QA findings and address them in a focused Task 11 UX refinement pass.
-- Keep implementation-pass strategy (`docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`) separate from post-implementation usability/design iteration notes.
+- Keep implementation-pass strategy (`docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md`) separate from post-implementation usability/design iteration notes.
 - Allow incremental additions as findings are discovered.
 
 ## Working Rules

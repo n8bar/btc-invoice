@@ -74,8 +74,8 @@ Execute the full suite via Sail:
 - Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
 - MS14 Phase 5 strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
-- Task 11 implementation strategy: [`docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md)
-- Task 11 UX Engineering pass: [`docs/strategies/TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS.md)
-- Task 11 UX Engineering pass2: [`docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS2.md)
+- Task 11 implementation strategy: [`docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md)
+- Task 11 UX Engineering pass: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md)
+- Task 11 UX Engineering pass2: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
