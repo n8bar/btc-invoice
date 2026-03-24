@@ -63,7 +63,7 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 - [ ] Force delete stays blocked across all unresolved bookkeeping blocker classes.
 - [ ] `./vendor/bin/sail artisan test`
 
-### Browser QA Setup
+### Scenario Prep
 1. [ ] Start the local stack with `./vendor/bin/sail up -d` and leave the `scheduler` service running.
 2. [ ] Confirm the controlled MS14 baseline from [`docs/strategies/MS14_PHASE1_BASELINE_RESEED.md`](MS14_PHASE1_BASELINE_RESEED.md) is present. If invoices `50` through `58` are missing, stop and rebuild that baseline first.
 3. [ ] Leave queue jobs undrained while testing payment-correction suppression. This stack has a scheduler but no always-on queue worker, so use the invoice delivery log as the source of truth for `queued` -> `skipped`.
@@ -86,7 +86,7 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
    3. [ ] Send one confirmed `testnet4` payment to source invoice A and run `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the payment row appears.
    4. [ ] After destination invoice B exists, send one additional `testnet4` payment to source invoice A's old address and rerun `./vendor/bin/sail artisan wallet:watch-payments --invoice={sourceInvoiceId}` until the later payment row appears.
 
-### Browser QA Actions
+### Browser QA
 1. [ ] Ignore a paid payment and verify paid-state rollback:
    1. [ ] Open Scenario A's invoice and click `Ignore` on the detected payment.
    2. [ ] Enter a reason and submit.
@@ -114,6 +114,3 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 7. [ ] Verify force-delete guidance:
    1. [ ] Attempt force delete on an invoice that still has one unresolved blocker class: detected payment row, ignored row, manual adjustment, or active reattribution.
    2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance appears for active reattributions, and the flow offers no one-click auto-conversion or cleanup.
-8. [ ] Optionally drain one queue job after suppression checks:
-   1. [ ] Only after the relevant delivery rows already show `Skipped`, run `./vendor/bin/sail artisan queue:work --once`.
-   2. [ ] Verify the skipped rows remain unsent.

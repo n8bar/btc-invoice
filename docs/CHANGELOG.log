@@ -572,3 +572,6 @@ Renamed the closing section in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_S
 
 2026-03-23 | MS14 Phase 5 Browser QA now includes setup and action steps
 Expanded the Browser QA portion of `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into concrete setup and action checklists that name the local stack prerequisites, seeded-owner login, `testnet4` funding/watcher steps, queue/delivery-log expectations, and the exact ignore/restore/reattribute/force-delete behaviors to verify in the browser.
+
+2026-03-23 | MS14 Phase 5 now separates scenario prep from Browser QA
+Split the closing manual verification in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into `Scenario Prep` and `Browser QA` so the browser section now stays browser-only while funding, watcher, and queue-state setup live outside it.
