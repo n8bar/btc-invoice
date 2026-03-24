@@ -7,7 +7,7 @@ Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_C
 This strategy is the running scratchpad for Phase 5 Browser QA findings. During the live session, capture the repro, expected behavior, and observed behavior here. After Browser QA ends, reshape this doc into the ordered fix sequence.
 
 ## Findings
-1. [ ] Ignore validation loses scroll position and weakens required-field feedback
+1. Ignore validation loses scroll position and weakens required-field feedback
    - Surface: owner invoice show page, Scenario A on invoice `67` / `INV-0003`, payment row `39`.
    - Repro:
      1. Open invoice `67` and expand the `Ignore` confirmation for payment row `39`.
