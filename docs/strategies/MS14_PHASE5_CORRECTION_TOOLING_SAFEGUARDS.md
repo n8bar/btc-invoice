@@ -95,11 +95,11 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
    1. [x] Open source invoice `69` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is absent there while the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` still appears as the active source payment.
    2. [x] Open destination invoice `70` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is present and counted there.
    3. [x] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
-6. [ ] Verify the stale-address wrong-invoice boundary:
-   1. [ ] Use the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` on source invoice `69`.
-   2. [ ] Verify that `40,000 sats` / `$28.08` payment appears as a normal correction candidate on source invoice `69`.
-   3. [ ] Verify unsupported-wallet UI does not appear solely because of that later payment.
-   4. [ ] Reattribute that `40,000 sats` / `$28.08` payment to destination invoice `70` and re-check the same owner/public behavior there.
+6. [x] Verify the stale-address wrong-invoice boundary:
+   1. [x] Use the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` on source invoice `69`.
+   2. [x] Verify that `40,000 sats` / `$28.08` payment appears as a normal correction candidate on source invoice `69`.
+   3. [x] Verify unsupported-wallet UI does not appear solely because of that later payment.
+   4. [x] Reattribute that `40,000 sats` / `$28.08` payment to destination invoice `70` and re-check the same owner/public behavior there.
 7. [ ] Verify manual-adjustment guardrails:
    1. [ ] Create a manual adjustment row through the existing adjustment flow on invoice `67`, `68`, `69`, or `70`.
    2. [ ] Verify that row shows no `Ignore`, `Restore`, or `Reattribute` controls.
