@@ -724,11 +724,11 @@
                                                     $correctionPanelClasses = 'border-amber-200 bg-amber-50/70 dark:border-amber-400/35 dark:bg-slate-900';
                                                 } elseif ($isOutgoingReattribution) {
                                                     $correctionLabelLines = ['Reapplied', 'Elsewhere'];
-                                                    $correctionButtonClasses = 'border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100 focus:ring-sky-500 dark:border-sky-100 dark:bg-sky-100 dark:text-sky-950 dark:hover:bg-sky-50 dark:focus:ring-sky-300';
+                                                    $correctionButtonClasses = 'border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100 focus:ring-sky-500 dark:border-sky-300/80 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 dark:focus:ring-sky-300';
                                                     $correctionPanelClasses = 'border-sky-200 bg-sky-50/70 dark:border-sky-400/35 dark:bg-slate-900';
                                                 } elseif ($isInboundReattribution) {
                                                     $correctionLabelLines = ['Applied', 'Here'];
-                                                    $correctionButtonClasses = 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 focus:ring-emerald-500 dark:border-emerald-100 dark:bg-emerald-100 dark:text-emerald-950 dark:hover:bg-emerald-50 dark:focus:ring-emerald-300';
+                                                    $correctionButtonClasses = 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 focus:ring-emerald-500 dark:border-emerald-300/80 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-400 dark:focus:ring-emerald-300';
                                                     $correctionPanelClasses = 'border-emerald-200 bg-emerald-50/70 dark:border-emerald-400/35 dark:bg-slate-900';
                                                 }
 
