@@ -765,27 +765,30 @@
                                                         <form method="POST"
                                                               action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
                                                               class="flex flex-col gap-1"
-                                                              data-payment-note-form>
+                                                              data-payment-note-form
+                                                              data-payment-note-container>
                                                             @csrf
                                                             @method('PATCH')
                                                             <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
                                                             <textarea name="note" rows="2"
-                                                                      class="min-h-[5.5rem] max-h-[6.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 text-sm leading-5"
+                                                                      class="min-h-[5.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 text-sm leading-5"
                                                                       placeholder="Add note..."
-                                                                      data-payment-note-input>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                                      data-payment-note-input
+                                                                      data-payment-note-field>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
                                                             <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
                                                             @if ($errors->has('note') && old('source_payment_id') == $payment->id)
                                                                 <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
                                                             @endif
                                                         </form>
                                                     @else
-                                                        <div x-data="{ showReadonlyNoteHint: false }" class="flex flex-col gap-1">
+                                                        <div x-data="{ showReadonlyNoteHint: false }" class="flex flex-col gap-1" data-payment-note-container>
                                                             <textarea rows="2"
                                                                       readonly
-                                                                      class="min-h-[5.5rem] max-h-[6.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
+                                                                      class="min-h-[5.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
                                                                       placeholder="No note."
                                                                       @focus="showReadonlyNoteHint = true"
-                                                                      @click="showReadonlyNoteHint = true">{{ $payment->note }}</textarea>
+                                                                      @click="showReadonlyNoteHint = true"
+                                                                      data-payment-note-field>{{ $payment->note }}</textarea>
                                                             @if ($relatedSourceInvoice)
                                                                 <p x-cloak
                                                                    x-show="showReadonlyNoteHint"
@@ -1275,6 +1278,42 @@
                 deliveryInput.addEventListener('change', saveDraft);
             }
 
+            const syncPaymentNoteFieldHeight = (noteField) => {
+                const noteCell = noteField.closest('td');
+                const noteContainer = noteField.closest('[data-payment-note-container]');
+
+                if (!noteCell || !noteContainer) {
+                    return;
+                }
+
+                noteField.style.height = 'auto';
+
+                const cellStyles = window.getComputedStyle(noteCell);
+                const containerStyles = window.getComputedStyle(noteContainer);
+                const gap = Number.parseFloat(containerStyles.rowGap || containerStyles.gap || '0') || 0;
+                const cellInnerHeight = noteCell.getBoundingClientRect().height
+                    - (Number.parseFloat(cellStyles.paddingTop || '0') || 0)
+                    - (Number.parseFloat(cellStyles.paddingBottom || '0') || 0);
+
+                let siblingHeight = 0;
+                let visibleSiblingCount = 0;
+
+                Array.from(noteContainer.children).forEach((child) => {
+                    if (child === noteField || child.offsetParent === null) {
+                        return;
+                    }
+
+                    siblingHeight += child.getBoundingClientRect().height;
+                    visibleSiblingCount += 1;
+                });
+
+                const contentHeight = Math.ceil(noteField.scrollHeight);
+                const availableHeight = Math.floor(cellInnerHeight - siblingHeight - (visibleSiblingCount * gap));
+                const targetHeight = Math.max(88, contentHeight, availableHeight);
+
+                noteField.style.height = `${targetHeight}px`;
+            };
+
             document.querySelectorAll('[data-payment-note-form]').forEach((noteForm) => {
                 const noteInput = noteForm.querySelector('[data-payment-note-input]');
                 const noteSaveState = noteForm.querySelector('[data-payment-note-save-state]');
@@ -1291,6 +1330,7 @@
                     noteSaveState.classList.toggle('text-red-600', isError);
                     noteSaveState.classList.toggle('text-green-600', !isError && text.length > 0);
                     noteSaveState.classList.toggle('text-gray-500', text.length === 0);
+                    requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteInput));
                 };
 
                 const saveNote = async () => {
@@ -1343,7 +1383,34 @@
                     }
                 };
 
+                syncPaymentNoteFieldHeight(noteInput);
+                requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteInput));
+                window.addEventListener('load', () => syncPaymentNoteFieldHeight(noteInput), { once: true });
+                window.addEventListener('resize', () => syncPaymentNoteFieldHeight(noteInput));
+
+                const noteCell = noteInput.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => syncPaymentNoteFieldHeight(noteInput));
+                    resizeObserver.observe(noteCell);
+                }
+
+                noteInput.addEventListener('input', () => syncPaymentNoteFieldHeight(noteInput));
                 noteInput.addEventListener('change', saveNote);
+            });
+
+            document.querySelectorAll('textarea[data-payment-note-field]:not([data-payment-note-input])').forEach((noteField) => {
+                syncPaymentNoteFieldHeight(noteField);
+                requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField));
+                window.addEventListener('load', () => syncPaymentNoteFieldHeight(noteField), { once: true });
+                window.addEventListener('resize', () => syncPaymentNoteFieldHeight(noteField));
+                noteField.addEventListener('focus', () => requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField)));
+                noteField.addEventListener('click', () => requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField)));
+
+                const noteCell = noteField.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => syncPaymentNoteFieldHeight(noteField));
+                    resizeObserver.observe(noteCell);
+                }
             });
 
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
