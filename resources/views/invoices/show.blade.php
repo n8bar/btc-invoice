@@ -825,7 +825,10 @@
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
                                                     @if ($payment->is_adjustment)
-                                                        <span class="text-xs text-gray-500">Manual adjustments stay outside correction tooling.</span>
+                                                        <span class="inline-flex flex-col text-xs text-gray-500">
+                                                            <span>Manual</span>
+                                                            <span>adjustment</span>
+                                                        </span>
                                                     @else
                                                         <div class="w-28"
                                                              x-data="{
