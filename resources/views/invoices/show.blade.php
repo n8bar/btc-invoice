@@ -786,13 +786,21 @@
                                                     @if ($payment->is_adjustment)
                                                         <span class="text-xs text-gray-500">Manual adjustments stay outside correction tooling.</span>
                                                     @else
-                                                        <details class="w-28" @if ($showCorrectionMenu) open @endif>
-                                                            <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
-                                                                <span class="inline-flex w-full flex-col items-center justify-center rounded-md border px-3 py-2 text-center text-xs font-semibold leading-tight shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $correctionButtonClasses }}">
+                                                        <details class="w-28" x-data="{ open: @js($showCorrectionMenu) }" @toggle="open = $el.open" @if ($showCorrectionMenu) open @endif>
+                                                            <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden" style="list-style: none;">
+                                                                <span class="inline-flex w-full items-center justify-center gap-1 rounded-md border px-3 py-2 text-center text-xs font-semibold leading-tight shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $correctionButtonClasses }}">
                                                                     <span class="sr-only">Correction menu: {{ $correctionLabelText }}</span>
-                                                                    @foreach ($correctionLabelLines as $labelLine)
-                                                                        <span>{{ $labelLine }}</span>
-                                                                    @endforeach
+                                                                    <span class="flex flex-col items-center">
+                                                                        @foreach ($correctionLabelLines as $labelLine)
+                                                                            <span>{{ $labelLine }}</span>
+                                                                        @endforeach
+                                                                    </span>
+                                                                    <svg viewBox="0 0 12 12"
+                                                                         aria-hidden="true"
+                                                                         class="h-3 w-3 shrink-0 transition-transform"
+                                                                         x-bind:class="open ? 'rotate-90' : ''">
+                                                                        <path d="M4 2.5 8 6 4 9.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                                                                    </svg>
                                                                 </span>
                                                             </summary>
                                                             <div class="mt-2 space-y-2 rounded-lg border p-3 text-xs text-gray-700 shadow-sm {{ $correctionPanelClasses }}">
@@ -823,13 +831,11 @@
                                                                             @csrf
                                                                             @method('PATCH')
                                                                             <p class="text-xs text-indigo-900">
-                                                                                Restore this payment so it counts toward invoice totals and status again.
+                                                                                <button type="submit" class="font-semibold text-indigo-700 underline decoration-indigo-400 underline-offset-2 hover:text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                                                    Restore
+                                                                                </button>
+                                                                                this payment so it counts toward invoice totals and status again.
                                                                             </p>
-                                                                            <div class="flex justify-end">
-                                                                                <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
-                                                                                    Confirm restore
-                                                                                </x-secondary-button>
-                                                                            </div>
                                                                         </form>
                                                                     </div>
                                                                 @else
