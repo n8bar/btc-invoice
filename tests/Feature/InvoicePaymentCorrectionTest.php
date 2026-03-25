@@ -343,14 +343,14 @@ class InvoicePaymentCorrectionTest extends TestCase
         $this->actingAs($owner)
             ->get(route('invoices.show', $sourceInvoice))
             ->assertOk()
-            ->assertSee('Reattributed out', false)
+            ->assertSee('Correction menu: Reapplied Elsewhere', false)
             ->assertSee($destinationInvoice->number, false)
             ->assertSee('No longer counts on this invoice.', false);
 
         $this->actingAs($owner)
             ->get(route('invoices.show', $destinationInvoice))
             ->assertOk()
-            ->assertSee('Reattributed in', false)
+            ->assertSee('Correction menu: Applied Here', false)
             ->assertSee($sourceInvoice->number, false)
             ->assertSee('Edit notes on', false);
 
