@@ -23,5 +23,21 @@ This strategy is the running scratchpad for Phase 5 Browser QA findings. During 
      3. The missing required reason is easier to miss.
      4. The user can briefly think the ignore succeeded when it did not.
 
+2. Reattribution validation loses scroll position and makes the missing reason feel accepted
+   - Surface: owner invoice show page, Scenario C on source invoice `69` / `INV-0005`, `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`.
+   - Repro:
+     1. Open invoice `69` and start the reattribution flow for the `30,000 sats` / `$21.06` payment.
+     2. Choose destination invoice `70` / `INV-0006`.
+     3. Leave the reattribution reason empty and submit.
+   - Expected:
+     1. The page stays anchored on the same payment row.
+     2. The correction panel stays open with the selected destination preserved.
+     3. Focus lands on the required reason field and the validation error is obvious.
+     4. Nothing about the row presentation implies the reattribution succeeded.
+   - Actual:
+     1. The page reloads and loses scroll position.
+     2. The payment row and correction panel fall out of view.
+     3. The user can think the reattribution succeeded because the failed validation is no longer in context.
+
 ## Fix Sequence
 - [ ] Flesh this out after Browser QA ends.
