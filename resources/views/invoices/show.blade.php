@@ -964,7 +964,7 @@
                                                                                     @method('PATCH')
                                                                                     <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
                                                                                     <p class="text-xs text-indigo-900">
-                                                                                        Stop counting this payment toward {{ $invoice->number }} and count it toward another invoice you own.
+                                                                                        Stop counting this payment toward {{ $invoice->number }} and count it toward another invoice.
                                                                                     </p>
                                                                                     <div>
                                                                                         <label for="destination_invoice_id_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900">Destination invoice</label>
