@@ -770,7 +770,8 @@
                                                             <textarea name="note" rows="2"
                                                                       class="w-full flex-1 resize-none overflow-hidden rounded border-gray-300 text-sm leading-5"
                                                                       placeholder="Add note..."
-                                                                      data-payment-note-input>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                                      data-payment-note-input
+                                                                      data-payment-note-field>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
                                                             <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
                                                             @if ($errors->has('note') && old('source_payment_id') == $payment->id)
                                                                 <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
@@ -783,7 +784,8 @@
                                                                       class="min-h-[4.75rem] w-full resize-none overflow-hidden rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
                                                                       placeholder="No note."
                                                                       @focus="showReadonlyNoteHint = true"
-                                                                      @click="showReadonlyNoteHint = true">{{ $payment->note }}</textarea>
+                                                                      @click="showReadonlyNoteHint = true"
+                                                                      data-payment-note-field>{{ $payment->note }}</textarea>
                                                             @if ($relatedSourceInvoice)
                                                                 <p x-cloak
                                                                    x-show="showReadonlyNoteHint"
@@ -1291,9 +1293,13 @@
                     const noteError = noteForm.querySelector('.text-red-600');
                     const formStyles = window.getComputedStyle(noteForm);
                     const gap = Number.parseFloat(formStyles.rowGap || formStyles.gap || '0') || 0;
-                    const availableHeight = noteCell
-                        ? noteCell.clientHeight - (noteSaveState.offsetHeight || 0) - (noteError?.offsetHeight || 0) - gap
+                    const cellStyles = noteCell ? window.getComputedStyle(noteCell) : null;
+                    const cellInnerHeight = noteCell
+                        ? noteCell.clientHeight
+                            - (Number.parseFloat(cellStyles?.paddingTop || '0') || 0)
+                            - (Number.parseFloat(cellStyles?.paddingBottom || '0') || 0)
                         : 0;
+                    const availableHeight = cellInnerHeight - (noteSaveState.offsetHeight || 0) - (noteError?.offsetHeight || 0) - gap;
 
                     noteInput.style.height = `${Math.max(noteInput.scrollHeight, availableHeight, 76)}px`;
                 };
@@ -1358,8 +1364,51 @@
 
                 resizeNoteInput();
                 requestAnimationFrame(resizeNoteInput);
+                window.addEventListener('load', resizeNoteInput, { once: true });
+                window.addEventListener('resize', resizeNoteInput);
+
+                const noteCell = noteInput.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => resizeNoteInput());
+                    resizeObserver.observe(noteCell);
+                    noteForm._noteResizeObserver = resizeObserver;
+                }
+
                 noteInput.addEventListener('input', resizeNoteInput);
                 noteInput.addEventListener('change', saveNote);
+            });
+
+            document.querySelectorAll('textarea[data-payment-note-field]:not([data-payment-note-input])').forEach((noteField) => {
+                const resizeReadonlyNote = () => {
+                    noteField.style.height = 'auto';
+
+                    const noteCell = noteField.closest('td');
+                    const noteWrapper = noteField.parentElement;
+                    const noteHint = noteWrapper?.querySelector('p');
+                    const wrapperStyles = noteWrapper ? window.getComputedStyle(noteWrapper) : null;
+                    const gap = Number.parseFloat(wrapperStyles?.rowGap || wrapperStyles?.gap || '0') || 0;
+                    const cellStyles = noteCell ? window.getComputedStyle(noteCell) : null;
+                    const cellInnerHeight = noteCell
+                        ? noteCell.clientHeight
+                            - (Number.parseFloat(cellStyles?.paddingTop || '0') || 0)
+                            - (Number.parseFloat(cellStyles?.paddingBottom || '0') || 0)
+                        : 0;
+                    const availableHeight = cellInnerHeight - ((noteHint && noteHint.offsetParent !== null ? noteHint.offsetHeight : 0) || 0) - gap;
+
+                    noteField.style.height = `${Math.max(noteField.scrollHeight, availableHeight, 76)}px`;
+                };
+
+                resizeReadonlyNote();
+                requestAnimationFrame(resizeReadonlyNote);
+                window.addEventListener('load', resizeReadonlyNote, { once: true });
+                window.addEventListener('resize', resizeReadonlyNote);
+
+                const noteCell = noteField.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => resizeReadonlyNote());
+                    resizeObserver.observe(noteCell);
+                    noteField._noteResizeObserver = resizeObserver;
+                }
             });
 
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
