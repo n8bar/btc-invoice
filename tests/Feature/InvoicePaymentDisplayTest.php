@@ -487,6 +487,62 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSeeInOrder(['Payment QR', 'Delivery log', 'Payment history', 'Public link'], false);
     }
 
+    public function test_delivery_log_truncates_error_text_but_keeps_full_tooltip(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $errorMessage = 'Mailgun rejected the payload because the remote address parser found an invalid recipient format after alias rewriting and refused the queued send.';
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'failed',
+            'recipient' => 'client@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'error_message' => $errorMessage,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $response->assertOk();
+        $response->assertSee('title="' . e($errorMessage) . '"', false);
+        $response->assertSee('max-w-[18rem]', false);
+        $response->assertSee('truncate', false);
+        $response->assertSee('text-red-600', false);
+        $response->assertSee($errorMessage, false);
+    }
+
+    public function test_delivery_log_shows_none_as_neutral_state(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => 'client@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'error_message' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $response->assertOk();
+        $response->assertSee('title="None"', false);
+        $response->assertSee('text-gray-500', false);
+        $response->assertSeeText('None');
+    }
+
     public function test_bitcoin_uri_targets_outstanding_balance(): void
     {
         Cache::put(BtcRate::CACHE_KEY, [

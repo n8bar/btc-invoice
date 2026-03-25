@@ -653,8 +653,15 @@
                                                             —
                                                         @endif
                                                     </td>
-                                                    <td class="px-2 py-2 text-sm text-red-600">
-                                                        {{ $delivery->error_message ?: 'None' }}
+                                                    @php
+                                                        $hasDeliveryError = filled($delivery->error_message);
+                                                        $deliveryErrorMessage = $hasDeliveryError ? $delivery->error_message : 'None';
+                                                    @endphp
+                                                    <td class="px-2 py-2 text-sm">
+                                                        <div class="block max-w-[18rem] truncate {{ $hasDeliveryError ? 'text-red-600' : 'text-gray-500' }}"
+                                                             title="{{ $deliveryErrorMessage }}">
+                                                            {{ $deliveryErrorMessage }}
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach
