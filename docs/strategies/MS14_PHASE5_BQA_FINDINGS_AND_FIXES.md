@@ -75,7 +75,7 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 5. [ ] Add/update automated coverage for reversal creation and the append-only adjustment history.
 
 ### 4. Verify the follow-up fixes
-1. [ ] Run the targeted automated coverage for correction validation recovery and manual adjustment reversal.
-2. [ ] Rerun the ignore validation Browser QA steps and verify scroll, focus, and inline error behavior.
-3. [ ] Rerun the reattribution validation Browser QA steps and verify scroll, focus, preserved destination state, and inline error behavior.
-4. [ ] Rerun the manual adjustment Browser QA steps and verify the inline reversal flow plus the resulting reversal row.
+1. [ ] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
+2. [ ] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
+3. [ ] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
+4. [ ] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history.
