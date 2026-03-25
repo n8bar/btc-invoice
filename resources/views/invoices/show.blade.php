@@ -762,13 +762,13 @@
                                                     @if ($isSourcePayment)
                                                         <form method="POST"
                                                               action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                              class="space-y-1"
+                                                              class="flex min-h-[4.75rem] flex-col gap-1"
                                                               data-payment-note-form>
                                                             @csrf
                                                             @method('PATCH')
                                                             <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
                                                             <textarea name="note" rows="2"
-                                                                      class="w-full rounded border-gray-300 text-sm"
+                                                                      class="w-full flex-1 resize-none overflow-hidden rounded border-gray-300 text-sm leading-5"
                                                                       placeholder="Add note..."
                                                                       data-payment-note-input>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
                                                             <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
@@ -780,7 +780,7 @@
                                                         <div x-data="{ showReadonlyNoteHint: false }" class="space-y-1">
                                                             <textarea rows="2"
                                                                       readonly
-                                                                      class="w-full rounded border-gray-300 bg-gray-50 text-sm text-gray-700"
+                                                                      class="min-h-[4.75rem] w-full resize-none overflow-hidden rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
                                                                       placeholder="No note."
                                                                       @focus="showReadonlyNoteHint = true"
                                                                       @click="showReadonlyNoteHint = true">{{ $payment->note }}</textarea>
@@ -1284,11 +1284,26 @@
 
                 let lastSavedValue = noteInput.value;
 
+                const resizeNoteInput = () => {
+                    noteInput.style.height = 'auto';
+
+                    const noteCell = noteInput.closest('td');
+                    const noteError = noteForm.querySelector('.text-red-600');
+                    const formStyles = window.getComputedStyle(noteForm);
+                    const gap = Number.parseFloat(formStyles.rowGap || formStyles.gap || '0') || 0;
+                    const availableHeight = noteCell
+                        ? noteCell.clientHeight - (noteSaveState.offsetHeight || 0) - (noteError?.offsetHeight || 0) - gap
+                        : 0;
+
+                    noteInput.style.height = `${Math.max(noteInput.scrollHeight, availableHeight, 76)}px`;
+                };
+
                 const setNoteSaveState = (text, isError = false) => {
                     noteSaveState.textContent = text;
                     noteSaveState.classList.toggle('text-red-600', isError);
                     noteSaveState.classList.toggle('text-green-600', !isError && text.length > 0);
                     noteSaveState.classList.toggle('text-gray-500', text.length === 0);
+                    requestAnimationFrame(resizeNoteInput);
                 };
 
                 const saveNote = async () => {
@@ -1341,6 +1356,9 @@
                     }
                 };
 
+                resizeNoteInput();
+                requestAnimationFrame(resizeNoteInput);
+                noteInput.addEventListener('input', resizeNoteInput);
                 noteInput.addEventListener('change', saveNote);
             });
 
