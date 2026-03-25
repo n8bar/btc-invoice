@@ -1,5 +1,5 @@
 # PLAN
-_Last updated: 2026-03-23_
+_Last updated: 2026-03-25_
 
 This is the human-facing execution dashboard for Release Candidate work.
 
@@ -12,11 +12,11 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS14 - On-Chain Payment Attribution Hardening**
 - Status: `active`
-- Next action: finish agent-owned Phase 5 BQA prep, then hand off the rewritten Browser QA.
-- Primary next doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
-- Supporting docs: [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md), [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
+- Next action: address the Phase 5 Browser QA findings in a follow-up PR.
+- Primary next doc: [`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md`](strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md)
+- Supporting docs: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md), [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md)
 - Most recently completed milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md)
-- Milestone-doc note: phase-specific MS14 strategies now live under `docs/strategies/`; the current active checklist is [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md).
+- Milestone-doc note: phase-specific MS14 strategies now live under `docs/strategies/`; the current active working doc is [`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md`](strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md).
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |

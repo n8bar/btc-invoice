@@ -608,3 +608,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-25 | Manual adjustment reversal is now the canonical append-only undo path
 `docs/specs/PARTIAL_PAYMENTS.md` now requires owner-facing manual adjustment reversal instead of in-place edit/delete: an inline two-step `Reverse adjustment` -> `Confirm reverse entry` flow must create an equal-and-opposite manual adjustment row with note `reversal of {txid}` while preserving the original entry, and `docs/PRODUCT_SPEC.md` now summarizes that append-only reversal model at the product level.
+
+2026-03-25 | MS14 Phase 5 docs now point at the Browser QA findings follow-up
+`docs/PLAN.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now reflect that Browser QA is complete, Phase 5 remains active, and the next follow-up PR work is the findings/fix pass rather than more BQA prep.

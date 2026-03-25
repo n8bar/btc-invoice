@@ -1,10 +1,10 @@
 # MS14 Phase 5 Strategy - Browser QA Findings + Fixes
 
-Status: Active during Browser QA. Log findings here as they surface; sequence the fix work after the session.
+Status: Active after Browser QA. Use this doc to sequence the Phase 5 follow-up fixes.
 Parent phase strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
-This strategy is the running scratchpad for Phase 5 Browser QA findings. During the live session, capture the repro, expected behavior, and observed behavior here. After Browser QA ends, reshape this doc into the ordered fix sequence.
+This strategy is the active Phase 5 follow-up doc for issues found during Browser QA. Keep the findings list intact and turn the fix sequence below into the ordered follow-up implementation plan.
 
 ## Findings
 1. Ignore validation loses scroll position and weakens required-field feedback
@@ -53,4 +53,4 @@ This strategy is the running scratchpad for Phase 5 Browser QA findings. During 
      2. The only shipped adjustment action is creation, so an owner cannot practically say `oops` after recording the wrong adjustment.
 
 ## Fix Sequence
-- [ ] Flesh this out after Browser QA ends.
+- [ ] Flesh this out for the follow-up Phase 5 fixes.

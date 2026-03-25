@@ -1,10 +1,10 @@
 # MS14 Phase 5 Strategy - Correction Tooling + Safeguards
 
-Status: Active. Remaining work is the human Browser QA pass.
+Status: Active. Browser QA is complete; the remaining Phase 5 work lives in the findings follow-up doc.
 Parent milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](../milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
-This strategy owns the execution order for the remaining Phase 5 work. Use the milestone doc for phase rollup and the spec for behavior and invariants.
+This strategy owns the execution order for the shipped Phase 5 work and the completed Browser QA pass. Use the milestone doc for phase rollup, the findings doc for the active follow-up fixes, and the spec for behavior and invariants.
 
 - Ignore/restore/reattribute correction metadata now lives on `invoice_payments` with immutable source provenance and one active accounting destination.
 - Owner-only ignore/restore/reattribute actions now ship from the invoice payment-history table with inline confirmation.
