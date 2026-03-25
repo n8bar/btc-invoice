@@ -605,3 +605,6 @@ Rewrote the unchecked reattribution/public-surface Browser QA items in `docs/str
 
 2026-03-25 | Delivery log timestamps are now compact and MS15 notes delivery-type label cleanup
 The owner invoice delivery log in `resources/views/invoices/show.blade.php` now renders queued/sent timestamps as compact `MM-DD-YY HH:MM` 24-hour values while keeping full timestamps in the tooltip, and `docs/specs/NOTIFICATIONS.md` now notes planned MS15 polish to replace raw underscore-separated delivery type keys with concise owner-facing labels.
+
+2026-03-25 | Manual adjustment reversal is now the canonical append-only undo path
+`docs/specs/PARTIAL_PAYMENTS.md` now requires owner-facing manual adjustment reversal instead of in-place edit/delete: an inline two-step `Reverse adjustment` -> `Confirm reverse entry` flow must create an equal-and-opposite manual adjustment row with note `reversal of {txid}` while preserving the original entry, and `docs/PRODUCT_SPEC.md` now summarizes that append-only reversal model at the product level.
