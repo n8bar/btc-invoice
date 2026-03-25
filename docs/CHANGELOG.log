@@ -602,3 +602,6 @@ Removed the checkbox from the finding entry in `docs/strategies/MS14_PHASE5_BQA_
 
 2026-03-24 | MS14 Phase 5 Browser QA now identifies remaining payments by visible cues
 Rewrote the unchecked reattribution/public-surface Browser QA items in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to use the visible Scenario C payment timestamps and sats/USD amounts instead of internal payment-row IDs, so the tester can match the correct rows directly in the UI.
+
+2026-03-25 | Delivery log timestamps are now compact and MS15 notes delivery-type label cleanup
+The owner invoice delivery log in `resources/views/invoices/show.blade.php` now renders queued/sent timestamps as compact `MM-DD-YY HH:MM` 24-hour values while keeping full timestamps in the tooltip, and `docs/specs/NOTIFICATIONS.md` now notes planned MS15 polish to replace raw underscore-separated delivery type keys with concise owner-facing labels.

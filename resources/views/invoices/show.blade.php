@@ -634,21 +634,23 @@
                                                     @php
                                                         $queued = $delivery->dispatched_at;
                                                         $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
+                                                        $queuedCompactDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
                                                         $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
                                                         $sent = $delivery->sent_at;
                                                         $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
+                                                        $sentCompactDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
                                                         $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
                                                     @endphp
                                                     <td class="px-2 py-2 text-sm text-gray-600">
                                                         @if ($queuedIso)
-                                                            <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
+                                                            <time datetime="{{ $queuedIso }}" data-utc-compact-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedCompactDisplay }}</time>
                                                         @else
                                                             —
                                                         @endif
                                                     </td>
                                                     <td class="px-2 py-2 text-sm text-gray-600">
                                                         @if ($sentIso)
-                                                            <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
+                                                            <time datetime="{{ $sentIso }}" data-utc-compact-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentCompactDisplay }}</time>
                                                         @else
                                                             —
                                                         @endif
@@ -1482,6 +1484,33 @@
                 if (noteCell && 'ResizeObserver' in window) {
                     const resizeObserver = new ResizeObserver(() => syncPaymentNoteFieldHeight(noteField));
                     resizeObserver.observe(noteCell);
+                }
+            });
+
+            const padCompactDatePart = (value) => String(value).padStart(2, '0');
+
+            document.querySelectorAll('[data-utc-compact-ts]').forEach((node) => {
+                const iso = node.getAttribute('data-utc-compact-ts');
+                if (!iso) return;
+
+                const parsed = new Date(iso);
+                if (Number.isNaN(parsed.getTime())) return;
+
+                const compact = [
+                    padCompactDatePart(parsed.getMonth() + 1),
+                    padCompactDatePart(parsed.getDate()),
+                    padCompactDatePart(parsed.getFullYear() % 100),
+                ].join('-') + ` ${padCompactDatePart(parsed.getHours())}:${padCompactDatePart(parsed.getMinutes())}`;
+
+                node.textContent = compact;
+
+                const localizedTitle = parsed.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                });
+
+                if (localizedTitle) {
+                    node.title = localizedTitle;
                 }
             });
 

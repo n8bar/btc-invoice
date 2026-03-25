@@ -524,12 +524,13 @@ class InvoicePaymentDisplayTest extends TestCase
             'status' => 'sent',
         ]);
 
-        $invoice->deliveries()->create([
+        $delivery = $invoice->deliveries()->create([
             'user_id' => $owner->id,
             'type' => 'send',
             'status' => 'queued',
             'recipient' => 'client@example.com',
             'dispatched_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'sent_at' => Carbon::parse('2025-01-04 11:05:00', 'UTC'),
             'error_message' => null,
         ]);
 
@@ -537,11 +538,20 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.show', $invoice->fresh('deliveries')));
 
+        $expectedQueuedDisplay = $delivery->fresh()->dispatched_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
+        $expectedSentDisplay = $delivery->fresh()->sent_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
+
         $response->assertOk();
         $response->assertSee('title="None"', false);
         $response->assertSee('max-w-[10rem]', false);
         $response->assertSee('text-gray-500', false);
         $response->assertSeeText('None');
+        $response->assertSee($expectedQueuedDisplay, false);
+        $response->assertSee($expectedSentDisplay, false);
     }
 
     public function test_bitcoin_uri_targets_outstanding_balance(): void

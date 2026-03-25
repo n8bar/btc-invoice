@@ -70,6 +70,7 @@ This doc is canonical for outbound invoice communication:
 - For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
 - This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
 - Manual invoice sends and past-due reminders are outside this safeguard.
+- MS15 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## Mailables, Routes, and Jobs
 - Base communication classes:
