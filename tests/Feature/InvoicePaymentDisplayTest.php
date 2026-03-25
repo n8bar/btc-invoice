@@ -449,7 +449,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'source' => 'test',
         ], BtcRate::TTL);
 
-        InvoicePayment::create([
+        $payment = InvoicePayment::create([
             'invoice_id' => $invoice->id,
             'txid' => 'tx-partial-1',
             'sats_received' => 400_000,
@@ -476,6 +476,9 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Outstanding balance', false);
         $response->assertSee('$348.00', false);
         $response->assertSee('(0.00696 BTC)', false);
+        $paymentHistoryDetected = $payment->fresh()->detected_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
         $detectedDisplay = optional(
             $invoice->fresh('payments')->payments->max('detected_at')
         )
@@ -484,6 +487,7 @@ class InvoicePaymentDisplayTest extends TestCase
             ->toDayDateTimeString();
         $response->assertSee('Last payment detected', false);
         $response->assertSee($detectedDisplay, false);
+        $response->assertSee($paymentHistoryDetected, false);
         $response->assertSeeInOrder(['Payment QR', 'Delivery log', 'Payment history', 'Public link'], false);
     }
 

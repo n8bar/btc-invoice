@@ -735,7 +735,19 @@
                                                 $correctionLabelText = implode(' ', $correctionLabelLines);
                                             @endphp
                                             <tr>
-                                                <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
+                                                @php
+                                                    $paymentDetectedAt = $payment->detected_at;
+                                                    $paymentDetectedIso = $paymentDetectedAt ? $paymentDetectedAt->copy()->utc()->toIso8601String() : null;
+                                                    $paymentDetectedCompactDisplay = $paymentDetectedAt ? $paymentDetectedAt->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
+                                                    $paymentDetectedDisplay = $paymentDetectedAt ? $paymentDetectedAt->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                @endphp
+                                                <td class="px-2 py-2 text-sm text-gray-600">
+                                                    @if ($paymentDetectedIso)
+                                                        <time datetime="{{ $paymentDetectedIso }}" data-utc-compact-ts="{{ $paymentDetectedIso }}" title="{{ $paymentDetectedDisplay }}">{{ $paymentDetectedCompactDisplay }}</time>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
                                                 <td class="px-2 py-2 font-mono">
                                                     @if ($payment->txid)
                                                         <div class="max-h-[6.5rem] max-w-[9rem] overflow-y-auto break-all text-[15px] leading-[1.05rem]">{{ $payment->txid }}</div>
@@ -954,7 +966,7 @@
                                                                                 </div>
                                                                             @endif
                                                                             <details @if ($showReattributeForm) open @endif>
-                                                                                <summary class="list-none cursor-pointer font-semibold text-indigo-700 hover:text-indigo-900 [&::-webkit-details-marker]:hidden">
+                                                                                <summary class="list-none cursor-pointer rounded-md border border-indigo-200 bg-white px-3 py-2 text-center text-xs font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 [&::-webkit-details-marker]:hidden">
                                                                                     {{ $isOutgoingReattribution ? 'Change reattribution' : 'Reattribute payment' }}
                                                                                 </summary>
                                                                                 <form method="POST"
@@ -1014,7 +1026,7 @@
                                                                                 </form>
                                                                             </details>
                                                                             <details @if ($showIgnoreForm) open @endif>
-                                                                                <summary class="list-none cursor-pointer font-semibold text-red-700 hover:text-red-800 [&::-webkit-details-marker]:hidden">
+                                                                                <summary class="list-none cursor-pointer rounded-md border border-red-200 bg-white px-3 py-2 text-center text-xs font-semibold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 [&::-webkit-details-marker]:hidden">
                                                                                     Ignore payment
                                                                                 </summary>
                                                                                 <form method="POST"
