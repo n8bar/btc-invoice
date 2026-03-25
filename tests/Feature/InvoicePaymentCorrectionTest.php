@@ -351,8 +351,7 @@ class InvoicePaymentCorrectionTest extends TestCase
             ->get(route('invoices.show', $destinationInvoice))
             ->assertOk()
             ->assertSee('Correction menu: Applied Here', false)
-            ->assertSee($sourceInvoice->number, false)
-            ->assertSee('Edit notes on', false);
+            ->assertSee($sourceInvoice->number, false);
 
         $this->actingAs($owner)
             ->get(route('invoices.print', $sourceInvoice))

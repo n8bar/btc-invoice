@@ -777,16 +777,24 @@
                                                             @endif
                                                         </form>
                                                     @else
-                                                        <div class="text-sm text-gray-800" data-payment-note-display>{{ $payment->note ?: '—' }}</div>
-                                                    @endif
-
-                                                    @if ($relatedSourceInvoice)
-                                                        <p class="mt-2 text-xs text-gray-500">
-                                                            Edit notes on
-                                                            <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
-                                                                {{ $relatedSourceInvoice->number }}
-                                                            </a>.
-                                                        </p>
+                                                        <div x-data="{ showReadonlyNoteHint: false }" class="space-y-1">
+                                                            <textarea rows="2"
+                                                                      readonly
+                                                                      class="w-full rounded border-gray-300 bg-gray-50 text-sm text-gray-700"
+                                                                      placeholder="No note."
+                                                                      @focus="showReadonlyNoteHint = true"
+                                                                      @click="showReadonlyNoteHint = true">{{ $payment->note }}</textarea>
+                                                            @if ($relatedSourceInvoice)
+                                                                <p x-cloak
+                                                                   x-show="showReadonlyNoteHint"
+                                                                   class="text-xs text-gray-500">
+                                                                    Edit notes on
+                                                                    <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
+                                                                        {{ $relatedSourceInvoice->number }}
+                                                                    </a>.
+                                                                </p>
+                                                            @endif
+                                                        </div>
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
