@@ -308,7 +308,7 @@
                                 </div>
                                 <div class="flex justify-between font-semibold">
                                     <span>Outstanding balance (confirmed)</span>
-                                    <span>
+                                    <span class="whitespace-nowrap">
                                         {{ $currency($summary['outstanding_usd']) }}
                                 @if (!empty($summary['outstanding_btc_formatted']))
                                     ({{ $summary['outstanding_btc_formatted'] }} BTC)
