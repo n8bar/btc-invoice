@@ -759,11 +759,10 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
-                                                    <div class="text-sm text-gray-800" data-payment-note-display>{{ $payment->note ?: '—' }}</div>
                                                     @if ($isSourcePayment)
                                                         <form method="POST"
                                                               action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                              class="mt-2 space-y-1"
+                                                              class="space-y-1"
                                                               data-payment-note-form>
                                                             @csrf
                                                             @method('PATCH')
@@ -777,7 +776,11 @@
                                                                 <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
                                                             @endif
                                                         </form>
-                                                    @elseif ($relatedSourceInvoice)
+                                                    @else
+                                                        <div class="text-sm text-gray-800" data-payment-note-display>{{ $payment->note ?: '—' }}</div>
+                                                    @endif
+
+                                                    @if ($relatedSourceInvoice)
                                                         <p class="mt-2 text-xs text-gray-500">
                                                             Edit notes on
                                                             <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
