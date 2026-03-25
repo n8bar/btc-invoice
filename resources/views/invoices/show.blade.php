@@ -1290,16 +1290,17 @@
                     noteInput.style.height = 'auto';
 
                     const noteCell = noteInput.closest('td');
+                    const noteRow = noteInput.closest('tr');
                     const noteError = noteForm.querySelector('.text-red-600');
                     const formStyles = window.getComputedStyle(noteForm);
                     const gap = Number.parseFloat(formStyles.rowGap || formStyles.gap || '0') || 0;
                     const cellStyles = noteCell ? window.getComputedStyle(noteCell) : null;
-                    const cellInnerHeight = noteCell
-                        ? noteCell.clientHeight
+                    const rowInnerHeight = noteRow
+                        ? noteRow.getBoundingClientRect().height
                             - (Number.parseFloat(cellStyles?.paddingTop || '0') || 0)
                             - (Number.parseFloat(cellStyles?.paddingBottom || '0') || 0)
                         : 0;
-                    const availableHeight = cellInnerHeight - (noteSaveState.offsetHeight || 0) - (noteError?.offsetHeight || 0) - gap;
+                    const availableHeight = rowInnerHeight - (noteSaveState.offsetHeight || 0) - (noteError?.offsetHeight || 0) - gap;
 
                     noteInput.style.height = `${Math.max(noteInput.scrollHeight, availableHeight, 76)}px`;
                 };
@@ -1367,10 +1368,10 @@
                 window.addEventListener('load', resizeNoteInput, { once: true });
                 window.addEventListener('resize', resizeNoteInput);
 
-                const noteCell = noteInput.closest('td');
-                if (noteCell && 'ResizeObserver' in window) {
+                const noteRow = noteInput.closest('tr');
+                if (noteRow && 'ResizeObserver' in window) {
                     const resizeObserver = new ResizeObserver(() => resizeNoteInput());
-                    resizeObserver.observe(noteCell);
+                    resizeObserver.observe(noteRow);
                     noteForm._noteResizeObserver = resizeObserver;
                 }
 
@@ -1383,17 +1384,18 @@
                     noteField.style.height = 'auto';
 
                     const noteCell = noteField.closest('td');
+                    const noteRow = noteField.closest('tr');
                     const noteWrapper = noteField.parentElement;
                     const noteHint = noteWrapper?.querySelector('p');
                     const wrapperStyles = noteWrapper ? window.getComputedStyle(noteWrapper) : null;
                     const gap = Number.parseFloat(wrapperStyles?.rowGap || wrapperStyles?.gap || '0') || 0;
                     const cellStyles = noteCell ? window.getComputedStyle(noteCell) : null;
-                    const cellInnerHeight = noteCell
-                        ? noteCell.clientHeight
+                    const rowInnerHeight = noteRow
+                        ? noteRow.getBoundingClientRect().height
                             - (Number.parseFloat(cellStyles?.paddingTop || '0') || 0)
                             - (Number.parseFloat(cellStyles?.paddingBottom || '0') || 0)
                         : 0;
-                    const availableHeight = cellInnerHeight - ((noteHint && noteHint.offsetParent !== null ? noteHint.offsetHeight : 0) || 0) - gap;
+                    const availableHeight = rowInnerHeight - ((noteHint && noteHint.offsetParent !== null ? noteHint.offsetHeight : 0) || 0) - gap;
 
                     noteField.style.height = `${Math.max(noteField.scrollHeight, availableHeight, 76)}px`;
                 };
@@ -1403,10 +1405,10 @@
                 window.addEventListener('load', resizeReadonlyNote, { once: true });
                 window.addEventListener('resize', resizeReadonlyNote);
 
-                const noteCell = noteField.closest('td');
-                if (noteCell && 'ResizeObserver' in window) {
+                const noteRow = noteField.closest('tr');
+                if (noteRow && 'ResizeObserver' in window) {
                     const resizeObserver = new ResizeObserver(() => resizeReadonlyNote());
-                    resizeObserver.observe(noteCell);
+                    resizeObserver.observe(noteRow);
                     noteField._noteResizeObserver = resizeObserver;
                 }
             });
