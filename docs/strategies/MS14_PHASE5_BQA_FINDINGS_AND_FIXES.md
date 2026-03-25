@@ -53,4 +53,29 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
      2. The only shipped adjustment action is creation, so an owner cannot practically say `oops` after recording the wrong adjustment.
 
 ## Fix Sequence
-- [ ] Flesh this out for the follow-up Phase 5 fixes.
+### 1. Fix ignore validation recovery
+1. [ ] Keep the same ignore form open when validation fails for payment row `39` on invoice `67`.
+2. [ ] Preserve scroll position by returning focus to that payment row instead of reloading near the top.
+3. [ ] Focus the required reason field and keep the validation error inline and obvious.
+4. [ ] Make the failed submit state look clearly unsaved so the row does not read like the ignore succeeded.
+5. [ ] Add/update automated coverage for empty-reason ignore validation recovery.
+
+### 2. Fix reattribution validation recovery
+1. [ ] Keep the same reattribution form open when validation fails for the `30,000 sats` / `$21.06` payment on invoice `69`.
+2. [ ] Preserve the selected destination invoice while returning the browser to that payment row.
+3. [ ] Focus the required reason field and keep the validation error inline and obvious.
+4. [ ] Make the failed submit state look clearly unsaved so the row does not read like the reattribution succeeded.
+5. [ ] Add/update automated coverage for empty-reason reattribution validation recovery.
+
+### 3. Add manual adjustment reversal
+1. [ ] Add an owner-only reversal path that creates an equal-and-opposite manual adjustment row instead of editing or deleting the original row.
+2. [ ] Ship the inline two-step row UI: `Reverse` / `adjustment`, then `Confirm` / `reverse` / `entry`.
+3. [ ] Let a second click on `Reverse adjustment` hide the confirm control again.
+4. [ ] Auto-generate the reversal note as `reversal of {txid}` and recompute invoice state after the reversal entry is created.
+5. [ ] Add/update automated coverage for reversal creation and the append-only adjustment history.
+
+### 4. Verify the follow-up fixes
+1. [ ] Run the targeted automated coverage for correction validation recovery and manual adjustment reversal.
+2. [ ] Rerun the ignore validation Browser QA steps and verify scroll, focus, and inline error behavior.
+3. [ ] Rerun the reattribution validation Browser QA steps and verify scroll, focus, preserved destination state, and inline error behavior.
+4. [ ] Rerun the manual adjustment Browser QA steps and verify the inline reversal flow plus the resulting reversal row.
