@@ -39,5 +39,18 @@ This strategy is the running scratchpad for Phase 5 Browser QA findings. During 
      2. The payment row and correction panel fall out of view.
      3. The user can think the reattribution succeeded because the failed validation is no longer in context.
 
+3. Manual adjustment rows have no owner-facing `oops` path
+   - Surface: owner invoice show page, any manual adjustment row in payment history.
+   - Repro:
+     1. Add a manual adjustment row from the existing `Manual adjustments` form.
+     2. Review that row in payment history and try to correct it after realizing the amount/direction was wrong.
+   - Expected:
+     1. Manual adjustment rows expose the append-only undo path inline.
+     2. The owner can click `Reverse` / `adjustment` to reveal `Confirm` / `reverse` / `entry`.
+     3. Confirming creates an equal-and-opposite manual adjustment row with note `reversal of {txid}` while preserving the original row in history.
+   - Actual:
+     1. Manual adjustment rows show no reversal affordance.
+     2. The only shipped adjustment action is creation, so an owner cannot practically say `oops` after recording the wrong adjustment.
+
 ## Fix Sequence
 - [ ] Flesh this out after Browser QA ends.
