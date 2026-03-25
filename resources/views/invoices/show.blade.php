@@ -224,7 +224,7 @@
                 <div class="border-b border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-indigo-900 dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
                     Need to update invoice details? <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold underline hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100">edit</a> this invoice.
                 </div>
-                <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                     <div class="p-6 border-b md:border-b-0 md:border-r">
                         <h3 class="mb-3 text-sm font-semibold text-gray-700">Summary</h3>
                         <dl class="space-y-2 text-sm">
