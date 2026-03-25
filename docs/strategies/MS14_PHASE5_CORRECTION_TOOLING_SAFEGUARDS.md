@@ -103,8 +103,8 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
 7. [x] Verify manual-adjustment guardrails:
    1. [x] Create a manual adjustment row through the existing adjustment flow on invoice `67`, `68`, `69`, or `70`.
    2. [x] Verify that row shows no `Ignore`, `Restore`, or `Reattribute` controls.
-8. [ ] Verify force-delete guidance:
-   1. [ ] After reattributing either the `30,000 sats` / `$21.06` payment or the `40,000 sats` / `$28.08` payment from source invoice `69`, attempt force delete on destination invoice `70` (`INV-0006`).
-   2. [ ] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance points back to invoice `69`, and the flow offers no one-click auto-conversion or cleanup.
+8. [x] Verify force-delete guidance:
+   1. [x] After reattributing either the `30,000 sats` / `$21.06` payment or the `40,000 sats` / `$28.08` payment from source invoice `69`, attempt force delete on destination invoice `70` (`INV-0006`).
+   2. [x] Verify force delete is blocked, the blocker is named clearly, source-invoice guidance points back to invoice `69`, and the flow offers no one-click auto-conversion or cleanup.
 
 Current next-step/fix tracking during/after Browser QA lives in [`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md`](MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md).
