@@ -289,7 +289,7 @@
                     @foreach ($invoice->payments as $payment)
                         <tr>
                             <td>{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
-                            <td class="mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                            <td class="mono" style="word-break: break-all;">{{ $payment->txid ?: '—' }}</td>
                             <td style="text-align:right;">{{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}</td>
                             <td style="text-align:right;">
                                 @if ($payment->fiat_amount !== null)

@@ -727,7 +727,13 @@
                                             @endphp
                                             <tr>
                                                 <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
-                                                <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                                                <td class="px-2 py-2 font-mono">
+                                                    @if ($payment->txid)
+                                                        <div class="max-w-[11rem] break-all">{{ $payment->txid }}</div>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
                                                 <td class="px-2 py-2 text-right">
                                                     {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
                                                 </td>
@@ -753,25 +759,23 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
-                                                    <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
+                                                    <div class="text-sm text-gray-800" data-payment-note-display>{{ $payment->note ?: '—' }}</div>
                                                     @if ($isSourcePayment)
                                                         <form method="POST"
                                                               action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                              class="mt-2 space-y-2">
+                                                              class="mt-2 space-y-1"
+                                                              data-payment-note-form>
                                                             @csrf
                                                             @method('PATCH')
                                                             <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
                                                             <textarea name="note" rows="2"
                                                                       class="w-full rounded border-gray-300 text-sm"
-                                                                      placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                                      placeholder="Add note..."
+                                                                      data-payment-note-input>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                            <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
                                                             @if ($errors->has('note') && old('source_payment_id') == $payment->id)
                                                                 <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
                                                             @endif
-                                                            <div class="flex justify-end">
-                                                                <x-secondary-button type="submit" class="text-xs px-3 py-1">
-                                                                    Save
-                                                                </x-secondary-button>
-                                                            </div>
                                                         </form>
                                                     @elseif ($relatedSourceInvoice)
                                                         <p class="mt-2 text-xs text-gray-500">
@@ -1257,6 +1261,77 @@
 
                 deliveryInput.addEventListener('change', saveDraft);
             }
+
+            document.querySelectorAll('[data-payment-note-form]').forEach((noteForm) => {
+                const noteInput = noteForm.querySelector('[data-payment-note-input]');
+                const noteSaveState = noteForm.querySelector('[data-payment-note-save-state]');
+                const noteDisplay = noteForm.closest('td')?.querySelector('[data-payment-note-display]');
+
+                if (!noteInput || !noteSaveState || !csrfToken) {
+                    return;
+                }
+
+                let lastSavedValue = noteInput.value;
+
+                const setNoteSaveState = (text, isError = false) => {
+                    noteSaveState.textContent = text;
+                    noteSaveState.classList.toggle('text-red-600', isError);
+                    noteSaveState.classList.toggle('text-green-600', !isError && text.length > 0);
+                    noteSaveState.classList.toggle('text-gray-500', text.length === 0);
+                };
+
+                const saveNote = async () => {
+                    const currentValue = noteInput.value;
+
+                    if (currentValue === lastSavedValue) {
+                        return;
+                    }
+
+                    setNoteSaveState('Saving...');
+
+                    try {
+                        const response = await fetch(noteForm.action, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: JSON.stringify({
+                                note: currentValue,
+                                source_payment_id: noteForm.querySelector('input[name="source_payment_id"]')?.value,
+                            }),
+                        });
+
+                        if (response.status === 422) {
+                            const payload = await response.json();
+                            throw new Error(payload?.errors?.note?.[0] || 'Could not save this note yet.');
+                        }
+
+                        if (!response.ok) {
+                            throw new Error('Could not save this note yet.');
+                        }
+
+                        const payload = await response.json();
+
+                        lastSavedValue = currentValue;
+                        if (noteDisplay) {
+                            noteDisplay.textContent = payload.note && payload.note.length > 0 ? payload.note : '—';
+                        }
+
+                        setNoteSaveState('Saved');
+                        setTimeout(() => {
+                            if (noteSaveState.textContent === 'Saved') {
+                                setNoteSaveState('');
+                            }
+                        }, 1200);
+                    } catch (error) {
+                        setNoteSaveState(error instanceof Error ? error.message : 'Could not save this note yet.', true);
+                    }
+                };
+
+                noteInput.addEventListener('change', saveNote);
+            });
 
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
                 const iso = node.getAttribute('data-utc-ts');

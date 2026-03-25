@@ -601,6 +601,40 @@ class InvoicePaymentDisplayTest extends TestCase
             ->assertSee('@ $35,000.00 USD/BTC', false);
     }
 
+    public function test_owner_can_update_payment_note_via_json(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-note-json-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::parse('2025-01-05 12:00:00', 'UTC'),
+            'usd_rate' => 35_000,
+            'fiat_amount' => 35.00,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patchJson(route('invoices.payments.note', [$invoice, $payment]), [
+                'note' => 'Autosaved partial note',
+                'source_payment_id' => $payment->id,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'status' => 'saved',
+                'note' => 'Autosaved partial note',
+            ]);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'id' => $payment->id,
+            'note' => 'Autosaved partial note',
+        ]);
+    }
+
     public function test_print_view_shows_payment_history_table(): void
     {
         $owner = User::factory()->create();
