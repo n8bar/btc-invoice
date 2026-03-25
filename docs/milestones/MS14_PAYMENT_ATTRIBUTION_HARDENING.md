@@ -15,7 +15,7 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
 
 ## Current Focus
 - Active phase: **Phase 5 - Correction Tooling + Safeguards**
-- Current objective: address the Browser QA findings for the shipped ignore, restore, and reattribute correction tooling.
+- Current objective: rerun the targeted Browser QA checks for the shipped follow-up fixes to ignore validation, reattribution validation, and manual adjustment reversal.
 - Canonical Phase 5 requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
 ## Phase Rollup
@@ -28,7 +28,7 @@ This is the milestone execution doc for MS14. It tracks milestone-level objectiv
 4. [x] Phase 4 - Dedicated-Wallet UX Hardening
    Shipped dedicated-account guidance across wallet, onboarding, and Helpful Notes, with Browser QA complete.
 5. [ ] Phase 5 - Correction Tooling + Safeguards
-   Browser QA is complete; remaining work is the follow-up findings fix pass for the shipped ignore, restore, and reattribute correction tooling.
+   Follow-up fixes are implemented; remaining work is the targeted Browser QA rerun for validation recovery and manual adjustment reversal.
 
 ## Exit Criteria
 - False-attribution root cause is structurally mitigated through key-aware lineage and cursor behavior.

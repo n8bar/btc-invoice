@@ -1,10 +1,10 @@
 # MS14 Phase 5 Strategy - Browser QA Findings + Fixes
 
-Status: Active after Browser QA. Use this doc to sequence the Phase 5 follow-up fixes.
+Status: Active after Browser QA. The follow-up fixes are implemented on this branch; remaining work is the targeted Browser QA rerun.
 Parent phase strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
-This strategy is the active Phase 5 follow-up doc for issues found during Browser QA. Keep the findings list intact and turn the fix sequence below into the ordered follow-up implementation plan.
+This strategy is the active Phase 5 follow-up doc for issues found during Browser QA. Keep the findings list intact, track what shipped in the fix sequence below, and use the remaining verification items for the targeted rerun.
 
 ## Findings
 1. Ignore validation loses scroll position and weakens required-field feedback
@@ -54,28 +54,28 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 
 ## Fix Sequence
 ### 1. Fix ignore validation recovery
-1. [ ] Keep the same ignore form open when validation fails for payment row `39` on invoice `67`.
-2. [ ] Preserve scroll position by returning focus to that payment row instead of reloading near the top.
-3. [ ] Focus the required reason field and keep the validation error inline and obvious.
-4. [ ] Make the failed submit state look clearly unsaved so the row does not read like the ignore succeeded.
-5. [ ] Add/update automated coverage for empty-reason ignore validation recovery.
+1. [x] Keep the same ignore form open when validation fails for payment row `39` on invoice `67`.
+2. [x] Preserve scroll position by returning focus to that payment row instead of reloading near the top.
+3. [x] Focus the required reason field and keep the validation error inline and obvious.
+4. [x] Make the failed submit state look clearly unsaved so the row does not read like the ignore succeeded.
+5. [x] Add/update automated coverage for empty-reason ignore validation recovery.
 
 ### 2. Fix reattribution validation recovery
-1. [ ] Keep the same reattribution form open when validation fails for the `30,000 sats` / `$21.06` payment on invoice `69`.
-2. [ ] Preserve the selected destination invoice while returning the browser to that payment row.
-3. [ ] Focus the required reason field and keep the validation error inline and obvious.
-4. [ ] Make the failed submit state look clearly unsaved so the row does not read like the reattribution succeeded.
-5. [ ] Add/update automated coverage for empty-reason reattribution validation recovery.
+1. [x] Keep the same reattribution form open when validation fails for the `30,000 sats` / `$21.06` payment on invoice `69`.
+2. [x] Preserve the selected destination invoice while returning the browser to that payment row.
+3. [x] Focus the required reason field and keep the validation error inline and obvious.
+4. [x] Make the failed submit state look clearly unsaved so the row does not read like the reattribution succeeded.
+5. [x] Add/update automated coverage for empty-reason reattribution validation recovery.
 
 ### 3. Add manual adjustment reversal
-1. [ ] Add an owner-only reversal path that creates an equal-and-opposite manual adjustment row instead of editing or deleting the original row.
-2. [ ] Ship the inline two-step row UI: `Reverse` / `adjustment`, then `Confirm` / `reverse` / `entry`.
-3. [ ] Let a second click on `Reverse adjustment` hide the confirm control again.
-4. [ ] Auto-generate the reversal note as `reversal of {txid}` and recompute invoice state after the reversal entry is created.
-5. [ ] Add/update automated coverage for reversal creation and the append-only adjustment history.
+1. [x] Add an owner-only reversal path that creates an equal-and-opposite manual adjustment row instead of editing or deleting the original row.
+2. [x] Ship the inline two-step row UI: `Reverse` / `adjustment`, then `Confirm` / `reverse` / `entry`.
+3. [x] Let a second click on `Reverse adjustment` hide the confirm control again.
+4. [x] Auto-generate the reversal note as `reversal of {txid}` and recompute invoice state after the reversal entry is created.
+5. [x] Add/update automated coverage for reversal creation and the append-only adjustment history.
 
 ### 4. Verify the follow-up fixes
-1. [ ] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
+1. [x] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
 2. [ ] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
 3. [ ] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
 4. [ ] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history.

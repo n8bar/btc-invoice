@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Services\InvoiceAlertService;
@@ -9,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class InvoicePaymentCorrectionController extends Controller
@@ -34,10 +36,21 @@ class InvoicePaymentCorrectionController extends Controller
             'ignore_reason' => trim((string) $request->input('ignore_reason', '')),
         ]);
 
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'ignore_reason' => ['required', 'string', 'max:500'],
             'correction_payment_id' => ['nullable', 'integer'],
         ]);
+
+        if ($validator->fails()) {
+            return $this->redirectCorrectionValidationFailure(
+                $invoice,
+                $payment,
+                $validator,
+                'ignore_reason_'.$payment->id
+            );
+        }
+
+        $data = $validator->validated();
 
         $statusBefore = $invoice->status;
         $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
@@ -132,7 +145,7 @@ class InvoicePaymentCorrectionController extends Controller
             'reattribute_reason' => trim((string) $request->input('reattribute_reason', '')),
         ]);
 
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'destination_invoice_id' => [
                 'required',
                 'integer',
@@ -144,6 +157,19 @@ class InvoicePaymentCorrectionController extends Controller
             'reattribute_reason' => ['required', 'string', 'max:500'],
             'correction_payment_id' => ['nullable', 'integer'],
         ]);
+
+        if ($validator->fails()) {
+            return $this->redirectCorrectionValidationFailure(
+                $invoice,
+                $payment,
+                $validator,
+                $validator->errors()->has('destination_invoice_id')
+                    ? 'destination_invoice_id_'.$payment->id
+                    : 'reattribute_reason_'.$payment->id
+            );
+        }
+
+        $data = $validator->validated();
 
         $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
         $destinationInvoiceId = (int) $data['destination_invoice_id'];
@@ -241,5 +267,21 @@ class InvoicePaymentCorrectionController extends Controller
         }
 
         return $refreshed;
+    }
+
+    private function redirectCorrectionValidationFailure(
+        Invoice $invoice,
+        InvoicePayment $payment,
+        ValidatorContract $validator,
+        string $focusField
+    ): RedirectResponse {
+        $targetUrl = strtok(url()->previous(), '#') ?: route('invoices.show', $invoice);
+        $rowId = 'payment-row-'.$payment->id;
+
+        return redirect()->to($targetUrl.'#'.$rowId)
+            ->withInput()
+            ->withErrors($validator)
+            ->with('correction_focus_field', $focusField)
+            ->with('correction_focus_row', $rowId);
     }
 }

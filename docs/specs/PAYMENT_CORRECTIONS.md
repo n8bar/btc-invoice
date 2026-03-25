@@ -140,6 +140,7 @@ UX guardrails:
 - Keep the confirmation UI inline to the row or section so keyboard flow remains sane and layout shift stays controlled.
 - Preserve typed ignore reason on validation failure.
 - Preserve the selected destination invoice and typed reason on reattribution validation failure.
+- Keep the same payment row in view when correction validation fails.
 - Focus the first errored field when correction validation fails.
 
 ## Public, Print, and Support Surfaces

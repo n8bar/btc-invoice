@@ -472,6 +472,70 @@ class InvoicePaymentCorrectionTest extends TestCase
         $this->assertNull($payment->reattributed_at);
     }
 
+    public function test_ignore_validation_redirects_back_to_the_same_payment_row_with_focus_state(): void
+    {
+        [$owner, , $invoice] = $this->makeInvoice(['number' => 'INV-IGNORE-VALIDATION']);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-ignore-validation',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $this->actingAs($owner)
+            ->from(route('invoices.show', $invoice))
+            ->patch(route('invoices.payments.ignore', [$invoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'ignore_reason' => '   ',
+            ])
+            ->assertRedirect(route('invoices.show', $invoice).'#payment-row-'.$payment->id)
+            ->assertSessionHasErrors('ignore_reason')
+            ->assertSessionHas('correction_focus_field', 'ignore_reason_'.$payment->id)
+            ->assertSessionHas('correction_focus_row', 'payment-row-'.$payment->id)
+            ->assertSessionHas('_old_input.correction_payment_id', $payment->id);
+
+        $payment->refresh();
+        $this->assertNull($payment->ignored_at);
+    }
+
+    public function test_reattribution_validation_redirects_back_to_the_same_payment_row_with_destination_preserved(): void
+    {
+        [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-VALIDATION-SRC']);
+        [, , $destinationInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-VALIDATION-DEST'], $owner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'tx-reattr-validation',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $this->actingAs($owner)
+            ->from(route('invoices.show', $sourceInvoice))
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'destination_invoice_id' => $destinationInvoice->id,
+                'reattribute_reason' => '   ',
+            ])
+            ->assertRedirect(route('invoices.show', $sourceInvoice).'#payment-row-'.$payment->id)
+            ->assertSessionHasErrors('reattribute_reason')
+            ->assertSessionHas('correction_focus_field', 'reattribute_reason_'.$payment->id)
+            ->assertSessionHas('correction_focus_row', 'payment-row-'.$payment->id)
+            ->assertSessionHas('_old_input.correction_payment_id', $payment->id)
+            ->assertSessionHas('_old_input.destination_invoice_id', $destinationInvoice->id);
+
+        $payment->refresh();
+        $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
+        $this->assertNull($payment->reattributed_at);
+    }
+
     public function test_payment_correction_returns_404_for_mismatched_invoice_payment_pair(): void
     {
         [$owner, , $invoiceA] = $this->makeInvoice(['number' => 'INV-CORRECT-A']);
@@ -570,6 +634,57 @@ class InvoicePaymentCorrectionTest extends TestCase
         $payment->refresh();
         $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
         $this->assertNull($payment->reattributed_at);
+    }
+
+    public function test_owner_can_reverse_manual_adjustment_with_equal_and_opposite_entry(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-13 10:00:00', 'UTC'));
+
+        [$owner, , $invoice] = $this->makeInvoice([
+            'number' => 'INV-MANUAL-REVERSE',
+            'amount_usd' => 10,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.0002,
+        ]);
+
+        $adjustment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'manual-adjustment-1',
+            'sats_received' => 20_000,
+            'detected_at' => Carbon::now()->subMinute(),
+            'confirmed_at' => Carbon::now()->subMinute(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+            'note' => 'Courtesy credit',
+            'is_adjustment' => true,
+        ]);
+
+        $invoice->refresh()->refreshPaymentLedger();
+        $invoice->refresh();
+        $this->assertSame('paid', $invoice->status);
+
+        $this->actingAs($owner)
+            ->post(route('invoices.payments.adjustments.reverse', [$invoice, $adjustment]))
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Adjustment reversed.');
+
+        $invoice->refresh();
+
+        /** @var InvoicePayment|null $reversal */
+        $reversal = InvoicePayment::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('note', 'reversal of manual-adjustment-1')
+            ->first();
+
+        $this->assertNotNull($reversal);
+        $this->assertTrue($reversal->is_adjustment);
+        $this->assertSame(-20_000, $reversal->sats_received);
+        $this->assertSame(-10.0, (float) $reversal->fiat_amount);
+        $this->assertSame(50_000.0, (float) $reversal->usd_rate);
+        $this->assertSame('reversal of manual-adjustment-1', $reversal->note);
+        $this->assertSame('sent', $invoice->status);
+        $this->assertNull($invoice->paid_at);
+        $this->assertSame(0, $invoice->payment_amount_sat);
     }
 
     private function makeInvoice(array $invoiceOverrides = [], ?User $owner = null): array

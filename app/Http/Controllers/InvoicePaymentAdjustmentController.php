@@ -63,10 +63,7 @@ class InvoicePaymentAdjustmentController extends Controller
             'is_adjustment' => true,
         ]);
 
-        $invoice->refreshPaymentLedger();
-        $invoice->refresh();
-        $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after small-balance resolution.');
-        $this->alerts->checkPaymentThresholds($invoice);
+        $this->refreshAdjustmentTargets($invoice, 'Skipped after small-balance resolution.');
 
         return back()->with('status', 'Small balance resolved and invoice marked paid.');
     }
@@ -112,11 +109,54 @@ class InvoicePaymentAdjustmentController extends Controller
             'is_adjustment' => true,
         ]);
 
-        $invoice->refreshPaymentLedger();
-        $invoice->refresh();
-        $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after manual adjustment.');
-        $this->alerts->checkPaymentThresholds($invoice);
+        $this->refreshAdjustmentTargets($invoice, 'Skipped after manual adjustment.');
 
         return back()->with('status', 'Adjustment recorded.');
+    }
+
+    public function reverse(Request $request, Invoice $invoice, InvoicePayment $payment): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+        abort_if($payment->invoice_id !== $invoice->id, 404);
+
+        if (! $payment->is_adjustment) {
+            return back()->with('error', 'Only manual adjustments can be reversed.');
+        }
+
+        $existingReversal = InvoicePayment::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('is_adjustment', true)
+            ->where('note', 'reversal of '.$payment->txid)
+            ->exists();
+
+        if ($existingReversal) {
+            return back()->with('status', 'Adjustment already reversed.');
+        }
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'manual-reversal-' . Str::uuid(),
+            'sats_received' => $payment->sats_received * -1,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => $payment->usd_rate,
+            'fiat_amount' => $payment->fiat_amount !== null
+                ? round((float) $payment->fiat_amount * -1, 2)
+                : null,
+            'note' => 'reversal of '.$payment->txid,
+            'is_adjustment' => true,
+        ]);
+
+        $this->refreshAdjustmentTargets($invoice, 'Skipped after manual adjustment reversal.');
+
+        return back()->with('status', 'Adjustment reversed.');
+    }
+
+    private function refreshAdjustmentTargets(Invoice $invoice, string $skipReason): void
+    {
+        $invoice->refreshPaymentLedger();
+        $invoice->refresh();
+        $this->alerts->skipInvalidQueuedDeliveries($invoice, $skipReason);
+        $this->alerts->checkPaymentThresholds($invoice);
     }
 }

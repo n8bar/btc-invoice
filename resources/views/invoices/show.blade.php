@@ -714,6 +714,10 @@
                                                 $selectedDestinationId = $showReattributeForm
                                                     ? old('destination_invoice_id')
                                                     : ($isOutgoingReattribution ? $payment->activeAccountingInvoiceId() : null);
+                                                $hasManualAdjustmentReversal = $payment->is_adjustment
+                                                    && $paymentHistory->contains(fn ($candidate) => $candidate->id !== $payment->id
+                                                        && $candidate->is_adjustment
+                                                        && $candidate->note === 'reversal of '.$payment->txid);
                                                 $correctionLabelLines = ['Corrections'];
                                                 $correctionButtonClasses = 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 dark:border-white/15 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-indigo-400';
                                                 $correctionPanelClasses = 'border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900';
@@ -734,7 +738,7 @@
 
                                                 $correctionLabelText = implode(' ', $correctionLabelLines);
                                             @endphp
-                                            <tr>
+                                            <tr id="payment-row-{{ $payment->id }}">
                                                 @php
                                                     $paymentDetectedAt = $payment->detected_at;
                                                     $paymentDetectedIso = $paymentDetectedAt ? $paymentDetectedAt->copy()->utc()->toIso8601String() : null;
@@ -825,10 +829,39 @@
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
                                                     @if ($payment->is_adjustment)
-                                                        <span class="inline-flex flex-col text-xs text-gray-500">
-                                                            <span>Manual</span>
-                                                            <span>adjustment</span>
-                                                        </span>
+                                                        <div class="w-28" x-data="{ open: false }">
+                                                            @if ($hasManualAdjustmentReversal)
+                                                                <span class="inline-flex flex-col text-xs text-gray-500">
+                                                                    <span>Reversed</span>
+                                                                    <span>entry</span>
+                                                                </span>
+                                                            @else
+                                                                <button type="button"
+                                                                        class="inline-flex w-full items-center justify-center rounded-md border border-rose-200 bg-white px-3 py-2 text-center text-xs font-semibold leading-tight text-rose-700 shadow-sm transition hover:border-rose-300 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:border-rose-400/35 dark:bg-slate-900/80 dark:text-rose-200 dark:hover:border-rose-300/60 dark:hover:bg-rose-950/35 dark:focus:ring-rose-400 dark:focus:ring-offset-slate-900"
+                                                                        @click="open = !open"
+                                                                        :aria-expanded="open ? 'true' : 'false'">
+                                                                    <span class="flex flex-col items-center">
+                                                                        <span>Reverse</span>
+                                                                        <span>adjustment</span>
+                                                                    </span>
+                                                                </button>
+                                                                <div x-cloak
+                                                                     x-show="open"
+                                                                     x-transition
+                                                                     class="mt-2 space-y-2 rounded-lg border border-rose-200 bg-rose-50/70 p-2 dark:border-rose-400/30 dark:bg-rose-950/35">
+                                                                    <form method="POST" action="{{ route('invoices.payments.adjustments.reverse', [$invoice, $payment]) }}">
+                                                                        @csrf
+                                                                        <x-danger-button type="submit" class="w-full px-2 py-1 text-[11px] normal-case tracking-normal">
+                                                                            <span class="flex flex-col items-center leading-tight">
+                                                                                <span>Confirm</span>
+                                                                                <span>reverse</span>
+                                                                                <span>entry</span>
+                                                                            </span>
+                                                                        </x-danger-button>
+                                                                    </form>
+                                                                </div>
+                                                            @endif
+                                                        </div>
                                                     @else
                                                         <div class="w-28"
                                                              x-data="{
@@ -985,7 +1018,7 @@
                                                                                         <label for="destination_invoice_id_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900 dark:text-indigo-100">Destination invoice</label>
                                                                                         <select id="destination_invoice_id_{{ $payment->id }}"
                                                                                                 name="destination_invoice_id"
-                                                                                                class="mt-1 w-full rounded border-indigo-200 text-sm dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-slate-100"
+                                                                                                class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 {{ $showReattributeForm && $errors->has('destination_invoice_id') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-indigo-200 dark:border-indigo-400/30' }}"
                                                                                                 @if ($showReattributeForm && $errors->has('destination_invoice_id')) autofocus @endif>
                                                                                             @unless ($isOutgoingReattribution)
                                                                                                 <option value="" @selected($selectedDestinationId === null)>Select an invoice</option>
@@ -1014,7 +1047,7 @@
                                                                                         <textarea id="reattribute_reason_{{ $payment->id }}"
                                                                                                   name="reattribute_reason"
                                                                                                   rows="2"
-                                                                                                  class="mt-1 w-full rounded border-indigo-200 text-sm dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400"
+                                                                                                  class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showReattributeForm && $errors->has('reattribute_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-indigo-200 dark:border-indigo-400/30' }}"
                                                                                                   placeholder="Why should this payment count toward another invoice?"
                                                                                                   @if ($showReattributeForm && ! $errors->has('destination_invoice_id')) autofocus @endif>{{ $showReattributeForm ? old('reattribute_reason') : ($isOutgoingReattribution ? $payment->reattribute_reason : '') }}</textarea>
                                                                                         @if ($showReattributeForm && $errors->has('reattribute_reason'))
@@ -1046,7 +1079,7 @@
                                                                                         <textarea id="ignore_reason_{{ $payment->id }}"
                                                                                                   name="ignore_reason"
                                                                                                   rows="2"
-                                                                                                  class="mt-1 w-full rounded border-red-200 text-sm dark:border-red-400/30 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400"
+                                                                                                  class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showIgnoreForm && $errors->has('ignore_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-red-200 dark:border-red-400/30' }}"
                                                                                                   placeholder="Why should this payment stop counting toward this invoice?"
                                                                                                   @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
                                                                                         @if ($showIgnoreForm)
@@ -1312,6 +1345,38 @@
                         window.scrollTo({ top: restoreScrollY, left: 0, behavior: 'auto' });
                     });
                 });
+            }
+
+            const correctionFocusFieldId = @json(session('correction_focus_field'));
+            const correctionFocusRowId = @json(session('correction_focus_row'));
+            if (correctionFocusFieldId || correctionFocusRowId) {
+                let correctionFocusAttempts = 0;
+
+                const focusCorrectionTarget = () => {
+                    correctionFocusAttempts += 1;
+
+                    const correctionRow = correctionFocusRowId ? document.getElementById(correctionFocusRowId) : null;
+                    if (correctionRow) {
+                        correctionRow.scrollIntoView({ block: 'center', inline: 'nearest' });
+                    }
+
+                    const correctionField = correctionFocusFieldId ? document.getElementById(correctionFocusFieldId) : null;
+                    if (correctionField && correctionField.offsetParent !== null) {
+                        correctionField.focus({ preventScroll: true });
+                        if (typeof correctionField.setSelectionRange === 'function') {
+                            const valueLength = correctionField.value?.length ?? 0;
+                            correctionField.setSelectionRange(valueLength, valueLength);
+                        }
+                        correctionRow?.scrollIntoView({ block: 'center', inline: 'nearest' });
+                        return;
+                    }
+
+                    if (correctionFocusAttempts < 24) {
+                        requestAnimationFrame(focusCorrectionTarget);
+                    }
+                };
+
+                requestAnimationFrame(focusCorrectionTarget);
             }
 
             const deliveryForm = document.querySelector('[data-delivery-message-form]');
