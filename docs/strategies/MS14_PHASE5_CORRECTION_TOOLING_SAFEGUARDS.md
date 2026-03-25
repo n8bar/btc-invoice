@@ -91,10 +91,10 @@ This strategy owns the execution order for the remaining Phase 5 work. Use the m
    1. [x] On source invoice `69` (`INV-0005`), click `Reattribute` on the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` (`INV-0006`), enter a reason, and submit.
    2. [x] Verify source invoice `69` owner history shows that `30,000 sats` / `$21.06` payment as reattributed out and no longer counting there.
    3. [x] Verify destination invoice `70` owner history shows that same `30,000 sats` / `$21.06` payment as reattributed in and counting there.
-5. [ ] Verify public and print surfaces after reattribution:
-   1. [ ] Open source invoice `69` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is absent there while the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` still appears as the active source payment.
-   2. [ ] Open destination invoice `70` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is present and counted there.
-   3. [ ] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
+5. [x] Verify public and print surfaces after reattribution:
+   1. [x] Open source invoice `69` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is absent there while the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` still appears as the active source payment.
+   2. [x] Open destination invoice `70` public/print surfaces and verify the `30,000 sats` / `$21.06` payment is present and counted there.
+   3. [x] Verify neither public/print surface exposes source provenance, related-invoice links, or reattribution labels.
 6. [ ] Verify the stale-address wrong-invoice boundary:
    1. [ ] Use the later `40,000 sats` / `$28.08` payment detected `Mon, Mar 23, 2026 11:27 PM` on source invoice `69`.
    2. [ ] Verify that `40,000 sats` / `$28.08` payment appears as a normal correction candidate on source invoice `69`.
