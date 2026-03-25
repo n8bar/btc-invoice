@@ -729,7 +729,7 @@
                                                 <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
                                                 <td class="px-2 py-2 font-mono">
                                                     @if ($payment->txid)
-                                                        <div class="max-h-[6.5rem] max-w-[9rem] overflow-y-auto break-all text-[10px] leading-3">{{ $payment->txid }}</div>
+                                                        <div class="max-h-[6.5rem] max-w-[9rem] overflow-y-auto break-all text-[15px] leading-[1.05rem]">{{ $payment->txid }}</div>
                                                     @else
                                                         —
                                                     @endif
