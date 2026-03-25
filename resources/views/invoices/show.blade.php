@@ -729,7 +729,7 @@
                                                 <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
                                                 <td class="px-2 py-2 font-mono">
                                                     @if ($payment->txid)
-                                                        <div class="max-w-[11rem] break-all">{{ $payment->txid }}</div>
+                                                        <div class="max-h-[6.5rem] max-w-[9rem] overflow-y-auto break-all text-[10px] leading-3">{{ $payment->txid }}</div>
                                                     @else
                                                         —
                                                     @endif
@@ -758,18 +758,17 @@
                                                         <span class="font-medium text-gray-700">{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</span>
                                                     @endif
                                                 </td>
-                                                <td class="relative px-2 py-2 align-top">
+                                                <td class="px-2 py-2 align-top">
                                                     @if ($isSourcePayment)
-                                                        <div aria-hidden="true" class="min-h-[4.75rem]"></div>
                                                         <form method="POST"
                                                               action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                              class="absolute inset-2 flex flex-col gap-1"
+                                                              class="flex flex-col gap-1"
                                                               data-payment-note-form>
                                                             @csrf
                                                             @method('PATCH')
                                                             <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
                                                             <textarea name="note" rows="2"
-                                                                      class="min-h-0 w-full flex-1 resize-none overflow-auto rounded border-gray-300 text-sm leading-5"
+                                                                      class="min-h-[5.5rem] max-h-[6.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 text-sm leading-5"
                                                                       placeholder="Add note..."
                                                                       data-payment-note-input>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
                                                             <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
@@ -778,11 +777,10 @@
                                                             @endif
                                                         </form>
                                                     @else
-                                                        <div aria-hidden="true" class="min-h-[4.75rem]"></div>
-                                                        <div x-data="{ showReadonlyNoteHint: false }" class="absolute inset-2 flex flex-col gap-1">
+                                                        <div x-data="{ showReadonlyNoteHint: false }" class="flex flex-col gap-1">
                                                             <textarea rows="2"
                                                                       readonly
-                                                                      class="min-h-0 w-full flex-1 resize-none overflow-auto rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
+                                                                      class="min-h-[5.5rem] max-h-[6.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
                                                                       placeholder="No note."
                                                                       @focus="showReadonlyNoteHint = true"
                                                                       @click="showReadonlyNoteHint = true">{{ $payment->note }}</textarea>
