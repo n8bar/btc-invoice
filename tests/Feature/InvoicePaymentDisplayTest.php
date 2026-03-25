@@ -511,7 +511,7 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('title="' . e($errorMessage) . '"', false);
-        $response->assertSee('max-w-[18rem]', false);
+        $response->assertSee('max-w-[10rem]', false);
         $response->assertSee('truncate', false);
         $response->assertSee('text-red-600', false);
         $response->assertSee($errorMessage, false);
@@ -539,6 +539,7 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('title="None"', false);
+        $response->assertSee('max-w-[10rem]', false);
         $response->assertSee('text-gray-500', false);
         $response->assertSeeText('None');
     }

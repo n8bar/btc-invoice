@@ -658,7 +658,7 @@
                                                         $deliveryErrorMessage = $hasDeliveryError ? $delivery->error_message : 'None';
                                                     @endphp
                                                     <td class="px-2 py-2 text-sm">
-                                                        <div class="block max-w-[18rem] truncate {{ $hasDeliveryError ? 'text-red-600' : 'text-gray-500' }}"
+                                                        <div class="block max-w-[10rem] truncate {{ $hasDeliveryError ? 'text-red-600' : 'text-gray-500' }}"
                                                              title="{{ $deliveryErrorMessage }}">
                                                             {{ $deliveryErrorMessage }}
                                                         </div>
