@@ -37,6 +37,7 @@ class DashboardSnapshot
 
         $paymentsLast7d = InvoicePayment::query()
             ->forUserInvoices($user)
+            ->active()
             ->recentBetween($windowStart, $windowEnd)
             ->count();
 
@@ -62,11 +63,13 @@ class DashboardSnapshot
                 $query->select(
                     'id',
                     'invoice_id',
+                    'accounting_invoice_id',
                     'sats_received',
                     'usd_rate',
                     'fiat_amount',
                     'detected_at',
                     'confirmed_at',
+                    'ignored_at',
                     'is_adjustment',
                     'created_at'
                 );
@@ -107,15 +110,16 @@ class DashboardSnapshot
 
         $paymentsLast7dUsd = InvoicePayment::query()
             ->forUserInvoices($user)
+            ->active()
             ->recentBetween($today->copy()->subDays(7), $today->copy()->addDay())
             ->where(function ($query) {
                 $query->whereNotNull('invoice_payments.confirmed_at')
                     ->orWhere('invoice_payments.is_adjustment', true);
             })
-            ->with('invoice:id,user_id,btc_rate')
+            ->with('accountingInvoice:id,user_id,btc_rate')
             ->get()
             ->sum(function (InvoicePayment $payment) {
-                $invoice = $payment->invoice;
+                $invoice = $payment->accountingInvoice;
                 if (!$invoice) {
                     return 0.0;
                 }
@@ -140,19 +144,20 @@ class DashboardSnapshot
     {
         $payments = InvoicePayment::query()
             ->select(['invoice_payments.*'])
-            ->join('invoices', 'invoices.id', '=', 'invoice_payments.invoice_id')
+            ->join('invoices', 'invoices.id', '=', 'invoice_payments.accounting_invoice_id')
             ->where('invoices.user_id', $user->id)
             ->whereNull('invoices.deleted_at')
+            ->active()
             ->orderByRaw('COALESCE(invoice_payments.detected_at, invoice_payments.created_at) DESC')
             ->orderByDesc('invoice_payments.id')
             ->limit(5)
-            ->with(['invoice' => function ($query) {
+            ->with(['accountingInvoice' => function ($query) {
                 $query->select('id', 'user_id', 'client_id', 'number', 'status', 'amount_usd', 'btc_rate');
-            }, 'invoice.client:id,name'])
+            }, 'accountingInvoice.client:id,name'])
             ->get();
 
         return $payments->map(function (InvoicePayment $payment) {
-            $invoice = $payment->invoice;
+            $invoice = $payment->accountingInvoice;
             $detectedAt = $payment->detected_at ?? $payment->created_at;
             $amountUsd = $this->paymentUsdValue($invoice, $payment);
             $outstandingSats = $invoice?->outstanding_sats;

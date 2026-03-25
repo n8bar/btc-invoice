@@ -108,6 +108,11 @@ class DeliverInvoiceMail implements ShouldQueue
             return 'Delivery no longer queued.';
         }
 
+        $paidTypes = ['receipt', 'owner_paid_notice'];
+        if (in_array($delivery->type, $paidTypes, true) && $invoice->status !== 'paid') {
+            return 'Invoice no longer paid.';
+        }
+
         $underpayTypes = ['client_underpay_alert', 'owner_underpay_alert'];
         if (in_array($delivery->type, $underpayTypes, true) && !$invoice->requiresClientUnderpayAlert()) {
             return 'Underpayment resolved before send.';

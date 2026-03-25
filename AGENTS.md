@@ -7,8 +7,10 @@
   - `docs/PRODUCT_SPEC.md` for global product behavior and invariants
   - `docs/BACKLOG.md` for post-MVP and deferred work only
 - Keep the docs structure roles straight:
-  - `docs/milestones/**` for checklist-bearing milestone execution docs when a milestone is active or large enough to need one
+  - `docs/PLAN.md` lays out milestone-level progress only; each milestone should check off once there
+  - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, primary linked specs/strategies, phase checkoffs, and milestone exit criteria
   - `docs/specs/**` for detailed feature and domain requirements
+  - `docs/strategies/**` expand one milestone phase into the ordered implementation checklist, sequencing, and verification steps; these are the “do this in this order” docs for active execution
   - `docs/ops/**` for rollout, contributor, and deployment runbooks
   - `docs/qa/**` for findings, test plans, verification notes, and archive material
 - Keep `docs/CHANGELOG.log` updated alongside canonical docs when scope or doc structure shifts.
@@ -21,14 +23,16 @@
 - Sail Compose includes a dedicated `scheduler` service that runs `php artisan schedule:work`; `./vendor/bin/sail up -d` keeps the watcher alive automatically.
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
-- Strategy docs (implementation approaches / execution notes, e.g. `docs/strategies/**`) are advisory working docs, not canonical like `docs/PLAN.md`/`docs/PRODUCT_SPEC.md`/`docs/BACKLOG.md`/`docs/CHANGELOG.log`; they may be deleted after implementation if they’re no longer useful.
+- Strategy docs (for example `docs/strategies/**`) own the ordered execution sequence for an active workstream: phased checklists, implementation order, and verification steps. They are authoritative for “what do we do next?” and resumption context, but they are not canonical for product scope or behavior; canonical requirements still live in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and the relevant docs under `docs/specs/**`. Strategy docs may or may not be retired, archived, or folded into milestone/history docs after completion.
+- Keep checklist depth separated: `docs/PLAN.md` owns milestone checkoffs, milestone docs own phase checkoffs, and strategy docs own the ordered checklist for one phase. Higher-level docs should roll up lower-level completion with a single checkoff instead of duplicating lower-level checklist items.
+- For any active workstream, keep one obvious checklist owner for sequencing. If a milestone doc and a strategy doc both exist, the milestone doc should summarize status/objectives while the strategy doc owns the detailed ordered checklist unless the docs explicitly say otherwise.
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
 - If the user is asking for your input/feedback (e.g. “what do you think?”, “should we…?”, “does this make sense?”), answer first and confirm before making changes—even if the request sounds actionable.
 - If asked to implement code before a spec exists, pause to confirm and recommend documenting the scope first (write the spec, then ship the code) unless the user explicitly insists otherwise.
 - If you create a new doc/spec that shapes future implementation scope, pause for user review before treating that doc as approved implementation direction.
 - If asked to merge a PR while there are uncommitted changes, unpushed commits, or any other local state that makes the tree non-clean or potentially misleading, pause and get explicit confirmation before merging.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
-- Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
+- Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away. Exception: single-item checklist checkoffs in the same active workstream do not need to be pushed right away and may be committed together later.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
 - GitHub `main` is canonical and protected. New work branches follow `codex/<task>`, and existing PRs must be updated via their original source branch rather than alternate branches.
 - PRs are gated by GitHub Actions `PR Tests`; keep branches current with `origin/main` before requesting review.
@@ -65,7 +69,7 @@
 - Keep the Sail stack (`./vendor/bin/sail up -d`) running during active work/testing unless there’s a clear reason to tear it down.
 - Codex owns the terminal tooling: you drive Sail, git, and related commands—assume the user doesn’t have a shell open unless they say otherwise.
 - For `.cybercreek/` changelog/findings handling, follow `.cybercreek/AGENTS_LOCAL.md`.
-- Whenever `docs/**` changes, commit/push those updates right away, except single-item checklist checkoffs which may be batched and committed together later in the same active workstream.
+- Whenever `docs/**` changes, commit/push those updates right away. Exception: single-item checklist checkoffs in the same active workstream do not need to be pushed right away and may be committed together later.
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
 ## Roles

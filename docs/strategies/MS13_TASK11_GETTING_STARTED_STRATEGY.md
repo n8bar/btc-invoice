@@ -115,7 +115,7 @@ This document is a temporary working plan. It is not a source of truth like `doc
 
 ## UX Engineering Pass (Task 11)
 - Browser-QA findings and follow-up UX refinement items now live in:
-  - `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`
+  - `docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md`
 - Keep this file focused on the implementation pass (v1 behavior + test plan).
 
 ## Task 11 Findings Strategy (Implementation Order)
@@ -199,7 +199,7 @@ Goal: address the current findings in a controlled sequence with small, testable
   - User + scenario tested, exact route hit, expected vs actual result, and whether issue is reproducible.
   - For regressions, include a short note on whether impact is block/major/minor.
 - Exit criteria:
-  - Completed: UXInspections A-D are done and follow-up issues are logged in `docs/strategies/TASK11_UX_ENGINEERING_PASS.md` and `docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`.
+  - Completed: UXInspections A-D are done and follow-up issues are logged in `docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md` and `docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md`.
 
 ## Notes / Risks
 - Keep underlying forms/pages as source of truth; avoid duplicating field validation UI in step shells.

@@ -359,6 +359,88 @@ class WatchPaymentsCommandTest extends TestCase
         $this->assertSame(0, $invoice->payment_amount_sat);
     }
 
+    public function test_ignored_unconfirmed_payment_is_not_dropped_when_missing_from_mempool(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-03 19:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+        $base = config('blockchain.mempool.testnet_base');
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'ignored-stale-tx',
+            'sats_received' => 200_000,
+            'detected_at' => Carbon::now()->subHours(1),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 80.00,
+            'ignored_at' => Carbon::now()->subMinutes(30),
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'invoice_id' => $invoice->id,
+            'txid' => 'ignored-stale-tx',
+        ]);
+    }
+
+    public function test_watcher_keeps_ignored_payment_ignored_when_txid_reappears(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-03 20:00:00', 'UTC'));
+        $invoice = $this->makeInvoice();
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'ignored-live-tx',
+            'sats_received' => 200_000,
+            'detected_at' => Carbon::now()->subHours(1),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 80.00,
+            'ignored_at' => Carbon::now()->subMinutes(30),
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'ignored-live-tx',
+                    'status' => [
+                        'confirmed' => false,
+                        'block_height' => null,
+                        'block_time' => null,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 200_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $payment->refresh();
+        $invoice->refresh();
+
+        $this->assertNotNull($payment->ignored_at);
+        $this->assertSame('Wrong invoice', $payment->ignore_reason);
+        $this->assertSame('sent', $invoice->status);
+        $this->assertNull($invoice->txid);
+    }
+
     public function test_command_records_multiple_partial_transactions(): void
     {
         Carbon::setTestNow(Carbon::parse('2025-01-04 12:00:00', 'UTC'));

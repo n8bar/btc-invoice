@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Invoice extends Model
@@ -72,8 +73,29 @@ class Invoice extends Model
 
     public function user(): BelongsTo   { return $this->belongsTo(User::class); }
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }
-    public function payments(): HasMany { return $this->hasMany(InvoicePayment::class); }
+    public function payments(): HasMany { return $this->hasMany(InvoicePayment::class, 'accounting_invoice_id'); }
+    public function sourcePayments(): HasMany { return $this->hasMany(InvoicePayment::class, 'invoice_id'); }
     public function deliveries(): HasMany { return $this->hasMany(InvoiceDelivery::class); }
+
+    public function paymentHistory(): Collection
+    {
+        $this->loadMissing(['payments', 'sourcePayments']);
+
+        $history = $this->sourcePayments->concat(
+            $this->payments->filter(
+                fn (InvoicePayment $payment) => ! $payment->belongsToSourceInvoice($this)
+            )
+        );
+
+        return $history
+            ->unique('id')
+            ->sortBy(function (InvoicePayment $payment): string {
+                $timestamp = ($payment->detected_at ?? $payment->created_at)?->getTimestamp() ?? 0;
+
+                return sprintf('%020d-%020d', $timestamp, $payment->id);
+            })
+            ->values();
+    }
 
     public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
     {
@@ -179,12 +201,13 @@ class Invoice extends Model
     public function getPaidSatsAttribute(): int
     {
         if ($this->relationLoaded('payments')) {
-            return (int) $this->payments
+            return (int) $this->activePayments()
                 ->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment))
                 ->sum('sats_received');
         }
 
         return (int) $this->payments()
+            ->whereNull('ignored_at')
             ->where(function (Builder $query) {
                 $query->whereNotNull('confirmed_at')
                     ->orWhere('is_adjustment', true);
@@ -284,11 +307,8 @@ class Invoice extends Model
 
     public function refreshPaymentState(?\Illuminate\Support\Carbon $reference = null): void
     {
-        if ($this->relationLoaded('payments')) {
-            $this->load('payments');
-        } else {
-            $this->loadMissing('payments');
-        }
+        $this->unsetRelation('payments');
+        $this->load('payments');
         $originalStatus = $this->status;
         $becamePaid = false;
         $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
@@ -307,14 +327,18 @@ class Invoice extends Model
                 }
 
                 if (!$this->paid_at) {
-                    $firstConfirmed = $this->payments
+                    $firstConfirmed = $this->activePayments()
                         ->filter(fn (InvoicePayment $p) => $this->paymentIsConfirmed($p))
                         ->min('confirmed_at');
                     $this->paid_at = $reference ?? $firstConfirmed ?? now();
                 }
             } elseif (!in_array($this->status, ['draft','void'], true)) {
-                $this->status = $confirmedUsd > 0 ? 'partial' : ($hasUnconfirmed ? 'pending' : $this->status);
+                $this->status = $confirmedUsd > 0 ? 'partial' : ($hasUnconfirmed ? 'pending' : 'sent');
             }
+        }
+
+        if ($this->status !== 'paid') {
+            $this->paid_at = null;
         }
 
         $this->save();
@@ -322,6 +346,40 @@ class Invoice extends Model
         if ($becamePaid && $this->status === 'paid') {
             event(new \App\Events\InvoicePaid($this->fresh(['client','user','deliveries'])));
         }
+    }
+
+    public function refreshPaymentLedger(?Carbon $reference = null, ?int $paymentConfirmations = null): void
+    {
+        $this->unsetRelation('payments');
+        $this->load('payments');
+
+        $activeOnChainPayments = $this->activeOnChainPayments();
+        $latestDetected = $activeOnChainPayments
+            ->sortBy(fn (InvoicePayment $payment) => ($payment->detected_at ?? $payment->created_at)?->getTimestamp() ?? 0)
+            ->last();
+        $latestConfirmed = $activeOnChainPayments
+            ->filter(fn (InvoicePayment $payment) => $payment->confirmed_at !== null)
+            ->sortBy(fn (InvoicePayment $payment) => ($payment->confirmed_at ?? $payment->detected_at ?? $payment->created_at)?->getTimestamp() ?? 0)
+            ->last();
+        $selectedPayment = $latestConfirmed ?? $latestDetected;
+
+        $this->payment_amount_sat = $this->sumPaymentSats(true);
+
+        if (! $selectedPayment) {
+            $this->txid = null;
+            $this->payment_confirmations = 0;
+            $this->payment_confirmed_height = null;
+            $this->payment_detected_at = null;
+            $this->payment_confirmed_at = null;
+        } else {
+            $this->txid = $selectedPayment->txid;
+            $this->payment_confirmations = $paymentConfirmations ?? $this->paymentConfirmationsFor($selectedPayment);
+            $this->payment_confirmed_height = $latestConfirmed?->block_height;
+            $this->payment_detected_at = $latestDetected?->detected_at ?? $latestDetected?->created_at;
+            $this->payment_confirmed_at = $latestConfirmed?->confirmed_at;
+        }
+
+        $this->refreshPaymentState($reference);
     }
 
     /**
@@ -422,6 +480,7 @@ class Invoice extends Model
     public function paymentSummary(?array $rate = null, ?float $computedBtc = null): array
     {
         $this->loadMissing('payments');
+        $activePayments = $this->activePayments();
 
         $expectedUsd = $this->amount_usd !== null ? (float) $this->amount_usd : null;
         $rateUsd = isset($rate['rate_usd']) ? (float) $rate['rate_usd'] : null;
@@ -457,8 +516,8 @@ class Invoice extends Model
                 : null;
         }
 
-        $lastDetected = $this->payments->max('detected_at');
-        $lastConfirmed = $this->payments
+        $lastDetected = $activePayments->max('detected_at');
+        $lastConfirmed = $activePayments
             ->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment))
             ->max('confirmed_at');
 
@@ -528,18 +587,14 @@ class Invoice extends Model
             return false;
         }
 
-        $payments = $this->relationLoaded('payments')
-            ? $this->payments
-            : $this->payments()->get();
+        $payments = $this->activePayments();
 
         return $payments->count() >= 2;
     }
 
     public function sumPaymentsUsd(bool $confirmedOnly = false): float
     {
-        $payments = $this->relationLoaded('payments')
-            ? $this->payments
-            : $this->payments()->get();
+        $payments = $this->activePayments();
 
         if ($confirmedOnly) {
             $payments = $payments->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment));
@@ -550,9 +605,7 @@ class Invoice extends Model
 
     public function sumPaymentSats(bool $confirmedOnly = false): int
     {
-        $payments = $this->relationLoaded('payments')
-            ? $this->payments
-            : $this->payments()->get();
+        $payments = $this->activePayments();
 
         if ($confirmedOnly) {
             $payments = $payments->filter(fn (InvoicePayment $payment) => $this->paymentIsConfirmed($payment));
@@ -564,10 +617,11 @@ class Invoice extends Model
     public function hasUnconfirmedPayments(): bool
     {
         if ($this->relationLoaded('payments')) {
-            return $this->payments->contains(fn (InvoicePayment $payment) => !$this->paymentIsConfirmed($payment));
+            return $this->activePayments()->contains(fn (InvoicePayment $payment) => !$this->paymentIsConfirmed($payment));
         }
 
         return $this->payments()
+            ->whereNull('ignored_at')
             ->whereNull('confirmed_at')
             ->where('is_adjustment', false)
             ->exists();
@@ -593,6 +647,31 @@ class Invoice extends Model
     private function paymentIsConfirmed(InvoicePayment $payment): bool
     {
         return $payment->is_adjustment || $payment->confirmed_at !== null;
+    }
+
+    private function activePayments(): Collection
+    {
+        $payments = $this->relationLoaded('payments')
+            ? $this->payments
+            : $this->payments()->get();
+
+        return $payments->filter(fn (InvoicePayment $payment) => !$payment->isIgnored());
+    }
+
+    private function activeOnChainPayments(): Collection
+    {
+        return $this->activePayments()
+            ->filter(fn (InvoicePayment $payment) => !$payment->is_adjustment);
+    }
+
+    private function paymentConfirmationsFor(InvoicePayment $payment): int
+    {
+        $storedConfirmations = data_get($payment->meta, 'confirmations');
+        if ($storedConfirmations !== null) {
+            return max((int) $storedConfirmations, 0);
+        }
+
+        return $payment->confirmed_at !== null ? 1 : 0;
     }
 
     public function smallBalanceResolutionThresholdUsd(float $expectedUsd): float

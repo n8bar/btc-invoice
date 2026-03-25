@@ -13,11 +13,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\BtcRate;
 use App\Services\GettingStartedFlow;
+use App\Services\InvoiceForceDeleteGuard;
 use App\Services\WalletKeyLineage;
 
 class InvoiceController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly InvoiceForceDeleteGuard $forceDeleteGuard)
     {
         $this->authorizeResource(Invoice::class, 'invoice');
     }
@@ -192,12 +193,27 @@ class InvoiceController extends Controller
 
         $invoice = $invoice->load([
             'client',
-            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'payments' => fn ($query) => $query
+                ->with('sourceInvoice:id,user_id,number')
+                ->orderBy('detected_at')
+                ->orderBy('id'),
+            'sourcePayments' => fn ($query) => $query
+                ->with('accountingInvoice:id,user_id,number')
+                ->orderBy('detected_at')
+                ->orderBy('id'),
             'deliveries' => fn ($query) => $query->latest('id'),
             'user',
         ]);
         $display = $this->formatInvoiceDisplay($invoice, $rate);
         $summary = $invoice->paymentSummary($rate, $display['computedBtc'] ?? null);
+        $paymentHistory = $invoice->paymentHistory();
+        $reattributeDestinations = Invoice::query()
+            ->ownedBy($request->user())
+            ->whereKeyNot($invoice->id)
+            ->with('client:id,name')
+            ->orderByDesc('invoice_date')
+            ->orderByDesc('id')
+            ->get(['id', 'user_id', 'client_id', 'number', 'status']);
 
         $btcForUri = $summary['outstanding_btc_float'];
         $display['displayBitcoinUri'] = $invoice->bitcoinUriForAmount(
@@ -209,6 +225,8 @@ class InvoiceController extends Controller
             'invoice'           => $invoice,
             'rate'              => $rate,
             'paymentSummary'    => $summary,
+            'paymentHistory'    => $paymentHistory,
+            'reattributeDestinations' => $reattributeDestinations,
             'gettingStartedStrip' => $request->boolean('getting_started')
                 ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_DELIVER, $invoice)
                 : null,
@@ -354,7 +372,11 @@ class InvoiceController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('invoices.trash', compact('invoices'));
+        $forceDeleteBlockers = $invoices->getCollection()
+            ->mapWithKeys(fn (Invoice $invoice) => [$invoice->id => $this->forceDeleteGuard->blockers($invoice)])
+            ->all();
+
+        return view('invoices.trash', compact('invoices', 'forceDeleteBlockers'));
     }
 
     public function restore(\Illuminate\Http\Request $request, int $invoiceId)
@@ -372,6 +394,21 @@ class InvoiceController extends Controller
     {
         $invoice = \App\Models\Invoice::withTrashed()->findOrFail($invoiceId);
         $this->authorize('forceDelete', $invoice);
+
+        $blockers = $this->forceDeleteGuard->blockers($invoice);
+        if ($blockers !== []) {
+            $message = $blockers[0]['message'];
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'deleted' => false,
+                    'error' => $message,
+                    'blockers' => $blockers,
+                ], 422);
+            }
+
+            return redirect()->route('invoices.trash')->with('error', $message);
+        }
 
         $invoice->forceDelete();
 
@@ -490,7 +527,7 @@ class InvoiceController extends Controller
     {
         return $invoice->load([
             'client',
-            'payments' => fn ($query) => $query->orderBy('detected_at')->orderBy('id'),
+            'payments' => fn ($query) => $query->active()->orderBy('detected_at')->orderBy('id'),
             'user',
         ]);
     }

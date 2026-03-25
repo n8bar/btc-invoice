@@ -509,3 +509,105 @@ Updated wallet settings, onboarding, and Helpful Notes so the watch-only model n
 
 2026-03-19 | MS14 Phase 4 Browser QA is complete and Phase 5 is now the active next step
 Checked off all three Browser QA items in `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` after the approved Phase 4 copy follow-up, added `docs/qa/MS14_PHASE4_BROWSER_QA.md` with the final verification note and disposition, and updated `docs/PLAN.md` so the active next action is Phase 5 correction-tooling implementation against the approved `docs/specs/PAYMENT_CORRECTIONS.md` spec.
+
+2026-03-19 | MS14 Phase 5 correction tooling is implemented and awaiting Browser QA
+Added auditable payment-correction metadata on `invoice_payments`, shipped owner-only ignore/restore actions on invoice payment history with inline confirmation and reason capture, excluded ignored rows from invoice/public/print/dashboard settlement math while keeping them visible in owner/support audit views, preserved ignored rows across watcher sync, and skipped queued payment-related deliveries when correction state made them untruthful. Added focused coverage for correction state changes, authorization/logging/visibility rules, dashboard exclusion, watcher persistence, and summary math, then reran `./vendor/bin/sail artisan test` successfully with `246 passed`. Updated `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` so the remaining MS14 Phase 5 gate is Browser QA.
+
+2026-03-19 | Attribution vs unsupported-wallet docs clarified
+`docs/PRODUCT_SPEC.md`, `docs/specs/PAYMENT_CORRECTIONS.md`, and `docs/specs/WALLET_XPUB_UX_SPEC.md` now distinguish stale-address wrong-invoice attribution from unsupported shared-wallet evidence; `docs/specs/NOTIFICATIONS.md` now requires owner validation before second-or-later payment-triggered mail on already-funded invoices.
+
+2026-03-19 | Phase 5 correction scope expanded to include reattribution
+`docs/PLAN.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/specs/PAYMENT_CORRECTIONS.md` now keep MS14 Phase 5 open for planned same-owner invoice-to-invoice reattribution, rewrite the Phase 5 verification/Browser QA around ignore/restore/reattribute, and clarify the distinction between detected-payment interpretation tools and separate manual adjustment entries.
+
+2026-03-20 | Reattribution docs now cover dual-history visibility and delete safeguards
+`docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/PRODUCT_SPEC.md` now require owner-visible reattribution history on both source and destination invoices, relax the destination-picker wording so current-invoice selection can collapse to no change, and block force delete for invoices participating in active reattributions while directing owners back to the source invoice for manual resolution.
+
+2026-03-20 | Payment-correction docs now require a purge-only hard-delete path with DB backstop
+`docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, and `docs/PRODUCT_SPEC.md` now treat force delete as a purge-only path blocked while bookkeeping history remains, require both app-layer guidance and a persistence-layer backstop for destructive deletes, and allow owner/support correction history to link to related invoices while keeping those links off public/print surfaces.
+
+2026-03-20 | Phase 5 checklist now names the shared delete guard and blocker classes
+`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` now sharpens the existing Phase 5 delete-safeguard checklist so one implementation bullet explicitly covers choosing the persistence-layer backstop and routing all force-delete paths through a shared preflight guard, while one verification bullet now names the blocker classes that must be covered.
+
+2026-03-20 | Reattribution docs now lock the RC storage model and defer the mail-hold gate to MS15
+`docs/specs/PAYMENT_CORRECTIONS.md` now defines an `invoice_payments`-centric RC storage model with immutable source provenance plus one active accounting destination at a time, replaces the blunt delete wording with a blocker-resolution matrix, and limits Phase 5 mail behavior to suppressing untruthful sends after reattribution. `docs/specs/NOTIFICATIONS.md` now marks the broader later-payment owner-validation hold as planned MS15 work, and `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` now aligns Phase 5 implementation/verification with that storage model and deferral.
+
+2026-03-23 | Reattribution docs now spell out source vs destination visibility rules
+`docs/specs/PAYMENT_CORRECTIONS.md` now makes the public/print rule explicit: reattributed-out payments stay visible only in owner history on the source invoice, never show or count on the source invoice’s public/print surfaces, and show/count only on the destination invoice’s public/print surfaces without source-provenance links or labels. `docs/PRODUCT_SPEC.md` now carries the same source-vs-destination visibility invariant.
+
+2026-03-23 | Doc-role guidance now preserves strategies as the sequencing owner
+`AGENTS.md` now defines `docs/milestones/**` as milestone-level execution docs and `docs/strategies/**` as the ordered “do this in this order” checklist docs for active execution, while keeping specs canonical for behavior/scope and requiring one obvious checklist owner whenever both a milestone doc and strategy doc exist.
+
+2026-03-23 | Doc-role guidance now spells out checklist depth by layer
+`AGENTS.md` now makes the hierarchy explicit: `docs/PLAN.md` owns milestone-level checkoffs, milestone docs own phase-level checkoffs, and strategy docs own the ordered checklist for one phase. Higher-level docs should roll up lower-level completion with a single checkoff instead of duplicating lower-level checklist items.
+
+2026-03-23 | MS14 now has a milestone doc above the current strategy checklist
+Added `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` as the phase-level rollup for MS14, updated `docs/PLAN.md` so MS14 now points to that milestone doc as the primary next doc while the current detailed sequencing still lives in `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`, moved the active next action from Phase 5 scope review into reattribution implementation after the approved doc pass, and updated the README documentation map to link the new milestone doc.
+
+2026-03-23 | MS14 milestone doc now lets the phase checkbox carry status
+`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now avoids restating open/closed status in prose under phase items; the phase checkbox carries the status while the supporting text only describes outcome or remaining work.
+
+2026-03-23 | MS14 milestone doc now omits direct strategy references
+`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now stays at the milestone/phase layer without naming the unsplit MS14 strategy doc directly; the strategy references can be added back after the strategy is split into phase-specific docs.
+
+2026-03-23 | MS14 strategy sequencing is now split by phase
+Replaced the monolithic `docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md` with phase-specific strategy docs for MS14 Phases 1-5, kept the ordered checklists with their existing completion state in those phase docs, updated `docs/PLAN.md` and `README.md` to point at the active Phase 5 strategy, and removed the old monolith instead of leaving a redirect stub.
+
+2026-03-23 | MS14 strategy split now uses terse phase summaries
+Removed repeated strategy-role boilerplate from the new MS14 phase docs and tightened `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` so the phase rollup now uses checkbox plus one short sentence per phase instead of multi-line outcome/status prose.
+
+2026-03-23 | Task 11 strategy docs now carry the MS13 prefix
+Renamed `docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`, `docs/strategies/TASK11_UX_ENGINEERING_PASS.md`, and `docs/strategies/TASK11_UX_ENGINEERING_PASS2.md` to `docs/strategies/MS13_TASK11_*`, and updated README plus intra-doc links to match.
+
+2026-03-23 | MS14 Phase 5 strategy now focuses on route-to-done
+Reshaped `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` so it now centers on completed checked items, the remaining ordered execution sequence, and the closure-proof checklist instead of carrying legacy `5.1`-style subsection framing and spec-like restatement.
+
+2026-03-23 | MS14 Phase 5 substeps now use numbered checklists
+Converted the `Remaining Sequence` substeps in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` from plain bullets to numbered checkbox items so execution depth stays explicit at both checklist levels.
+
+2026-03-23 | MS14 Phase 5 strategy now promotes parent steps to section headings
+Removed checkboxes from the completed recap bullets in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, dropped the `Remaining Sequence` wrapper heading, and promoted each remaining parent step into its own `##` section while keeping numbered checkbox substeps beneath it.
+
+2026-03-23 | MS14 Phase 5 verification section now stays phase-scoped
+Renamed the closing section in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` from `Closure Proof` to `Verify Phase 5` and tightened the automated/browser bullets so they read as Phase 5 verification checklists instead of a second pass at spec wording.
+
+2026-03-23 | MS14 Phase 5 Browser QA now includes setup and action steps
+Expanded the Browser QA portion of `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into concrete setup and action checklists that name the local stack prerequisites, seeded-owner login, `testnet4` funding/watcher steps, queue/delivery-log expectations, and the exact ignore/restore/reattribute/force-delete behaviors to verify in the browser.
+
+2026-03-23 | MS14 Phase 5 now separates scenario prep from Browser QA
+Split the closing manual verification in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into `Scenario Prep` and `Browser QA` so the browser section now stays browser-only while funding, watcher, and queue-state setup live outside it.
+
+2026-03-23 | MS14 Phase 5 now treats BQA prep as agent-owned setup
+Renamed `Scenario Prep` in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to `BQA Prep`, made it explicit that the agent owns the funding/watcher/queue-state setup, and added a handoff checklist so the human Browser QA pass starts from prepared invoice IDs and payment rows instead of terminal work.
+
+2026-03-23 | Phase 5 reattribution and delete safeguards now ship in code
+`invoice_payments` now carries the reattribution state fields plus immutable source provenance, owner/support payment history now preserves reattributed source/destination context while public/print/dashboard math follows the active accounting destination, force delete now has blocker guidance plus a foreign-key backstop, and the automated coverage now includes reattribution math, visibility, dashboard ownership, and hard-delete blockers. `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, and `docs/PLAN.md` now reflect that implementation is done and that the remaining Phase 5 work is BQA prep plus human Browser QA.
+
+2026-03-23 | MS14 Phase 5 strategy now uses one verification section
+Removed the duplicate closeout section from `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` so Phase 5 verification now lives in one place with `Automated`, `BQA Prep`, and `Browser QA` instead of a second blurred Browser-QA/test-pass wrapper above it.
+
+2026-03-23 | MS14 Phase 5 strategy now treats prep and browser work as peer steps
+Collapsed the separate automated-coverage build/verify pair in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` into one completed item, then promoted `BQA Prep` and `Browser QA` into top-level Phase 5 steps so the remaining manual work now reads as `5.7` prepare and `5.8` run.
+
+2026-03-24 | MS14 Phase 5 BQA prep now carries concrete run details
+Checked off the completed `Prepare Browser QA` work in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, changed Phase 5 status to browser-only, and replaced the generic Browser QA placeholders with the actual local scenario invoice IDs, payment rows, delivery-log rows, and public URLs for this run.
+
+2026-03-24 | AGENTS checklist-checkoff exception wording is now explicit
+Updated `AGENTS.md` so the docs-push rule now says single-item checklist checkoffs in the same active workstream do not need to be pushed right away, instead of describing them with softer batching language.
+
+2026-03-24 | MS14 Phase 5 Browser QA findings now have a dedicated strategy doc
+Checked off the first exercised ignore-flow Browser QA steps in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` and added `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` so live Browser QA findings now have one place to capture repros and expected-vs-actual behavior before we turn them into an ordered fix sequence.
+
+2026-03-24 | MS14 Phase 5 findings now avoid duplicate checklist ownership
+Removed the checkbox from the finding entry in `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` so findings stay descriptive while the eventual fix sequence remains the only checklist in that doc.
+
+2026-03-24 | MS14 Phase 5 Browser QA now identifies remaining payments by visible cues
+Rewrote the unchecked reattribution/public-surface Browser QA items in `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md` to use the visible Scenario C payment timestamps and sats/USD amounts instead of internal payment-row IDs, so the tester can match the correct rows directly in the UI.
+
+2026-03-25 | Delivery log timestamps are now compact and MS15 notes delivery-type label cleanup
+The owner invoice delivery log in `resources/views/invoices/show.blade.php` now renders queued/sent timestamps as compact `MM-DD-YY HH:MM` 24-hour values while keeping full timestamps in the tooltip, and `docs/specs/NOTIFICATIONS.md` now notes planned MS15 polish to replace raw underscore-separated delivery type keys with concise owner-facing labels.
+
+2026-03-25 | Manual adjustment reversal is now the canonical append-only undo path
+`docs/specs/PARTIAL_PAYMENTS.md` now requires owner-facing manual adjustment reversal instead of in-place edit/delete: an inline two-step `Reverse adjustment` -> `Confirm reverse entry` flow must create an equal-and-opposite manual adjustment row with note `reversal of {txid}` while preserving the original entry, and `docs/PRODUCT_SPEC.md` now summarizes that append-only reversal model at the product level.
+
+2026-03-25 | MS14 Phase 5 docs now point at the Browser QA findings follow-up
+`docs/PLAN.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now reflect that Browser QA is complete, Phase 5 remains active, and the next follow-up PR work is the findings/fix pass rather than more BQA prep.

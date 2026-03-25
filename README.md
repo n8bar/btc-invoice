@@ -63,6 +63,7 @@ Execute the full suite via Sail:
 - Contributor walkthrough: [`docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
 - MS13 UX Overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](docs/milestones/MS13_UX_OVERHAUL.md)
+- MS14 Payment Attribution Hardening milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
 - Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
 - Support access spec: [`docs/specs/SUPPORT_ACCESS.md`](docs/specs/SUPPORT_ACCESS.md)
@@ -72,9 +73,9 @@ Execute the full suite via Sail:
 - Payment correction / ignore-restore spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
 - Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
-- MS14 implementation strategy: [`docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md`](docs/strategies/MS14_IMPLEMENTATION_STRATEGY.md)
-- Task 11 implementation strategy: [`docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/TASK11_GETTING_STARTED_STRATEGY.md)
-- Task 11 UX Engineering pass: [`docs/strategies/TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS.md)
-- Task 11 UX Engineering pass2: [`docs/strategies/TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/TASK11_UX_ENGINEERING_PASS2.md)
+- MS14 Phase 5 strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
+- Task 11 implementation strategy: [`docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md)
+- Task 11 UX Engineering pass: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md)
+- Task 11 UX Engineering pass2: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.

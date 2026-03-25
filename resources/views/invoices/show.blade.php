@@ -22,6 +22,7 @@
             ];
         @endphp
         @php $billingDetails = $billingDetails ?? $invoice->billingDetails(); @endphp
+        @php $paymentHistory = $paymentHistory ?? $invoice->paymentHistory(); @endphp
         @if (!empty($billingDetails['heading']))
             <p class="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
                 {{ $billingDetails['heading'] }}
@@ -97,7 +98,7 @@
 
             @php
                 $hasDraftOnChainPayments = ($invoice->status ?? 'draft') === 'draft'
-                    && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment);
+                    && $invoice->payments->contains(fn ($payment) => !$payment->is_adjustment && !$payment->isIgnored());
             @endphp
 
             @if ($hasDraftOnChainPayments)
@@ -223,7 +224,7 @@
                 <div class="border-b border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-indigo-900 dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
                     Need to update invoice details? <a href="{{ route('invoices.edit', $invoice) }}" class="font-semibold underline hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100">edit</a> this invoice.
                 </div>
-                <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                     <div class="p-6 border-b md:border-b-0 md:border-r">
                         <h3 class="mb-3 text-sm font-semibold text-gray-700">Summary</h3>
                         <dl class="space-y-2 text-sm">
@@ -307,7 +308,7 @@
                                 </div>
                                 <div class="flex justify-between font-semibold">
                                     <span>Outstanding balance (confirmed)</span>
-                                    <span>
+                                    <span class="whitespace-nowrap">
                                         {{ $currency($summary['outstanding_usd']) }}
                                 @if (!empty($summary['outstanding_btc_formatted']))
                                     ({{ $summary['outstanding_btc_formatted'] }} BTC)
@@ -633,27 +634,36 @@
                                                     @php
                                                         $queued = $delivery->dispatched_at;
                                                         $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
+                                                        $queuedCompactDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
                                                         $queuedDisplay = $queued ? $queued->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
                                                         $sent = $delivery->sent_at;
                                                         $sentIso = $sent ? $sent->copy()->utc()->toIso8601String() : null;
+                                                        $sentCompactDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
                                                         $sentDisplay = $sent ? $sent->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
                                                     @endphp
                                                     <td class="px-2 py-2 text-sm text-gray-600">
                                                         @if ($queuedIso)
-                                                            <time datetime="{{ $queuedIso }}" data-utc-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedDisplay }}</time>
+                                                            <time datetime="{{ $queuedIso }}" data-utc-compact-ts="{{ $queuedIso }}" title="{{ $queuedDisplay }}">{{ $queuedCompactDisplay }}</time>
                                                         @else
                                                             —
                                                         @endif
                                                     </td>
                                                     <td class="px-2 py-2 text-sm text-gray-600">
                                                         @if ($sentIso)
-                                                            <time datetime="{{ $sentIso }}" data-utc-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentDisplay }}</time>
+                                                            <time datetime="{{ $sentIso }}" data-utc-compact-ts="{{ $sentIso }}" title="{{ $sentDisplay }}">{{ $sentCompactDisplay }}</time>
                                                         @else
                                                             —
                                                         @endif
                                                     </td>
-                                                    <td class="px-2 py-2 text-sm text-red-600">
-                                                        {{ $delivery->error_message ?: 'None' }}
+                                                    @php
+                                                        $hasDeliveryError = filled($delivery->error_message);
+                                                        $deliveryErrorMessage = $hasDeliveryError ? $delivery->error_message : 'None';
+                                                    @endphp
+                                                    <td class="px-2 py-2 text-sm">
+                                                        <div class="block max-w-[10rem] truncate {{ $hasDeliveryError ? 'text-red-600' : 'text-gray-500' }}"
+                                                             title="{{ $deliveryErrorMessage }}">
+                                                            {{ $deliveryErrorMessage }}
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -672,7 +682,7 @@
                     </div>
                 @endif
 
-                @if ($invoice->payments->isNotEmpty())
+                @if ($paymentHistory->isNotEmpty())
                     <div class="rounded-lg bg-white shadow">
                         <div class="p-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
@@ -686,15 +696,69 @@
                                             <th class="px-2 py-2 text-right">USD</th>
                                             <th class="px-2 py-2 text-left">Status</th>
                                             <th class="px-2 py-2 text-left">Note</th>
+                                            <th class="px-2 py-2 text-left">Correction</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100">
-                                        @foreach ($invoice->payments as $payment)
+                                        @foreach ($paymentHistory as $payment)
+                                            @php
+                                                $showIgnoreForm = (string) old('correction_payment_id') === (string) $payment->id && $errors->has('ignore_reason');
+                                                $showReattributeForm = (string) old('correction_payment_id') === (string) $payment->id
+                                                    && ($errors->has('destination_invoice_id') || $errors->has('reattribute_reason'));
+                                                $showCorrectionMenu = $showIgnoreForm || $showReattributeForm;
+                                                $isSourcePayment = $payment->belongsToSourceInvoice($invoice);
+                                                $isOutgoingReattribution = $payment->isReattributedOutFrom($invoice);
+                                                $isInboundReattribution = $payment->isReattributedInto($invoice);
+                                                $relatedSourceInvoice = $payment->sourceInvoice;
+                                                $relatedDestinationInvoice = $payment->accountingInvoice;
+                                                $selectedDestinationId = $showReattributeForm
+                                                    ? old('destination_invoice_id')
+                                                    : ($isOutgoingReattribution ? $payment->activeAccountingInvoiceId() : null);
+                                                $correctionLabelLines = ['Corrections'];
+                                                $correctionButtonClasses = 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 dark:border-white/15 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-indigo-400';
+                                                $correctionPanelClasses = 'border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900';
+
+                                                if ($payment->isIgnored()) {
+                                                    $correctionLabelLines = ['Ignored'];
+                                                    $correctionButtonClasses = 'border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100 focus:ring-amber-500 dark:border-amber-200/80 dark:bg-amber-200 dark:text-amber-950 dark:hover:bg-amber-100 dark:focus:ring-amber-300';
+                                                    $correctionPanelClasses = 'border-amber-200 bg-amber-50/70 dark:border-amber-400/35 dark:bg-slate-900';
+                                                } elseif ($isOutgoingReattribution) {
+                                                    $correctionLabelLines = ['Reapplied', 'Elsewhere'];
+                                                    $correctionButtonClasses = 'border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100 focus:ring-sky-500 dark:border-sky-300/80 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 dark:focus:ring-sky-300';
+                                                    $correctionPanelClasses = 'border-sky-200 bg-sky-50/70 dark:border-sky-400/35 dark:bg-slate-900';
+                                                } elseif ($isInboundReattribution) {
+                                                    $correctionLabelLines = ['Applied', 'Here'];
+                                                    $correctionButtonClasses = 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 focus:ring-emerald-500 dark:border-emerald-300/80 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-400 dark:focus:ring-emerald-300';
+                                                    $correctionPanelClasses = 'border-emerald-200 bg-emerald-50/70 dark:border-emerald-400/35 dark:bg-slate-900';
+                                                }
+
+                                                $correctionLabelText = implode(' ', $correctionLabelLines);
+                                            @endphp
                                             <tr>
-                                                <td class="px-2 py-2">{{ optional($payment->detected_at)->toDayDateTimeString() ?? '—' }}</td>
-                                                <td class="px-2 py-2 font-mono">{{ \Illuminate\Support\Str::limit($payment->txid, 18, '…') }}</td>
+                                                @php
+                                                    $paymentDetectedAt = $payment->detected_at;
+                                                    $paymentDetectedIso = $paymentDetectedAt ? $paymentDetectedAt->copy()->utc()->toIso8601String() : null;
+                                                    $paymentDetectedCompactDisplay = $paymentDetectedAt ? $paymentDetectedAt->copy()->setTimezone(config('app.timezone'))->format('m-d-y H:i') : null;
+                                                    $paymentDetectedDisplay = $paymentDetectedAt ? $paymentDetectedAt->copy()->setTimezone(config('app.timezone'))->toDayDateTimeString() : null;
+                                                @endphp
+                                                <td class="px-2 py-2 text-sm text-gray-600">
+                                                    @if ($paymentDetectedIso)
+                                                        <time datetime="{{ $paymentDetectedIso }}" data-utc-compact-ts="{{ $paymentDetectedIso }}" title="{{ $paymentDetectedDisplay }}">{{ $paymentDetectedCompactDisplay }}</time>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2 font-mono">
+                                                    @if ($payment->txid)
+                                                        <div class="max-h-[6.5rem] max-w-[9rem] overflow-y-auto break-all text-[15px] leading-[1.05rem]">{{ $payment->txid }}</div>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
                                                 <td class="px-2 py-2 text-right">
-                                                    {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
+                                                    <div class="font-mono text-[15px] leading-[1.05rem]">
+                                                        {{ number_format($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC, 8, '.', '') }}
+                                                    </div>
                                                 </td>
                                                 <td class="px-2 py-2 text-right">
                                                     @if ($payment->fiat_amount !== null)
@@ -714,29 +778,294 @@
                                                             {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
                                                         </span>
                                                     @else
-                                                        {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                                        <span class="font-medium text-gray-700">{{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 align-top">
-                                                    <div class="text-sm text-gray-800">{{ $payment->note ?: '—' }}</div>
-                                                    <form method="POST"
-                                                          action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
-                                                          class="mt-2 space-y-2">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
-                                                        <textarea name="note" rows="2"
-                                                                  class="w-full rounded border-gray-300 text-sm"
-                                                                  placeholder="Add note...">{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
-                                                        @if ($errors->has('note') && old('source_payment_id') == $payment->id)
-                                                            <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
-                                                        @endif
-                                                        <div class="flex justify-end">
-                                                            <x-secondary-button type="submit" class="text-xs px-3 py-1">
-                                                                Save
-                                                            </x-secondary-button>
+                                                    @if ($isSourcePayment)
+                                                        <form method="POST"
+                                                              action="{{ route('invoices.payments.note', [$invoice, $payment]) }}"
+                                                              class="flex flex-col gap-1"
+                                                              data-payment-note-form
+                                                              data-payment-note-container>
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="source_payment_id" value="{{ $payment->id }}">
+                                                            <textarea name="note" rows="2"
+                                                                      class="min-h-[5.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 text-sm leading-5"
+                                                                      placeholder="Add note..."
+                                                                      data-payment-note-input
+                                                                      data-payment-note-field>{{ old('source_payment_id') == $payment->id ? old('note') : $payment->note }}</textarea>
+                                                            <p class="text-xs text-gray-500" data-payment-note-save-state aria-live="polite"></p>
+                                                            @if ($errors->has('note') && old('source_payment_id') == $payment->id)
+                                                                <p class="text-xs text-red-600">{{ $errors->first('note') }}</p>
+                                                            @endif
+                                                        </form>
+                                                    @else
+                                                        <div x-data="{ showReadonlyNoteHint: false }" class="flex flex-col gap-1" data-payment-note-container>
+                                                            <textarea rows="2"
+                                                                      readonly
+                                                                      class="min-h-[5.5rem] w-full resize-none overflow-y-auto rounded border-gray-300 bg-gray-50 text-sm text-gray-700 leading-5"
+                                                                      placeholder="No note."
+                                                                      @focus="showReadonlyNoteHint = true"
+                                                                      @click="showReadonlyNoteHint = true"
+                                                                      data-payment-note-field>{{ $payment->note }}</textarea>
+                                                            @if ($relatedSourceInvoice)
+                                                                <p x-cloak
+                                                                   x-show="showReadonlyNoteHint"
+                                                                   class="text-xs text-gray-500">
+                                                                    Edit notes on
+                                                                    <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900">
+                                                                        {{ $relatedSourceInvoice->number }}
+                                                                    </a>.
+                                                                </p>
+                                                            @endif
                                                         </div>
-                                                    </form>
+                                                    @endif
+                                                </td>
+                                                <td class="px-2 py-2 align-top">
+                                                    @if ($payment->is_adjustment)
+                                                        <span class="inline-flex flex-col text-xs text-gray-500">
+                                                            <span>Manual</span>
+                                                            <span>adjustment</span>
+                                                        </span>
+                                                    @else
+                                                        <div class="w-28"
+                                                             x-data="{
+                                                                 open: @js($showCorrectionMenu),
+                                                                 panelStyle: {},
+                                                                 init() {
+                                                                     const syncPanelPosition = () => this.repositionPanel();
+                                                                     this.$watch('open', (value) => {
+                                                                         if (value) {
+                                                                             this.$nextTick(() => this.repositionPanel());
+                                                                         }
+                                                                     });
+                                                                     window.addEventListener('resize', syncPanelPosition);
+                                                                     window.addEventListener('scroll', syncPanelPosition, true);
+                                                                     if (this.open) {
+                                                                         this.$nextTick(() => this.repositionPanel());
+                                                                     }
+                                                                 },
+                                                                 togglePanel() {
+                                                                     this.open = !this.open;
+                                                                     if (this.open) {
+                                                                         this.$nextTick(() => this.repositionPanel());
+                                                                     }
+                                                                 },
+                                                                 repositionPanel() {
+                                                                     if (!this.open || !this.$refs.trigger) {
+                                                                         return;
+                                                                     }
+                                                                     const margin = 16;
+                                                                     const gap = 8;
+                                                                     const triggerRect = this.$refs.trigger.getBoundingClientRect();
+                                                                     const panelRect = this.$refs.panel?.getBoundingClientRect();
+                                                                     const panelWidth = Math.min(panelRect?.width || 288, window.innerWidth - (margin * 2));
+                                                                     let left = triggerRect.right - panelWidth;
+                                                                     left = Math.max(margin, Math.min(left, window.innerWidth - margin - panelWidth));
+                                                                     const panelHeight = panelRect?.height || 0;
+                                                                     const maxHeight = Math.max(160, window.innerHeight - (margin * 2));
+                                                                     let top = triggerRect.bottom + gap;
+                                                                     if (panelHeight && top + panelHeight > window.innerHeight - margin) {
+                                                                         const aboveTop = triggerRect.top - gap - panelHeight;
+                                                                         top = aboveTop >= margin
+                                                                             ? aboveTop
+                                                                             : Math.max(margin, window.innerHeight - margin - panelHeight);
+                                                                     }
+                                                                     this.panelStyle = {
+                                                                         position: 'fixed',
+                                                                         left: `${left}px`,
+                                                                         top: `${top}px`,
+                                                                         width: `${panelWidth}px`,
+                                                                         maxHeight: `${maxHeight}px`,
+                                                                     };
+                                                                 },
+                                                             }"
+                                                             @keydown.escape.window="open = false">
+                                                            <button type="button"
+                                                                    x-ref="trigger"
+                                                                    class="inline-flex w-full items-center justify-center gap-1 rounded-md border px-3 py-2 text-center text-xs font-semibold leading-tight shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $correctionButtonClasses }}"
+                                                                    x-on:click="togglePanel()"
+                                                                    x-bind:aria-expanded="open ? 'true' : 'false'"
+                                                                    aria-haspopup="dialog"
+                                                                    aria-controls="payment-correction-panel-{{ $payment->id }}">
+                                                                <span class="sr-only">Correction menu: {{ $correctionLabelText }}</span>
+                                                                <span class="flex flex-col items-center">
+                                                                    @foreach ($correctionLabelLines as $labelLine)
+                                                                        <span>{{ $labelLine }}</span>
+                                                                    @endforeach
+                                                                </span>
+                                                                <svg viewBox="0 0 12 12"
+                                                                     aria-hidden="true"
+                                                                     class="h-3 w-3 shrink-0 transition-transform"
+                                                                     x-bind:class="open ? 'rotate-90' : ''">
+                                                                    <path d="M4 2.5 8 6 4 9.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                                                                </svg>
+                                                            </button>
+                                                            <template x-teleport="body">
+                                                                <div id="payment-correction-panel-{{ $payment->id }}"
+                                                                     x-ref="panel"
+                                                                     x-cloak
+                                                                     x-show="open"
+                                                                     x-transition.origin.top.right
+                                                                     @click.outside="open = false"
+                                                                     x-bind:style="panelStyle"
+                                                                     class="z-50 space-y-2 overflow-y-auto rounded-lg border p-3 text-xs text-gray-700 shadow-xl dark:text-slate-100 {{ $correctionPanelClasses }}">
+                                                                    @if (! $isSourcePayment)
+                                                                        <div class="space-y-2">
+                                                                            <p class="font-semibold text-emerald-900 dark:text-emerald-100">Applied here through reattribution.</p>
+                                                                            <p>Counts on this invoice.</p>
+                                                                            @if ($relatedSourceInvoice)
+                                                                                <p>
+                                                                                    Source invoice:
+                                                                                    <a href="{{ route('invoices.show', $relatedSourceInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900 dark:text-indigo-200 dark:hover:text-indigo-100">
+                                                                                        {{ $relatedSourceInvoice->number }}
+                                                                                    </a>
+                                                                                </p>
+                                                                            @endif
+                                                                        </div>
+                                                                    @elseif ($payment->isIgnored())
+                                                                        <div class="space-y-2">
+                                                                            <div>
+                                                                                <p class="font-semibold text-amber-900 dark:text-amber-100">Ignored for invoice math.</p>
+                                                                                <p class="mt-1">{{ $payment->confirmed_at ? 'Confirmed row excluded from totals.' : 'Pending row excluded from totals.' }}</p>
+                                                                                <p class="mt-1">Reason: {{ $payment->ignore_reason }}</p>
+                                                                                <p class="mt-1">Ignored {{ optional($payment->ignored_at)->toDayDateTimeString() ?? '—' }}</p>
+                                                                            </div>
+                                                                            <form method="POST"
+                                                                                  action="{{ route('invoices.payments.restore', [$invoice, $payment]) }}"
+                                                                                  class="space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/60 p-3 dark:border-indigo-400/30 dark:bg-indigo-950/35">
+                                                                                @csrf
+                                                                                @method('PATCH')
+                                                                                <p class="text-xs text-indigo-900 dark:text-indigo-100">
+                                                                                    <button type="submit" class="font-semibold text-indigo-700 underline decoration-indigo-400 underline-offset-2 hover:text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-indigo-200 dark:hover:text-indigo-100 dark:focus:ring-indigo-400 dark:focus:ring-offset-slate-900">
+                                                                                        Restore
+                                                                                    </button>
+                                                                                    this payment so it counts toward invoice totals and status again.
+                                                                                </p>
+                                                                            </form>
+                                                                        </div>
+                                                                    @else
+                                                                        <div class="space-y-2">
+                                                                            @if ($isOutgoingReattribution)
+                                                                                <div>
+                                                                                    <p class="font-semibold text-sky-900 dark:text-sky-100">Reapplied elsewhere.</p>
+                                                                                    <p class="mt-1">No longer counts on this invoice.</p>
+                                                                                    <p class="mt-1">
+                                                                                        Counting on
+                                                                                        @if ($relatedDestinationInvoice)
+                                                                                            <a href="{{ route('invoices.show', $relatedDestinationInvoice) }}" class="font-semibold text-indigo-700 hover:text-indigo-900 dark:text-indigo-200 dark:hover:text-indigo-100">
+                                                                                                {{ $relatedDestinationInvoice->number }}
+                                                                                            </a>
+                                                                                        @else
+                                                                                            another invoice
+                                                                                        @endif
+                                                                                    </p>
+                                                                                    @if ($payment->reattribute_reason)
+                                                                                        <p class="mt-1">Reason: {{ $payment->reattribute_reason }}</p>
+                                                                                    @endif
+                                                                                    <p class="mt-1">Updated {{ optional($payment->reattributed_at)->toDayDateTimeString() ?? '—' }}</p>
+                                                                                </div>
+                                                                            @endif
+                                                                            <details @if ($showReattributeForm) open @endif>
+                                                                                <summary class="list-none cursor-pointer rounded-md border border-indigo-200 bg-white px-3 py-2 text-center text-xs font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/35 dark:bg-slate-900/80 dark:text-indigo-200 dark:hover:border-indigo-300/60 dark:hover:bg-indigo-950/35 dark:focus:ring-indigo-400 dark:focus:ring-offset-slate-900 [&::-webkit-details-marker]:hidden">
+                                                                                    {{ $isOutgoingReattribution ? 'Change reattribution' : 'Reattribute payment' }}
+                                                                                </summary>
+                                                                                <form method="POST"
+                                                                                      action="{{ route('invoices.payments.reattribute', [$invoice, $payment]) }}"
+                                                                                      class="mt-2 space-y-2 rounded-lg border border-indigo-100 bg-indigo-50/70 p-3 dark:border-indigo-400/30 dark:bg-indigo-950/35">
+                                                                                    @csrf
+                                                                                    @method('PATCH')
+                                                                                    <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                                    <p class="text-xs text-indigo-900 dark:text-indigo-100">
+                                                                                        Stop counting this payment toward {{ $invoice->number }} and count it toward another invoice.
+                                                                                    </p>
+                                                                                    <div>
+                                                                                        <label for="destination_invoice_id_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900 dark:text-indigo-100">Destination invoice</label>
+                                                                                        <select id="destination_invoice_id_{{ $payment->id }}"
+                                                                                                name="destination_invoice_id"
+                                                                                                class="mt-1 w-full rounded border-indigo-200 text-sm dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-slate-100"
+                                                                                                @if ($showReattributeForm && $errors->has('destination_invoice_id')) autofocus @endif>
+                                                                                            @unless ($isOutgoingReattribution)
+                                                                                                <option value="" @selected($selectedDestinationId === null)>Select an invoice</option>
+                                                                                            @endunless
+                                                                                            @if ($isOutgoingReattribution)
+                                                                                                <option value="{{ $invoice->id }}" @selected((string) $selectedDestinationId === (string) $invoice->id)>
+                                                                                                    Return credit to {{ $invoice->number }}
+                                                                                                </option>
+                                                                                            @endif
+                                                                                            @foreach ($reattributeDestinations as $destinationInvoice)
+                                                                                                <option value="{{ $destinationInvoice->id }}" @selected((string) $selectedDestinationId === (string) $destinationInvoice->id)>
+                                                                                                    {{ $destinationInvoice->number }}
+                                                                                                    @if ($destinationInvoice->client?->name)
+                                                                                                        — {{ $destinationInvoice->client->name }}
+                                                                                                    @endif
+                                                                                                    ({{ ucfirst($destinationInvoice->status) }})
+                                                                                                </option>
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                        @if ($showReattributeForm && $errors->has('destination_invoice_id'))
+                                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('destination_invoice_id') }}</p>
+                                                                                        @endif
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <label for="reattribute_reason_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900 dark:text-indigo-100">Reason</label>
+                                                                                        <textarea id="reattribute_reason_{{ $payment->id }}"
+                                                                                                  name="reattribute_reason"
+                                                                                                  rows="2"
+                                                                                                  class="mt-1 w-full rounded border-indigo-200 text-sm dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400"
+                                                                                                  placeholder="Why should this payment count toward another invoice?"
+                                                                                                  @if ($showReattributeForm && ! $errors->has('destination_invoice_id')) autofocus @endif>{{ $showReattributeForm ? old('reattribute_reason') : ($isOutgoingReattribution ? $payment->reattribute_reason : '') }}</textarea>
+                                                                                        @if ($showReattributeForm && $errors->has('reattribute_reason'))
+                                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('reattribute_reason') }}</p>
+                                                                                        @endif
+                                                                                    </div>
+                                                                                    <div class="flex justify-end">
+                                                                                        <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                            Confirm reattribution
+                                                                                        </x-secondary-button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            </details>
+                                                                            <details @if ($showIgnoreForm) open @endif>
+                                                                                <summary class="list-none cursor-pointer rounded-md border border-red-200 bg-white px-3 py-2 text-center text-xs font-semibold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-400/35 dark:bg-slate-900/80 dark:text-red-200 dark:hover:border-red-300/60 dark:hover:bg-red-950/35 dark:focus:ring-red-400 dark:focus:ring-offset-slate-900 [&::-webkit-details-marker]:hidden">
+                                                                                    Ignore payment
+                                                                                </summary>
+                                                                                <form method="POST"
+                                                                                      action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
+                                                                                      class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3 dark:border-red-400/30 dark:bg-red-950/35">
+                                                                                    @csrf
+                                                                                    @method('PATCH')
+                                                                                    <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                                    <p class="text-xs text-red-900 dark:text-red-100">
+                                                                                        This removes the payment from invoice totals and status without deleting the raw ledger row.
+                                                                                    </p>
+                                                                                    <div>
+                                                                                        <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900 dark:text-red-100">Reason</label>
+                                                                                        <textarea id="ignore_reason_{{ $payment->id }}"
+                                                                                                  name="ignore_reason"
+                                                                                                  rows="2"
+                                                                                                  class="mt-1 w-full rounded border-red-200 text-sm dark:border-red-400/30 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400"
+                                                                                                  placeholder="Why should this payment stop counting toward this invoice?"
+                                                                                                  @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
+                                                                                        @if ($showIgnoreForm)
+                                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
+                                                                                        @endif
+                                                                                    </div>
+                                                                                    <div class="flex justify-end">
+                                                                                        <x-danger-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                            Confirm ignore
+                                                                                        </x-danger-button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            </details>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -1037,6 +1366,168 @@
 
                 deliveryInput.addEventListener('change', saveDraft);
             }
+
+            const syncPaymentNoteFieldHeight = (noteField) => {
+                const noteCell = noteField.closest('td');
+                const noteContainer = noteField.closest('[data-payment-note-container]');
+
+                if (!noteCell || !noteContainer) {
+                    return;
+                }
+
+                noteField.style.height = 'auto';
+
+                const cellStyles = window.getComputedStyle(noteCell);
+                const containerStyles = window.getComputedStyle(noteContainer);
+                const gap = Number.parseFloat(containerStyles.rowGap || containerStyles.gap || '0') || 0;
+                const cellInnerHeight = noteCell.getBoundingClientRect().height
+                    - (Number.parseFloat(cellStyles.paddingTop || '0') || 0)
+                    - (Number.parseFloat(cellStyles.paddingBottom || '0') || 0);
+
+                let siblingHeight = 0;
+                let visibleSiblingCount = 0;
+
+                Array.from(noteContainer.children).forEach((child) => {
+                    if (child === noteField || child.offsetParent === null) {
+                        return;
+                    }
+
+                    siblingHeight += child.getBoundingClientRect().height;
+                    visibleSiblingCount += 1;
+                });
+
+                const contentHeight = Math.ceil(noteField.scrollHeight);
+                const availableHeight = Math.floor(cellInnerHeight - siblingHeight - (visibleSiblingCount * gap));
+                const targetHeight = Math.max(88, contentHeight, availableHeight);
+
+                noteField.style.height = `${targetHeight}px`;
+            };
+
+            document.querySelectorAll('[data-payment-note-form]').forEach((noteForm) => {
+                const noteInput = noteForm.querySelector('[data-payment-note-input]');
+                const noteSaveState = noteForm.querySelector('[data-payment-note-save-state]');
+                const noteDisplay = noteForm.closest('td')?.querySelector('[data-payment-note-display]');
+
+                if (!noteInput || !noteSaveState || !csrfToken) {
+                    return;
+                }
+
+                let lastSavedValue = noteInput.value;
+
+                const setNoteSaveState = (text, isError = false) => {
+                    noteSaveState.textContent = text;
+                    noteSaveState.classList.toggle('text-red-600', isError);
+                    noteSaveState.classList.toggle('text-green-600', !isError && text.length > 0);
+                    noteSaveState.classList.toggle('text-gray-500', text.length === 0);
+                    requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteInput));
+                };
+
+                const saveNote = async () => {
+                    const currentValue = noteInput.value;
+
+                    if (currentValue === lastSavedValue) {
+                        return;
+                    }
+
+                    setNoteSaveState('Saving...');
+
+                    try {
+                        const response = await fetch(noteForm.action, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: JSON.stringify({
+                                note: currentValue,
+                                source_payment_id: noteForm.querySelector('input[name="source_payment_id"]')?.value,
+                            }),
+                        });
+
+                        if (response.status === 422) {
+                            const payload = await response.json();
+                            throw new Error(payload?.errors?.note?.[0] || 'Could not save this note yet.');
+                        }
+
+                        if (!response.ok) {
+                            throw new Error('Could not save this note yet.');
+                        }
+
+                        const payload = await response.json();
+
+                        lastSavedValue = currentValue;
+                        if (noteDisplay) {
+                            noteDisplay.textContent = payload.note && payload.note.length > 0 ? payload.note : '—';
+                        }
+
+                        setNoteSaveState('Saved');
+                        setTimeout(() => {
+                            if (noteSaveState.textContent === 'Saved') {
+                                setNoteSaveState('');
+                            }
+                        }, 1200);
+                    } catch (error) {
+                        setNoteSaveState(error instanceof Error ? error.message : 'Could not save this note yet.', true);
+                    }
+                };
+
+                syncPaymentNoteFieldHeight(noteInput);
+                requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteInput));
+                window.addEventListener('load', () => syncPaymentNoteFieldHeight(noteInput), { once: true });
+                window.addEventListener('resize', () => syncPaymentNoteFieldHeight(noteInput));
+
+                const noteCell = noteInput.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => syncPaymentNoteFieldHeight(noteInput));
+                    resizeObserver.observe(noteCell);
+                }
+
+                noteInput.addEventListener('input', () => syncPaymentNoteFieldHeight(noteInput));
+                noteInput.addEventListener('change', saveNote);
+            });
+
+            document.querySelectorAll('textarea[data-payment-note-field]:not([data-payment-note-input])').forEach((noteField) => {
+                syncPaymentNoteFieldHeight(noteField);
+                requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField));
+                window.addEventListener('load', () => syncPaymentNoteFieldHeight(noteField), { once: true });
+                window.addEventListener('resize', () => syncPaymentNoteFieldHeight(noteField));
+                noteField.addEventListener('focus', () => requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField)));
+                noteField.addEventListener('click', () => requestAnimationFrame(() => syncPaymentNoteFieldHeight(noteField)));
+
+                const noteCell = noteField.closest('td');
+                if (noteCell && 'ResizeObserver' in window) {
+                    const resizeObserver = new ResizeObserver(() => syncPaymentNoteFieldHeight(noteField));
+                    resizeObserver.observe(noteCell);
+                }
+            });
+
+            const padCompactDatePart = (value) => String(value).padStart(2, '0');
+
+            document.querySelectorAll('[data-utc-compact-ts]').forEach((node) => {
+                const iso = node.getAttribute('data-utc-compact-ts');
+                if (!iso) return;
+
+                const parsed = new Date(iso);
+                if (Number.isNaN(parsed.getTime())) return;
+
+                const compact = [
+                    padCompactDatePart(parsed.getMonth() + 1),
+                    padCompactDatePart(parsed.getDate()),
+                    padCompactDatePart(parsed.getFullYear() % 100),
+                ].join('-') + ` ${padCompactDatePart(parsed.getHours())}:${padCompactDatePart(parsed.getMinutes())}`;
+
+                node.textContent = compact;
+
+                const localizedTitle = parsed.toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                });
+
+                if (localizedTitle) {
+                    node.title = localizedTitle;
+                }
+            });
 
             document.querySelectorAll('[data-utc-ts]').forEach((node) => {
                 const iso = node.getAttribute('data-utc-ts');

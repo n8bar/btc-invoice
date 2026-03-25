@@ -10,8 +10,18 @@ use Illuminate\Support\Carbon;
 
 class InvoicePayment extends Model
 {
+    protected static function booted(): void
+    {
+        static::creating(function (InvoicePayment $payment): void {
+            if ($payment->accounting_invoice_id === null && $payment->ignored_at === null) {
+                $payment->accounting_invoice_id = $payment->invoice_id;
+            }
+        });
+    }
+
     protected $fillable = [
         'invoice_id',
+        'accounting_invoice_id',
         'txid',
         'vout_index',
         'sats_received',
@@ -21,6 +31,12 @@ class InvoicePayment extends Model
         'usd_rate',
         'fiat_amount',
         'note',
+        'ignored_at',
+        'ignored_by_user_id',
+        'ignore_reason',
+        'reattributed_at',
+        'reattributed_by_user_id',
+        'reattribute_reason',
         'meta',
         'is_adjustment',
     ];
@@ -29,6 +45,8 @@ class InvoicePayment extends Model
         'sats_received' => 'int',
         'detected_at' => 'datetime',
         'confirmed_at' => 'datetime',
+        'ignored_at' => 'datetime',
+        'reattributed_at' => 'datetime',
         'block_height' => 'int',
         'usd_rate' => 'decimal:2',
         'fiat_amount' => 'decimal:2',
@@ -38,14 +56,34 @@ class InvoicePayment extends Model
 
     public function invoice(): BelongsTo
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
+    public function sourceInvoice(): BelongsTo
+    {
+        return $this->invoice();
+    }
+
+    public function accountingInvoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class, 'accounting_invoice_id');
+    }
+
+    public function ignoredByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ignored_by_user_id');
+    }
+
+    public function reattributedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reattributed_by_user_id');
     }
 
     public function scopeForUserInvoices(Builder $query, User|int $user): Builder
     {
         $userId = $user instanceof User ? $user->id : $user;
 
-        return $query->whereHas('invoice', function (Builder $invoiceQuery) use ($userId) {
+        return $query->whereHas('accountingInvoice', function (Builder $invoiceQuery) use ($userId) {
             $invoiceQuery->ownedBy($userId);
         });
     }
@@ -59,5 +97,65 @@ class InvoicePayment extends Model
                         ->whereBetween('invoice_payments.created_at', [$from, $to]);
                 });
         });
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('invoice_payments.ignored_at');
+    }
+
+    public function scopeIgnored(Builder $query): Builder
+    {
+        return $query->whereNotNull('invoice_payments.ignored_at');
+    }
+
+    public function isIgnored(): bool
+    {
+        return $this->ignored_at !== null;
+    }
+
+    public function activeAccountingInvoiceId(): ?int
+    {
+        if ($this->isIgnored()) {
+            return null;
+        }
+
+        return $this->accounting_invoice_id ?? $this->invoice_id;
+    }
+
+    public function isReattributed(): bool
+    {
+        $accountingInvoiceId = $this->activeAccountingInvoiceId();
+
+        return $accountingInvoiceId !== null
+            && $accountingInvoiceId !== $this->invoice_id;
+    }
+
+    public function belongsToSourceInvoice(Invoice|int $invoice): bool
+    {
+        $invoiceId = $invoice instanceof Invoice ? $invoice->id : $invoice;
+
+        return $this->invoice_id === $invoiceId;
+    }
+
+    public function countsOnInvoice(Invoice|int $invoice): bool
+    {
+        $invoiceId = $invoice instanceof Invoice ? $invoice->id : $invoice;
+
+        return $this->activeAccountingInvoiceId() === $invoiceId;
+    }
+
+    public function isReattributedOutFrom(Invoice|int $invoice): bool
+    {
+        return $this->belongsToSourceInvoice($invoice)
+            && $this->isReattributed();
+    }
+
+    public function isReattributedInto(Invoice|int $invoice): bool
+    {
+        $invoiceId = $invoice instanceof Invoice ? $invoice->id : $invoice;
+
+        return $this->countsOnInvoice($invoiceId)
+            && !$this->belongsToSourceInvoice($invoiceId);
     }
 }

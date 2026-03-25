@@ -63,22 +63,10 @@ class InvoicePaymentAdjustmentController extends Controller
             'is_adjustment' => true,
         ]);
 
-        $invoice->refreshPaymentState();
+        $invoice->refreshPaymentLedger();
         $invoice->refresh();
+        $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after small-balance resolution.');
         $this->alerts->checkPaymentThresholds($invoice);
-
-        $invoice->deliveries()
-            ->whereIn('type', [
-                'client_underpay_alert',
-                'owner_underpay_alert',
-                'client_partial_warning',
-                'owner_partial_warning',
-            ])
-            ->where('status', 'queued')
-            ->update([
-                'status' => 'skipped',
-                'error_message' => 'Skipped after small-balance resolution.',
-            ]);
 
         return back()->with('status', 'Small balance resolved and invoice marked paid.');
     }
@@ -124,8 +112,9 @@ class InvoicePaymentAdjustmentController extends Controller
             'is_adjustment' => true,
         ]);
 
-        $invoice->refreshPaymentState();
+        $invoice->refreshPaymentLedger();
         $invoice->refresh();
+        $this->alerts->skipInvalidQueuedDeliveries($invoice, 'Skipped after manual adjustment.');
         $this->alerts->checkPaymentThresholds($invoice);
 
         return back()->with('status', 'Adjustment recorded.');

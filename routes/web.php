@@ -11,6 +11,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InvoicePaymentNoteController;
 use App\Http\Controllers\InvoiceDeliveryController;
 use App\Http\Controllers\InvoicePaymentAdjustmentController;
+use App\Http\Controllers\InvoicePaymentCorrectionController;
 use App\Http\Controllers\ThemePreferenceController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\GettingStartedController;
@@ -120,6 +121,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.deliver.draft');
     Route::patch('invoices/{invoice}/payments/{payment}/note', [InvoicePaymentNoteController::class, 'update'])
         ->name('invoices.payments.note');
+    Route::patch('invoices/{invoice}/payments/{payment}/ignore', [InvoicePaymentCorrectionController::class, 'ignore'])
+        ->name('invoices.payments.ignore');
+    Route::patch('invoices/{invoice}/payments/{payment}/restore', [InvoicePaymentCorrectionController::class, 'restore'])
+        ->name('invoices.payments.restore');
+    Route::patch('invoices/{invoice}/payments/{payment}/reattribute', [InvoicePaymentCorrectionController::class, 'reattribute'])
+        ->name('invoices.payments.reattribute');
     Route::post('invoices/{invoice}/payments/adjustments', [InvoicePaymentAdjustmentController::class, 'store'])
         ->name('invoices.payments.adjustments.store');
     Route::post('invoices/{invoice}/payments/resolve-small-balance', [InvoicePaymentAdjustmentController::class, 'resolve'])

@@ -99,6 +99,16 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
 - When the residual is below the small-balance threshold, surface an explicit “Resolve small balance” control that records a manual credit adjustment for the remaining USD (at the latest available rate) and marks the invoice paid. The adjustment is logged in `invoice_payments` as an `is_adjustment` row for auditability. Threshold rule: `max($1.00, min(1% of expected USD, $50.00 cap))`.
 - Do not auto-settle residuals; owners must opt-in via the control.
 
+## Manual Adjustment Reversal
+- Manual adjustments are append-only ledger entries. Owners must not edit or delete the recorded amount/direction in place.
+- Owner invoice payment history should expose an inline reversal path for manual adjustment rows:
+  - first click on `Reverse` / `adjustment` reveals `Confirm` / `reverse` / `entry`
+  - clicking `Reverse adjustment` again before confirmation re-hides the confirm control
+- Confirming the reversal creates a second manual adjustment row on the same invoice with equal-and-opposite `sats_received` and `fiat_amount` values so the original accounting effect is cancelled exactly.
+- Reversal rows preserve the original adjustment's USD/BTC snapshot rather than repricing at the latest rate.
+- The generated reversal note is `reversal of {txid}` where `{txid}` is the original manual adjustment row identifier.
+- Both rows remain visible in payment history after reversal. Reversal is the supported owner-facing `oops` path for manual adjustments.
+
 ## Testing
 - Unit tests for `Invoice` accessors (paid/confirmed USD and sats, outstanding USD/BTC, status transitions).
 - Watcher feature tests covering:
@@ -109,6 +119,10 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
     - Unconfirmed payment does not mark paid, then flips to paid after confirmations meet threshold.
     - RBF replacement removes the old live tx from totals and avoids double-counting.
     - Dropped unconfirmed tx shrinks totals and reverts status appropriately.
+- Feature tests covering manual adjustment reversal:
+    - the reveal/collapse control flow on manual adjustment rows
+    - equal-and-opposite reversal row creation with `reversal of {txid}` note
+    - invoice/payment/alert recomputation after reversal
 - Blade tests / snapshots for the payment history table and public view.
 
 ## Completed Tasks

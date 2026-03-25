@@ -15,6 +15,9 @@
             @if (session('status'))
                 <div class="mb-4 rounded-md bg-green-50 p-3 text-green-700">{{ session('status') }}</div>
             @endif
+            @if (session('error'))
+                <div class="mb-4 rounded-md bg-red-50 p-3 text-red-700">{{ session('error') }}</div>
+            @endif
 
             <div class="overflow-hidden rounded-lg bg-white shadow">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -28,6 +31,9 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse ($invoices as $inv)
+                        @php
+                            $blockers = $forceDeleteBlockers[$inv->id] ?? [];
+                        @endphp
                         <tr>
                             <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ $inv->number }}</td>
                             <td class="px-6 py-3 text-sm">{{ $inv->client->name ?? '—' }}</td>
@@ -42,6 +48,16 @@
                                     @csrf @method('DELETE')
                                     <x-danger-button type="submit">Delete forever</x-danger-button>
                                 </form>
+                                @if ($blockers !== [])
+                                    <div class="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-left text-xs text-amber-900">
+                                        <p class="font-semibold">Permanent delete is currently blocked.</p>
+                                        <ul class="mt-2 space-y-1">
+                                            @foreach ($blockers as $blocker)
+                                                <li>{{ $blocker['message'] }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @empty

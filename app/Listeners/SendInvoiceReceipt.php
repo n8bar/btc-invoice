@@ -26,7 +26,7 @@ class SendInvoiceReceipt
 
             $alreadySent = $invoice->deliveries()
                 ->where('type', 'receipt')
-                ->where('status', 'sent')
+                ->whereIn('status', ['queued', 'sent'])
                 ->exists();
 
             if ($alreadySent) {

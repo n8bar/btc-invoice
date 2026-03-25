@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class InvoicePaymentNoteController extends Controller
 {
-    public function update(Request $request, Invoice $invoice, InvoicePayment $payment): RedirectResponse
+    public function update(Request $request, Invoice $invoice, InvoicePayment $payment): RedirectResponse|JsonResponse
     {
         $this->authorize('update', $invoice);
 
@@ -22,6 +23,13 @@ class InvoicePaymentNoteController extends Controller
 
         $payment->note = $data['note'] ?? null;
         $payment->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'saved',
+                'note' => $payment->note,
+            ]);
+        }
 
         return back()->with('status', 'Payment note updated.');
     }

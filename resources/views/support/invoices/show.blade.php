@@ -73,10 +73,10 @@
             <div class="rounded-lg bg-white p-6 shadow dark:bg-slate-900/80">
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white">Payment history</h3>
-                    <span class="text-sm text-gray-500 dark:text-slate-400">{{ $invoice->payments->count() }} entries</span>
+                    <span class="text-sm text-gray-500 dark:text-slate-400">{{ $paymentHistory->count() }} entries</span>
                 </div>
 
-                @if ($invoice->payments->isEmpty())
+                @if ($paymentHistory->isEmpty())
                     <p class="mt-4 text-sm text-gray-500 dark:text-slate-400">No payments recorded yet.</p>
                 @else
                     <div class="mt-4 overflow-x-auto">
@@ -86,16 +86,59 @@
                                     <th class="py-2 pr-4">Detected</th>
                                     <th class="py-2 pr-4">Sats</th>
                                     <th class="py-2 pr-4">USD snapshot</th>
+                                    <th class="py-2 pr-4">Status</th>
                                     <th class="py-2 pr-4">Txid</th>
                                     <th class="py-2 pr-4">Note</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-white/10">
-                                @foreach ($invoice->payments as $payment)
+                                @foreach ($paymentHistory as $payment)
+                                    @php
+                                        $isOutgoingReattribution = $payment->isReattributedOutFrom($invoice);
+                                        $isInboundReattribution = $payment->isReattributedInto($invoice);
+                                        $relatedSourceInvoice = $payment->sourceInvoice;
+                                        $relatedDestinationInvoice = $payment->accountingInvoice;
+                                    @endphp
                                     <tr>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->detected_at?->setTimezone(config('app.timezone'))->toDayDateTimeString() ?? '—' }}</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ number_format((int) $payment->sats_received) }}</td>
-                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->usd_amount !== null ? '$' . number_format((float) $payment->usd_amount, 2) : '—' }}</td>
+                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->fiat_amount !== null ? '$' . number_format((float) $payment->fiat_amount, 2) : '—' }}</td>
+                                        <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">
+                                            @if ($payment->is_adjustment)
+                                                {{ $payment->sats_received >= 0 ? 'Manual credit' : 'Manual debit' }}
+                                            @elseif ($payment->isIgnored())
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">Ignored</span>
+                                                    <div class="text-xs text-amber-800 dark:text-amber-200">{{ $payment->ignore_reason }}</div>
+                                                </div>
+                                            @elseif ($isOutgoingReattribution)
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-900">Reattributed out</span>
+                                                    @if ($relatedDestinationInvoice)
+                                                        <div class="text-xs text-sky-800 dark:text-sky-200">
+                                                            Counting on
+                                                            <a href="{{ route('support.owners.invoices.show', [$owner, $relatedDestinationInvoice]) }}" class="font-semibold underline">
+                                                                {{ $relatedDestinationInvoice->number }}
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @elseif ($isInboundReattribution)
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900">Reattributed in</span>
+                                                    @if ($relatedSourceInvoice)
+                                                        <div class="text-xs text-emerald-800 dark:text-emerald-200">
+                                                            Detected on
+                                                            <a href="{{ route('support.owners.invoices.show', [$owner, $relatedSourceInvoice]) }}" class="font-semibold underline">
+                                                                {{ $relatedSourceInvoice->number }}
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                {{ $payment->confirmed_at ? 'Confirmed' : 'Pending' }}
+                                            @endif
+                                        </td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">@if ($payment->txid)<span class="break-all">{{ $payment->txid }}</span>@else—@endif</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $payment->note ?: '—' }}</td>
                                     </tr>

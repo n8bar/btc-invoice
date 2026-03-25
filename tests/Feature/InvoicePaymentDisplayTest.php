@@ -449,7 +449,7 @@ class InvoicePaymentDisplayTest extends TestCase
             'source' => 'test',
         ], BtcRate::TTL);
 
-        InvoicePayment::create([
+        $payment = InvoicePayment::create([
             'invoice_id' => $invoice->id,
             'txid' => 'tx-partial-1',
             'sats_received' => 400_000,
@@ -476,6 +476,9 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('Outstanding balance', false);
         $response->assertSee('$348.00', false);
         $response->assertSee('(0.00696 BTC)', false);
+        $paymentHistoryDetected = $payment->fresh()->detected_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
         $detectedDisplay = optional(
             $invoice->fresh('payments')->payments->max('detected_at')
         )
@@ -484,7 +487,75 @@ class InvoicePaymentDisplayTest extends TestCase
             ->toDayDateTimeString();
         $response->assertSee('Last payment detected', false);
         $response->assertSee($detectedDisplay, false);
+        $response->assertSee($paymentHistoryDetected, false);
         $response->assertSeeInOrder(['Payment QR', 'Delivery log', 'Payment history', 'Public link'], false);
+    }
+
+    public function test_delivery_log_truncates_error_text_but_keeps_full_tooltip(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $errorMessage = 'Mailgun rejected the payload because the remote address parser found an invalid recipient format after alias rewriting and refused the queued send.';
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'failed',
+            'recipient' => 'client@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'error_message' => $errorMessage,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $response->assertOk();
+        $response->assertSee('title="' . e($errorMessage) . '"', false);
+        $response->assertSee('max-w-[10rem]', false);
+        $response->assertSee('truncate', false);
+        $response->assertSee('text-red-600', false);
+        $response->assertSee($errorMessage, false);
+    }
+
+    public function test_delivery_log_shows_none_as_neutral_state(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $delivery = $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => 'client@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 10:00:00', 'UTC'),
+            'sent_at' => Carbon::parse('2025-01-04 11:05:00', 'UTC'),
+            'error_message' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $expectedQueuedDisplay = $delivery->fresh()->dispatched_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
+        $expectedSentDisplay = $delivery->fresh()->sent_at
+            ->setTimezone(config('app.timezone'))
+            ->format('m-d-y H:i');
+
+        $response->assertOk();
+        $response->assertSee('title="None"', false);
+        $response->assertSee('max-w-[10rem]', false);
+        $response->assertSee('text-gray-500', false);
+        $response->assertSeeText('None');
+        $response->assertSee($expectedQueuedDisplay, false);
+        $response->assertSee($expectedSentDisplay, false);
     }
 
     public function test_bitcoin_uri_targets_outstanding_balance(): void
@@ -598,7 +669,42 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.show', $invoice->fresh('payments')))
             ->assertSee('First partial from client', false)
+            ->assertSee('0.00100000', false)
             ->assertSee('@ $35,000.00 USD/BTC', false);
+    }
+
+    public function test_owner_can_update_payment_note_via_json(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'sent',
+        ]);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-note-json-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::parse('2025-01-05 12:00:00', 'UTC'),
+            'usd_rate' => 35_000,
+            'fiat_amount' => 35.00,
+        ]);
+
+        $this
+            ->actingAs($owner)
+            ->patchJson(route('invoices.payments.note', [$invoice, $payment]), [
+                'note' => 'Autosaved partial note',
+                'source_payment_id' => $payment->id,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'status' => 'saved',
+                'note' => 'Autosaved partial note',
+            ]);
+
+        $this->assertDatabaseHas('invoice_payments', [
+            'id' => $payment->id,
+            'note' => 'Autosaved partial note',
+        ]);
     }
 
     public function test_print_view_shows_payment_history_table(): void

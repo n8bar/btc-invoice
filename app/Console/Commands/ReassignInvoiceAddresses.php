@@ -100,10 +100,10 @@ class ReassignInvoiceAddresses extends Command
                     if (
                         $apply
                         && $this->option('reset-payments')
-                        && $invoice->payments()->exists()
+                        && $invoice->sourcePayments()->exists()
                     ) {
                         DB::transaction(function () use ($invoice, &$summary) {
-                            $invoice->payments()->delete();
+                            $invoice->sourcePayments()->delete();
                             $invoice->update([
                                 'payment_amount_sat' => null,
                                 'payment_confirmations' => 0,
@@ -136,9 +136,9 @@ class ReassignInvoiceAddresses extends Command
                     }
                     $summary['updated']++;
 
-                    if ($this->option('reset-payments') && $invoice->payments()->exists()) {
+                    if ($this->option('reset-payments') && $invoice->sourcePayments()->exists()) {
                         DB::transaction(function () use ($invoice, &$summary) {
-                            $invoice->payments()->delete();
+                            $invoice->sourcePayments()->delete();
                             $invoice->update([
                                 'payment_amount_sat' => null,
                                 'payment_confirmations' => 0,
