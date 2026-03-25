@@ -735,7 +735,9 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-2 py-2 text-right">
-                                                    {{ $invoice->formatBitcoinAmount($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC) ?? '—' }}
+                                                    <div class="font-mono text-[15px] leading-[1.05rem]">
+                                                        {{ number_format($payment->sats_received / \App\Models\Invoice::SATS_PER_BTC, 8, '.', '') }}
+                                                    </div>
                                                 </td>
                                                 <td class="px-2 py-2 text-right">
                                                     @if ($payment->fiat_amount !== null)

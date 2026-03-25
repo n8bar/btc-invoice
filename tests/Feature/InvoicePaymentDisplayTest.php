@@ -598,6 +598,7 @@ class InvoicePaymentDisplayTest extends TestCase
             ->actingAs($owner)
             ->get(route('invoices.show', $invoice->fresh('payments')))
             ->assertSee('First partial from client', false)
+            ->assertSee('0.00100000', false)
             ->assertSee('@ $35,000.00 USD/BTC', false);
     }
 
