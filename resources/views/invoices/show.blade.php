@@ -1080,7 +1080,7 @@
                                                                                                   class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showIgnoreForm && $errors->has('ignore_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-red-200 dark:border-red-400/30' }}"
                                                                                                   placeholder="Why should this payment stop counting toward this invoice?">{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
                                                                                         @if ($showIgnoreForm)
-                                                                                            <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
+                                                                                            <p class="mt-1 text-xs font-semibold text-red-700 underline decoration-2 decoration-red-500 underline-offset-2 animate-pulse">{{ $errors->first('ignore_reason') }}</p>
                                                                                         @endif
                                                                                     </div>
                                                                                     <div class="flex justify-end">
