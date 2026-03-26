@@ -1,6 +1,6 @@
 # MS14 Phase 5 Strategy - Browser QA Findings + Fixes
 
-Status: Active after Browser QA. The follow-up fixes are implemented on this branch; remaining work is the targeted Browser QA rerun.
+Status: Active after Browser QA. The follow-up fixes are implemented on this branch; the targeted Browser QA rerun is in progress, and `4.2` is still failing because the ignore validation flow zips back to the top instead of staying anchored on the payment row.
 Parent phase strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
@@ -22,6 +22,7 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
      2. The payment row falls out of view.
      3. The missing required reason is easier to miss.
      4. The user can briefly think the ignore succeeded when it did not.
+     5. During the targeted rerun, the page still zipped confusingly back to the top instead of staying anchored on the payment row.
 
 2. Reattribution validation loses scroll position and makes the missing reason feel accepted
    - Surface: owner invoice show page, Scenario C on source invoice `69` / `INV-0005`, `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`.
