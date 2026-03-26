@@ -502,6 +502,36 @@ class InvoicePaymentCorrectionTest extends TestCase
         $this->assertNull($payment->ignored_at);
     }
 
+    public function test_ignore_validation_page_does_not_render_native_autofocus_on_teleported_correction_fields(): void
+    {
+        [$owner, , $invoice] = $this->makeInvoice(['number' => 'INV-IGNORE-AUTOFOCUS']);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-ignore-autofocus',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $response = $this->actingAs($owner)
+            ->followingRedirects()
+            ->from(route('invoices.show', $invoice))
+            ->patch(route('invoices.payments.ignore', [$invoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'ignore_reason' => '   ',
+            ])
+            ->assertOk();
+
+        $matches = [];
+        preg_match('/<textarea\b[^>]*id="ignore_reason_'.preg_quote((string) $payment->id, '/').'"[^>]*>/i', $response->getContent(), $matches);
+
+        $this->assertNotEmpty($matches);
+        $this->assertStringNotContainsString('autofocus', $matches[0]);
+    }
+
     public function test_reattribution_validation_redirects_back_to_the_same_payment_row_with_destination_preserved(): void
     {
         [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-VALIDATION-SRC']);
@@ -534,6 +564,38 @@ class InvoicePaymentCorrectionTest extends TestCase
         $payment->refresh();
         $this->assertSame($sourceInvoice->id, $payment->accounting_invoice_id);
         $this->assertNull($payment->reattributed_at);
+    }
+
+    public function test_reattribution_validation_page_does_not_render_native_autofocus_on_teleported_correction_fields(): void
+    {
+        [$owner, , $sourceInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-AUTOFOCUS-SRC']);
+        [, , $destinationInvoice] = $this->makeInvoice(['number' => 'INV-REATTR-AUTOFOCUS-DEST'], $owner);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $sourceInvoice->id,
+            'txid' => 'tx-reattr-autofocus',
+            'sats_received' => 20_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 10.00,
+        ]);
+
+        $response = $this->actingAs($owner)
+            ->followingRedirects()
+            ->from(route('invoices.show', $sourceInvoice))
+            ->patch(route('invoices.payments.reattribute', [$sourceInvoice, $payment]), [
+                'correction_payment_id' => $payment->id,
+                'destination_invoice_id' => $destinationInvoice->id,
+                'reattribute_reason' => '   ',
+            ])
+            ->assertOk();
+
+        $matches = [];
+        preg_match('/<textarea\b[^>]*id="reattribute_reason_'.preg_quote((string) $payment->id, '/').'"[^>]*>/i', $response->getContent(), $matches);
+
+        $this->assertNotEmpty($matches);
+        $this->assertStringNotContainsString('autofocus', $matches[0]);
     }
 
     public function test_payment_correction_returns_404_for_mismatched_invoice_payment_pair(): void

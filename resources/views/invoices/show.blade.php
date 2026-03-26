@@ -1018,8 +1018,7 @@
                                                                                         <label for="destination_invoice_id_{{ $payment->id }}" class="text-xs font-semibold text-indigo-900 dark:text-indigo-100">Destination invoice</label>
                                                                                         <select id="destination_invoice_id_{{ $payment->id }}"
                                                                                                 name="destination_invoice_id"
-                                                                                                class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 {{ $showReattributeForm && $errors->has('destination_invoice_id') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-indigo-200 dark:border-indigo-400/30' }}"
-                                                                                                @if ($showReattributeForm && $errors->has('destination_invoice_id')) autofocus @endif>
+                                                                                                class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 {{ $showReattributeForm && $errors->has('destination_invoice_id') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-indigo-200 dark:border-indigo-400/30' }}">
                                                                                             @unless ($isOutgoingReattribution)
                                                                                                 <option value="" @selected($selectedDestinationId === null)>Select an invoice</option>
                                                                                             @endunless
@@ -1048,8 +1047,7 @@
                                                                                                   name="reattribute_reason"
                                                                                                   rows="2"
                                                                                                   class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showReattributeForm && $errors->has('reattribute_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-indigo-200 dark:border-indigo-400/30' }}"
-                                                                                                  placeholder="Why should this payment count toward another invoice?"
-                                                                                                  @if ($showReattributeForm && ! $errors->has('destination_invoice_id')) autofocus @endif>{{ $showReattributeForm ? old('reattribute_reason') : ($isOutgoingReattribution ? $payment->reattribute_reason : '') }}</textarea>
+                                                                                                  placeholder="Why should this payment count toward another invoice?">{{ $showReattributeForm ? old('reattribute_reason') : ($isOutgoingReattribution ? $payment->reattribute_reason : '') }}</textarea>
                                                                                         @if ($showReattributeForm && $errors->has('reattribute_reason'))
                                                                                             <p class="mt-1 text-xs text-red-700">{{ $errors->first('reattribute_reason') }}</p>
                                                                                         @endif
@@ -1080,8 +1078,7 @@
                                                                                                   name="ignore_reason"
                                                                                                   rows="2"
                                                                                                   class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showIgnoreForm && $errors->has('ignore_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-red-200 dark:border-red-400/30' }}"
-                                                                                                  placeholder="Why should this payment stop counting toward this invoice?"
-                                                                                                  @if ($showIgnoreForm) autofocus @endif>{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
+                                                                                                  placeholder="Why should this payment stop counting toward this invoice?">{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
                                                                                         @if ($showIgnoreForm)
                                                                                             <p class="mt-1 text-xs text-red-700">{{ $errors->first('ignore_reason') }}</p>
                                                                                         @endif
