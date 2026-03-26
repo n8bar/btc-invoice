@@ -617,3 +617,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-26 | MS14 findings now include reattribution undo and AGENTS preserves related user doc edits
 `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now records that reattributed payments still lack a clear inline undo path back to the source invoice, and `AGENTS.md` now says uncommitted user doc edits in the same active workstream should be preserved and carried into the next related commit by default.
+
+2026-03-26 | MS14 findings strategy now gives reattribution undo its own fix block
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now inserts a dedicated `2.4` fix sequence for adding a clear reattribution undo path back to the source invoice and shifts the follow-up verification block to `2.5`, including a targeted Browser QA rerun step for the undo flow.

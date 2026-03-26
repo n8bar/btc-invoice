@@ -88,8 +88,16 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 4. [x] Auto-generate the reversal note as `reversal of {txid}` and recompute invoice state after the reversal entry is created.
 5. [x] Add/update automated coverage for reversal creation and the append-only adjustment history.
 
-### 4. Verify the follow-up fixes
+### 4. Add reattribution undo
+1. [ ] Add a clear inline undo path for reattributed payments instead of forcing the user to infer that destination selection can act as reversal.
+2. [ ] Let the user return active accounting credit to the source invoice directly from the correction UI.
+3. [ ] Keep the undo path explicit and stateful in both source and destination contexts so the current accounting destination is never ambiguous.
+4. [ ] Recompute source and destination invoice state immediately after undoing a reattribution.
+5. [ ] Add/update automated coverage for undoing a reattribution back to the source invoice.
+
+### 5. Verify the follow-up fixes
 1. [x] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
 2. [ ] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
 3. [ ] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
 4. [ ] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history.
+5. [ ] Reattribute a payment from source invoice `69` / `INV-0005` to destination invoice `70` / `INV-0006`, then use the new undo path and verify the payment cleanly returns to the source invoice without guessing through destination selection, source/destination invoice math recomputes immediately, and the row no longer reads as reattributed.
