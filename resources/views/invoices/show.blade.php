@@ -1335,8 +1335,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const correctionFocusFieldId = @json(session('correction_focus_field'));
+            const correctionFocusRowId = @json(session('correction_focus_row'));
+            const hasHashTarget = typeof window.location.hash === 'string' && window.location.hash.length > 1;
             const restoreScrollY = Number(@json(session('restore_scroll_y')));
-            if (Number.isFinite(restoreScrollY) && restoreScrollY >= 0) {
+            if (!hasHashTarget && !correctionFocusFieldId && !correctionFocusRowId && Number.isFinite(restoreScrollY) && restoreScrollY >= 0) {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         window.scrollTo({ top: restoreScrollY, left: 0, behavior: 'auto' });
@@ -1344,8 +1347,6 @@
                 });
             }
 
-            const correctionFocusFieldId = @json(session('correction_focus_field'));
-            const correctionFocusRowId = @json(session('correction_focus_row'));
             if (correctionFocusFieldId || correctionFocusRowId) {
                 let correctionFocusAttempts = 0;
 
