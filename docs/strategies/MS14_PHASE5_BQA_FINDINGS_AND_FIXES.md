@@ -1,12 +1,12 @@
 # MS14 Phase 5 Strategy - Browser QA Findings + Fixes
 
-Status: Active after Browser QA. The follow-up fixes are implemented on this branch; the targeted Browser QA rerun is in progress, and `4.2` is still failing because the ignore validation flow zips back to the top instead of staying anchored on the payment row.
+Status: Active after Browser QA. The follow-up fixes are implemented on this branch; remaining work is the targeted Browser QA rerun.
 Parent phase strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
 This strategy is the active Phase 5 follow-up doc for issues found during Browser QA. Keep the findings list intact, track what shipped in the fix sequence below, and use the remaining verification items for the targeted rerun.
 
-## Findings
+## 1. Findings
 1. Ignore validation loses scroll position and weakens required-field feedback
    - Surface: owner invoice show page, Scenario A on invoice `67` / `INV-0003`, payment row `39`.
    - Repro:
@@ -22,7 +22,6 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
      2. The payment row falls out of view.
      3. The missing required reason is easier to miss.
      4. The user can briefly think the ignore succeeded when it did not.
-     5. During the targeted rerun, the page still zipped confusingly back to the top instead of staying anchored on the payment row.
 
 2. Reattribution validation loses scroll position and makes the missing reason feel accepted
    - Surface: owner invoice show page, Scenario C on source invoice `69` / `INV-0005`, `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`.
@@ -53,7 +52,21 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
      1. Manual adjustment rows show no reversal affordance.
      2. The only shipped adjustment action is creation, so an owner cannot practically say `oops` after recording the wrong adjustment.
 
-## Fix Sequence
+4. Reattributed payments have no clean inline undo path
+   - Surface: owner invoice show page, any reattributed payment row in payment history.
+   - Repro:
+     1. Reattribute a payment from a source invoice to a destination invoice.
+     2. Try to undo that reattribution cleanly from the correction UI.
+   - Expected:
+     1. A reattributed payment exposes a clear inline way to return the active accounting destination to the source invoice.
+     2. The undo path does not depend on choosing a fake destination or guessing at a no-op.
+     3. If the current invoice is the right destination again, the correction UI makes that obvious instead of hiding the option.
+   - Actual:
+     1. There is no clear undo action for a reattributed payment.
+     2. The current/source invoice is omitted from the destination list, so the user cannot simply return the payment there.
+     3. The user is left guessing whether changing the destination to the same invoice should undo the reattribution.
+
+## 2. Fix Sequence
 ### 1. Fix ignore validation recovery
 1. [x] Keep the same ignore form open when validation fails for payment row `39` on invoice `67`.
 2. [x] Preserve scroll position by returning focus to that payment row instead of reloading near the top.

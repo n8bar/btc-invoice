@@ -614,3 +614,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-25 | MS14 Phase 5 follow-up fixes now ship on the findings branch
 `resources/views/invoices/show.blade.php`, `app/Http/Controllers/InvoicePaymentCorrectionController.php`, `app/Http/Controllers/InvoicePaymentAdjustmentController.php`, `routes/web.php`, and `tests/Feature/InvoicePaymentCorrectionTest.php` now keep ignore/reattribution validation anchored to the same payment row with focused inline errors, add owner-facing manual adjustment reversal, and make `invoice_payments.sats_received` signed so equal-and-opposite adjustment rows can be stored. `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/PLAN.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now point the remaining Phase 5 work at the targeted Browser QA rerun.
+
+2026-03-26 | MS14 findings now include reattribution undo and AGENTS preserves related user doc edits
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now records that reattributed payments still lack a clear inline undo path back to the source invoice, and `AGENTS.md` now says uncommitted user doc edits in the same active workstream should be preserved and carried into the next related commit by default.
