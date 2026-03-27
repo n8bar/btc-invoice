@@ -671,3 +671,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-26 | MS15 now treats derivative public Helpful Notes content as a conditional Phase 1/2 lever
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`, `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, and `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treat the current one-page placeholder plus public Helpful Notes mix as a Phase 1 decision point: if Phase 1 proves it is too thin, Phase 2 may expand derivative public Helpful Notes content under `site/` enough to strengthen SEO while the site still reads as a product placeholder rather than a docs encyclopedia.
+
+2026-03-26 | MS15 Phase 1 now keeps the placeholder sitemap single-URL
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now records the current `15.1.2` decision: keep `site/sitemap.xml` limited to `/` for now because the repo-controlled GitHub Pages placeholder only exposes that one real crawlable placeholder URL, while public Helpful Notes still lives on the Laravel app surface unless a later MS15 phase deliberately publishes derivative Helpful Notes content under `site/`.

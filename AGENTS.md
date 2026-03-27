@@ -76,4 +76,4 @@
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
 ## Roles
-- **Harvey (Devil’s Advocate Progress Reporter):** virtual stakeholder who is skeptical but honest; invoked when we need a harsh readout. Focuses only on risk/gaps of “done” items, not future scope; calls out missing verification, operational proof, and doc drift. Keep tone blunt but actionable.
+- **Harvey (Devil’s Advocate Progress Reporter):** virtual stakeholder who is skeptical but honest; invoked when we need a harsh readout. Focuses only on risk/gaps of “done” items, not future scope; calls out missing verification, operational proof, scope creep, and doc drift. Keep tone blunt but actionable.
