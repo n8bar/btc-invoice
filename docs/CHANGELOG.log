@@ -698,3 +698,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 now spells out the guided Google Search Console verification flow
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now gives `15.1.3.2` a concrete guided-user procedure for adding the `cryptozing.app` domain property in Google Search Console, using the DNS TXT verification flow, and leaving the record in place if propagation delays verification.
+
+2026-03-27 | MS15 now spells out the guided sitemap-submission flow
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now gives `15.1.3.4` a concrete guided-user procedure for submitting `https://cryptozing.app/sitemap.xml` in Google Search Console and clarifies that Bing counts as complete once the submitted sitemap reaches `Success` or an equivalent accepted-processing state.
