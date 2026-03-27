@@ -674,3 +674,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-26 | MS15 Phase 1 now keeps the placeholder sitemap single-URL
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now records the current `15.1.2` decision: keep `site/sitemap.xml` limited to `/` for now because the repo-controlled GitHub Pages placeholder only exposes that one real crawlable placeholder URL, while public Helpful Notes still lives on the Laravel app surface unless a later MS15 phase deliberately publishes derivative Helpful Notes content under `site/`.
+
+2026-03-26 | MS15 Phase 1 now records the rest of the discovery-signal baseline
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now records that the live placeholder host resolves the intended canonical, social, JSON-LD, and image URLs correctly; that no extra repo-controlled discovery-signal fixes are needed right now; that `site/sitemap.xml` `lastmod` should be maintained manually when the placeholder's crawl-visible `site/` content changes meaningfully; and that the current root robots/sitemap/canonical setup still makes sense for the later live-app handoff as long as deployment preserves that SEO baseline.
