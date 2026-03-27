@@ -11,7 +11,7 @@
 ## 2. Goals
 1. Let invoice owners email a public link plus summary to their client from the app.
 2. Enable automatic, non-promissory payment acknowledgments and truthful receipt emails.
-3. Ensure both owners and clients receive email alerts for key invoice events without relying on manual follow-up.
+3. Support truthful alert emails for past-due, overpayment, underpayment, and partial-payment events.
 4. Surface automated emails when an invoice is paid, becomes past due, or when on-chain payments deviate from the invoice total by more than the defined tolerance.
 5. Prevent payment-triggered mail from claiming certainty after a later on-chain payment on an already-funded invoice when that payment may be semantically ambiguous.
 
