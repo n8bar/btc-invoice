@@ -36,9 +36,9 @@
 
 ## 4. Automated Alert Triggers
 1. **Invoice Paid Notice (Owner)**
-   1. Fired when `InvoicePaid` event dispatches (already happens when watcher crosses `paid` threshold or manual adjustments close the balance).
-   2. Owner gets a succinct “Invoice {number} paid” email summarizing amounts, tx metadata, and a link back to the dashboard.
-   3. Delivery log should capture owner notice and client receipt with distinct `type` values (for example `owner_paid_notice`, `receipt`).
+   1. When an invoice becomes paid, the invoice issuer should receive a succinct owner notice.
+   2. This notice should summarize the paid state, relevant payment details, and link back into the app for follow-up.
+   3. The owner paid notice should remain distinct from any client-facing payment acknowledgment or receipt in the delivery history.
 
 2. **Past Due (Owner + Client)**
    1. Nightly scheduler checks invoices whose `due_date` is in the past, status is not `paid`/`void`, and that have not been reminded in the last 48h.

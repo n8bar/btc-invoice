@@ -797,3 +797,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications Section 5 now preserves the delivery-history implementation details that no longer belong in Section 3
 `docs/specs/NOTIFICATIONS.md` now carries the `invoice_deliveries` table name, delivery-row field expectations, current invoice-detail operator view note, and the full queued/sent/skipped/failed outcome set under Shared Implementation Requirements instead of letting those implementation-shaped details disappear when Section 3 was cleaned up.
+
+2026-03-27 | Notifications alert 4.1 now stays at the product-behavior level
+`docs/specs/NOTIFICATIONS.md` no longer describes the owner paid notice in terms of the `InvoicePaid` event, watcher/manual-adjustment trigger paths, or raw delivery types; `4.1` now simply states that when an invoice becomes paid, the invoice issuer gets a succinct owner notice that stays distinct from client-facing payment acknowledgments and receipts.
