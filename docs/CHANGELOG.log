@@ -825,5 +825,8 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications item 5.2 now expresses delivery-history context as a product requirement instead of a row schema checklist
 `docs/specs/NOTIFICATIONS.md` now says the shared delivery history must preserve enough context to identify the invoice, issuer, recipients, communication class, outcome, and timing/error details for each outbound attempt, instead of spelling that out as delivery-log row fields.
 
+2026-03-27 | Notifications item 5.3 no longer freezes the delivery-history UI to today’s owner invoice page
+`docs/specs/NOTIFICATIONS.md` no longer says the owner invoice detail page is the primary operator view for delivery history, because that is current UI placement rather than an enduring notification invariant and future versions may expose delivery history elsewhere too.
+
 2026-03-27 | Product spec header date now reflects the current synced doc set
 `docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.
