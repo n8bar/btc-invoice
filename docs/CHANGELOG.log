@@ -656,3 +656,6 @@ Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordere
 
 2026-03-26 | Checklist-depth rules now talk about lower-level detail, not the word strategy
 `AGENTS.md` now frames the boundary in terms of detail depth: `docs/PLAN.md` should not pull in phase-level or strategy-detail steps, and milestone docs may mention reviewing the current phase strategy without pulling strategy-level checklist detail up into the milestone layer.
+
+2026-03-26 | Drafted the remaining MS15 phase strategies before Phase 1 execution
+Added `docs/strategies/MS15_PHASE2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, `docs/strategies/MS15_PHASE3_CONTINUITY_LAUNCH_HANDOFF.md`, and `docs/strategies/MS15_PHASE4_VERIFICATION_MONITORING.md` so all four MS15 phases now have draft strategy docs before execution begins. Updated the README documentation map to include those new phase strategies.

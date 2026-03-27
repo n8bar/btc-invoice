@@ -1,0 +1,33 @@
+# MS15 Phase 2 Strategy - Metadata + Search-Signal Hygiene
+
+Status: Draft.
+Parent milestone doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](../milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+
+Tighten the placeholder's technical search signals and only the minimum on-page copy that Phase 1 proves needs adjustment.
+
+## 1. Lock the scope boundary before edits
+1. [ ] Confirm which Phase 1 findings are true metadata/search-signal issues versus broader marketing/content ideas.
+2. [ ] Keep this phase limited to titles, descriptions, headings, canonical/schema signals, image/meta references, and only the minimum on-page copy needed to support the existing landing page.
+3. [ ] Reject any proposed changes that amount to a landing-page rewrite, messaging overhaul, or new-page expansion.
+
+## 2. Correct repo-controlled metadata and discovery signals
+1. [ ] Fix any incorrect or weak `<title>`, meta description, canonical, Open Graph, Twitter, or JSON-LD fields identified in Phase 1.
+2. [ ] Verify social-preview assets, image URLs, and structured-data references remain accurate on the live placeholder host.
+3. [ ] Tighten `site/robots.txt` and `site/sitemap.xml` only if Phase 1 proved a real search-signal problem.
+4. [ ] Decide whether any sitemap `lastmod` update process belongs in the repo, in workflow discipline, or in later launch operations; avoid fake automation.
+
+## 3. Make only the minimum on-page copy adjustments needed
+1. [ ] Limit on-page copy changes to the minimum required to support accurate metadata/search signals or remove claims Phase 1 proved risky.
+2. [ ] Keep the existing placeholder positioning and structure intact.
+3. [ ] Re-check that the placeholder still reads as the same landing page after any copy touch.
+
+## 4. Preserve launch continuity while editing
+1. [ ] Keep the root URL, canonical intent, and GitHub Pages deployment assumptions compatible with the later live landing-page replacement.
+2. [ ] Avoid introducing placeholder-only metadata or copy choices that the live landing page would immediately need to undo.
+3. [ ] Note any SEO-related changes that Phase 3 must preserve at go-live.
+
+## 5. Verify Phase 2
+1. [ ] Confirm every shipped change in this phase maps back to a Phase 1 finding or decision instead of open-ended content polishing.
+2. [ ] Confirm the live placeholder still exposes the intended title, description, canonical, social, and JSON-LD signals after the edits.
+3. [ ] Confirm the placeholder content still feels like the same page, not a rewritten marketing surface.
+4. [ ] Confirm any continuity constraints discovered here are captured for Phase 3.

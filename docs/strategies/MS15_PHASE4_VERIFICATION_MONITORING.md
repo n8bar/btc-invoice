@@ -1,0 +1,31 @@
+# MS15 Phase 4 Strategy - Verification + Monitoring
+
+Status: Draft.
+Parent milestone doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](../milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+
+Close MS15 by verifying the live signals, capturing the monitoring baseline, and leaving a clear post-phase watch list.
+
+## 1. Re-verify the live placeholder baseline
+1. [ ] Re-check the live root URL, robots file, sitemap, canonical, social tags, and structured data after earlier phases are complete.
+2. [ ] Confirm the GitHub Pages deployment path still matches the repo-controlled placeholder assumptions at the moment MS15 closes.
+3. [ ] Confirm the current live placeholder matches what the repo intends to publish.
+
+## 2. Confirm external-tool state
+1. [ ] Reconfirm Google Search Console ownership, sitemap submission, and any immediately visible coverage/index signals.
+2. [ ] Reconfirm Bing Webmaster ownership, sitemap submission, and any immediately visible crawl/index signals.
+3. [ ] Record any warnings, delays, or follow-up monitoring items instead of pretending indexing settles instantly.
+
+## 3. Capture the monitoring baseline
+1. [ ] Record what has actually been verified in repo-controlled surfaces versus external tooling.
+2. [ ] Capture the baseline dates, submitted sitemap state, and any known lag between submission and useful indexing feedback.
+3. [ ] Leave a short watch list for the days/weeks after MS15 closes.
+
+## 4. Roll the results up cleanly
+1. [ ] Update the milestone doc and `docs/PLAN.md` only at their own checklist depth once MS15 is truly complete.
+2. [ ] Update any supporting docs needed so later milestones inherit the right SEO baseline without reopening this phase work.
+3. [ ] Keep the closeout focused on what was verified, what remains to monitor, and what later milestones must preserve.
+
+## 5. Verify Phase 4
+1. [ ] Confirm MS15 closes with a real discovery/indexing baseline rather than only repo-side assumptions.
+2. [ ] Confirm the post-MS15 watch list is short, concrete, and realistic about search-engine lag.
+3. [ ] Confirm the milestone can be checked off without burying lower-level monitoring detail in higher-level docs.

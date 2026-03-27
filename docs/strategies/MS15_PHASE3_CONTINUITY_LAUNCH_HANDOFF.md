@@ -1,0 +1,27 @@
+# MS15 Phase 3 Strategy - Continuity + Launch Handoff
+
+Status: Draft.
+Parent milestone doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](../milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+
+Define what must stay stable when the live app landing page replaces the placeholder at `https://cryptozing.app/`.
+
+## 1. Identify the continuity-critical surfaces
+1. [ ] List the SEO-relevant signals that must remain stable across the placeholder-to-live cutover.
+2. [ ] Distinguish which signals must stay identical versus which can evolve without resetting discovery.
+3. [ ] Identify any repo-owned assumptions that will no longer hold once the root URL is served by the live app instead of GitHub Pages.
+
+## 2. Define the launch handoff requirements
+1. [ ] State what the live landing page must preserve for canonical URL, robots behavior, sitemap presence, social-preview intent, and structured data.
+2. [ ] Define what should happen to any GitHub Pages-specific assets or references when the live app takes over the root URL.
+3. [ ] Identify any redirects, DNS, or hosting transitions that must not break crawler access during cutover.
+4. [ ] Note any owner-facing or operational follow-up needed outside the repo to keep search-console ownership stable.
+
+## 3. Align continuity rules with rollout docs
+1. [ ] Decide which continuity requirements belong in the milestone doc versus rollout/ops docs.
+2. [ ] Sync any launch-sensitive SEO requirements into the appropriate rollout checklist without duplicating this strategy's step-by-step detail.
+3. [ ] Call out any dependencies on later milestones so continuity work is not rediscovered at go-live.
+
+## 4. Verify Phase 3
+1. [ ] Confirm the handoff requirements are concrete enough that the live landing page can replace the placeholder without guessing.
+2. [ ] Confirm the continuity rules protect discovery/indexing signals without freezing the future landing page unnecessarily.
+3. [ ] Confirm the launch-sensitive pieces are captured in the right higher-level doc instead of living only in this strategy.
