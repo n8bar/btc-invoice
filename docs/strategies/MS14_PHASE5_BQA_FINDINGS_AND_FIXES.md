@@ -1,10 +1,10 @@
 # MS14 Phase 5 Strategy - Browser QA Findings + Fixes
 
-Status: Active after Browser QA. The follow-up fixes are implemented on this branch; remaining work is the targeted Browser QA rerun.
+Status: Complete as of 2026-03-26. The follow-up fixes are implemented and the targeted Browser QA rerun passed.
 Parent phase strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
 Canonical requirements: [`docs/specs/PAYMENT_CORRECTIONS.md`](../specs/PAYMENT_CORRECTIONS.md)
 
-This strategy is the active Phase 5 follow-up doc for issues found during Browser QA. Keep the findings list intact, track what shipped in the fix sequence below, and use the remaining verification items for the targeted rerun.
+This strategy records the Phase 5 follow-up fixes found during Browser QA plus the targeted rerun that closed them.
 
 ## 1. Findings
 1. Ignore validation loses scroll position and weakens required-field feedback
@@ -112,6 +112,6 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 ### 5. Verify the follow-up fixes
 1. [x] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
 2. [x] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
-3. [ ] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
+3. [x] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
 4. [x] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history. Also verify that once an entry has been reversed, it cannot be reversed again directly.
-5. [ ] Reattribute a payment from source invoice `69` / `INV-0005` to destination invoice `70` / `INV-0006`, verify the actively reattributed row does not offer `Ignore`, then use the new undo path and verify the payment cleanly returns to the source invoice without guessing through destination selection, source/destination invoice math recomputes immediately, and the row no longer reads as reattributed.
+5. [x] Reattribute a payment from source invoice `69` / `INV-0005` to destination invoice `70` / `INV-0006`, verify the actively reattributed row does not offer `Ignore`, then use the new undo path and verify the payment cleanly returns to the source invoice without guessing through destination selection, source/destination invoice math recomputes immediately, and the row no longer reads as reattributed.

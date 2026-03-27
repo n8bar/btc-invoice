@@ -626,3 +626,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-26 | Phase 5 findings branch now ships explicit reattribution undo and blocks ignore during active reattribution
 `app/Http/Controllers/InvoicePaymentCorrectionController.php`, `routes/web.php`, and `resources/views/invoices/show.blade.php` now add an explicit owner undo path for active reattributions, route destination-side undo submissions through the canonical source invoice/payment pair, remove the fake return-to-source picker path, and hide/block `Ignore` while a payment is still actively reattributed. `tests/Feature/InvoicePaymentCorrectionTest.php` now covers source/destination undo behavior and the ignore-blocking rule, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now checks off the shipped `2.4` implementation items while leaving the human rerun open.
+
+2026-03-26 | MS14 is complete after the targeted Phase 5 follow-up rerun
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now marks the last two targeted Browser QA reruns passed and closes the follow-up strategy, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now marks Phase 5 and MS14 complete, and `docs/PLAN.md` now moves MS14 into the completed milestones list and leaves the plan in a between-milestones state pending insertion of the next milestone from `main`.
