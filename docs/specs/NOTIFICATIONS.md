@@ -54,7 +54,7 @@
    2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
 
 ## 5. ____
-1. Use the existing queued mail + `invoice_deliveries` pattern for all outbound communication so aliasing and delivery logging stay consistent.
+1. Outbound invoice communication should use a shared queued delivery path and shared delivery history so send outcomes remain auditable.
 2. Delivery-log rows should capture invoice, sender/issuer context, recipient email(s), delivery type, status, and error/timestamp metadata.
 3. The owner invoice detail page is the current primary operator view for this delivery history.
 4. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
