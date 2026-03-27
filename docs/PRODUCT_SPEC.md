@@ -1,5 +1,5 @@
 # Product Spec
-_Last updated: 2026-03-19_
+_Last updated: 2026-03-27_
 
 This is the canonical product-level spec for CryptoZing.
 
