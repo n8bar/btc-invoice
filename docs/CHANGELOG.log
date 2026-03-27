@@ -770,3 +770,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications Goals 3 and 4 are now one clean non-receipt alert goal
 `docs/specs/NOTIFICATIONS.md` now folds the useful trigger language from the old Goal 4 into Goal 3, deletes the redundant standalone Goal 4, and renumbers the remaining ambiguity/truthfulness goal so the goals section no longer repeats the same alert scope in two adjacent items.
+
+2026-03-27 | Notifications ambiguity goal now states the cross-cutting truthfulness rule directly
+`docs/specs/NOTIFICATIONS.md` no longer phrases the final goal as one narrow later-payment scenario; it now says payment-triggered mail must not overstate certainty when the underlying payment state is semantically ambiguous, which better matches the broader MS14/MS16 correction and acknowledgment concerns.
