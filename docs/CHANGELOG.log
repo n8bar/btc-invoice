@@ -646,7 +646,7 @@ Added `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` as the milestone-le
 `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` no longer frames MS15 as strengthening placeholder content in general, renames the second phase to `Metadata + Search-Signal Hygiene`, and limits that phase to titles, descriptions, headings, canonical/schema signals, and only the minimum on-page copy needed to support the existing landing page.
 
 2026-03-26 | Drafted the MS15 Phase 1 strategy for discovery and indexing baseline
-Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordered checklist for the first MS15 phase, updated `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` so the milestone doc now points at that draft strategy as the current phase strategy, kept `docs/PLAN.md` pointed at the milestone doc, and updated the README documentation map to link the active MS15 Phase 1 strategy.
+Added `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` as the ordered checklist for the first MS15 phase, updated `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` so the milestone doc now points at that draft strategy as the current phase strategy, kept `docs/PLAN.md` pointed at the milestone doc, and updated the README documentation map to link the active MS15 Phase 1 strategy.
 
 2026-03-26 | PLAN next-action wording now stays milestone-level
 `AGENTS.md` now makes the rule explicit that any `Next action` in `docs/PLAN.md` must stay milestone-level rather than pointing at strategies or phase-level checklist steps, and `docs/PLAN.md` now says to review the MS15 milestone doc and begin MS15 execution.
@@ -658,7 +658,7 @@ Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordere
 `AGENTS.md` now frames the boundary in terms of detail depth: `docs/PLAN.md` should not pull in phase-level or strategy-detail steps, and milestone docs may mention reviewing the current phase strategy without pulling strategy-level checklist detail up into the milestone layer.
 
 2026-03-26 | Drafted the remaining MS15 phase strategies before Phase 1 execution
-Added `docs/strategies/MS15_PHASE2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, `docs/strategies/MS15_PHASE3_CONTINUITY_LAUNCH_HANDOFF.md`, and `docs/strategies/MS15_PHASE4_VERIFICATION_MONITORING.md` so all four MS15 phases now have draft strategy docs before execution begins. Updated the README documentation map to include those new phase strategies.
+Added `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, `docs/strategies/15.3_CONTINUITY_LAUNCH_HANDOFF.md`, and `docs/strategies/15.4_VERIFICATION_MONITORING.md` so all four MS15 phases now have draft strategy docs before execution begins. Updated the README documentation map to include those new phase strategies.
 
 2026-03-26 | MS15 phase strategy filenames now use the 15.x prefix
 Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to `15.1_...` through `15.4_...`, and updated the README documentation map to use the shorter filenames.
