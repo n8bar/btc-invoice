@@ -24,7 +24,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 2. [ ] Phase 2 - Provider Recovery + Transport Decision
    Determine whether Mailgun is currently blocking or throttling us, decide what recovery action is required, and choose whether MS16 stays on SMTP or moves to the Mailgun HTTP API.
 3. [ ] Phase 3 - Notifications Polish + Audit
-   Resume the broader notifications/alerts polish once the delivery path is trustworthy again, including any later-payment validation work, delivery-log polish, and related alert-behavior hardening.
+   Resume the broader notifications/alerts polish once the delivery path is trustworthy again, including any later-payment validation work, delivery-log polish, the issuer-copy toggle for client-facing notification emails (default on for RC), and related alert-behavior hardening.
 
 ## Open Scope Questions
 - During MS14 Browser QA we found evidence that some payment-triggered outgoing mail may need owner confirmation/validation first to catch ignored, reattributed, or otherwise semantically ambiguous payment states. MS16 should decide whether that remains a narrow later-payment safeguard or becomes a broader notification rule.

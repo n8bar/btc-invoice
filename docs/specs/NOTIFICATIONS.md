@@ -48,12 +48,10 @@
 3. **Significant Overpayment Alert (Client)**
    1. Triggered when the invoice reflects a significant overpayment (15% threshold for RC).
    2. The client alert should explain that overpayments are treated as gratuities by default and tell the client to contact the sender if the overpayment was accidental.
-   3. Owner can be CC’d automatically (or has the option via profile setting) so they know the alert fired.
 
 4. **Significant Underpayment Alert (Client)**
    1. Triggered when the invoice still carries a significant remaining balance after payment activity (15% threshold for RC).
    2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
-   3. The invoice issuer should also receive a brief owner-side notice that the underpayment outreach went out.
 
 ## 5. Shared Implementation Requirements
 1. Use the existing queued mail + `invoice_deliveries` pattern for all outbound communication so aliasing and delivery logging stay consistent.
@@ -62,14 +60,15 @@
 4. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
 5. Temporary catch-all aliasing during pre-production uses `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`. Disable aliasing before RC or real-customer traffic.
 6. Profile setting for automatic paid receipts remains part of the owner communication model.
-7. A global feature flag may disable outbound invoice communication entirely when mail is not configured.
-8. Delivery jobs should surface queued, sent, skipped, and failed outcomes through the shared delivery log.
-9. Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
-10. The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
-11. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
-12. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
-13. Manual invoice sends and past-due reminders are outside this safeguard.
-14. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+7. Client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior.
+8. A global feature flag may disable outbound invoice communication entirely when mail is not configured.
+9. Delivery jobs should surface queued, sent, skipped, and failed outcomes through the shared delivery log.
+10. Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
+11. The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
+12. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
+13. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
+14. Manual invoice sends and past-due reminders are outside this safeguard.
+15. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:
