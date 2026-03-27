@@ -758,3 +758,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 now preserves the candidate low-information payment-acknowledgment copy and follow-through requirement
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now records the current candidate client-facing acknowledgment copy for a detected Bitcoin payment plus the matching MS16 reminder that the operator side must actually notify the invoice issuer promptly and surface a visible review/receipt CTA if that acknowledgment path is adopted.
+
+2026-03-27 | MS16 payment-acknowledgment draft copy is now less self-undermining
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now trims the candidate client acknowledgment from “was detected and is being reviewed” down to “was detected” so the notification reassures without sounding like it is backpedaling the same claim in its next line.

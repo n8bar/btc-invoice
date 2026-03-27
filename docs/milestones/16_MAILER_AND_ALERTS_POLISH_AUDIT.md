@@ -29,7 +29,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 ## Open Scope Questions
 - During MS14 Browser QA we found evidence that some payment-triggered outgoing mail may need owner confirmation/validation first to catch ignored, reattributed, or otherwise semantically ambiguous payment states. MS16 should decide whether that remains a narrow later-payment safeguard or becomes a broader notification rule.
 - If MS16 introduces an automatic low-information payment acknowledgment before any owner-reviewed receipt, keep the copy deliberately narrow and non-promissory. Current candidate wording:
-  - `A Bitcoin payment of 0.00123456 BTC was detected and is being reviewed.`
+  - `A Bitcoin payment of 0.00123456 BTC was detected.`
   - `No action is needed right now.`
   - `The invoice issuer has been notified to review it promptly.`
 - If MS16 adopts that acknowledgment path, the operator side must actually support the last line: the invoice issuer needs a prompt, visible review/receipt CTA in the dashboard and invoice payment history so the acknowledgment does not become hollow reassurance.
