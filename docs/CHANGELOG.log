@@ -834,8 +834,8 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications spec no longer carries temporary aliasing config, but MS16 preserves it for later strategy work
 `docs/specs/NOTIFICATIONS.md` no longer treats catch-all aliasing as a product invariant; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now preserves the operational question for later phase planning so MS16 can decide when aliasing is still useful for safe testing, when it distorts delivery validation, and when it must be turned off before real-recipient traffic.
 
-2026-03-27 | Notifications Goal 2 no longer pre-answers the receipt model with the word “automatic”
-`docs/specs/NOTIFICATIONS.md` now says the system should enable non-promissory payment acknowledgments and truthful receipt emails, leaving the exact automation level to the still-open MS16 receipt-model discussion instead of implying full automation at the goal layer.
+2026-03-27 | Notifications Goal 2 now keeps “automatic” scoped to acknowledgments instead of dropping it entirely
+`docs/specs/NOTIFICATIONS.md` again says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails; this preserves the automatic acknowledgment idea without forcing the spec to treat receipt emails themselves as fully automatic.
 
 2026-03-27 | Product spec header date now reflects the current synced doc set
 `docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.
