@@ -1,6 +1,6 @@
 # MS15 - CryptoZing.app SEO Bootstrap
 
-Status: Draft as of 2026-03-26.
+Status: Active as of 2026-03-27.
 Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
 Supporting docs: [`site/index.html`](../../site/index.html), [`site/sitemap.xml`](../../site/sitemap.xml), [`site/robots.txt`](../../site/robots.txt), [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md)
 
@@ -14,15 +14,15 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 - Leave a clear SEO baseline that later deployment work can preserve at go-live.
 
 ## Current Focus
-- Active phase: **Phase 1 - Discovery + Indexing Baseline**
-- Current objective: review the Phase 1 strategy, then execute the repo-controlled discovery baseline work.
+- Active phase: **Phase 3 - Verification + Monitoring**
+- Current objective: continue MS15 closeout and monitoring work while leaving Phase 2 conditional unless later signals prove the current placeholder plus public Helpful Notes mix is too thin.
 - Primary surfaces: [`site/index.html`](../../site/index.html), [`site/sitemap.xml`](../../site/sitemap.xml), [`site/robots.txt`](../../site/robots.txt)
 
 ## Phase Rollup
-1. [ ] Phase 1 - Discovery + Indexing Baseline
-   Verify crawlability, sitemap/robots correctness, domain ownership, initial search-engine submission, and whether the current one-page/public Helpful Notes mix is too thin.
+1. [x] Phase 1 - Discovery + Indexing Baseline
+   Verified crawlability, sitemap/robots correctness, domain ownership, initial search-engine submission, and the initial controlled-link baseline; current decision is that the one-page placeholder plus public Helpful Notes mix is good enough for now.
 2. [ ] Phase 2 - Metadata + Search-Signal Hygiene
-   Tighten titles, descriptions, headings, canonical/schema signals, and, if Phase 1 proves it is needed, expand derivative public Helpful Notes content enough to strengthen SEO without turning the placeholder into a docs site.
+   Hold this phase unless later search-signal findings or early discovery data show the current placeholder plus public Helpful Notes mix is too thin or otherwise needs tightening.
 3. [ ] Phase 3 - Verification + Monitoring
    Capture indexing/discovery baselines, confirm the expected signals are live, and document what to monitor after launch.
 

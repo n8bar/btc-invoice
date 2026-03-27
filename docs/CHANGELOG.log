@@ -719,3 +719,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 now records the Phase 1 monitoring baseline and matching verification roll-up
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.5.1` through `15.1.5.3` and `15.1.6.1` through `15.1.6.7`, documenting the repo-vs-webmaster-tool verification split, the Google/Bing property and sitemap baseline, the short watch list for crawl/index health, and the matching Phase 1 verification results. The only Phase 1 decision still open is whether the placeholder plus public Helpful Notes mix is too thin for MS15 Phase 2.
+
+2026-03-27 | MS15 Phase 1 is now complete and Phase 2 remains conditional
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now closes Phase 1 with the decision that the current one-page placeholder plus public Helpful Notes mix is good enough for now, `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now rolls Phase 1 up as complete and shifts the active focus to Phase 3 monitoring/closeout work, and `docs/PLAN.md` now reflects that MS15 continues with Phase 2 held in reserve unless later search-signal evidence proves it is needed.
