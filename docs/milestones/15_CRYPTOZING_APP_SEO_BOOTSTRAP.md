@@ -15,7 +15,7 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 
 ## Current Focus
 - Active phase: **Phase 2 - Verification + Monitoring**
-- Current objective: continue MS15 closeout and monitoring work while leaving Phase 3 conditional unless later signals prove the current placeholder plus public Helpful Notes mix is too thin.
+- Current objective: review the Phase 2 strategy, then execute the verification and monitoring checklist while keeping Phase 3 conditional unless later signals prove it is needed.
 - Primary surfaces: [`site/index.html`](../../site/index.html), [`site/sitemap.xml`](../../site/sitemap.xml), [`site/robots.txt`](../../site/robots.txt)
 
 ## Phase Rollup

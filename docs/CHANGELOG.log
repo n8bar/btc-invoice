@@ -725,3 +725,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 phase numbering now puts the active closeout work second and the conditional content-tuning work third
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now orders Phase 2 as Verification + Monitoring and Phase 3 as Metadata + Search-Signal Hygiene, `README.md` now points at [`docs/strategies/15.2_VERIFICATION_MONITORING.md`](strategies/15.2_VERIFICATION_MONITORING.md) and [`docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md`](strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md), and the strategy filenames/headings now match that reordered sequence so MS15 no longer looks like it is skipping a numbered phase.
+
+2026-03-27 | MS15 Phase 2 kickoff docs now match the reordered sequence
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` and `docs/PLAN.md` now point the current work at the reordered Phase 2 verification/monitoring sequence, and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now labels its final verification section as Phase 2 instead of the stale old numbering.
