@@ -63,17 +63,19 @@
 
 ## 5. Shared Implementation Requirements
 1. Use the existing queued mail + `invoice_deliveries` pattern for all outbound communication so aliasing and delivery logging stay consistent.
-2. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
-3. Temporary catch-all aliasing during pre-production uses `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`. Disable aliasing before RC or real-customer traffic.
-4. Profile setting for automatic paid receipts remains part of the owner communication model.
-5. A global feature flag may disable outbound invoice communication entirely when mail is not configured.
-6. Delivery jobs should surface queued, sent, and failed outcomes through the shared delivery log.
-7. Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
-8. The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
-9. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
-10. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
-11. Manual invoice sends and past-due reminders are outside this safeguard.
-12. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+2. Delivery-log rows should capture invoice, sender/issuer context, recipient email(s), delivery type, status, and error/timestamp metadata.
+3. The owner invoice detail page is the current primary operator view for this delivery history.
+4. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
+5. Temporary catch-all aliasing during pre-production uses `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`. Disable aliasing before RC or real-customer traffic.
+6. Profile setting for automatic paid receipts remains part of the owner communication model.
+7. A global feature flag may disable outbound invoice communication entirely when mail is not configured.
+8. Delivery jobs should surface queued, sent, skipped, and failed outcomes through the shared delivery log.
+9. Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
+10. The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
+11. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
+12. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
+13. Manual invoice sends and past-due reminders are outside this safeguard.
+14. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:

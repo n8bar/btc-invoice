@@ -794,3 +794,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications flow 3.3 now stays at the product-behavior level
 `docs/specs/NOTIFICATIONS.md` no longer hardcodes the `invoice_deliveries` table name, per-row field list, or the invoice detail page as the primary operator view inside the base communication flows; `3.3` now describes only the enduring shared delivery-history behavior and the operator outcomes it must expose.
+
+2026-03-27 | Notifications Section 5 now preserves the delivery-history implementation details that no longer belong in Section 3
+`docs/specs/NOTIFICATIONS.md` now carries the `invoice_deliveries` table name, delivery-row field expectations, current invoice-detail operator view note, and the full queued/sent/skipped/failed outcome set under Shared Implementation Requirements instead of letting those implementation-shaped details disappear when Section 3 was cleaned up.
