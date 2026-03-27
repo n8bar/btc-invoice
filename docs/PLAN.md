@@ -12,15 +12,15 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS16 - Mailer & Alerts Polish + Audit**
 - Status: `active`
-- Next action: review the MS16 notifications spec and continue mailer/alerts polish work now that the SEO bootstrap baseline is complete.
-- Primary next doc: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md)
-- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
+- Next action: review the notifications spec and define the initial MS16 safety/recovery scope before broader mailer and alerts polish.
+- Primary next doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
+- Supporting docs: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
 - Most recently completed milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 16 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
+| [ ] | 16 | Mailer & Alerts Polish + Audit | Restore trustworthy outbound mail first, then tighten alert behavior, cooldowns, templates, and delivery safeguards. | [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md) |
 | [ ] | 17 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 18 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
 | [ ] | 19 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |

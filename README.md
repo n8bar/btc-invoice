@@ -67,6 +67,7 @@ Execute the full suite via Sail:
 - MS13 UX Overhaul milestone doc: [`docs/milestones/13_UX_OVERHAUL.md`](docs/milestones/13_UX_OVERHAUL.md)
 - MS14 Payment Attribution Hardening milestone doc: [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md)
 - MS15 CryptoZing.app SEO Bootstrap milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+- MS16 Mailer & Alerts Polish + Audit milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
 - Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
 - Support access spec: [`docs/specs/SUPPORT_ACCESS.md`](docs/specs/SUPPORT_ACCESS.md)
