@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS15 - CryptoZing.app SEO Bootstrap**
 - Status: `active`
-- Next action: review the new MS15 milestone doc, then draft the Phase 1 strategy.
+- Next action: review the MS15 milestone doc, then begin MS15 execution.
 - Primary next doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 - Supporting docs: [`site/index.html`](../site/index.html), [`site/sitemap.xml`](../site/sitemap.xml), [`site/robots.txt`](../site/robots.txt), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
 - Most recently completed milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)

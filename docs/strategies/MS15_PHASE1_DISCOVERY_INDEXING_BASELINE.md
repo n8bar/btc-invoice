@@ -1,0 +1,39 @@
+# MS15 Phase 1 Strategy - Discovery + Indexing Baseline
+
+Status: Draft.
+Parent milestone doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](../milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+
+Establish the initial discovery/indexing baseline for `cryptozing.app` without reopening the placeholder for a broad content rewrite.
+
+## 1. Audit the current repo-controlled baseline
+1. [x] Confirm `site/index.html` already exposes a title, meta description, canonical URL, Open Graph/Twitter tags, and JSON-LD.
+2. [x] Confirm `site/robots.txt` currently allows crawling and points to `https://cryptozing.app/sitemap.xml`.
+3. [x] Confirm `site/sitemap.xml` currently submits the root URL with a `lastmod`.
+4. [x] Confirm `.github/workflows/pages.yml` deploys the `site/` directory from `main` to GitHub Pages.
+5. [x] Record that SEO-oriented content work has already had a couple passes; this phase is baseline/discovery work, not a broad content rewrite.
+
+## 2. Tighten the repo-controlled discovery signals
+1. [ ] Verify the canonical, Open Graph, Twitter, JSON-LD, and image URLs resolve correctly on the live placeholder host.
+2. [ ] Decide whether the sitemap should remain single-URL or include any additional crawlable placeholder URLs that genuinely exist; do not invent URLs just for SEO.
+3. [ ] Tighten any missing or incorrect technical discovery signals found in the audit without reopening broad copy work.
+4. [ ] Decide how `site/sitemap.xml` `lastmod` should be maintained so it reflects meaningful placeholder changes.
+5. [ ] Check that the current robots/sitemap/canonical setup will still make sense when the live landing page replaces the placeholder at `/`.
+
+## 3. Establish ownership and submission in external tools
+1. [ ] Choose the intended ownership model for `cryptozing.app` in Google Search Console and Bing Webmaster Tools.
+2. [ ] Verify `cryptozing.app` in Google Search Console.
+3. [ ] Verify `cryptozing.app` in Bing Webmaster Tools.
+4. [ ] Submit `https://cryptozing.app/sitemap.xml` in both tools.
+5. [ ] Record any DNS, repo, or account follow-up needed to keep those verifications stable.
+
+## 4. Capture the initial monitoring baseline
+1. [ ] Document which discovery/indexing signals are verified directly in the repo versus in webmaster tooling.
+2. [ ] Record the submitted property/sitemap baseline so later phases know what continuity they are inheriting.
+3. [ ] Note the post-launch checks we should watch over the next days/weeks for crawl and indexing health.
+
+## 5. Verify Phase 1
+1. [ ] Confirm the live placeholder serves the expected title, description, canonical URL, Open Graph/Twitter tags, JSON-LD, robots file, and sitemap.
+2. [ ] Confirm the GitHub Pages workflow still deploys the `site/` directory from `main`.
+3. [ ] Confirm Google Search Console ownership and sitemap submission are complete.
+4. [ ] Confirm Bing Webmaster ownership and sitemap submission are complete.
+5. [ ] Confirm the phase leaves a short monitoring note for what to check next while discovery and indexing settle.

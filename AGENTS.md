@@ -8,6 +8,7 @@
   - `docs/BACKLOG.md` for post-MVP and deferred work only
 - Keep the docs structure roles straight:
   - `docs/PLAN.md` lays out milestone-level progress only; each milestone should check off once there
+  - if `docs/PLAN.md` has a `Next action`, keep it milestone-level too; do not point it at strategies or phase-level checklist steps
   - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, primary linked specs/strategies, phase checkoffs, and milestone exit criteria
   - `docs/specs/**` for detailed feature and domain requirements
   - `docs/strategies/**` expand one milestone phase into the ordered implementation checklist, sequencing, and verification steps; these are the “do this in this order” docs for active execution

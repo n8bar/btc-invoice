@@ -74,7 +74,7 @@ Execute the full suite via Sail:
 - Payment correction / ignore-restore spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
 - Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
-- MS14 Phase 5 strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
+- MS15 Phase 1 strategy: [`docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md`](docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md)
 - Task 11 implementation strategy: [`docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md)
 - Task 11 UX Engineering pass: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md)
 - Task 11 UX Engineering pass2: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md)

@@ -644,3 +644,9 @@ Added `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` as the milestone-le
 
 2026-03-26 | MS15 milestone scope now constrains content work to metadata hygiene plus minimal copy fixes
 `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` no longer frames MS15 as strengthening placeholder content in general, renames the second phase to `Metadata + Search-Signal Hygiene`, and limits that phase to titles, descriptions, headings, canonical/schema signals, and only the minimum on-page copy needed to support the existing landing page.
+
+2026-03-26 | Drafted the MS15 Phase 1 strategy for discovery and indexing baseline
+Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordered checklist for the first MS15 phase, updated `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` so the milestone doc now points at that draft strategy as the current phase strategy, kept `docs/PLAN.md` pointed at the milestone doc, and updated the README documentation map to link the active MS15 Phase 1 strategy.
+
+2026-03-26 | PLAN next-action wording now stays milestone-level
+`AGENTS.md` now makes the rule explicit that any `Next action` in `docs/PLAN.md` must stay milestone-level rather than pointing at strategies or phase-level checklist steps, and `docs/PLAN.md` now says to review the MS15 milestone doc and begin MS15 execution.
