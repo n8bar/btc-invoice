@@ -10,7 +10,6 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 ## Milestone Objectives
 - Get `cryptozing.app` discovered, crawled, and indexable before go-live.
 - Verify the placeholder/landing page has the right sitemap, robots, canonical, and metadata baseline for search engines.
-- Strengthen the placeholder content enough to support early branded discovery and a believable landing-page role without overbuilding a temporary surface.
 - Establish ownership, submission, and monitoring workflows for the domain in search-engine webmaster tooling.
 - Preserve SEO continuity so the live app landing page can replace the placeholder at the same root URL without restarting discovery from zero.
 
@@ -22,8 +21,8 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 ## Phase Rollup
 1. [ ] Phase 1 - Discovery + Indexing Baseline
    Verify crawlability, sitemap/robots correctness, domain ownership, and initial search-engine submission for `cryptozing.app`.
-2. [ ] Phase 2 - Placeholder Content + Metadata Polish
-   Tighten landing-page copy, titles, descriptions, headings, and structured metadata so the placeholder can serve as an early search surface.
+2. [ ] Phase 2 - Metadata + Search-Signal Hygiene
+   Tighten titles, descriptions, headings, canonical/schema signals, and only the minimum on-page copy needed to support the existing landing page.
 3. [ ] Phase 3 - Continuity + Launch Handoff
    Define what must stay stable when the live app landing page replaces the placeholder at the same URL.
 4. [ ] Phase 4 - Verification + Monitoring
@@ -32,6 +31,6 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 ## Exit Criteria
 - `cryptozing.app` is verified in the intended webmaster/search-console tooling and its sitemap has been submitted.
 - The placeholder/landing page is crawlable and exposes the intended robots, canonical, sitemap, and metadata signals.
-- The placeholder content is strong enough for early branded discovery and does not make unsupported claims about the live product.
+- The placeholder exposes accurate, consistent search signals and does not make unsupported claims about the live product.
 - The go-live handoff preserves URL/canonical continuity so the launch landing page does not reset discovery from scratch.
 - A lightweight monitoring baseline exists for indexing status, sitemap health, and early search visibility after launch.

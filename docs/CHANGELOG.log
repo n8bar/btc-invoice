@@ -641,3 +641,6 @@ Added `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` as the milestone-le
 
 2026-03-26 | MS15 milestone doc now explicitly treats prior SEO content passes as baseline
 `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now states that SEO-oriented content work has already had a couple passes, so MS15 should refine only what the milestone proves needs adjustment rather than reopening the placeholder for a broad rewrite.
+
+2026-03-26 | MS15 milestone scope now constrains content work to metadata hygiene plus minimal copy fixes
+`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` no longer frames MS15 as strengthening placeholder content in general, renames the second phase to `Metadata + Search-Signal Hygiene`, and limits that phase to titles, descriptions, headings, canonical/schema signals, and only the minimum on-page copy needed to support the existing landing page.
