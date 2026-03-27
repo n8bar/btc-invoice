@@ -779,3 +779,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications ambiguity goal now explicitly leaves room for safe acknowledgment
 `docs/specs/NOTIFICATIONS.md` now ends the ambiguity goal with “while still acknowledging what it safely can,” closing the lingering “truth via silence” loophole without prematurely dropping down into flow-level rules.
+
+2026-03-27 | Notifications spec now forbids sending invoices while still in draft
+`docs/specs/NOTIFICATIONS.md` now states that the manual send flow is available only when the invoice has a client email, its public link is enabled, and it is no longer in `draft` status; the stale open question about allowing draft sends has been removed because draft now clearly means the invoice is still being edited.

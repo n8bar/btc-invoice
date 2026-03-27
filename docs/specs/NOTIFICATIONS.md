@@ -16,9 +16,8 @@
 
 ## 3. Base Communication Flows
 1. **Send Invoice (manual owner action)**
-   1. Visible on invoice show when the invoice has a client email and public link enabled.
-   2. Submission dispatches a queued job that renders the invoice-ready email and logs the attempt.
-   3. Draft sends are allowed for now, but the UX should make draft state clear.
+   1. Available when the invoice has a client email, its public link is enabled, and the invoice is no longer in `draft` status.
+   2. Sending the invoice queues outbound delivery and records the attempt in the delivery log.
 
 2. **Paid Receipt (automatic client receipt)**
    1. Fired when `InvoicePaid` dispatches after the invoice transitions to `paid`.
@@ -112,8 +111,7 @@
 2. Optional Blade/mail snapshot tests can be used for the invoice-ready and receipt mailables.
 
 ## 9. Open Questions
-1. Should “Send invoice” stay allowed while status is `draft`? Current direction: yes, but make draft state explicit in the email UX.
-2. Retry strategy: keep one `invoice_deliveries` row per job fire vs. a single row with status updates. Current direction: one row per job fire for audit clarity.
+1. Retry strategy: keep one `invoice_deliveries` row per job fire vs. a single row with status updates. Current direction: one row per job fire for audit clarity.
 
 ## 10. Future Enhancements
 1. After base implementation, consider allowing owners to configure alert thresholds per profile (default 15%).
