@@ -27,8 +27,8 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
    Not triggered. Phase 1 and Phase 2 did not produce evidence that the current placeholder plus public Helpful Notes mix is too thin or otherwise needs immediate metadata/content tightening, so no standalone Phase 3 strategy doc was kept.
 
 ## Exit Criteria
-- `cryptozing.app` is verified in the intended webmaster/search-console tooling and its sitemap has been submitted.
-- The placeholder/landing page is crawlable and exposes the intended robots, canonical, sitemap, and metadata signals.
-- The placeholder exposes accurate, consistent search signals and does not make unsupported claims about the live product.
-- The milestone leaves a clear SEO baseline for later deployment work to preserve at go-live.
-- A lightweight monitoring baseline exists for indexing status, sitemap health, and early search visibility after launch.
+- [x] `cryptozing.app` is verified in the intended webmaster/search-console tooling and its sitemap has been submitted.
+- [x] The placeholder/landing page is crawlable and exposes the intended robots, canonical, sitemap, and metadata signals.
+- [x] The placeholder exposes accurate, consistent search signals and does not make unsupported claims about the live product.
+- [x] The milestone leaves a clear SEO baseline for later deployment work to preserve at go-live.
+- [x] A lightweight monitoring baseline exists for indexing status, sitemap health, and early search visibility after launch.

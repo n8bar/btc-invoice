@@ -737,3 +737,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 no longer keeps a standalone strategy doc for the untriggered Phase 3
 `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` has been deleted, `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now records that Phase 3 was not triggered and therefore did not keep its own strategy doc, and `README.md` no longer points at a never-used MS15 Phase 3 strategy file.
+
+2026-03-27 | MS15 milestone exit criteria are now explicitly checked off
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now marks each exit criterion as satisfied instead of leaving the milestone closeout only implied by the phase rollup and completion notes.
