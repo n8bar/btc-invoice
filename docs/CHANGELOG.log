@@ -677,3 +677,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-26 | MS15 Phase 1 now records the rest of the discovery-signal baseline
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now records that the live placeholder host resolves the intended canonical, social, JSON-LD, and image URLs correctly; that no extra repo-controlled discovery-signal fixes are needed right now; that `site/sitemap.xml` `lastmod` should be maintained manually when the placeholder's crawl-visible `site/` content changes meaningfully; and that the current root robots/sitemap/canonical setup still makes sense for the later live-app handoff as long as deployment preserves that SEO baseline.
+
+2026-03-26 | MS15 Phase 1 now explicitly covers root-URL submission and controlled inbound links
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now adds an explicit post-verification step to inspect/request indexing for `https://cryptozing.app/` in the verified webmaster tools, adds a new section for a small set of legitimate inbound links we control, and extends the Phase 1 verification checklist to confirm both the root-URL submission step and those controlled links are actually live.
