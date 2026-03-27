@@ -713,3 +713,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 now records the initial controlled inbound-link set
 The GitHub repository homepage now points at `https://cryptozing.app`, `README.md` now includes a direct website link near the top, and `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off the Phase 1 controlled-link selection/setup steps with those two project-scoped surfaces as the baseline inbound-link set.
+
+2026-03-27 | MS15 now records the live controlled-link baseline after merge
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.4.3`, recording that the GitHub repository homepage and README website link are both live on `main`, with the public LinkedIn post also counted as additional controlled discovery help.
