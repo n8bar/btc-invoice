@@ -707,3 +707,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 now records the clean Google root-URL inspection result
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.3.5` and records that Google Search Console URL Inspection already reports `https://cryptozing.app/` as on Google, indexed, and served over HTTPS, which is enough to count the root-URL inspection/request step as complete even though Bing's equivalent UI remained flaky.
+
+2026-03-27 | MS15 now records the external-tool stability follow-up
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.3.6` and records the concrete follow-up needed to keep the verified baseline stable: leave the Google TXT and Bing CNAME records in DNS, keep access to the same verified Google/Bing accounts, and treat Bing as durably verified through its own CNAME path rather than through the import shortcut.
