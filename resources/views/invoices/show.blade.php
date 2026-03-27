@@ -973,7 +973,7 @@
                                                                                         <p class="flex-1 text-xs text-emerald-900 dark:text-emerald-100">
                                                                                             Return this payment to {{ $correctionRouteInvoice->number }}.
                                                                                         </p>
-                                                                                        <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                        <x-secondary-button type="submit" class="border-2 border-emerald-400 px-3 py-1 text-xs normal-case tracking-normal text-emerald-900 hover:border-emerald-500 hover:bg-emerald-100">
                                                                                             Undo reattribution
                                                                                         </x-secondary-button>
                                                                                     </div>
@@ -1032,7 +1032,7 @@
                                                                                             <p class="flex-1 text-xs text-sky-900 dark:text-sky-100">
                                                                                                 Return this payment to {{ $invoice->number }}.
                                                                                             </p>
-                                                                                            <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                            <x-secondary-button type="submit" class="border-2 border-sky-400 px-3 py-1 text-xs normal-case tracking-normal text-sky-900 hover:border-sky-500 hover:bg-sky-100">
                                                                                                 Undo reattribution
                                                                                             </x-secondary-button>
                                                                                         </div>
