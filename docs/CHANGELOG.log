@@ -761,3 +761,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 payment-acknowledgment draft copy is now less self-undermining
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now trims the candidate client acknowledgment from “was detected and is being reviewed” down to “was detected” so the notification reassures without sounding like it is backpedaling the same claim in its next line.
+
+2026-03-27 | Notifications Goal 2 now matches the emerging MS16 acknowledgment-vs-receipt split
+`docs/specs/NOTIFICATIONS.md` no longer promises an automatic watcher-driven paid receipt; Goal 2 now says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails, leaving room for owner-reviewed receipts and the narrower client acknowledgment idea recorded in MS16.
