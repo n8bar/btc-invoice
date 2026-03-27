@@ -5,6 +5,7 @@ Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
 Supporting docs: [`site/index.html`](../../site/index.html), [`site/sitemap.xml`](../../site/sitemap.xml), [`site/robots.txt`](../../site/robots.txt), [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md)
 
 This is the milestone execution doc for MS15. It tracks milestone-level objectives plus phase-level progress only.
+SEO-oriented content work has already had a couple passes; MS15 should refine only what this milestone proves needs adjustment rather than reopening the placeholder for a broad rewrite.
 
 ## Milestone Objectives
 - Get `cryptozing.app` discovered, crawled, and indexable before go-live.
