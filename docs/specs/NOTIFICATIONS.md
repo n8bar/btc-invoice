@@ -42,22 +42,22 @@
 
 2. **Past Due (Owner + Client)**
    1. When an invoice becomes past due and is still not `paid` or `void`, both the invoice issuer and the client should receive past-due reminders.
-   2. Owner email: “Invoice {number} is past due” with outstanding totals and suggested next steps.
-   3. Client email: polite reminder referencing outstanding balance, invoice link, and a short “contact the sender if you already paid” line.
+   2. The owner reminder should communicate that the invoice is overdue, include the outstanding totals, and suggest next steps.
+   3. The client reminder should communicate the overdue status, include the outstanding balance and invoice link, and include a short “contact the sender if you already paid” caveat.
 
 3. **Overpayment Alert (Client)**
    1. Triggered when `overpaymentPercent() >= 15%`. Checked whenever watcher logs a new payment or a manual adjustment increases the paid total.
-   2. Email explains that overpayments are treated as gratuities by default and asks the client to contact the sender if it was accidental.
+   2. The client alert should explain that overpayments are treated as gratuities by default and tell the client to contact the sender if the overpayment was accidental.
    3. Owner can be CC’d automatically (or has the option via profile setting) so they know the alert fired.
 
 4. **Underpayment Alert (Client)**
    1. Triggered when `underpaymentPercent() >= 15%` (after tolerance). Same entry point as overpay (watcher or manual adjustment that reopens balance).
-   2. Email lists the outstanding USD/BTC amounts and links to the public invoice so the client can settle.
-   3. Owner also receives a brief notice (“Client underpayment alert sent”) so they’re aware of the outreach.
+   2. The client alert should include the outstanding USD/BTC amounts and link to the public invoice so the client can settle.
+   3. The invoice issuer should also receive a brief owner-side notice that the underpayment outreach went out.
 
 5. **Proactive Partial-Payment Warning (Client + Owner FYI)**
    1. Fired after the watcher detects multiple partial payments on the same invoice to encourage a single payment and reduce miner fees.
-   2. Client email reminds them to send one payment for the outstanding balance; owner gets an FYI in the delivery log/CC.
+   2. The client warning should encourage sending one payment for the outstanding balance, and the invoice issuer should receive an FYI that the warning went out.
    3. Logged via `invoice_deliveries` (e.g., `partial_warning_client`, `partial_warning_owner`) and respects aliasing in non-prod.
 
 ## 5. Shared Implementation Requirements

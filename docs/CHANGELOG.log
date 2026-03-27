@@ -803,3 +803,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications alert 4.2 now keeps only the past-due behavior while MS16 holds the cadence/storage details
 `docs/specs/NOTIFICATIONS.md` no longer hardcodes nightly scheduling, 48-hour resend spacing, or raw delivery-log storage detail inside the Past Due alert; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now preserves those as MS16 Phase 3 decisions to flesh out later.
+
+2026-03-27 | Notifications Section 4 now uses content requirements instead of verbatim alert copy
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes owner/client alert sentences inside the Past Due, Overpayment, Underpayment, and Partial-Payment sections; those lines now describe what each alert must communicate while leaving the exact wording to the later copy-guidelines and implementation work.
