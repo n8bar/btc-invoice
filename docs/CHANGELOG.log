@@ -773,3 +773,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications ambiguity goal now states the cross-cutting truthfulness rule directly
 `docs/specs/NOTIFICATIONS.md` no longer phrases the final goal as one narrow later-payment scenario; it now says payment-triggered mail must not overstate certainty when the underlying payment state is semantically ambiguous, which better matches the broader MS14/MS16 correction and acknowledgment concerns.
+
+2026-03-27 | Notifications ambiguity goal is now less suppression-coded
+`docs/specs/NOTIFICATIONS.md` now says to keep payment-triggered mail truthful when the underlying payment state is semantically ambiguous, which preserves the truthfulness goal without implying that ambiguity should automatically suppress all communication.
