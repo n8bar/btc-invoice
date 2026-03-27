@@ -837,6 +837,9 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications spec no longer treats automatic paid receipts as a settled cross-cutting rule
 `docs/specs/NOTIFICATIONS.md` no longer says automatic paid receipts remain part of the owner communication model; that receipt-model decision is still being reconsidered in MS16, so it no longer belongs as a stable item in Section 5.
 
+2026-03-27 | Notifications item 5.5 now treats outbound mail as a required deployment capability rather than a global feature-flag escape hatch
+`docs/specs/NOTIFICATIONS.md` no longer says a global feature flag may disable outbound communication entirely when mail is not configured; it now says outbound mail is required for any valid recipient-facing deployment, while still allowing development and test environments to run without it intentionally.
+
 2026-03-27 | Notifications Goal 2 now keeps “automatic” scoped to acknowledgments instead of dropping it entirely
 `docs/specs/NOTIFICATIONS.md` again says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails; this preserves the automatic acknowledgment idea without forcing the spec to treat receipt emails themselves as fully automatic.
 
