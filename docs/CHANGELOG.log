@@ -782,3 +782,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec now treats manual send as the action that issues a draft invoice
 `docs/specs/NOTIFICATIONS.md` now states that the manual send flow is available when the invoice has a client email and its public link is enabled, and that sending the invoice queues outbound delivery, records the attempt in the delivery log, and issues the invoice out of `draft`.
+
+2026-03-27 | Notifications flow 3.2 now separates detected-payment acknowledgment from receipt follow-up
+`docs/specs/NOTIFICATIONS.md` no longer treats the second base communication flow as a simple automatic paid receipt; section 3.2 now distinguishes a low-information detected-payment acknowledgment from the higher-certainty receipt follow-up and adds owner-facing manual-follow-up expectations when no client email exists.

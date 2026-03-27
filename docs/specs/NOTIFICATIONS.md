@@ -19,10 +19,16 @@
    1. Available when the invoice has a client email and its public link is enabled.
    2. Sending the invoice queues outbound delivery, records the attempt in the delivery log, and issues the invoice out of `draft`.
 
-2. **Paid Receipt (automatic client receipt)**
-   1. Fired when `InvoicePaid` dispatches after the invoice transitions to `paid`.
-   2. Skip when the client email is missing or the receipt was already sent for the current paid state.
-   3. Receipt email includes amount, tx metadata, settlement timestamps, and a link to the paid public page.
+2. **Payment Acknowledgment + Receipt**
+   1. **Detected Payment Acknowledgment**
+      1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it may send a low-information client acknowledgment.
+      2. This acknowledgment should confirm only what the system can safely say, such as the detected BTC amount, without claiming that the payment has been fully applied to a specific invoice state.
+      3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
+      4. If the payment state is too ambiguous to acknowledge safely, the system should hold the client-facing acknowledgment and notify the invoice issuer for review instead.
+   2. **Receipt Follow-Up**
+      1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
+      2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
+      3. If the client email is missing, the owner should receive a visible reminder to follow up manually by sharing the paid invoice through the available public or print surfaces instead of silently skipping the receipt path.
 
 3. **Delivery Log**
    1. `invoice_deliveries` is the shared audit log for manual sends, receipts, and automated alerts.
