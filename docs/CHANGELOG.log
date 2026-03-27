@@ -658,7 +658,7 @@ Added `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` as the ordered check
 `AGENTS.md` now frames the boundary in terms of detail depth: `docs/PLAN.md` should not pull in phase-level or strategy-detail steps, and milestone docs may mention reviewing the current phase strategy without pulling strategy-level checklist detail up into the milestone layer.
 
 2026-03-26 | Drafted the remaining MS15 phase strategies before Phase 1 execution
-Added `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` and `docs/strategies/15.3_VERIFICATION_MONITORING.md` as the later-phase MS15 strategy docs, with the deployment/cutover continuity note later folded up into the MS19 plan entry instead of staying as its own MS15 phase. Updated the README documentation map to include those new phase strategies.
+Added `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` and `docs/strategies/15.2_VERIFICATION_MONITORING.md` as the later-phase MS15 strategy docs, with the deployment/cutover continuity note later folded up into the MS19 plan entry instead of staying as its own MS15 phase. Updated the README documentation map to include those new phase strategies.
 
 2026-03-26 | MS15 phase strategy filenames now use the 15.x prefix
 Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to `15.1_...` through `15.4_...`, and updated the README documentation map to use the shorter filenames.
@@ -667,10 +667,10 @@ Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to 
 Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, `PHASE*`, and `TASK*` filename patterns into numeric forms such as `13_...`, `14_...`, `15_...`, `13.11_...`, `14.5_...`, and `14.3_...`. Updated the live repo references plus historical changelog paths to match the new filenames.
 
 2026-03-26 | MS15 no longer treats launch handoff as its own phase
-`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now uses three phases instead of four, `docs/strategies/15.3_VERIFICATION_MONITORING.md` now carries the final MS15 phase after moving up from the old `15.4` slot, and the separate `15.3` continuity-handoff draft was removed. `docs/PLAN.md` now puts the placeholder-replacement continuity note where it belongs near `MS19`, while `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treats any continuity-sensitive findings as later rollout constraints instead of a dedicated MS15 handoff phase.
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now uses three phases instead of four, `docs/strategies/15.2_VERIFICATION_MONITORING.md` now carries the final MS15 verification/monitoring phase after moving up from the old `15.4` slot, and the separate `15.3` continuity-handoff draft was removed. `docs/PLAN.md` now puts the placeholder-replacement continuity note where it belongs near `MS19`, while `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treats any continuity-sensitive findings as later rollout constraints instead of a dedicated MS15 handoff phase.
 
 2026-03-26 | MS15 now treats derivative public Helpful Notes content as a conditional Phase 1/2 lever
-`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`, `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, and `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treat the current one-page placeholder plus public Helpful Notes mix as a Phase 1 decision point: if Phase 1 proves it is too thin, Phase 2 may expand derivative public Helpful Notes content under `site/` enough to strengthen SEO while the site still reads as a product placeholder rather than a docs encyclopedia.
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`, `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, and `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treat the current one-page placeholder plus public Helpful Notes mix as a Phase 1 decision point: if Phase 1 proves it is too thin, the later metadata/search-signal phase may expand derivative public Helpful Notes content under `site/` enough to strengthen SEO while the site still reads as a product placeholder rather than a docs encyclopedia.
 
 2026-03-26 | MS15 Phase 1 now keeps the placeholder sitemap single-URL
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now records the current `15.1.2` decision: keep `site/sitemap.xml` limited to `/` for now because the repo-controlled GitHub Pages placeholder only exposes that one real crawlable placeholder URL, while public Helpful Notes still lives on the Laravel app surface unless a later MS15 phase deliberately publishes derivative Helpful Notes content under `site/`.
@@ -682,16 +682,16 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now adds an explicit post-verification step to inspect/request indexing for `https://cryptozing.app/` in the verified webmaster tools, adds a new section for a small set of legitimate inbound links we control, and extends the Phase 1 verification checklist to confirm both the root-URL submission step and those controlled links are actually live.
 
 2026-03-26 | MS15 strategies now assign remaining work by who is better positioned
-`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now tag each remaining unchecked step as `Agent`, `User`, or `Shared` so webmaster-tool/account actions stay with the user while repo/live-host/docs work stays with the agent.
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now tag each remaining unchecked step as `Agent`, `User`, or `Shared` so webmaster-tool/account actions stay with the user while repo/live-host/docs work stays with the agent.
 
 2026-03-27 | MS15 strategies now call out safe subagent sidecars
-`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now distinguish critical-path `Agent` work from `Subagent`-safe sidecars so bounded verification, repo-signal checks, and monitoring-note synthesis can be delegated without improvising around the phase order.
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now distinguish critical-path `Agent` work from `Subagent`-safe sidecars so bounded verification, repo-signal checks, and monitoring-note synthesis can be delegated without improvising around the phase order.
 
 2026-03-27 | Strategy docs should expose subagent-friendly parallel sidecars
 `AGENTS.md` now says future strategy docs should still keep the primary critical path explicit but should also call out known safe parallel sidecars or path-scoped tasks so subagent use can follow the strategy intentionally instead of improvising around a single-threaded checklist.
 
 2026-03-27 | MS15 strategies now distinguish guided user work from self-driven user work
-`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now mark the Google/Bing ownership, sitemap-submission, and indexing-check tasks as `Guided User` rather than plain `User`, and `AGENTS.md` now says `Guided User` should be used when the user has the account access but still needs coaching through unfamiliar tooling.
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now mark the Google/Bing ownership, sitemap-submission, and indexing-check tasks as `Guided User` rather than plain `User`, and `AGENTS.md` now says `Guided User` should be used when the user has the account access but still needs coaching through unfamiliar tooling.
 
 2026-03-27 | MS15 now records the external-tool ownership decision
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.3.1` and records the decision to use a DNS-verified Google Search Console domain property for `cryptozing.app`, with Bing Webmaster Tools initially inheriting that baseline by importing the verified Google property unless later work proves Bing needs its own separate DNS verification.
@@ -713,3 +713,15 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 now records the initial controlled inbound-link set
 The GitHub repository homepage now points at `https://cryptozing.app`, `README.md` now includes a direct website link near the top, and `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off the Phase 1 controlled-link selection/setup steps with those two project-scoped surfaces as the baseline inbound-link set.
+
+2026-03-27 | MS15 now records the live controlled-link baseline after merge
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.4.3`, recording that the GitHub repository homepage and README website link are both live on `main`, with the public LinkedIn post also counted as additional controlled discovery help.
+
+2026-03-27 | MS15 now records the Phase 1 monitoring baseline and matching verification roll-up
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.5.1` through `15.1.5.3` and `15.1.6.1` through `15.1.6.7`, documenting the repo-vs-webmaster-tool verification split, the Google/Bing property and sitemap baseline, the short watch list for crawl/index health, and the matching Phase 1 verification results. The only Phase 1 decision still open is whether the placeholder plus public Helpful Notes mix is too thin for MS15 Phase 2.
+
+2026-03-27 | MS15 Phase 1 is now complete and the later metadata/search-signal phase remains conditional
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now closes Phase 1 with the decision that the current one-page placeholder plus public Helpful Notes mix is good enough for now, `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now rolls Phase 1 up as complete and keeps the verification/monitoring phase next in sequence, and `docs/PLAN.md` now reflects that the later metadata/search-signal phase remains in reserve unless future search-signal evidence proves it is needed.
+
+2026-03-27 | MS15 phase numbering now puts the active closeout work second and the conditional content-tuning work third
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now orders Phase 2 as Verification + Monitoring and Phase 3 as Metadata + Search-Signal Hygiene, `README.md` now points at [`docs/strategies/15.2_VERIFICATION_MONITORING.md`](strategies/15.2_VERIFICATION_MONITORING.md) and [`docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md`](strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md), and the strategy filenames/headings now match that reordered sequence so MS15 no longer looks like it is skipping a numbered phase.
