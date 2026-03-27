@@ -966,7 +966,7 @@
                                                                             @if ($canUndoReattribution)
                                                                                 <form method="POST"
                                                                                       action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
-                                                                                      class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-3 dark:border-emerald-400/30 dark:bg-emerald-950/35">
+                                                                                      class="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-3 dark:border dark:border-emerald-400/30 dark:bg-emerald-950/35">
                                                                                     @csrf
                                                                                     @method('PATCH')
                                                                                     <div class="flex items-center gap-3">
@@ -1025,7 +1025,7 @@
                                                                                 @if ($canUndoReattribution)
                                                                                     <form method="POST"
                                                                                           action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
-                                                                                          class="rounded-lg border border-sky-100 bg-sky-50/70 p-3 dark:border-sky-400/30 dark:bg-sky-950/35">
+                                                                                          class="rounded-lg border-2 border-sky-300 bg-sky-50 p-3 dark:border dark:border-sky-400/30 dark:bg-sky-950/35">
                                                                                         @csrf
                                                                                         @method('PATCH')
                                                                                         <div class="flex items-center gap-3">
