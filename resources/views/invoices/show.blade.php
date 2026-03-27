@@ -711,6 +711,7 @@
                                                 $isInboundReattribution = $payment->isReattributedInto($invoice);
                                                 $relatedSourceInvoice = $payment->sourceInvoice;
                                                 $relatedDestinationInvoice = $payment->accountingInvoice;
+                                                $correctionRouteInvoice = $isSourcePayment ? $invoice : $relatedSourceInvoice;
                                                 $selectedDestinationId = $showReattributeForm
                                                     ? old('destination_invoice_id')
                                                     : ($isOutgoingReattribution ? $payment->activeAccountingInvoiceId() : null);
@@ -718,6 +719,11 @@
                                                     && $paymentHistory->contains(fn ($candidate) => $candidate->id !== $payment->id
                                                         && $candidate->is_adjustment
                                                         && $candidate->note === 'reversal of '.$payment->txid);
+                                                $canUndoReattribution = $payment->isReattributed() && $correctionRouteInvoice;
+                                                $canIgnorePayment = $isSourcePayment
+                                                    && ! $payment->is_adjustment
+                                                    && ! $payment->isIgnored()
+                                                    && ! $payment->isReattributed();
                                                 $correctionLabelLines = ['Corrections'];
                                                 $correctionButtonClasses = 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 dark:border-white/15 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-indigo-400';
                                                 $correctionPanelClasses = 'border-gray-200 bg-white dark:border-white/10 dark:bg-slate-900';
@@ -957,6 +963,22 @@
                                                                                     </a>
                                                                                 </p>
                                                                             @endif
+                                                                            @if ($canUndoReattribution)
+                                                                                <form method="POST"
+                                                                                      action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
+                                                                                      class="space-y-2 rounded-lg border border-emerald-100 bg-emerald-50/70 p-3 dark:border-emerald-400/30 dark:bg-emerald-950/35">
+                                                                                    @csrf
+                                                                                    @method('PATCH')
+                                                                                    <p class="text-xs text-emerald-900 dark:text-emerald-100">
+                                                                                        Return this payment to {{ $correctionRouteInvoice->number }}.
+                                                                                    </p>
+                                                                                    <div class="flex justify-end">
+                                                                                        <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                            Undo reattribution
+                                                                                        </x-secondary-button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            @endif
                                                                         </div>
                                                                     @elseif ($payment->isIgnored())
                                                                         <div class="space-y-2">
@@ -1000,6 +1022,22 @@
                                                                                     @endif
                                                                                     <p class="mt-1">Updated {{ optional($payment->reattributed_at)->toDayDateTimeString() ?? '—' }}</p>
                                                                                 </div>
+                                                                                @if ($canUndoReattribution)
+                                                                                    <form method="POST"
+                                                                                          action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
+                                                                                          class="space-y-2 rounded-lg border border-sky-100 bg-sky-50/70 p-3 dark:border-sky-400/30 dark:bg-sky-950/35">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
+                                                                                        <p class="text-xs text-sky-900 dark:text-sky-100">
+                                                                                            Return this payment to {{ $invoice->number }}.
+                                                                                        </p>
+                                                                                        <div class="flex justify-end">
+                                                                                            <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                                Undo reattribution
+                                                                                            </x-secondary-button>
+                                                                                        </div>
+                                                                                    </form>
+                                                                                @endif
                                                                             @endif
                                                                             <details @if ($showReattributeForm) open @endif>
                                                                                 <summary class="list-none cursor-pointer rounded-md border border-indigo-200 bg-white px-3 py-2 text-center text-xs font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-indigo-400/35 dark:bg-slate-900/80 dark:text-indigo-200 dark:hover:border-indigo-300/60 dark:hover:bg-indigo-950/35 dark:focus:ring-indigo-400 dark:focus:ring-offset-slate-900 [&::-webkit-details-marker]:hidden">
@@ -1022,11 +1060,6 @@
                                                                                             @unless ($isOutgoingReattribution)
                                                                                                 <option value="" @selected($selectedDestinationId === null)>Select an invoice</option>
                                                                                             @endunless
-                                                                                            @if ($isOutgoingReattribution)
-                                                                                                <option value="{{ $invoice->id }}" @selected((string) $selectedDestinationId === (string) $invoice->id)>
-                                                                                                    Return credit to {{ $invoice->number }}
-                                                                                                </option>
-                                                                                            @endif
                                                                                             @foreach ($reattributeDestinations as $destinationInvoice)
                                                                                                 <option value="{{ $destinationInvoice->id }}" @selected((string) $selectedDestinationId === (string) $destinationInvoice->id)>
                                                                                                     {{ $destinationInvoice->number }}
@@ -1059,37 +1092,39 @@
                                                                                     </div>
                                                                                 </form>
                                                                             </details>
-                                                                            <details @if ($showIgnoreForm) open @endif>
-                                                                                <summary class="list-none cursor-pointer rounded-md border border-red-200 bg-white px-3 py-2 text-center text-xs font-semibold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-400/35 dark:bg-slate-900/80 dark:text-red-200 dark:hover:border-red-300/60 dark:hover:bg-red-950/35 dark:focus:ring-red-400 dark:focus:ring-offset-slate-900 [&::-webkit-details-marker]:hidden">
-                                                                                    Ignore payment
-                                                                                </summary>
-                                                                                <form method="POST"
-                                                                                      action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
-                                                                                      class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3 dark:border-red-400/30 dark:bg-red-950/35">
-                                                                                    @csrf
-                                                                                    @method('PATCH')
-                                                                                    <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
-                                                                                    <p class="text-xs text-red-900 dark:text-red-100">
-                                                                                        This removes the payment from invoice totals and status without deleting the raw ledger row.
-                                                                                    </p>
-                                                                                    <div>
-                                                                                        <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900 dark:text-red-100">Reason</label>
-                                                                                        <textarea id="ignore_reason_{{ $payment->id }}"
-                                                                                                  name="ignore_reason"
-                                                                                                  rows="2"
-                                                                                                  class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showIgnoreForm && $errors->has('ignore_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-red-200 dark:border-red-400/30' }}"
-                                                                                                  placeholder="Why should this payment stop counting toward this invoice?">{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
-                                                                                        @if ($showIgnoreForm)
-                                                                                            <p class="mt-1 text-xs font-semibold text-red-700 underline decoration-2 decoration-red-500 underline-offset-2 animate-pulse">{{ $errors->first('ignore_reason') }}</p>
-                                                                                        @endif
-                                                                                    </div>
-                                                                                    <div class="flex justify-end">
-                                                                                        <x-danger-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
-                                                                                            Confirm ignore
-                                                                                        </x-danger-button>
-                                                                                    </div>
-                                                                                </form>
-                                                                            </details>
+                                                                            @if ($canIgnorePayment)
+                                                                                <details @if ($showIgnoreForm) open @endif>
+                                                                                    <summary class="list-none cursor-pointer rounded-md border border-red-200 bg-white px-3 py-2 text-center text-xs font-semibold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-400/35 dark:bg-slate-900/80 dark:text-red-200 dark:hover:border-red-300/60 dark:hover:bg-red-950/35 dark:focus:ring-red-400 dark:focus:ring-offset-slate-900 [&::-webkit-details-marker]:hidden">
+                                                                                        Ignore payment
+                                                                                    </summary>
+                                                                                    <form method="POST"
+                                                                                          action="{{ route('invoices.payments.ignore', [$invoice, $payment]) }}"
+                                                                                          class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50/70 p-3 dark:border-red-400/30 dark:bg-red-950/35">
+                                                                                        @csrf
+                                                                                        @method('PATCH')
+                                                                                        <input type="hidden" name="correction_payment_id" value="{{ $payment->id }}">
+                                                                                        <p class="text-xs text-red-900 dark:text-red-100">
+                                                                                            This removes the payment from invoice totals and status without deleting the raw ledger row.
+                                                                                        </p>
+                                                                                        <div>
+                                                                                            <label for="ignore_reason_{{ $payment->id }}" class="text-xs font-semibold text-red-900 dark:text-red-100">Reason</label>
+                                                                                            <textarea id="ignore_reason_{{ $payment->id }}"
+                                                                                                      name="ignore_reason"
+                                                                                                      rows="2"
+                                                                                                      class="mt-1 w-full rounded text-sm dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-400 {{ $showIgnoreForm && $errors->has('ignore_reason') ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400/60' : 'border-red-200 dark:border-red-400/30' }}"
+                                                                                                      placeholder="Why should this payment stop counting toward this invoice?">{{ $showIgnoreForm ? old('ignore_reason') : '' }}</textarea>
+                                                                                            @if ($showIgnoreForm)
+                                                                                                <p class="mt-1 text-xs font-semibold text-red-700 underline decoration-2 decoration-red-500 underline-offset-2 animate-pulse">{{ $errors->first('ignore_reason') }}</p>
+                                                                                            @endif
+                                                                                        </div>
+                                                                                        <div class="flex justify-end">
+                                                                                            <x-danger-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
+                                                                                                Confirm ignore
+                                                                                            </x-danger-button>
+                                                                                        </div>
+                                                                                    </form>
+                                                                                </details>
+                                                                            @endif
                                                                         </div>
                                                                     @endif
                                                                 </div>

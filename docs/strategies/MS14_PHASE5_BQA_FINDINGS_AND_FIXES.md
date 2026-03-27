@@ -102,12 +102,12 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 5. [x] Add/update automated coverage for reversal creation and the append-only adjustment history.
 
 ### 4. Add reattribution undo
-1. [ ] Add a clear inline undo path for reattributed payments instead of forcing the user to infer that destination selection can act as reversal.
-2. [ ] Let the user return active accounting credit to the source invoice directly from the correction UI.
-3. [ ] Do not offer `Ignore` while a payment is actively reattributed; require the owner to undo first if they want to ignore that canonical payment row afterward.
-4. [ ] Keep the undo path explicit and stateful in both source and destination contexts so the current accounting destination is never ambiguous.
-5. [ ] Recompute source and destination invoice state immediately after undoing a reattribution.
-6. [ ] Add/update automated coverage for undoing a reattribution back to the source invoice and for blocking ignore while the reattribution is still active.
+1. [x] Add a clear inline undo path for reattributed payments instead of forcing the user to infer that destination selection can act as reversal.
+2. [x] Let the user return active accounting credit to the source invoice directly from the correction UI.
+3. [x] Do not offer `Ignore` while a payment is actively reattributed; require the owner to undo first if they want to ignore that canonical payment row afterward.
+4. [x] Keep the undo path explicit and stateful in both source and destination contexts so the current accounting destination is never ambiguous.
+5. [x] Recompute source and destination invoice state immediately after undoing a reattribution.
+6. [x] Add/update automated coverage for undoing a reattribution back to the source invoice and for blocking ignore while the reattribution is still active.
 
 ### 5. Verify the follow-up fixes
 1. [x] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.

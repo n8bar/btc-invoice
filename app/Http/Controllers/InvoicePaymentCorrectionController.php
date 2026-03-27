@@ -32,6 +32,10 @@ class InvoicePaymentCorrectionController extends Controller
             return back()->with('status', 'Payment already ignored.');
         }
 
+        if ($payment->isReattributed()) {
+            return back()->with('error', 'Undo the reattribution before ignoring this payment.');
+        }
+
         $request->merge([
             'ignore_reason' => trim((string) $request->input('ignore_reason', '')),
         ]);
@@ -174,6 +178,10 @@ class InvoicePaymentCorrectionController extends Controller
         $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
         $destinationInvoiceId = (int) $data['destination_invoice_id'];
 
+        if ($payment->isReattributed() && $destinationInvoiceId === $invoice->id) {
+            return back()->with('error', 'Use Undo reattribution to return this payment to the source invoice.');
+        }
+
         if ($previousAccountingInvoiceId === $destinationInvoiceId) {
             return back()->with('status', 'Payment already counts toward that invoice.');
         }
@@ -196,13 +204,11 @@ class InvoicePaymentCorrectionController extends Controller
             $sourceStatusBefore,
             $destinationStatusBefore
         ) {
-            $movingBackToSource = $destinationInvoiceId === $invoice->id;
-
             $payment->forceFill([
                 'accounting_invoice_id' => $destinationInvoiceId,
-                'reattributed_at' => $movingBackToSource ? null : now(),
-                'reattributed_by_user_id' => $movingBackToSource ? null : $request->user()->id,
-                'reattribute_reason' => $movingBackToSource ? null : $data['reattribute_reason'],
+                'reattributed_at' => now(),
+                'reattributed_by_user_id' => $request->user()->id,
+                'reattribute_reason' => $data['reattribute_reason'],
             ])->save();
 
             $refreshed = $this->refreshCorrectionTargets(
@@ -235,6 +241,68 @@ class InvoicePaymentCorrectionController extends Controller
         });
 
         return back()->with('status', 'Payment reattributed. Invoice totals refreshed.');
+    }
+
+    public function undoReattribution(Request $request, Invoice $invoice, InvoicePayment $payment): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+        abort_if($payment->invoice_id !== $invoice->id, 404);
+
+        if ($payment->is_adjustment) {
+            return back()->with('error', 'Manual adjustments cannot be reattributed through payment corrections.');
+        }
+
+        if ($payment->isIgnored() || ! $payment->isReattributed()) {
+            return back()->with('status', 'Payment already counts on the source invoice.');
+        }
+
+        $previousAccountingInvoiceId = $payment->activeAccountingInvoiceId();
+        $destination = $previousAccountingInvoiceId && $previousAccountingInvoiceId !== $invoice->id
+            ? Invoice::query()->find($previousAccountingInvoiceId)
+            : null;
+
+        $sourceStatusBefore = $invoice->status;
+        $destinationStatusBefore = $destination?->status;
+        $previousReattributeReason = $payment->reattribute_reason;
+
+        DB::transaction(function () use (
+            $destination,
+            $invoice,
+            $payment,
+            $previousAccountingInvoiceId,
+            $previousReattributeReason,
+            $request,
+            $sourceStatusBefore,
+            $destinationStatusBefore
+        ) {
+            $payment->forceFill([
+                'accounting_invoice_id' => $invoice->id,
+                'reattributed_at' => null,
+                'reattributed_by_user_id' => null,
+                'reattribute_reason' => null,
+            ])->save();
+
+            $refreshed = $this->refreshCorrectionTargets($invoice, $destination);
+
+            Log::info('invoice.payment.reattribution_undone', [
+                'invoice_id' => $invoice->id,
+                'payment_id' => $payment->id,
+                'user_id' => $request->user()->id,
+                'txid' => $payment->txid,
+                'status_before' => $sourceStatusBefore,
+                'status_after' => $refreshed[$invoice->id]->status,
+                'source_invoice_id' => $invoice->id,
+                'source_status_before' => $sourceStatusBefore,
+                'source_status_after' => $refreshed[$invoice->id]->status,
+                'destination_invoice_id' => $destination?->id,
+                'destination_status_before' => $destinationStatusBefore,
+                'destination_status_after' => $destination ? $refreshed[$destination->id]->status : null,
+                'previous_accounting_invoice_id' => $previousAccountingInvoiceId,
+                'previous_reattribute_reason' => $previousReattributeReason,
+            ]);
+        });
+
+        return back()->with('status', 'Payment returned to the source invoice. Invoice totals refreshed.');
     }
 
     /**
