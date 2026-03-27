@@ -752,3 +752,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec no longer mislabels the public invoice URL as signed
 `docs/specs/NOTIFICATIONS.md` now refers to the invoice email including a public link rather than a signed public link, matching the actual tokenized public-share implementation instead of implying cryptographic signing.
+
+2026-03-27 | Notifications spec now uses consistent numbering through its checklist-style sections
+`docs/specs/NOTIFICATIONS.md` now extends the user's numbered-section cleanup through the remaining goals, flows, alert triggers, implementation requirements, mailables, copy, testing, open-questions, and future-enhancement lists so the whole spec uses one numbering style instead of mixing bullets and numbered items.
