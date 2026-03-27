@@ -755,3 +755,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec now uses consistent numbering through its checklist-style sections
 `docs/specs/NOTIFICATIONS.md` now extends the user's numbered-section cleanup through the remaining goals, flows, alert triggers, implementation requirements, mailables, copy, testing, open-questions, and future-enhancement lists so the whole spec uses one numbering style instead of mixing bullets and numbered items.
+
+2026-03-27 | MS16 now preserves the candidate low-information payment-acknowledgment copy and follow-through requirement
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now records the current candidate client-facing acknowledgment copy for a detected Bitcoin payment plus the matching MS16 reminder that the operator side must actually notify the invoice issuer promptly and surface a visible review/receipt CTA if that acknowledgment path is adopted.
