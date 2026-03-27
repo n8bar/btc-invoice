@@ -23,7 +23,7 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
    Verified crawlability, sitemap/robots correctness, domain ownership, initial search-engine submission, and the initial controlled-link baseline; current decision is that the one-page placeholder plus public Helpful Notes mix is good enough for now.
 2. [x] Phase 2 - Verification + Monitoring
    Captured the monitoring baseline, re-verified the live placeholder against the repo-controlled `site/` surface, and documented the short post-milestone watch list.
-3. [x] Phase 3 - Metadata + Search-Signal Hygiene
+3. [x] Phase 3 - Metadata + Search-Signal Hygiene (only if the existing placeholder content is deemed too thin)
    Not triggered. Phase 1 and Phase 2 did not produce evidence that the current placeholder plus public Helpful Notes mix is too thin or otherwise needs immediate metadata/content tightening, so no standalone Phase 3 strategy doc was kept.
 
 ## Exit Criteria

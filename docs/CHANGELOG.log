@@ -740,3 +740,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 milestone exit criteria are now explicitly checked off
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now marks each exit criterion as satisfied instead of leaving the milestone closeout only implied by the phase rollup and completion notes.
+
+2026-03-27 | MS15 phase rollup now makes the conditional Phase 3 scope explicit in-line
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now adds a short parenthetical on the Phase 3 rollup line to make it clear that the metadata/search-signal phase only would have applied if the existing placeholder content had been deemed too thin.
