@@ -658,13 +658,16 @@ Added `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` as the ordered check
 `AGENTS.md` now frames the boundary in terms of detail depth: `docs/PLAN.md` should not pull in phase-level or strategy-detail steps, and milestone docs may mention reviewing the current phase strategy without pulling strategy-level checklist detail up into the milestone layer.
 
 2026-03-26 | Drafted the remaining MS15 phase strategies before Phase 1 execution
-Added `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, `docs/strategies/15.3_CONTINUITY_LAUNCH_HANDOFF.md`, and `docs/strategies/15.4_VERIFICATION_MONITORING.md` so all four MS15 phases now have draft strategy docs before execution begins. Updated the README documentation map to include those new phase strategies.
+Added `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` and `docs/strategies/15.3_VERIFICATION_MONITORING.md` as the later-phase MS15 strategy docs, with the deployment/cutover continuity note later folded up into the MS19 plan entry instead of staying as its own MS15 phase. Updated the README documentation map to include those new phase strategies.
 
 2026-03-26 | MS15 phase strategy filenames now use the 15.x prefix
 Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to `15.1_...` through `15.4_...`, and updated the README documentation map to use the shorter filenames.
 
 2026-03-26 | Docs filenames now use numeric milestone and phase prefixes consistently
 Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, `PHASE*`, and `TASK*` filename patterns into numeric forms such as `13_...`, `14_...`, `15_...`, `13.11_...`, `14.5_...`, and `14.3_...`. Updated the live repo references plus historical changelog paths to match the new filenames.
+
+2026-03-26 | MS15 no longer treats launch handoff as its own phase
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now uses three phases instead of four, `docs/strategies/15.3_VERIFICATION_MONITORING.md` now carries the final MS15 phase after moving up from the old `15.4` slot, and the separate `15.3` continuity-handoff draft was removed. `docs/PLAN.md` now puts the placeholder-replacement continuity note where it belongs near `MS19`, while `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treats any continuity-sensitive findings as later rollout constraints instead of a dedicated MS15 handoff phase.
 
 2026-03-26 | MS15 now treats derivative public Helpful Notes content as a conditional Phase 1/2 lever
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`, `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, and `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treat the current one-page placeholder plus public Helpful Notes mix as a Phase 1 decision point: if Phase 1 proves it is too thin, Phase 2 may expand derivative public Helpful Notes content under `site/` enough to strengthen SEO while the site still reads as a product placeholder rather than a docs encyclopedia.

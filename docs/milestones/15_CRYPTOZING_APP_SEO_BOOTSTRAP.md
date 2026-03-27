@@ -11,7 +11,7 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 - Get `cryptozing.app` discovered, crawled, and indexable before go-live.
 - Verify the placeholder/landing page has the right sitemap, robots, canonical, and metadata baseline for search engines.
 - Establish ownership, submission, and monitoring workflows for the domain in search-engine webmaster tooling.
-- Preserve SEO continuity so the live app landing page can replace the placeholder at the same root URL without restarting discovery from zero.
+- Leave a clear SEO baseline that later deployment work can preserve at go-live.
 
 ## Current Focus
 - Active phase: **Phase 1 - Discovery + Indexing Baseline**
@@ -23,14 +23,12 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
    Verify crawlability, sitemap/robots correctness, domain ownership, initial search-engine submission, and whether the current one-page/public Helpful Notes mix is too thin.
 2. [ ] Phase 2 - Metadata + Search-Signal Hygiene
    Tighten titles, descriptions, headings, canonical/schema signals, and, if Phase 1 proves it is needed, expand derivative public Helpful Notes content enough to strengthen SEO without turning the placeholder into a docs site.
-3. [ ] Phase 3 - Continuity + Launch Handoff
-   Define what must stay stable when the live app landing page replaces the placeholder at the same URL.
-4. [ ] Phase 4 - Verification + Monitoring
+3. [ ] Phase 3 - Verification + Monitoring
    Capture indexing/discovery baselines, confirm the expected signals are live, and document what to monitor after launch.
 
 ## Exit Criteria
 - `cryptozing.app` is verified in the intended webmaster/search-console tooling and its sitemap has been submitted.
 - The placeholder/landing page is crawlable and exposes the intended robots, canonical, sitemap, and metadata signals.
 - The placeholder exposes accurate, consistent search signals and does not make unsupported claims about the live product.
-- The go-live handoff preserves URL/canonical continuity so the launch landing page does not reset discovery from scratch.
+- The milestone leaves a clear SEO baseline for later deployment work to preserve at go-live.
 - A lightweight monitoring baseline exists for indexing status, sitemap health, and early search visibility after launch.
