@@ -35,6 +35,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - If MS16 adopts that acknowledgment path, the operator side must actually support the last line: the invoice issuer needs a prompt, visible review/receipt CTA in the dashboard and invoice payment history so the acknowledgment does not become hollow reassurance.
 - Past-due reminder cadence, cooldown spacing, and exact delivery-history representation are deferred MS16 details. The spec keeps only the owner/client reminder behavior; Phase 3 should decide the actual schedule, resend interval, and how distinct owner/client reminder entries are recorded.
 - The spec no longer treats repeated partial payments as a distinct client-facing alert family. If MS16 still wants to react specially to multiple partial payments, treat that as an owner-side or operational signal to design later rather than as a separate client alert category.
+- Temporary catch-all aliasing is not a spec-level rule, but MS16 strategy work should still account for it explicitly. The later phase doc should decide when aliasing remains useful for safe testing, when it becomes misleading for delivery validation, and when it must be disabled before real-recipient traffic or RC rollout.
 
 ## Exit Criteria
 - [ ] The runaway/spam-prone outbound-mail bug is understood and fixed.
