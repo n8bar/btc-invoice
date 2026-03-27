@@ -785,3 +785,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications flow 3.2 now separates detected-payment acknowledgment from receipt follow-up
 `docs/specs/NOTIFICATIONS.md` no longer treats the second base communication flow as a simple automatic paid receipt; section 3.2 now distinguishes a low-information detected-payment acknowledgment from the higher-certainty receipt follow-up and adds owner-facing manual-follow-up expectations when no client email exists.
+
+2026-03-27 | Notifications flow 3.2 no longer carries a dead missing-client-email fallback
+`docs/specs/NOTIFICATIONS.md` no longer says receipt follow-up should fall back to manual sharing when the client email is missing, because client email is now required both by the client form validation and by the non-null schema constraint.

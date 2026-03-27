@@ -28,7 +28,6 @@
    2. **Receipt Follow-Up**
       1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
       2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
-      3. If the client email is missing, the owner should receive a visible reminder to follow up manually by sharing the paid invoice through the available public or print surfaces instead of silently skipping the receipt path.
 
 3. **Delivery Log**
    1. `invoice_deliveries` is the shared audit log for manual sends, receipts, and automated alerts.
