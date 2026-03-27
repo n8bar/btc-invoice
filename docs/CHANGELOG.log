@@ -840,6 +840,9 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications item 5.5 now treats outbound mail as a required deployment capability rather than a global feature-flag escape hatch
 `docs/specs/NOTIFICATIONS.md` no longer says a global feature flag may disable outbound communication entirely when mail is not configured; it now says outbound mail is required for any valid recipient-facing deployment, while still allowing development and test environments to run without it intentionally.
 
+2026-03-27 | Notifications item 5.6 now states the delivery-history outcome requirement without job/plumbing wording
+`docs/specs/NOTIFICATIONS.md` now says the delivery history should surface queued, sent, skipped, and failed outcomes, replacing the more implementation-shaped wording about delivery jobs surfacing those states through a shared log.
+
 2026-03-27 | Notifications Goal 2 now keeps “automatic” scoped to acknowledgments instead of dropping it entirely
 `docs/specs/NOTIFICATIONS.md` again says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails; this preserves the automatic acknowledgment idea without forcing the spec to treat receipt emails themselves as fully automatic.
 
