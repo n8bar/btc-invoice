@@ -30,9 +30,9 @@
       2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
 
 3. **Delivery Log**
-   1. `invoice_deliveries` is the shared audit log for manual sends, receipts, and automated alerts.
-   2. Rows capture invoice, sender/owner context, recipient email(s), delivery type, status, and error/timestamp metadata.
-   3. The owner invoice detail page remains the primary operator view for this history.
+   1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.
+   2. That history should cover manual sends, payment acknowledgments, receipts, and automated alerts.
+   3. Owners should be able to review delivery outcomes, including queued, sent, skipped, and failed states.
 
 ## 4. Automated Alert Triggers
 1. **Invoice Paid Notice (Owner)**

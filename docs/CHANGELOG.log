@@ -791,3 +791,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications flow 3.2 now resolves ambiguity by narrowing the acknowledgment instead of suppressing it
 `docs/specs/NOTIFICATIONS.md` no longer says an ambiguous detected payment should hold the client-facing acknowledgment; `3.2.1.4` now says the acknowledgment should stay limited to what the system can safely say and avoid certainty about how the payment applies.
+
+2026-03-27 | Notifications flow 3.3 now stays at the product-behavior level
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes the `invoice_deliveries` table name, per-row field list, or the invoice detail page as the primary operator view inside the base communication flows; `3.3` now describes only the enduring shared delivery-history behavior and the operator outcomes it must expose.
