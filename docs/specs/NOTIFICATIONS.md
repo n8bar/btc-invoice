@@ -56,7 +56,8 @@
 ## 5. ____
 1. Outbound invoice communication should use a shared queued delivery path and shared delivery history so send outcomes remain auditable.
 2. The shared delivery history should preserve enough context to identify the invoice, sender/issuer context, recipient(s), communication class, outcome, and timing/error details for each outbound attempt.
-3. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
+3. Public-share links embedded in outbound emails must use the explicitly configured public host for the intended recipient-facing environment.
+   1. That public host may differ from the host currently running the app, such as when a development or staging environment is deliberately targeting another deployment.
 4. Temporary catch-all aliasing during pre-production uses `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`. Disable aliasing before RC or real-customer traffic.
 5. Profile setting for automatic paid receipts remains part of the owner communication model.
 6. Client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior.

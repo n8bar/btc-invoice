@@ -828,5 +828,8 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications item 5.3 no longer freezes the delivery-history UI to today’s owner invoice page
 `docs/specs/NOTIFICATIONS.md` no longer says the owner invoice detail page is the primary operator view for delivery history, because that is current UI placement rather than an enduring notification invariant and future versions may expose delivery history elsewhere too.
 
+2026-03-27 | Notifications item 5.3 now defines the public-host rule without hardcoding a specific domain or runtime host
+`docs/specs/NOTIFICATIONS.md` no longer ties outbound email links to `APP_PUBLIC_URL`, the currently running host, or a single production domain; it now says public-share links must use the explicitly configured public host for the intended recipient-facing environment, including cases where a dev/staging environment deliberately targets another deployment.
+
 2026-03-27 | Product spec header date now reflects the current synced doc set
 `docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.
