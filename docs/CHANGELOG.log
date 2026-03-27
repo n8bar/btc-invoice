@@ -684,5 +684,8 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 2026-03-26 | MS15 strategies now assign remaining work by who is better positioned
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now tag each remaining unchecked step as `Agent`, `User`, or `Shared` so webmaster-tool/account actions stay with the user while repo/live-host/docs work stays with the agent.
 
+2026-03-27 | MS15 strategies now call out safe subagent sidecars
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now distinguish critical-path `Agent` work from `Subagent`-safe sidecars so bounded verification, repo-signal checks, and monitoring-note synthesis can be delegated without improvising around the phase order.
+
 2026-03-27 | Strategy docs should expose subagent-friendly parallel sidecars
 `AGENTS.md` now says future strategy docs should still keep the primary critical path explicit but should also call out known safe parallel sidecars or path-scoped tasks so subagent use can follow the strategy intentionally instead of improvising around a single-threaded checklist.
