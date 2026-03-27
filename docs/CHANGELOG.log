@@ -692,3 +692,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 strategies now distinguish guided user work from self-driven user work
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` and `docs/strategies/15.3_VERIFICATION_MONITORING.md` now mark the Google/Bing ownership, sitemap-submission, and indexing-check tasks as `Guided User` rather than plain `User`, and `AGENTS.md` now says `Guided User` should be used when the user has the account access but still needs coaching through unfamiliar tooling.
+
+2026-03-27 | MS15 now records the external-tool ownership decision
+`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.3.1` and records the decision to use a DNS-verified Google Search Console domain property for `cryptozing.app`, with Bing Webmaster Tools initially inheriting that baseline by importing the verified Google property unless later work proves Bing needs its own separate DNS verification.
