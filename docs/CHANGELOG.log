@@ -816,5 +816,8 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications spec now defines issuer copies of client-facing notifications as a general behavior, with the MS16 toggle captured separately
 `docs/specs/NOTIFICATIONS.md` now says client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior; the old per-alert owner-copy special casing has been removed from Section 4, and `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now explicitly captures the concrete Phase 3 toggle implementation with a default-on RC posture.
 
+2026-03-27 | Notifications Section 5 is temporarily unnamed while its contents are being recategorized
+`docs/specs/NOTIFICATIONS.md` now uses `## 5. ____` as a placeholder heading so we can clean the mixed-role contents first and choose an honest section name afterward instead of locking in another misleading “implementation requirements” bucket.
+
 2026-03-27 | Product spec header date now reflects the current synced doc set
 `docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.

@@ -53,7 +53,7 @@
    1. Triggered when the invoice still carries a significant remaining balance after payment activity (15% threshold for RC).
    2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
 
-## 5. Shared Implementation Requirements
+## 5. ____
 1. Use the existing queued mail + `invoice_deliveries` pattern for all outbound communication so aliasing and delivery logging stay consistent.
 2. Delivery-log rows should capture invoice, sender/issuer context, recipient email(s), delivery type, status, and error/timestamp metadata.
 3. The owner invoice detail page is the current primary operator view for this delivery history.
