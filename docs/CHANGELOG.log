@@ -800,3 +800,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications alert 4.1 now stays at the product-behavior level
 `docs/specs/NOTIFICATIONS.md` no longer describes the owner paid notice in terms of the `InvoicePaid` event, watcher/manual-adjustment trigger paths, or raw delivery types; `4.1` now simply states that when an invoice becomes paid, the invoice issuer gets a succinct owner notice that stays distinct from client-facing payment acknowledgments and receipts.
+
+2026-03-27 | Notifications alert 4.2 now keeps only the past-due behavior while MS16 holds the cadence/storage details
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes nightly scheduling, 48-hour resend spacing, or raw delivery-log storage detail inside the Past Due alert; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now preserves those as MS16 Phase 3 decisions to flesh out later.

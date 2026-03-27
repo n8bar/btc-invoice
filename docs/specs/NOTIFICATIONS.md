@@ -41,10 +41,9 @@
    3. The owner paid notice should remain distinct from any client-facing payment acknowledgment or receipt in the delivery history.
 
 2. **Past Due (Owner + Client)**
-   1. Nightly scheduler checks invoices whose `due_date` is in the past, status is not `paid`/`void`, and that have not been reminded in the last 48h.
+   1. When an invoice becomes past due and is still not `paid` or `void`, both the invoice issuer and the client should receive past-due reminders.
    2. Owner email: “Invoice {number} is past due” with outstanding totals and suggested next steps.
    3. Client email: polite reminder referencing outstanding balance, invoice link, and a short “contact the sender if you already paid” line.
-   4. Store reminders in `invoice_deliveries` (type `past_due_owner`, `past_due_client`) to avoid spamming.
 
 3. **Overpayment Alert (Client)**
    1. Triggered when `overpaymentPercent() >= 15%`. Checked whenever watcher logs a new payment or a manual adjustment increases the paid total.
