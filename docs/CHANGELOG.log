@@ -710,3 +710,6 @@ Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, 
 
 2026-03-27 | MS15 now records the external-tool stability follow-up
 `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off `15.1.3.6` and records the concrete follow-up needed to keep the verified baseline stable: leave the Google TXT and Bing CNAME records in DNS, keep access to the same verified Google/Bing accounts, and treat Bing as durably verified through its own CNAME path rather than through the import shortcut.
+
+2026-03-27 | MS15 now records the initial controlled inbound-link set
+The GitHub repository homepage now points at `https://cryptozing.app`, `README.md` now includes a direct website link near the top, and `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md` now checks off the Phase 1 controlled-link selection/setup steps with those two project-scoped surfaces as the baseline inbound-link set.

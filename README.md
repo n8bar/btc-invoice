@@ -2,6 +2,8 @@
 
 This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md); current milestone status lives in [`docs/PLAN.md`](docs/PLAN.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
 
+Website: <https://cryptozing.app/>
+
 ## Highlights
 - **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
 - **Wallet integration:** Each user configures a BIP84 xpub under `/wallet/settings`; invoices derive unique Bech32 addresses and the watcher (`wallet:watch-payments`) logs incoming payments.
