@@ -659,3 +659,6 @@ Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordere
 
 2026-03-26 | Drafted the remaining MS15 phase strategies before Phase 1 execution
 Added `docs/strategies/MS15_PHASE2_METADATA_SEARCH_SIGNAL_HYGIENE.md`, `docs/strategies/MS15_PHASE3_CONTINUITY_LAUNCH_HANDOFF.md`, and `docs/strategies/MS15_PHASE4_VERIFICATION_MONITORING.md` so all four MS15 phases now have draft strategy docs before execution begins. Updated the README documentation map to include those new phase strategies.
+
+2026-03-26 | MS15 phase strategy filenames now use the 15.x prefix
+Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to `15.1_...` through `15.4_...`, and updated the README documentation map to use the shorter filenames.
