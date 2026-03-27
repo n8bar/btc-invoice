@@ -966,13 +966,13 @@
                                                                             @if ($canUndoReattribution)
                                                                                 <form method="POST"
                                                                                       action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
-                                                                                      class="space-y-2 rounded-lg border border-emerald-100 bg-emerald-50/70 p-3 dark:border-emerald-400/30 dark:bg-emerald-950/35">
+                                                                                      class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-3 dark:border-emerald-400/30 dark:bg-emerald-950/35">
                                                                                     @csrf
                                                                                     @method('PATCH')
-                                                                                    <p class="text-xs text-emerald-900 dark:text-emerald-100">
-                                                                                        Return this payment to {{ $correctionRouteInvoice->number }}.
-                                                                                    </p>
-                                                                                    <div class="flex justify-end">
+                                                                                    <div class="flex items-center gap-3">
+                                                                                        <p class="flex-1 text-xs text-emerald-900 dark:text-emerald-100">
+                                                                                            Return this payment to {{ $correctionRouteInvoice->number }}.
+                                                                                        </p>
                                                                                         <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
                                                                                             Undo reattribution
                                                                                         </x-secondary-button>
@@ -1025,13 +1025,13 @@
                                                                                 @if ($canUndoReattribution)
                                                                                     <form method="POST"
                                                                                           action="{{ route('invoices.payments.undo-reattribution', [$correctionRouteInvoice, $payment]) }}"
-                                                                                          class="space-y-2 rounded-lg border border-sky-100 bg-sky-50/70 p-3 dark:border-sky-400/30 dark:bg-sky-950/35">
+                                                                                          class="rounded-lg border border-sky-100 bg-sky-50/70 p-3 dark:border-sky-400/30 dark:bg-sky-950/35">
                                                                                         @csrf
                                                                                         @method('PATCH')
-                                                                                        <p class="text-xs text-sky-900 dark:text-sky-100">
-                                                                                            Return this payment to {{ $invoice->number }}.
-                                                                                        </p>
-                                                                                        <div class="flex justify-end">
+                                                                                        <div class="flex items-center gap-3">
+                                                                                            <p class="flex-1 text-xs text-sky-900 dark:text-sky-100">
+                                                                                                Return this payment to {{ $invoice->number }}.
+                                                                                            </p>
                                                                                             <x-secondary-button type="submit" class="px-3 py-1 text-xs normal-case tracking-normal">
                                                                                                 Undo reattribution
                                                                                             </x-secondary-button>
