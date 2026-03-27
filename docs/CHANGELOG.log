@@ -776,3 +776,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications ambiguity goal is now less suppression-coded
 `docs/specs/NOTIFICATIONS.md` now says to keep payment-triggered mail truthful when the underlying payment state is semantically ambiguous, which preserves the truthfulness goal without implying that ambiguity should automatically suppress all communication.
+
+2026-03-27 | Notifications ambiguity goal now explicitly leaves room for safe acknowledgment
+`docs/specs/NOTIFICATIONS.md` now ends the ambiguity goal with “while still acknowledging what it safely can,” closing the lingering “truth via silence” loophole without prematurely dropping down into flow-level rules.
