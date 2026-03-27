@@ -13,14 +13,14 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 - Active milestone: **MS15 - CryptoZing.app SEO Bootstrap**
 - Status: `active`
 - Next action: review the MS15 milestone doc, then begin MS15 execution.
-- Primary next doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
+- Primary next doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 - Supporting docs: [`site/index.html`](../site/index.html), [`site/sitemap.xml`](../site/sitemap.xml), [`site/robots.txt`](../site/robots.txt), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
-- Most recently completed milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
+- Most recently completed milestone doc: [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and positioned for continuity before the live app landing page replaces it at the same URL. | [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md) |
+| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and positioned for continuity before the live app landing page replaces it at the same URL. | [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md) |
 | [ ] | 16 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
 | [ ] | 17 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 18 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
@@ -41,5 +41,5 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 | [x] | 10 | User Settings | Add invoice defaults and stabilize wallet/settings behavior. | - |
 | [x] | 11 | Observability & Safety | Add safety checks, structured logging, and failure-path hardening. | - |
 | [x] | 12 | Payment & Address Accuracy | Correct derivation mismatches and lock confirmation-aware payment accuracy. | [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md) |
-| [x] | 13 | UX Overhaul | Deliver dashboard/theme/help/onboarding/settings IA and close Task 13 Browser QA. | [`docs/milestones/MS13_UX_OVERHAUL.md`](milestones/MS13_UX_OVERHAUL.md) |
-| [x] | 14 | On-Chain Payment Attribution Hardening | Make attribution key-aware, detect unsupported wallet reuse, reinforce dedicated-account usage, and provide auditable correction tooling. | [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md) |
+| [x] | 13 | UX Overhaul | Deliver dashboard/theme/help/onboarding/settings IA and close Task 13 Browser QA. | [`docs/milestones/13_UX_OVERHAUL.md`](milestones/13_UX_OVERHAUL.md) |
+| [x] | 14 | On-Chain Payment Attribution Hardening | Make attribution key-aware, detect unsupported wallet reuse, reinforce dedicated-account usage, and provide auditable correction tooling. | [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md) |
