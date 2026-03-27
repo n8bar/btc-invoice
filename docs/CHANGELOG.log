@@ -749,3 +749,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 now has a milestone stub for mailer safety, provider recovery, and transport decisions
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now exists as the active MS16 execution doc, `docs/PLAN.md` now points at it as the primary next doc, and `README.md` now lists it in the documentation map; the stub captures the four immediate MS16 fronts (spam-bug triage, app-side safeguards, Mailgun recovery, and SMTP-vs-HTTP-API evaluation) plus the open question about whether some payment-triggered mail needs broader owner confirmation before send.
+
+2026-03-27 | Notifications spec no longer mislabels the public invoice URL as signed
+`docs/specs/NOTIFICATIONS.md` now refers to the invoice email including a public link rather than a signed public link, matching the actual tokenized public-share implementation instead of implying cryptographic signing.

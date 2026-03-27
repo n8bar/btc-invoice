@@ -8,7 +8,7 @@ This doc is canonical for outbound invoice communication:
 - cooldown expectations and notice-class behavior
 
 ## Goals
-- Let invoice owners email a signed public link plus summary to their client from the app.
+- Let invoice owners email a public link plus summary to their client from the app.
 - Automatically send a paid receipt email once the watcher marks an invoice paid.
 - Ensure both owners and clients receive email alerts for key invoice events without relying on manual follow-up.
 - Surface automated emails when an invoice is paid, becomes past due, or when on-chain payments deviate from the invoice total by more than the defined tolerance.
