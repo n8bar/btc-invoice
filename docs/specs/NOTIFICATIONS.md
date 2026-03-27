@@ -63,11 +63,10 @@
    1. Development and test environments may intentionally run without outbound mail, but production-ready deployments must have it configured.
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
 7. Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
-8. The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
-9. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
-10. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
-11. Manual invoice sends and past-due reminders are outside this safeguard.
-12. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+8. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
+9. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
+10. Manual invoice sends and past-due reminders are outside this safeguard.
+11. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:
