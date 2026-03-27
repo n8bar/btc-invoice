@@ -16,7 +16,6 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 ## Current Focus
 - Active phase: **Phase 1 - Discovery + Indexing Baseline**
 - Current objective: review the Phase 1 strategy, then execute the repo-controlled discovery baseline work.
-- Current phase strategy: [`docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md`](../strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md)
 - Primary surfaces: [`site/index.html`](../../site/index.html), [`site/sitemap.xml`](../../site/sitemap.xml), [`site/robots.txt`](../../site/robots.txt)
 
 ## Phase Rollup

@@ -9,7 +9,8 @@
 - Keep the docs structure roles straight:
   - `docs/PLAN.md` lays out milestone-level progress only; each milestone should check off once there
   - if `docs/PLAN.md` has a `Next action`, keep it milestone-level too; do not point it at strategies or phase-level checklist steps
-  - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, primary linked specs/strategies, phase checkoffs, and milestone exit criteria
+  - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, phase-level next actions, phase checkoffs, and milestone exit criteria
+  - if a milestone doc has a current focus or next action, keep it phase-level; it may say to review the current phase strategy, but the milestone doc itself should not point at the strategy
   - `docs/specs/**` for detailed feature and domain requirements
   - `docs/strategies/**` expand one milestone phase into the ordered implementation checklist, sequencing, and verification steps; these are the “do this in this order” docs for active execution
   - `docs/ops/**` for rollout, contributor, and deployment runbooks

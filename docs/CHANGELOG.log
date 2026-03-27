@@ -650,3 +650,6 @@ Added `docs/strategies/MS15_PHASE1_DISCOVERY_INDEXING_BASELINE.md` as the ordere
 
 2026-03-26 | PLAN next-action wording now stays milestone-level
 `AGENTS.md` now makes the rule explicit that any `Next action` in `docs/PLAN.md` must stay milestone-level rather than pointing at strategies or phase-level checklist steps, and `docs/PLAN.md` now says to review the MS15 milestone doc and begin MS15 execution.
+
+2026-03-26 | Milestone-doc current focus now stays phase-level without pointing at strategies
+`AGENTS.md` now makes the same rule explicit for `docs/milestones/**`: current-focus and next-action lines stay phase-level and may include reviewing the current phase strategy, but milestone docs should not point at strategy docs directly. `docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now follows that rule.
