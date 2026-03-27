@@ -10,20 +10,21 @@ Use supporting specs under `docs/specs/` for detailed local requirements.
 Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 
 ## Current
-- Active milestone: none
-- Status: `between milestones`
-- Next action: insert the next milestone from `main` and choose the new primary execution doc.
+- Active milestone: **MS15 - CryptoZing.app SEO Bootstrap**
+- Status: `active`
+- Next action: draft the MS15 milestone doc and scope the placeholder/landing-page SEO bootstrap work.
 - Primary next doc: [`docs/PLAN.md`](PLAN.md)
-- Supporting docs: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
+- Supporting docs: [`site/index.html`](../site/index.html), [`site/sitemap.xml`](../site/sitemap.xml), [`site/robots.txt`](../site/robots.txt), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
 - Most recently completed milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 15 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
-| [ ] | 16 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
-| [ ] | 17 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
-| [ ] | 18 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, remove temporary mail aliasing, and complete rollout verification. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
+| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and positioned for continuity before the live app landing page replaces it at the same URL. | [`docs/PLAN.md`](PLAN.md) |
+| [ ] | 16 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
+| [ ] | 17 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
+| [ ] | 18 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
+| [ ] | 19 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, remove temporary mail aliasing, and complete rollout verification. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
 
 ## Completed Milestones
 | Status | ID | Milestone | Short intent | Primary doc |

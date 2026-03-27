@@ -629,3 +629,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-26 | MS14 is complete after the targeted Phase 5 follow-up rerun
 `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now marks the last two targeted Browser QA reruns passed and closes the follow-up strategy, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now marks Phase 5 and MS14 complete, and `docs/PLAN.md` now moves MS14 into the completed milestones list and leaves the plan in a between-milestones state pending insertion of the next milestone from `main`.
+
+2026-03-26 | PLAN now inserts MS15 for CryptoZing.app SEO bootstrap
+`docs/PLAN.md` now makes `MS15 - CryptoZing.app SEO Bootstrap` the active milestone so early discovery/indexing work for the placeholder/landing page can begin before go-live, and renumbers the downstream RC milestones from `16` through `19`.
