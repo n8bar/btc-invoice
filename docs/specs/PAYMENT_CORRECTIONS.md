@@ -17,6 +17,7 @@ Wrong-invoice cases include stale-address reuse: an old valid CryptoZing invoice
 ## Goals
 - Give the owner an explicit way to exclude a wrongly attributed on-chain payment from an invoice without deleting the underlying ledger row.
 - Give the owner an explicit way to reassign a wrongly attributed payment from one invoice to another invoice owned by the same owner.
+- Give the owner an explicit way to undo an active reattribution and return the payment's accounting credit to its immutable source invoice.
 - Preserve the original transaction evidence (`txid`, sats, timestamps, metadata, notes) for support/debug/audit use.
 - Make the correction reversible so mistaken ignores can be restored cleanly.
 - Recompute invoice state immediately so status, outstanding balance, QR/BIP21 targets, and payment summaries stop claiming the wrong payment interpretation.
@@ -34,13 +35,15 @@ Wrong-invoice cases include stale-address reuse: an old valid CryptoZing invoice
 2. Ignoring a payment excludes it from settlement math and invoice state, but does not delete the row.
 3. Restoring a payment reverses the ignore and returns the row to normal settlement math.
 4. Reattributing a payment moves CryptoZing's accounting credit from invoice A to invoice B without changing the blockchain facts.
-5. Manual adjustment rows (`is_adjustment = true`) are never eligible for ignore/restore/reattribute.
-6. Invoice-to-invoice reattribution is same-owner only in RC.
-7. Owner auditability takes precedence over convenience: correction actions require explicit intent and leave a trace.
-8. Ignore/restore/reattribute are bookkeeping interpretation tools for detected payments; manual adjustments are separate owner-created ledger entries.
-9. Soft delete may remain available even when bookkeeping history exists because the invoice record and provenance still exist.
-10. Force delete is a purge-only action and must be blocked while unresolved bookkeeping blockers remain on or against the invoice.
-11. Bookkeeping-history delete guards must be enforced in both the application flow and a persistence-layer backstop so hard deletes cannot bypass them.
+5. Undoing a reattribution returns active accounting credit to the immutable source invoice through an explicit undo action, not by making the owner guess through the destination picker.
+6. Actively reattributed rows are not eligible for ignore until the owner undoes the reattribution and returns active accounting credit to the source invoice.
+7. Manual adjustment rows (`is_adjustment = true`) are never eligible for ignore/restore/reattribute.
+8. Invoice-to-invoice reattribution is same-owner only in RC.
+9. Owner auditability takes precedence over convenience: correction actions require explicit intent and leave a trace.
+10. Ignore/restore/reattribute are bookkeeping interpretation tools for detected payments; manual adjustments are separate owner-created ledger entries.
+11. Soft delete may remain available even when bookkeeping history exists because the invoice record and provenance still exist.
+12. Force delete is a purge-only action and must be blocked while unresolved bookkeeping blockers remain on or against the invoice.
+13. Bookkeeping-history delete guards must be enforced in both the application flow and a persistence-layer backstop so hard deletes cannot bypass them.
 
 ## Scope Boundary
 - Legitimate later payments to a correctly assigned old CryptoZing invoice address are correction candidates when the business intent belongs elsewhere, but they do not by themselves prove outside receive activity or a shared wallet namespace.
@@ -71,6 +74,8 @@ Rules:
 - Normal active rows set `accounting_invoice_id = invoice_id`.
 - Ignored rows set `accounting_invoice_id = null` and therefore count toward no invoice until restored or purged.
 - Reattributed rows set `accounting_invoice_id` to the destination invoice and require `reattributed_at`, `reattributed_by_user_id`, and `reattribute_reason`.
+- Undoing a reattribution sets `accounting_invoice_id = invoice_id` and clears the current-state reattribution metadata on the row.
+- A row with active reattribution is not ignore-eligible until `accounting_invoice_id` returns to `invoice_id`.
 - If `accounting_invoice_id` is `null` or equals `invoice_id`, the row has no active reattribution and current-state reattribution metadata may be cleared.
 - Source and destination histories derive from the same canonical `invoice_payments` row rather than duplicated payment rows.
 - Structured logs are the append-only audit history of reattribution events; row metadata represents the current active accounting state only.
@@ -132,6 +137,15 @@ For eligible detected payment rows:
 - Destination choices must be constrained to the same owner.
 - If the UI ever allows selecting the current invoice, treat that as cancel/no change rather than recording a meaningless reattribution event.
 
+For actively reattributed rows:
+- Show an explicit undo action instead of making the owner infer that the destination picker can reverse the move.
+- On the source invoice, that action should read as undoing the reattribution and returning the payment to the source invoice.
+- On the destination invoice, that action should read as returning the payment to the source invoice.
+- The confirmation step must explain that CryptoZing will stop counting the payment toward the current destination invoice and count it toward the source invoice again.
+- Undoing a reattribution must not require choosing from the destination picker.
+- Do not offer `Ignore` while the row is actively reattributed; the owner must undo the reattribution first if they want to ignore the canonical payment row afterward.
+- Destination-side undo affordances may appear in destination owner history, but they must still operate on the immutable source payment row context.
+
 For manual adjustment rows:
 - Do not render ignore/restore/reattribute controls.
 - Keep existing manual-adjustment labels and note behavior.
@@ -155,15 +169,21 @@ UX guardrails:
 - Support read-only surfaces may show the owner-visible ignored state if they already render payment history, but must never expose correction controls.
 
 ## Authorization and Routing
-- Ignore/restore/reattribute is owner-only.
+- Ignore/restore/reattribute/undo-reattribution is owner-only.
 - Route-model binding must enforce that the payment belongs to the invoice in the URL; mismatches are `404`.
 - Public users and support users receive denial/no-control behavior consistent with existing owner-only invoice actions.
 - Attempts to ignore or reattribute an adjustment row must fail safely and leave the ledger unchanged.
+- Attempts to ignore an actively reattributed row must fail safely and leave the ledger unchanged.
 
 Preferred route shape:
 - `PATCH /invoices/{invoice}/payments/{payment}/ignore`
 - `PATCH /invoices/{invoice}/payments/{payment}/restore`
 - `PATCH /invoices/{invoice}/payments/{payment}/reattribute`
+- `PATCH /invoices/{invoice}/payments/{payment}/undo-reattribution`
+
+Undo route note:
+- The source invoice remains the authoritative route context because `invoice_payments.invoice_id` is immutable source provenance.
+- If the owner triggers undo from the destination invoice UI, the app may still submit through the source invoice/payment pair.
 
 ## Deletion Safeguards
 - Soft delete may remain allowed even when bookkeeping history exists because the invoice record still exists for audit/provenance.
@@ -172,7 +192,7 @@ Preferred route shape:
 - a detected on-chain payment row on the invoice is unresolved until that retained row is intentionally removed as part of purge
 - an ignored payment row on the invoice is still unresolved; ignore alone does not clear the delete blocker
 - a manual adjustment row on the invoice is unresolved until that retained adjustment row is intentionally removed as part of purge
-- an active outgoing reattribution from the invoice is unresolved until the source invoice resolves that active accounting destination by reattributing elsewhere, returning credit to the source invoice, or ignoring it there
+- an active outgoing reattribution from the invoice is unresolved until the source invoice resolves that active accounting destination by reattributing elsewhere, returning credit to the source invoice, or returning credit to the source invoice and then ignoring it there
 - an active incoming reattribution to the invoice is unresolved until the source invoice resolves it first; the destination delete flow may only direct the owner back to that source invoice
 - The owner may reach a hard-delete state only after every blocker class above has been fully resolved away.
 - The delete flow may link to the implicated source or destination invoices, but it must not auto-convert or offer one-click cleanup inside the destructive delete action.
@@ -183,6 +203,7 @@ Every correction action must emit a structured log entry:
 - `invoice.payment.ignored`
 - `invoice.payment.restored`
 - `invoice.payment.reattributed`
+- `invoice.payment.reattribution_undone`
 
 Minimum log context:
 - `invoice_id`
@@ -223,7 +244,10 @@ Automated coverage should include:
 - restoring that payment returns the invoice to the prior truthful state
 - owner-only authorization for ignore/restore routes
 - reattributing a payment from invoice A to invoice B recomputes both invoices truthfully
+- undoing a reattribution returns active accounting credit to the source invoice and recomputes both invoices truthfully
+- destination-side undo affordances still route safely through the immutable source payment row context
 - owner-only authorization and same-owner destination safeguards for reattribution
+- actively reattributed rows cannot be ignored until the reattribution is undone, both in the UI and on the route
 - manual adjustment rows cannot be ignored, restored, or reattributed through the correction flow
 - correction metadata persistence (`ignored_at`, `ignored_by_user_id`, `ignore_reason`)
 - structured audit log emission for ignore and restore
@@ -242,6 +266,8 @@ Browser QA should include:
 - owner can ignore a row with a reason and immediately see totals/status change
 - owner can restore the row and see totals/status recover
 - owner can reattribute a row to another owned invoice and immediately see both invoices recalculate truthfully
+- owner can undo an active reattribution from either the source or destination owner view and immediately see the payment count on the source invoice again
+- actively reattributed rows do not offer ignore until the payment has been returned to the source invoice
 - ignored or reattributed rows remain visible and clearly marked in owner history
 - ignored rows do not appear in public/print payment history
 - reattributed-out rows remain visible in owner history on the source invoice but do not count there

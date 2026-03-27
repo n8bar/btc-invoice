@@ -66,6 +66,19 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
      2. The current/source invoice is omitted from the destination list, so the user cannot simply return the payment there.
      3. The user is left guessing whether changing the destination to the same invoice should undo the reattribution.
 
+5. Reattributed payments still expose ignore when they should require undo first
+   - Surface: owner invoice show page, any actively reattributed payment row in payment history.
+   - Repro:
+     1. Reattribute a payment from a source invoice to a destination invoice.
+     2. Open the correction UI for that actively reattributed row.
+   - Expected:
+     1. The row exposes the explicit undo path back to the source invoice.
+     2. `Ignore` is unavailable while the payment is still actively reattributed.
+     3. If the owner wants to ignore that payment later, they must first return it to the source invoice and then ignore it there.
+   - Actual:
+     1. The row still offers `Ignore` while the active accounting destination is another invoice.
+     2. The UI allows overlapping correction directions instead of forcing the clean undo-first path.
+
 ## 2. Fix Sequence
 ### 1. Fix ignore validation recovery
 1. [x] Keep the same ignore form open when validation fails for payment row `39` on invoice `67`.
@@ -91,13 +104,14 @@ This strategy is the active Phase 5 follow-up doc for issues found during Browse
 ### 4. Add reattribution undo
 1. [ ] Add a clear inline undo path for reattributed payments instead of forcing the user to infer that destination selection can act as reversal.
 2. [ ] Let the user return active accounting credit to the source invoice directly from the correction UI.
-3. [ ] Keep the undo path explicit and stateful in both source and destination contexts so the current accounting destination is never ambiguous.
-4. [ ] Recompute source and destination invoice state immediately after undoing a reattribution.
-5. [ ] Add/update automated coverage for undoing a reattribution back to the source invoice.
+3. [ ] Do not offer `Ignore` while a payment is actively reattributed; require the owner to undo first if they want to ignore that canonical payment row afterward.
+4. [ ] Keep the undo path explicit and stateful in both source and destination contexts so the current accounting destination is never ambiguous.
+5. [ ] Recompute source and destination invoice state immediately after undoing a reattribution.
+6. [ ] Add/update automated coverage for undoing a reattribution back to the source invoice and for blocking ignore while the reattribution is still active.
 
 ### 5. Verify the follow-up fixes
 1. [x] Run the targeted automated coverage for ignore validation recovery, reattribution validation recovery, and manual adjustment reversal.
-2. [ ] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
+2. [x] Open invoice `67` / `INV-0003`, expand `Ignore` for payment row `39`, leave the reason empty, click `Confirm Ignore`, and verify the page stays anchored on that row, the ignore form stays open, the reason field is focused, the validation error is obvious, and the row does not read as ignored.
 3. [ ] Open invoice `69` / `INV-0005`, start reattribution for the `30,000 sats` / `$21.06` payment detected `Mon, Mar 23, 2026 11:41 PM`, choose destination invoice `70` / `INV-0006`, leave the reason empty, submit, and verify the page stays anchored on that row, the destination selection is preserved, the reason field is focused, the validation error is obvious, and the row does not read as reattributed.
-4. [ ] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history.
-5. [ ] Reattribute a payment from source invoice `69` / `INV-0005` to destination invoice `70` / `INV-0006`, then use the new undo path and verify the payment cleanly returns to the source invoice without guessing through destination selection, source/destination invoice math recomputes immediately, and the row no longer reads as reattributed.
+4. [x] Create a manual adjustment row on invoice `67`, `68`, `69`, or `70`, click `Reverse` / `adjustment`, verify `Confirm` / `reverse` / `entry` appears, click `Reverse` / `adjustment` again and verify the confirm control hides, then confirm a reversal and verify a new equal-and-opposite adjustment row appears with note `reversal of {txid}` while the original row stays in history. Also verify that once an entry has been reversed, it cannot be reversed again directly.
+5. [ ] Reattribute a payment from source invoice `69` / `INV-0005` to destination invoice `70` / `INV-0006`, verify the actively reattributed row does not offer `Ignore`, then use the new undo path and verify the payment cleanly returns to the source invoice without guessing through destination selection, source/destination invoice math recomputes immediately, and the row no longer reads as reattributed.

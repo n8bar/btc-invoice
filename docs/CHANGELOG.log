@@ -620,3 +620,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-26 | MS14 findings strategy now gives reattribution undo its own fix block
 `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now inserts a dedicated `2.4` fix sequence for adding a clear reattribution undo path back to the source invoice and shifts the follow-up verification block to `2.5`, including a targeted Browser QA rerun step for the undo flow.
+
+2026-03-26 | Payment correction spec now requires explicit reattribution undo before ignore
+`docs/specs/PAYMENT_CORRECTIONS.md` now requires an explicit undo path that returns active accounting credit to the immutable source invoice, forbids `Ignore` while a payment is still actively reattributed, and defines the owner UI, routing, logging, testing, and Browser QA expectations for that undo-first model. `docs/PRODUCT_SPEC.md` now carries the same top-level correction invariant, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now records the matching Browser QA finding and folds the ignore-blocking work into the existing `2.4` reattribution-undo fix sequence.
