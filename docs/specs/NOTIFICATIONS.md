@@ -16,8 +16,8 @@
 
 ## 3. Base Communication Flows
 1. **Send Invoice (manual owner action)**
-   1. Available when the invoice has a client email, its public link is enabled, and the invoice is no longer in `draft` status.
-   2. Sending the invoice queues outbound delivery and records the attempt in the delivery log.
+   1. Available when the invoice has a client email and its public link is enabled.
+   2. Sending the invoice queues outbound delivery, records the attempt in the delivery log, and issues the invoice out of `draft`.
 
 2. **Paid Receipt (automatic client receipt)**
    1. Fired when `InvoicePaid` dispatches after the invoice transitions to `paid`.
