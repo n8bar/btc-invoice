@@ -66,11 +66,11 @@ This doc is canonical for outbound invoice communication:
 - A global feature flag may disable outbound invoice communication entirely when mail is not configured.
 - Delivery jobs should surface queued, sent, and failed outcomes through the shared delivery log.
 - Once an invoice has already received one or more detected on-chain payments, any later on-chain payment on that same invoice may be semantically ambiguous even when the wallet remains supported. Examples include stale-address reuse and payers intentionally using an older valid CryptoZing invoice address for a newer invoice.
-- The later-payment owner-validation gate is planned MS15 work, not an MS14 Phase 5 reattribution gate.
+- The later-payment owner-validation gate is planned MS16 work, not an MS14 Phase 5 reattribution gate.
 - For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
 - This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
 - Manual invoice sends and past-due reminders are outside this safeguard.
-- MS15 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+- MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## Mailables, Routes, and Jobs
 - Base communication classes:

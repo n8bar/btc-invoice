@@ -28,7 +28,7 @@ Address the current historical-data uncertainty before changing runtime lineage 
    3. [x] fund those addresses from local-only `testnet4` wallet material stored in an untracked path
    4. [x] broadcast the transactions for the selected funded scenarios
 6. [x] Keep the duplicate-key fixture isolated and clearly labeled so it remains a controlled MS14 fixture rather than ambient test-data ambiguity.
-7. [x] Leave outbound mail out of scope for this reseeding pass; mail restoration and queue cleanup remain MS15 work.
+7. [x] Leave outbound mail out of scope for this reseeding pass; mail restoration and queue cleanup remain MS16 work.
 8. [x] Document the resulting scenario set before continuing into Phase 2 runtime lineage work.
 
 ## 1.2 Verify the reseeded MS14 baseline

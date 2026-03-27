@@ -236,7 +236,7 @@ Audit rules:
 Minimum Phase 5 requirement:
 - queued receipts / paid notices must not send after an ignore reopens the invoice
 - queued underpay/partial warnings that no longer apply after a restore should be skippable
-- queued payment-triggered deliveries affected by reattribution must not send if they would now be untruthful; the broader later-payment owner-validation hold is deferred to MS15
+- queued payment-triggered deliveries affected by reattribution must not send if they would now be untruthful; the broader later-payment owner-validation hold is deferred to MS16
 
 ## Testing
 Automated coverage should include:
@@ -272,7 +272,7 @@ Browser QA should include:
 - ignored rows do not appear in public/print payment history
 - reattributed-out rows remain visible in owner history on the source invoice but do not count there
 - reattributed rows appear in public/print payment history and count only on the destination invoice, without exposing source-invoice provenance or related-invoice links
-- payment-triggered mail made untruthful by reattribution is skipped or otherwise suppressed, without relying on the deferred MS15 later-payment hold
+- payment-triggered mail made untruthful by reattribution is skipped or otherwise suppressed, without relying on the deferred MS16 later-payment hold
 - stale-address wrong-invoice cases do not trigger unsupported-wallet UI by themselves
 - manual adjustment rows never show correction controls
 - force delete is blocked with resolution guidance while unresolved bookkeeping blockers remain, including active reattributions, and the delete flow does not auto-convert anything

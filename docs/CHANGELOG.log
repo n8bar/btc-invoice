@@ -632,3 +632,6 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-26 | PLAN now inserts MS15 for CryptoZing.app SEO bootstrap
 `docs/PLAN.md` now makes `MS15 - CryptoZing.app SEO Bootstrap` the active milestone so early discovery/indexing work for the placeholder/landing page can begin before go-live, and renumbers the downstream RC milestones from `16` through `19`.
+
+2026-03-26 | Renumbered milestone references now point mail follow-up work at MS16
+`docs/specs/PAYMENT_CORRECTIONS.md`, `docs/specs/NOTIFICATIONS.md`, and `docs/strategies/MS14_PHASE1_BASELINE_RESEED.md` now update their live milestone references so later-payment validation, delivery-log label polish, and deferred outbound-mail cleanup point at `MS16` after the insertion of the new SEO bootstrap milestone at `MS15`.
