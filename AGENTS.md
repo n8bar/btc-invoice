@@ -33,6 +33,7 @@
 - If asked to merge a PR while there are uncommitted changes, unpushed commits, or any other local state that makes the tree non-clean or potentially misleading, pause and get explicit confirmation before merging.
 - Before any push/PR, keep all docs in sync: update specs first when scope shifts, then code, and ensure everything under `docs/` (plus README links) reflects the same state in the same commit.
 - Whenever `docs/**` or AGENTS.md changes, commit/push those updates right away. Exception: single-item checklist checkoffs in the same active workstream do not need to be pushed right away and may be committed together later.
+- If the user has uncommitted doc edits in the same active workstream, preserve them and include them in the next related commit by default unless the user says otherwise.
 - Apply the UX guardrails in [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md) on every UX touch: Nielsen/WCAG as baseline; inline guidance, preserved input, no layout shift, focus/error handling, mobile/accessibility.
 - GitHub `main` is canonical and protected. New work branches follow `codex/<task>`, and existing PRs must be updated via their original source branch rather than alternate branches.
 - PRs are gated by GitHub Actions `PR Tests`; keep branches current with `origin/main` before requesting review.

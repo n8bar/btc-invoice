@@ -611,3 +611,21 @@ The owner invoice delivery log in `resources/views/invoices/show.blade.php` now 
 
 2026-03-25 | MS14 Phase 5 docs now point at the Browser QA findings follow-up
 `docs/PLAN.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, `docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now reflect that Browser QA is complete, Phase 5 remains active, and the next follow-up PR work is the findings/fix pass rather than more BQA prep.
+
+2026-03-25 | MS14 Phase 5 follow-up fixes now ship on the findings branch
+`resources/views/invoices/show.blade.php`, `app/Http/Controllers/InvoicePaymentCorrectionController.php`, `app/Http/Controllers/InvoicePaymentAdjustmentController.php`, `routes/web.php`, and `tests/Feature/InvoicePaymentCorrectionTest.php` now keep ignore/reattribution validation anchored to the same payment row with focused inline errors, add owner-facing manual adjustment reversal, and make `invoice_payments.sats_received` signed so equal-and-opposite adjustment rows can be stored. `docs/specs/PAYMENT_CORRECTIONS.md`, `docs/PLAN.md`, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now point the remaining Phase 5 work at the targeted Browser QA rerun.
+
+2026-03-26 | MS14 findings now include reattribution undo and AGENTS preserves related user doc edits
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now records that reattributed payments still lack a clear inline undo path back to the source invoice, and `AGENTS.md` now says uncommitted user doc edits in the same active workstream should be preserved and carried into the next related commit by default.
+
+2026-03-26 | MS14 findings strategy now gives reattribution undo its own fix block
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now inserts a dedicated `2.4` fix sequence for adding a clear reattribution undo path back to the source invoice and shifts the follow-up verification block to `2.5`, including a targeted Browser QA rerun step for the undo flow.
+
+2026-03-26 | Payment correction spec now requires explicit reattribution undo before ignore
+`docs/specs/PAYMENT_CORRECTIONS.md` now requires an explicit undo path that returns active accounting credit to the immutable source invoice, forbids `Ignore` while a payment is still actively reattributed, and defines the owner UI, routing, logging, testing, and Browser QA expectations for that undo-first model. `docs/PRODUCT_SPEC.md` now carries the same top-level correction invariant, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now records the matching Browser QA finding and folds the ignore-blocking work into the existing `2.4` reattribution-undo fix sequence.
+
+2026-03-26 | Phase 5 findings branch now ships explicit reattribution undo and blocks ignore during active reattribution
+`app/Http/Controllers/InvoicePaymentCorrectionController.php`, `routes/web.php`, and `resources/views/invoices/show.blade.php` now add an explicit owner undo path for active reattributions, route destination-side undo submissions through the canonical source invoice/payment pair, remove the fake return-to-source picker path, and hide/block `Ignore` while a payment is still actively reattributed. `tests/Feature/InvoicePaymentCorrectionTest.php` now covers source/destination undo behavior and the ignore-blocking rule, and `docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now checks off the shipped `2.4` implementation items while leaving the human rerun open.
+
+2026-03-26 | MS14 is complete after the targeted Phase 5 follow-up rerun
+`docs/strategies/MS14_PHASE5_BQA_FINDINGS_AND_FIXES.md` now marks the last two targeted Browser QA reruns passed and closes the follow-up strategy, `docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md` now marks Phase 5 and MS14 complete, and `docs/PLAN.md` now moves MS14 into the completed milestones list and leaves the plan in a between-milestones state pending insertion of the next milestone from `main`.
