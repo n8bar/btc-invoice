@@ -725,3 +725,21 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 phase numbering now puts the active closeout work second and the conditional content-tuning work third
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now orders Phase 2 as Verification + Monitoring and Phase 3 as Metadata + Search-Signal Hygiene, `README.md` now points at [`docs/strategies/15.2_VERIFICATION_MONITORING.md`](strategies/15.2_VERIFICATION_MONITORING.md) and [`docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md`](strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md), and the strategy filenames/headings now match that reordered sequence so MS15 no longer looks like it is skipping a numbered phase.
+
+2026-03-27 | MS15 Phase 2 kickoff docs now match the reordered sequence
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` and `docs/PLAN.md` now point the current work at the reordered Phase 2 verification/monitoring sequence, and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now labels its final verification section as Phase 2 instead of the stale old numbering.
+
+2026-03-27 | MS15 Phase 2 drops the redundant ownership-reconfirmation section
+`docs/strategies/15.2_VERIFICATION_MONITORING.md` no longer asks for Search Console or Bing ownership reconfirmation after those were already completed in Phase 1; the phase now keeps only real verification, monitoring-baseline, and closeout work.
+
+2026-03-27 | MS15 is now complete
+`docs/strategies/15.2_VERIFICATION_MONITORING.md` now closes Phase 2 with live-vs-repo verification evidence, a concrete monitoring baseline, and a short post-milestone watch list; `docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` is now explicitly marked not triggered; `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now rolls the milestone up as complete; and `docs/PLAN.md` now advances the active milestone to MS16.
+
+2026-03-27 | MS15 no longer keeps a standalone strategy doc for the untriggered Phase 3
+`docs/strategies/15.3_METADATA_SEARCH_SIGNAL_HYGIENE.md` has been deleted, `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now records that Phase 3 was not triggered and therefore did not keep its own strategy doc, and `README.md` no longer points at a never-used MS15 Phase 3 strategy file.
+
+2026-03-27 | MS15 milestone exit criteria are now explicitly checked off
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now marks each exit criterion as satisfied instead of leaving the milestone closeout only implied by the phase rollup and completion notes.
+
+2026-03-27 | MS15 phase rollup now makes the conditional Phase 3 scope explicit in-line
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now adds a short parenthetical on the Phase 3 rollup line to make it clear that the metadata/search-signal phase only would have applied if the existing placeholder content had been deemed too thin.

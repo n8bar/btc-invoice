@@ -10,17 +10,16 @@ Use supporting specs under `docs/specs/` for detailed local requirements.
 Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 
 ## Current
-- Active milestone: **MS15 - CryptoZing.app SEO Bootstrap**
+- Active milestone: **MS16 - Mailer & Alerts Polish + Audit**
 - Status: `active`
-- Next action: review the MS15 milestone doc, then continue MS15 closeout while Phase 2 remains conditional on later search-signal evidence.
-- Primary next doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
-- Supporting docs: [`site/index.html`](../site/index.html), [`site/sitemap.xml`](../site/sitemap.xml), [`site/robots.txt`](../site/robots.txt), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
-- Most recently completed milestone doc: [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md)
+- Next action: review the MS16 notifications spec and continue mailer/alerts polish work now that the SEO bootstrap baseline is complete.
+- Primary next doc: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md)
+- Supporting docs: [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
+- Most recently completed milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and monitored early before go-live. | [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md) |
 | [ ] | 16 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
 | [ ] | 17 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 18 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
@@ -43,3 +42,4 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 | [x] | 12 | Payment & Address Accuracy | Correct derivation mismatches and lock confirmation-aware payment accuracy. | [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md) |
 | [x] | 13 | UX Overhaul | Deliver dashboard/theme/help/onboarding/settings IA and close Task 13 Browser QA. | [`docs/milestones/13_UX_OVERHAUL.md`](milestones/13_UX_OVERHAUL.md) |
 | [x] | 14 | On-Chain Payment Attribution Hardening | Make attribution key-aware, detect unsupported wallet reuse, reinforce dedicated-account usage, and provide auditable correction tooling. | [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md) |
+| [x] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and monitored early before go-live. | [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md) |
