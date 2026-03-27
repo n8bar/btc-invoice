@@ -24,7 +24,7 @@
       1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it may send a low-information client acknowledgment.
       2. This acknowledgment should confirm only what the system can safely say, such as the detected BTC amount, without claiming that the payment has been fully applied to a specific invoice state.
       3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
-      4. If the payment state is too ambiguous to acknowledge safely, the system should hold the client-facing acknowledgment and notify the invoice issuer for review instead.
+      4. If the payment state is ambiguous, the acknowledgment should stay limited to what the system can safely say and should avoid any certainty about how the payment applies.
    2. **Receipt Follow-Up**
       1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
       2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.

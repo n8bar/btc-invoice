@@ -788,3 +788,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications flow 3.2 no longer carries a dead missing-client-email fallback
 `docs/specs/NOTIFICATIONS.md` no longer says receipt follow-up should fall back to manual sharing when the client email is missing, because client email is now required both by the client form validation and by the non-null schema constraint.
+
+2026-03-27 | Notifications flow 3.2 now resolves ambiguity by narrowing the acknowledgment instead of suppressing it
+`docs/specs/NOTIFICATIONS.md` no longer says an ambiguous detected payment should hold the client-facing acknowledgment; `3.2.1.4` now says the acknowledgment should stay limited to what the system can safely say and avoid certainty about how the payment applies.
