@@ -767,3 +767,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications Goal 3 now covers only the non-receipt alert family
 `docs/specs/NOTIFICATIONS.md` no longer uses Goal 3 as a generic overlapping “owners and clients get key alerts” statement; it now explicitly covers truthful alert emails for past-due, overpayment, underpayment, and partial-payment events so Goal 2 can keep the payment acknowledgment/receipt lane.
+
+2026-03-27 | Notifications Goals 3 and 4 are now one clean non-receipt alert goal
+`docs/specs/NOTIFICATIONS.md` now folds the useful trigger language from the old Goal 4 into Goal 3, deletes the redundant standalone Goal 4, and renumbers the remaining ambiguity/truthfulness goal so the goals section no longer repeats the same alert scope in two adjacent items.
