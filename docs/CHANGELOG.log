@@ -728,3 +728,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 Phase 2 kickoff docs now match the reordered sequence
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` and `docs/PLAN.md` now point the current work at the reordered Phase 2 verification/monitoring sequence, and `docs/strategies/15.2_VERIFICATION_MONITORING.md` now labels its final verification section as Phase 2 instead of the stale old numbering.
+
+2026-03-27 | MS15 Phase 2 drops the redundant ownership-reconfirmation section
+`docs/strategies/15.2_VERIFICATION_MONITORING.md` no longer asks for Search Console or Bing ownership reconfirmation after those were already completed in Phase 1; the phase now keeps only real verification, monitoring-baseline, and closeout work.
