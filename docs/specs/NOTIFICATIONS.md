@@ -13,7 +13,6 @@ This doc is canonical for outbound invoice communication:
 - Ensure both owners and clients receive email alerts for key invoice events without relying on manual follow-up.
 - Surface automated emails when an invoice is paid, becomes past due, or when on-chain payments deviate from the invoice total by more than the defined tolerance.
 - Prevent payment-triggered mail from claiming certainty after a later on-chain payment on an already-funded invoice when that payment may be semantically ambiguous.
-- Preserve existing delivery infrastructure (queued mail, Mailgun aliasing, `invoice_deliveries` log) so every outbound email is auditable.
 
 ## Base Communication Flows
 1. **Send Invoice (manual owner action)**

@@ -743,3 +743,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 phase rollup now makes the conditional Phase 3 scope explicit in-line
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now adds a short parenthetical on the Phase 3 rollup line to make it clear that the metadata/search-signal phase only would have applied if the existing placeholder content had been deemed too thin.
+
+2026-03-27 | Notifications spec no longer locks MS16 to the current delivery plumbing
+`docs/specs/NOTIFICATIONS.md` no longer treats preserving the existing queued/SMTP/Mailgun-aliasing shape as a rigid goal, leaving MS16 free to evaluate safer delivery safeguards and transport choices without fighting the canonical notifications scope.
