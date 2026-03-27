@@ -20,9 +20,9 @@ SEO-oriented content work has already had a couple passes; MS15 should refine on
 
 ## Phase Rollup
 1. [ ] Phase 1 - Discovery + Indexing Baseline
-   Verify crawlability, sitemap/robots correctness, domain ownership, and initial search-engine submission for `cryptozing.app`.
+   Verify crawlability, sitemap/robots correctness, domain ownership, initial search-engine submission, and whether the current one-page/public Helpful Notes mix is too thin.
 2. [ ] Phase 2 - Metadata + Search-Signal Hygiene
-   Tighten titles, descriptions, headings, canonical/schema signals, and only the minimum on-page copy needed to support the existing landing page.
+   Tighten titles, descriptions, headings, canonical/schema signals, and, if Phase 1 proves it is needed, expand derivative public Helpful Notes content enough to strengthen SEO without turning the placeholder into a docs site.
 3. [ ] Phase 3 - Continuity + Launch Handoff
    Define what must stay stable when the live app landing page replaces the placeholder at the same URL.
 4. [ ] Phase 4 - Verification + Monitoring

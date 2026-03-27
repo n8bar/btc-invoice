@@ -665,3 +665,6 @@ Renamed the four MS15 phase strategy docs from the longer `MS15_PHASE*` form to 
 
 2026-03-26 | Docs filenames now use numeric milestone and phase prefixes consistently
 Renamed the remaining milestone, strategy, and QA docs away from the old `MS*`, `PHASE*`, and `TASK*` filename patterns into numeric forms such as `13_...`, `14_...`, `15_...`, `13.11_...`, `14.5_...`, and `14.3_...`. Updated the live repo references plus historical changelog paths to match the new filenames.
+
+2026-03-26 | MS15 now treats derivative public Helpful Notes content as a conditional Phase 1/2 lever
+`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`, `docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`, and `docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md` now treat the current one-page placeholder plus public Helpful Notes mix as a Phase 1 decision point: if Phase 1 proves it is too thin, Phase 2 may expand derivative public Helpful Notes content under `site/` enough to strengthen SEO while the site still reads as a product placeholder rather than a docs encyclopedia.
