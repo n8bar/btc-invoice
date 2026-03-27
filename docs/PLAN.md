@@ -12,15 +12,15 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS15 - CryptoZing.app SEO Bootstrap**
 - Status: `active`
-- Next action: draft the MS15 milestone doc and scope the placeholder/landing-page SEO bootstrap work.
-- Primary next doc: [`docs/PLAN.md`](PLAN.md)
+- Next action: review the new MS15 milestone doc, then draft the Phase 1 strategy.
+- Primary next doc: [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 - Supporting docs: [`site/index.html`](../site/index.html), [`site/sitemap.xml`](../site/sitemap.xml), [`site/robots.txt`](../site/robots.txt), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md)
 - Most recently completed milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
 |---|---|---|---|---|
-| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and positioned for continuity before the live app landing page replaces it at the same URL. | [`docs/PLAN.md`](PLAN.md) |
+| [ ] | 15 | CryptoZing.app SEO Bootstrap | Get the placeholder/landing page discovered, indexed, and positioned for continuity before the live app landing page replaces it at the same URL. | [`docs/milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/MS15_CRYPTOZING_APP_SEO_BOOTSTRAP.md) |
 | [ ] | 16 | Mailer & Alerts Polish + Audit | Tighten alert behavior, cooldowns, editable templates, and queue/delivery safeguards without changing the core send/receipt model. | [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) |
 | [ ] | 17 | Docs, DX & Support UX | Keep contributor docs current, document notification coverage, complete and harden the minimum viable support UI and access flow for RC, add auth/password policy hardening, and rationalize the test suite before RC closeout. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 18 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
