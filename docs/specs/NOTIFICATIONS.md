@@ -52,13 +52,8 @@
 
 4. **Significant Underpayment Alert (Client)**
    1. Triggered when the invoice still carries a significant remaining balance after payment activity (15% threshold for RC).
-   2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle.
+   2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
    3. The invoice issuer should also receive a brief owner-side notice that the underpayment outreach went out.
-
-5. **Proactive Partial-Payment Warning (Client + Owner FYI)**
-   1. Fired after the watcher detects multiple partial payments on the same invoice to encourage a single payment and reduce miner fees.
-   2. The client warning should encourage sending one payment for the outstanding balance, and the invoice issuer should receive an FYI that the warning went out.
-   3. Logged via `invoice_deliveries` (e.g., `partial_warning_client`, `partial_warning_owner`) and respects aliasing in non-prod.
 
 ## 5. Shared Implementation Requirements
 1. Use the existing queued mail + `invoice_deliveries` pattern for all outbound communication so aliasing and delivery logging stay consistent.
