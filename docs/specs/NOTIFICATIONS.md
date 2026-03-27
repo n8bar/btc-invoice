@@ -55,7 +55,7 @@
 
 ## 5. ____
 1. Outbound invoice communication should use a shared queued delivery path and shared delivery history so send outcomes remain auditable.
-2. Delivery-log rows should capture invoice, sender/issuer context, recipient email(s), delivery type, status, and error/timestamp metadata.
+2. The shared delivery history should preserve enough context to identify the invoice, sender/issuer context, recipient(s), communication class, outcome, and timing/error details for each outbound attempt.
 3. The owner invoice detail page is the current primary operator view for this delivery history.
 4. `APP_PUBLIC_URL` defines the host used in public-share links embedded in emails. Production must use `https://cryptozing.app`.
 5. Temporary catch-all aliasing during pre-production uses `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`. Disable aliasing before RC or real-customer traffic.
