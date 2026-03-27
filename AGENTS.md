@@ -8,7 +8,9 @@
   - `docs/BACKLOG.md` for post-MVP and deferred work only
 - Keep the docs structure roles straight:
   - `docs/PLAN.md` lays out milestone-level progress only; each milestone should check off once there
-  - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, primary linked specs/strategies, phase checkoffs, and milestone exit criteria
+  - if `docs/PLAN.md` has a `Next action`, keep it milestone-level too; do not pull phase-level or strategy-detail steps into it
+  - `docs/milestones/**` expand a milestone into phase-level execution docs: objective/status summary, phase rollup, current focus, phase-level next actions, phase checkoffs, and milestone exit criteria
+  - if a milestone doc has a current focus or next action, keep it phase-level; it may say to review the current phase strategy, but do not pull strategy-level checklist detail into the milestone doc
   - `docs/specs/**` for detailed feature and domain requirements
   - `docs/strategies/**` expand one milestone phase into the ordered implementation checklist, sequencing, and verification steps; these are the “do this in this order” docs for active execution
   - `docs/ops/**` for rollout, contributor, and deployment runbooks
@@ -24,6 +26,8 @@
 - Specs come first: align on the requirement in the spec docs, implement, then update the docs to reflect what shipped; only reverse-engineer specs from existing code when we’ve explicitly agreed to do so.
 - Docs are primarily internal architecture/engineering notes for us and future maintainers, not end-user documentation.
 - Strategy docs (for example `docs/strategies/**`) own the ordered execution sequence for an active workstream: phased checklists, implementation order, and verification steps. They are authoritative for “what do we do next?” and resumption context, but they are not canonical for product scope or behavior; canonical requirements still live in `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and the relevant docs under `docs/specs/**`. Strategy docs may or may not be retired, archived, or folded into milestone/history docs after completion.
+- Even when a workstream has one primary critical path, future strategy docs should be written with subagent use in mind: keep the main ordered sequence explicit, but call out any known safe parallel sidecars or path-scoped tasks so multi-agent execution does not have to improvise around the strategy.
+- When strategy docs assign work by owner, use `Guided User` for tasks that still require user-side account access or clicks but where the user should be coached through unfamiliar tooling; reserve plain `User` for work the user can drive directly without specialized coaching.
 - Keep checklist depth separated: `docs/PLAN.md` owns milestone checkoffs, milestone docs own phase checkoffs, and strategy docs own the ordered checklist for one phase. Higher-level docs should roll up lower-level completion with a single checkoff instead of duplicating lower-level checklist items.
 - For any active workstream, keep one obvious checklist owner for sequencing. If a milestone doc and a strategy doc both exist, the milestone doc should summarize status/objectives while the strategy doc owns the detailed ordered checklist unless the docs explicitly say otherwise.
 - Any doc with numbered tasks/milestones/todos is assumed to be done in order unless that doc explicitly says otherwise—flag any intentional deviations.
@@ -74,4 +78,4 @@
 - When you add or rename spec docs, update the README’s documentation section in the same commit so GitHub viewers always see the latest links.
 
 ## Roles
-- **Harvey (Devil’s Advocate Progress Reporter):** virtual stakeholder who is skeptical but honest; invoked when we need a harsh readout. Focuses only on risk/gaps of “done” items, not future scope; calls out missing verification, operational proof, and doc drift. Keep tone blunt but actionable.
+- **Harvey (Devil’s Advocate Progress Reporter):** virtual stakeholder who is skeptical but honest; invoked when we need a harsh readout. Focuses only on risk/gaps of “done” items, not future scope; calls out missing verification, operational proof, scope creep, and doc drift. Keep tone blunt but actionable.

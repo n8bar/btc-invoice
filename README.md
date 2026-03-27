@@ -2,6 +2,8 @@
 
 This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md); current milestone status lives in [`docs/PLAN.md`](docs/PLAN.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
 
+Website: <https://cryptozing.app/>
+
 ## Highlights
 - **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
 - **Wallet integration:** Each user configures a BIP84 xpub under `/wallet/settings`; invoices derive unique Bech32 addresses and the watcher (`wallet:watch-payments`) logs incoming payments.
@@ -62,8 +64,9 @@ Execute the full suite via Sail:
 - Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)
 - Contributor walkthrough: [`docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md)
 - RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
-- MS13 UX Overhaul milestone doc: [`docs/milestones/MS13_UX_OVERHAUL.md`](docs/milestones/MS13_UX_OVERHAUL.md)
-- MS14 Payment Attribution Hardening milestone doc: [`docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md`](docs/milestones/MS14_PAYMENT_ATTRIBUTION_HARDENING.md)
+- MS13 UX Overhaul milestone doc: [`docs/milestones/13_UX_OVERHAUL.md`](docs/milestones/13_UX_OVERHAUL.md)
+- MS14 Payment Attribution Hardening milestone doc: [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md)
+- MS15 CryptoZing.app SEO Bootstrap milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 - Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
 - Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
 - Support access spec: [`docs/specs/SUPPORT_ACCESS.md`](docs/specs/SUPPORT_ACCESS.md)
@@ -73,9 +76,11 @@ Execute the full suite via Sail:
 - Payment correction / ignore-restore spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
 - Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
-- MS14 Phase 5 strategy: [`docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md`](docs/strategies/MS14_PHASE5_CORRECTION_TOOLING_SAFEGUARDS.md)
-- Task 11 implementation strategy: [`docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md`](docs/strategies/MS13_TASK11_GETTING_STARTED_STRATEGY.md)
-- Task 11 UX Engineering pass: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS.md)
-- Task 11 UX Engineering pass2: [`docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md`](docs/strategies/MS13_TASK11_UX_ENGINEERING_PASS2.md)
+- MS15 Phase 1 strategy: [`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`](docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md)
+- MS15 Phase 2 strategy: [`docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md`](docs/strategies/15.2_METADATA_SEARCH_SIGNAL_HYGIENE.md)
+- MS15 Phase 3 strategy: [`docs/strategies/15.3_VERIFICATION_MONITORING.md`](docs/strategies/15.3_VERIFICATION_MONITORING.md)
+- Task 11 implementation strategy: [`docs/strategies/13.11_GETTING_STARTED_STRATEGY.md`](docs/strategies/13.11_GETTING_STARTED_STRATEGY.md)
+- Task 11 UX Engineering pass: [`docs/strategies/13.11_UX_ENGINEERING_PASS.md`](docs/strategies/13.11_UX_ENGINEERING_PASS.md)
+- Task 11 UX Engineering pass2: [`docs/strategies/13.11_UX_ENGINEERING_PASS2.md`](docs/strategies/13.11_UX_ENGINEERING_PASS2.md)
 
 For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
