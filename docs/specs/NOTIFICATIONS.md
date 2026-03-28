@@ -25,7 +25,10 @@
       2. This acknowledgment should confirm only what the system can safely say, such as the detected BTC amount, without claiming that the payment has been fully applied to a specific invoice state.
       3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
       4. If the payment state is ambiguous, the acknowledgment should stay limited to what the system can safely say and should avoid any certainty about how the payment applies.
-   2. **Receipt Follow-Up**
+   2. **Later Payment Ambiguity**
+      1. After an invoice has already received detected on-chain payment activity, later payments to that invoice’s address may still be semantically ambiguous even when the wallet configuration remains supported.
+      2. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
+   3. **Receipt Follow-Up**
       1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
       2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
 
@@ -53,7 +56,7 @@
    1. Triggered when the invoice still carries a significant remaining balance after payment activity (15% threshold for RC).
    2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
 
-## 5. ____
+## 5. Outbound Mail and History
 1. Outbound invoice communication should use a shared queued delivery path and shared delivery history so send outcomes remain auditable.
 2. The shared delivery history should preserve enough context to identify the invoice, sender/issuer context, recipient(s), communication class, outcome, and timing/error details for each outbound attempt.
 3. Public-share links embedded in outbound emails must use the explicitly configured public host for the intended recipient-facing environment.
@@ -62,9 +65,7 @@
 5. Outbound mail capability is a required part of a valid recipient-facing deployment.
    1. Development and test environments may intentionally run without outbound mail, but production-ready deployments must have it configured.
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
-7. After an invoice has already received detected on-chain payment activity, later payments to that invoice’s address may still be semantically ambiguous even when the wallet configuration remains supported.
-   1. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
-8. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
+7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:

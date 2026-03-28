@@ -860,3 +860,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec item 5.8 now states the delivery-label invariant instead of milestone work
 `docs/specs/NOTIFICATIONS.md` no longer says `MS16 delivery-log polish` in Section 5; it now simply requires the delivery history to use concise, human-friendly labels for communication classes and outcomes.
+
+2026-03-27 | Notifications spec now keeps outbound-mail/history rules together and moves payment ambiguity into the payment flow
+`docs/specs/NOTIFICATIONS.md` now renames Section 5 to `Outbound Mail and History`, moves the later-payment ambiguity note into Section 3.2 where payment acknowledgments and receipts are defined, and leaves Section 5 focused on outbound-mail and delivery-history invariants.
