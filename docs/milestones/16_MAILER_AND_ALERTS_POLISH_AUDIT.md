@@ -14,15 +14,15 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - Finish the remaining mailer/alerts polish and audit work once sending is trustworthy again.
 
 ## Current Focus
-- Active phase: **Phase 1 - Delivery Baseline Audit**
-- Current objective: lock the trustworthy outbound-mail baseline by inventorying the live delivery surface, identifying the runaway/spam-prone failure mode, and defining the stop-the-bleed safeguards that later provider and notification work depends on.
-- Primary next doc: [`docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`](../strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
+- Active phase: **Phase 2 - Safeguards + Provider Recovery**
+- Current objective: implement the shared outbound-mail safeguards the Phase 1 audit identified, recover provider trust, and ship the Mailgun HTTP API path on top of that safer delivery baseline.
+- Primary next doc: [`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`](../strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md)
 - Sequencing note: the phase breakout was re-cut from the actual dependency chain; later phases are sequential by default unless a phase strategy explicitly marks safe sidecars.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current delivery/alert code, and Mailgun account state.
 
 ## Phase Rollup
-1. [ ] Phase 1 - [Delivery Baseline Audit](../strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
-   Inventory the live outbound surface, identify the runaway/spam-prone risk concretely, and lock the stop-the-bleed inputs that the rest of MS16 depends on.
+1. [x] Phase 1 - [Delivery Baseline Audit](../strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
+   Completed. The live outbound inventory, current guardrail matrix, and the concrete Phase 2 / Phase 3 inputs are now documented, including the current lack of a shared send-intent gate, the unbounded manual-send path, the live partial-warning drift, and the missing skip path for queued overpayment alerts.
 2. [ ] Phase 2 - [Safeguards + Provider Recovery](../strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md)
    Implement the shared outbound-mail safeguards, determine actual provider/sendability state, and move the app onto Mailgun HTTP API unless a concrete blocking constraint prevents it.
 3. [ ] Phase 3 - [Payment Communication Truthfulness](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)

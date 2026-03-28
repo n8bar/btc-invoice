@@ -914,3 +914,6 @@ The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDI
 
 2026-03-27 | MS16 Phase 2 now spells out the Mailgun HTTP API implementation checklist
 `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the Mailgun HTTP API work at the level of generic prerequisites; `16.2.3.2` is now an executable nested checklist covering package install, `config/services.php`, `config/mail.php`, the `MAIL_MAILER=mailgun` default path, and the corresponding ops/env documentation updates.
+
+2026-03-27 | MS16 Phase 1 delivery baseline audit completed and Phase 2 is now active
+`docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md` now records the completed outbound delivery inventory, current guardrail matrix, concrete spam-risk findings, and the Phase 2 / Phase 3 inputs drawn from the live code; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, and `docs/PLAN.md` now advance MS16 to Phase 2 as the active next execution step.
