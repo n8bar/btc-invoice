@@ -941,3 +941,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-28 | MS16 Phase 2 allows a temporary alias-off proof window on user-controlled dev addresses
 `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now records that, as of `2026-03-28`, aliasing may be turned off temporarily for controlled Phase 2 verification sends because the dev-database recipient addresses are user-controlled; the exception is explicitly limited to this phase’s proof sends and does not change the later RC alias-off rollout work.
+
+2026-03-28 | MS16 Phase 2 restores sequential ordering around the aliasing decision
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the future-only aliasing flip/rollback task up in the earlier aliasing decision block; that action now lives with the later verification-prep step where it actually becomes actionable, so the strategy stays sequential outside explicit parallel items.
