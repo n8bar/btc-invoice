@@ -908,3 +908,6 @@ Added `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_S
 
 2026-03-27 | MS16 strategy docs now fold constraints into tasks and inline sidecars near the work they depend on
 `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` no longer leave constraint-only notes as separate checklist items or bury safe parallel sidecars in end sections; those requirements and sidecars now live inline with the owning steps so the ordered path stays obvious while parallel work remains visible at the moment it becomes safe.
+
+2026-03-27 | MS16 strategy sidecars now use numbered nested checkboxes under their owning tasks
+The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` now appears as numbered nested checkbox items directly under the parent task they depend on, making them easier to reference, assign, and check off without reviving separate sidecar sections.
