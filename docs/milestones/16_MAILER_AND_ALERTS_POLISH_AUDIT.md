@@ -10,7 +10,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - Stop the current runaway/spam-prone outbound-mail behavior before expanding the broader notifications surface.
 - Add app-side safety controls such as rate limiting, dedupe/cooldown hardening, and any needed circuit-breaker behavior so outbound email stays provider-safe.
 - Determine the current Mailgun account/sendability state and define the recovery path if sending has been blocked or degraded.
-- Decide whether MS16 should keep SMTP or move outbound mail onto the Mailgun HTTP API.
+- Adopt Mailgun HTTP API as the intended outbound transport for MS16 unless a concrete blocking constraint forces a temporary fallback.
 - Finish the remaining mailer/alerts polish and audit work once sending is trustworthy again.
 
 ## Current Focus
@@ -24,7 +24,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 1. [ ] Phase 1 - [Delivery Baseline Audit](../strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
    Inventory the live outbound surface, identify the runaway/spam-prone risk concretely, and lock the stop-the-bleed inputs that the rest of MS16 depends on.
 2. [ ] Phase 2 - [Safeguards + Provider Recovery](../strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md)
-   Implement the shared outbound-mail safeguards, determine actual provider/sendability state, and make the transport decision from evidence instead of inertia.
+   Implement the shared outbound-mail safeguards, determine actual provider/sendability state, and move the app onto Mailgun HTTP API unless a concrete blocking constraint prevents it.
 3. [ ] Phase 3 - [Payment Communication Truthfulness](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
    Resolve acknowledgment-versus-receipt behavior, later-payment ambiguity handling, issuer-copy behavior, and alert-surface rationalization on top of the trustworthy delivery path.
 4. [ ] Phase 4 - [Template Polish + RC Mail Readiness](../strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md)
@@ -34,5 +34,5 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - [ ] The runaway/spam-prone outbound-mail bug is understood and fixed.
 - [ ] App-side delivery safeguards are in place and documented.
 - [ ] Mailgun sendability is restored or an explicit alternate path is chosen.
-- [ ] The transport decision for MS16 (`SMTP` vs `Mailgun HTTP API`) is documented and implemented if needed.
+- [ ] Mailgun HTTP API is documented as the chosen MS16 transport and implemented unless a concrete blocking constraint forces a temporary fallback.
 - [ ] The remaining notifications/alerts/template polish ships on top of a trustworthy delivery path.
