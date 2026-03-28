@@ -887,3 +887,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 current objective now owns the doc-restructure task directly
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` no longer carries a separate temporary restructure section; the work now lives where it belongs, in `Current objective`, so the milestone doc keeps one obvious top-level statement of what we are doing now.
+
+2026-03-27 | MS16 current objective no longer pretends the notifications spec cleanup is still in progress
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now tightens `Current objective` to the actual next work: break out the phase docs and remove the milestone doc's temporary open-question / brain-dump sprawl before broader MS16 implementation proceeds.
