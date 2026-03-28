@@ -5,9 +5,11 @@ Use this when preparing the Release Candidate deployment; keep APP_PUBLIC_URL an
 ## Pre-flight
 - Confirm environment: APP_PUBLIC_URL set to intended host (e.g., https://cryptozing.app), WALLET_NETWORK matches network in use.
 - Verify secrets: MAIL_* creds valid for production domain; queue/DB/cache endpoints reachable; env files up to date.
+- Current Mailgun sending-domain assumption is US-region `mailer.cryptozing.app`, so the matching endpoint is `MAILGUN_ENDPOINT=api.mailgun.net` unless the provider region changes later.
 
 ## Mail aliasing flip
 - Set MAIL_ALIAS_ENABLED=false (and clear MAIL_ALIAS_DOMAIN if present).
+- MS16 Phase 2 already proved the app can deliver through Mailgun HTTP API with a temporary alias-off send to controlled dev inboxes on 2026-03-28; treat that as transport proof only, not as the RC sign-off for the target environment.
 - Send a test invoice email and a paid receipt to real recipients; verify links, headers, and rendering.
 - Confirm DKIM/SPF/DMARC pass on the production domain.
 

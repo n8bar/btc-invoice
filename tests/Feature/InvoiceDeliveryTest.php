@@ -548,10 +548,11 @@ class InvoiceDeliveryTest extends TestCase
             'status' => 'sent',
         ]);
 
-        Mail::assertQueued(InvoiceReadyMail::class, function (InvoiceReadyMail $mail) {
+        Mail::assertSent(InvoiceReadyMail::class, function (InvoiceReadyMail $mail) {
             return $mail->hasTo('client.example.com@cryptozing.app')
                 && $mail->hasCc('owner.gmail.com@cryptozing.app');
         });
+        Mail::assertNothingQueued();
     }
 
     public function test_delivery_job_does_not_send_again_when_delivery_is_already_claimed_for_sending(): void
