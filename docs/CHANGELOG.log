@@ -863,3 +863,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec now keeps outbound-mail/history rules together and moves payment ambiguity into the payment flow
 `docs/specs/NOTIFICATIONS.md` now renames Section 5 to `Outbound Mail and History`, moves the later-payment ambiguity note into Section 3.2 where payment acknowledgments and receipts are defined, and leaves Section 5 focused on outbound-mail and delivery-history invariants.
+
+2026-03-27 | Notifications spec now explicitly keeps later-payment ambiguity from suppressing safe acknowledgments
+`docs/specs/NOTIFICATIONS.md` now adds `3.2.2.3`, which says later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
