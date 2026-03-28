@@ -872,3 +872,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec no longer carries an empty deferred implementation section
 `docs/specs/NOTIFICATIONS.md` now deletes the former Section 6 deferral note entirely and renumbers the remaining copy, testing, open-questions, and future-enhancements sections.
+
+2026-03-27 | Notifications spec now keeps copy guidance as a single outbound-mail principle instead of a whole section
+`docs/specs/NOTIFICATIONS.md` now deletes the standalone `Copy Guidelines` section, folds the durable rule into Section 5 as `Outbound mail copy should stay concise and actionable`, and renumbers the testing/open-questions/future-enhancements sections.

@@ -67,19 +67,9 @@
    1. Development and test environments may intentionally run without outbound mail, but production-ready deployments must have it configured.
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
 7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
+8. Outbound mail copy should stay concise and actionable.
 
-## 6. Copy Guidelines
-1. Keep subjects/actionable text short (<=60 chars). Example subjects:
-   1. Manual send: `Invoice INV-1042 is ready`
-   2. Client receipt: `Receipt for Invoice INV-1042`
-   3. Owner paid: `Invoice INV-1042 paid`
-   4. Past due client: `Reminder: Invoice INV-1042 is past due`
-   5. Overpayment client: `Invoice INV-1042 was overpaid`
-   6. Underpayment client: `Invoice INV-1042 has a balance due`
-2. Client overpayment body must include: “Overpayments are treated as gratuities by default; please notify the sender if this was a mistake.”
-3. Underpayment emails must include outstanding USD/BTC amounts and the public link CTA.
-
-## 7. Testing
+## 6. Testing
 1. Feature tests covering:
    1. manual send flow queues work and writes delivery-log entries
    2. failure paths record delivery errors
@@ -88,9 +78,9 @@
    5. semantically ambiguous payment-triggered cases keep outbound communication truthful
 2. Optional Blade/mail snapshot tests can be used for the invoice-ready and receipt mailables.
 
-## 8. Open Questions
+## 7. Open Questions
 1. Retry strategy: keep one `invoice_deliveries` row per job fire vs. a single row with status updates. Current direction: one row per job fire for audit clarity.
 
-## 9. Future Enhancements
+## 8. Future Enhancements
 1. After base implementation, consider allowing owners to configure alert thresholds per profile (default 15%).
 2. Once we add Slack/webhook integrations, mirror these events there for ops teams.
