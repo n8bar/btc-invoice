@@ -854,3 +854,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Product spec header date now reflects the current synced doc set
 `docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.
+
+2026-03-27 | Notifications spec no longer treats the later-payment validation gate as a settled cross-cutting rule
+`docs/specs/NOTIFICATIONS.md` now stops after the later-payment ambiguity warning instead of hardcoding the owner-validation gate itself, and its testing section now expects only the durable truthfulness behavior for semantically ambiguous payment-triggered communication; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` preserves the real MS16 design question about whether such a gate is needed at all, how it coexists with safe low-information acknowledgments, which outbound classes it would cover, and whether manual sends/past-due reminders remain outside it.

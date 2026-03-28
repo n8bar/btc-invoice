@@ -29,6 +29,10 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 ## Open Scope Questions
 - During MS14 Browser QA we found evidence that some payment-triggered outgoing mail may need owner confirmation/validation first to catch ignored, reattributed, or otherwise semantically ambiguous payment states. MS16 should decide whether that remains a narrow later-payment safeguard or becomes a broader notification rule.
 - The later-payment owner-validation gate belongs to MS16 follow-up work, not to the earlier MS14 reattribution tooling itself. Keep that sequencing explicit when Phase 3 gets drafted so we do not back-assign the guardrail to the wrong milestone.
+- The spec no longer hardcodes a blanket later-payment validation gate. Phase 3 should decide whether later-payment owner validation is needed at all, and if so:
+  - whether it applies only to higher-certainty follow-up mail while still allowing the limited acknowledgment path
+  - which outbound classes it covers
+  - whether manual sends and past-due reminders stay outside that safeguard
 - If MS16 introduces an automatic low-information payment acknowledgment before any owner-reviewed receipt, keep the copy deliberately narrow and non-promissory. Current candidate wording:
   - `A Bitcoin payment of 0.00123456 BTC was detected.`
   - `No action is needed right now.`

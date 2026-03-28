@@ -64,10 +64,7 @@
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
 7. After an invoice has already received detected on-chain payment activity, later payments to that invoice’s address may still be semantically ambiguous even when the wallet configuration remains supported.
    1. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
-8. For second-or-later detected on-chain payments on the same invoice, payment-triggered outbound mail should eventually be held pending owner validation before send.
-9. This planned later-payment validation gate applies to `receipt`, `owner_paid_notice`, `client_partial_warning`, `owner_partial_warning`, and any overpayment or underpayment alert first raised by that later payment.
-10. Manual invoice sends and past-due reminders are outside this safeguard.
-11. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+8. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:
@@ -106,7 +103,7 @@
    2. failure paths record delivery errors
    3. `InvoicePaid` dispatch triggers owner notice plus client receipt exactly once
    4. automated alert classes respect cooldown and delivery-log rules
-   5. second-or-later payment-triggered deliveries on an already-funded invoice are held until owner validation
+   5. semantically ambiguous payment-triggered cases keep outbound communication truthful
 2. Optional Blade/mail snapshot tests can be used for the invoice-ready and receipt mailables.
 
 ## 9. Open Questions
