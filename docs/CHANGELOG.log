@@ -935,3 +935,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-28 | PRODUCT_SPEC is pulled back to summary-level mailer requirements
 `docs/PRODUCT_SPEC.md` no longer carries the implementation-shaped `intent-level` and `send-boundary` idempotency wording; it now stays at the higher-level requirement that outbound mail prevent duplicate sends and points to [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) for the detailed notifications-specific idempotency rules.
+
+2026-03-28 | MS16 Phase 2 adds queue-intent idempotency before live Mailgun verification
+`App\\Services\\InvoiceDeliveryService` now uses a stable delivery-intent key plus a shared lock so concurrent duplicate queue attempts cannot create multiple real outbound intents for the same invoice/type/recipient, duplicate locked-intent attempts are recorded as `skipped`, `tests/Feature/InvoiceDeliveryTest.php` now covers that locked-intent path, and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now checks off `16.2.2.5.1` while leaving the send-boundary half of the idempotency work open.

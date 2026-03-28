@@ -13,6 +13,7 @@ use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -347,6 +348,57 @@ class InvoiceDeliveryTest extends TestCase
 
         Queue::assertNothingPushed();
         $this->assertSame(2, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'send')->count());
+    }
+
+    public function test_manual_send_is_skipped_when_matching_delivery_intent_is_locked(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-LOCKED',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplelocked',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $deliveries = app(InvoiceDeliveryService::class);
+        $lock = Cache::lock('invoice-delivery-intent:' . $deliveries->intentKey($invoice, 'send', $client->email), 10);
+        $this->assertTrue($lock->get());
+
+        try {
+            $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+                'message' => 'Do not double queue this',
+                'cc_self' => false,
+            ]);
+        } finally {
+            $lock->release();
+        }
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'A matching delivery intent is already being processed.');
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+            'status' => 'skipped',
+            'recipient' => $client->email,
+            'error_message' => 'A matching delivery intent is already being processed.',
+        ]);
+
+        Queue::assertNothingPushed();
     }
 
     public function test_receipt_email_queued_when_invoice_paid(): void
