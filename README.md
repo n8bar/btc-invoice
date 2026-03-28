@@ -1,86 +1,214 @@
-# Bitcoin Invoice Generator
+# CryptoZing
 
-This repository contains the CryptoZing Bitcoin invoicing app: a Laravel 12 + Sail stack for generating BTC invoices, locking USD amounts, tracking partial payments, and delivering invoices/receipts over email. Quick start instructions live in [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md); current milestone status lives in [`docs/PLAN.md`](docs/PLAN.md), and global product rules live in [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
+**Invoice Bitcoin today - track payments on-chain.**
 
-Website: <https://cryptozing.app/>
+CryptoZing is a self-hosted Bitcoin invoicing app built for people who want clear USD-denominated invoices, straightforward Bitcoin payment flows, and reliable on-chain payment tracking.
 
-## Highlights
-- **BTC-native invoicing:** Create invoices with live BTC/USD conversions, BIP21 links, QR codes, print/public views, and strict ownership enforcement.
-- **Wallet integration:** Each user configures a BIP84 xpub under `/wallet/settings`; invoices derive unique Bech32 addresses and the watcher (`wallet:watch-payments`) logs incoming payments.
-- **Partial payment ledger:** Every transaction lands in `invoice_payments` with sats + USD snapshots, outstanding balance summaries, editable owner notes, and tip detection.
-- **Invoice delivery + receipts:** Owners send invoices via email, see real-time delivery logs, and automatically email receipts when the watcher marks an invoice paid.
-- **Catch-all friendly testing:** Outbound mail is routed through Mailgun and, while `MAIL_ALIAS_ENABLED=true`, every recipient rewrites to the Mailgun catch-all (`MAIL_ALIAS_DOMAIN`) so we can test safely.
-- **Branding controls:** Set a default invoice heading plus billing name/contact/footer text in your profile and override them per invoice; public/print views (including public links) stay in sync automatically.
-- **Invoice defaults & wallets:** Profile settings include memo/terms defaults so new invoices auto-fill description/due dates, and wallet settings can stash extra xpubs ahead of multi-wallet selection.
+Create an invoice in USD, present a live BTC quote and QR code your client can trust, assign a unique payment address, and let CryptoZing watch the chain for payment activity from send to settle. No manual checking. No guesswork. Just clean invoices, an easy payment path, and real on-chain signals.
 
-## Getting Started
 
-### Prerequisites
-- Docker + Docker Compose
-- Node 20+ (for optional local Vite builds)
-- Mailgun (or equivalent SMTP provider) for outbound email
+## Why CryptoZing?
 
-### Initial setup
-1. Copy the env template and customize credentials:
-   ```bash
-   cp .env.example .env
-   ```
-   Required keys:
-   - `APP_URL` / `APP_PUBLIC_URL` – domain used in generated links (e.g., `https://cryptozing.app`).
-   - `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_*`.
-   - `MAIL_ALIAS_ENABLED=true` and `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app` while routing everything to the Mailgun catch-all.
-2. Install dependencies & start Sail:
-   ```bash
-   ./vendor/bin/sail up -d
-   ./vendor/bin/sail composer install
-   ./vendor/bin/sail npm install && ./vendor/bin/sail npm run build
-   ```
-3. Run migrations and seeders (includes demo user + wallet prompts):
-   ```bash
-   ./vendor/bin/sail artisan migrate --seed
-   ```
-4. Log in via `http://localhost` (or your hosts-mapped domain) using the seeded credentials, configure a wallet xpub under `/wallet/settings`, and you’re ready to issue invoices.
+CryptoZing is built around a simple idea:
 
-### Running tests
-Execute the full suite via Sail:
+**Bitcoin invoicing should feel clear, modern, and dependable.**
+
+That means:
+
+- **USD-first quoting** so invoices stay familiar and readable
+- **Live BTC pricing** so clients see a current quote
+- **Unique invoice addresses** so payments are easier to attribute
+- **On-chain tracking** so status updates reflect actual payment activity
+- **Client-friendly delivery** with public links, QR codes, and receipts
+
+## Core features
+
+### Invoice Bitcoin with clarity
+- Create invoices in USD
+- Store a BTC snapshot alongside the invoice
+- Show a BIP21 payment URI and scannable QR code
+- Auto-generate invoice numbers
+- Add due dates, notes, and branding overrides
+
+### Track payments on-chain
+- Assign a unique Bitcoin address to each invoice
+- Watch invoice addresses for incoming payments
+- Detect partial payments
+- Track sats received, confirmations, and payment history
+- Update invoice status automatically as payment activity arrives
+
+### Make it easy for clients to pay
+- Share public invoice links
+- Rotate or disable public links at any time
+- Support expiration windows for shared links
+- Send invoice emails
+- Auto-send receipts when invoices are paid
+
+### Stay in control
+- Connect a wallet account public key
+- Validate wallet keys before saving
+- Keep payment tracking tied to your own wallet lineage
+- Review deliveries, alerts, and payment corrections inside the app
+
+## Product highlights
+
+- **Wallet-ready** - account public key support with on-chain watching
+- **Client-friendly** - public links, QR payments, and receipts
+- **Accurate** - USD-first quoting with partial payment awareness
+- **On-chain aware** - payment visibility from send to settle
+- **Delivery-ready** - email sends with status logging
+- **Self-hostable** - run it on your own infrastructure
+
+## How it works
+
+1. Connect a wallet account public key
+2. Create a client
+3. Create an invoice in USD
+4. CryptoZing derives a unique payment address for that invoice
+5. Share the invoice using email or a public link
+6. The client pays by scanning the QR code or using the Bitcoin URI
+7. CryptoZing watches the chain, records payment activity, and updates invoice state
+
+## Built for practical Bitcoin invoicing
+
+CryptoZing is not trying to be a wallet.
+
+It is an invoicing layer that helps you:
+
+- quote cleanly
+- collect cleanly
+- verify cleanly
+- communicate cleanly
+
+The goal is a smoother path between **invoice created** and **invoice settled**.
+
+## Stack
+
+- **Laravel 12**
+- **PHP 8.2+**
+- **MySQL 8**
+- **Blade + Alpine.js + Tailwind CSS**
+- **Vite**
+- **Laravel Sail / Docker Compose**
+- **bitcoinjs-lib / bip32 / tiny-secp256k1**
+- **simple-qrcode**
+
+## Quick start
+
+### Clone the repo
+
+```bash
+git clone https://github.com/n8bar/btc-invoice.git
+cd btc-invoice
+```
+
+### Copy your environment file
+
+```bash
+cp .env.example .env
+```
+
+### Install dependencies
+
+```bash
+composer install
+npm install
+```
+
+### Start the app with Sail
+
+```bash
+./vendor/bin/sail up -d
+```
+
+### Generate the app key and run migrations
+
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
+```
+
+### Build frontend assets
+
+```bash
+./vendor/bin/sail npm run build
+```
+
+Then open the app in your browser.
+
+## Development
+
+### Run the dev stack
+
+```bash
+composer run dev
+```
+
+### Run tests
+
 ```bash
 ./vendor/bin/sail artisan test
 ```
 
-## Configuration Notes
-- **Wallet watcher:** `./vendor/bin/sail artisan wallet:watch-payments` polls mempool.space and updates invoice/payment state. It runs automatically via the scheduler container once Sail is up.
-- **Mail aliasing:** Keep `MAIL_ALIAS_ENABLED` on while the product is in pre-production so all outgoing mail lands in the Mailgun catch-all route. Disable it (or clear the domain) before the RC deploy so recipients get their real email addresses.
-- **Support access:** `SUPPORT_AGENT_EMAILS` defines the comma-separated support-account allowlist, and `SUPPORT_ACCESS_HOURS` defines the fixed owner-grant duration for temporary read-only support access.
-- **Public links:** `APP_PUBLIC_URL` controls the base URL used in invoice emails/public share links. Set it per environment (localhost for dev, `https://cryptozing.app` for production).
-- **Placeholder site:** The temporary GitHub Pages placeholder for `cryptozing.app` lives under `site/` and is intended to deploy separately from the Laravel app surface. For local review on the existing app host, it is exposed at `/site/index.html` via the tracked `public/site` alias.
+### Run the payment watcher
 
-## Documentation & Specs
-- Plan: [`docs/PLAN.md`](docs/PLAN.md)
-- Product spec: [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
-- Backlog: [`docs/BACKLOG.md`](docs/BACKLOG.md)
-- Changelog: [`docs/CHANGELOG.log`](docs/CHANGELOG.log)
-- UX guardrails reference: [`docs/UX_GUARDRAILS.md`](docs/UX_GUARDRAILS.md)
-- Docs & DX ops: [`docs/ops/DOCS_DX.md`](docs/ops/DOCS_DX.md)
-- Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)
-- Contributor walkthrough: [`docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`](docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md)
-- RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
-- MS13 UX Overhaul milestone doc: [`docs/milestones/13_UX_OVERHAUL.md`](docs/milestones/13_UX_OVERHAUL.md)
-- MS14 Payment Attribution Hardening milestone doc: [`docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md`](docs/milestones/14_PAYMENT_ATTRIBUTION_HARDENING.md)
-- MS15 CryptoZing.app SEO Bootstrap milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
-- MS16 Mailer & Alerts Polish + Audit milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
-- Onboarding wizard spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
-- Wallet/Xpub UX spec: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](docs/specs/WALLET_XPUB_UX_SPEC.md)
-- Support access spec: [`docs/specs/SUPPORT_ACCESS.md`](docs/specs/SUPPORT_ACCESS.md)
-- Print/Public polish spec: [`docs/specs/PRINT_PUBLIC_POLISH.md`](docs/specs/PRINT_PUBLIC_POLISH.md)
-- Rate handling rules: [`docs/specs/RATES.md`](docs/specs/RATES.md)
-- Partial payments, confirmations, and adjustments spec: [`docs/specs/PARTIAL_PAYMENTS.md`](docs/specs/PARTIAL_PAYMENTS.md)
-- Payment correction / ignore-restore spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
-- Notifications, delivery, and alerts spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
-- Test hardening draft: [`docs/qa/tests/TEST_HARDENING.md`](docs/qa/tests/TEST_HARDENING.md)
-- MS15 Phase 1 strategy: [`docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md`](docs/strategies/15.1_DISCOVERY_INDEXING_BASELINE.md)
-- MS15 Phase 2 strategy: [`docs/strategies/15.2_VERIFICATION_MONITORING.md`](docs/strategies/15.2_VERIFICATION_MONITORING.md)
-- Task 11 implementation strategy: [`docs/strategies/13.11_GETTING_STARTED_STRATEGY.md`](docs/strategies/13.11_GETTING_STARTED_STRATEGY.md)
-- Task 11 UX Engineering pass: [`docs/strategies/13.11_UX_ENGINEERING_PASS.md`](docs/strategies/13.11_UX_ENGINEERING_PASS.md)
-- Task 11 UX Engineering pass2: [`docs/strategies/13.11_UX_ENGINEERING_PASS2.md`](docs/strategies/13.11_UX_ENGINEERING_PASS2.md)
+```bash
+./vendor/bin/sail artisan wallet:watch-payments
+```
 
-For coding conventions, workflow expectations, and per-environment reminders, see [`AGENTS.md`](AGENTS.md). Sail commands, migrations, and tests must run through `./vendor/bin/sail …`.
+## Wallet setup notes
+
+CryptoZing expects an **account-level public key** for invoice receiving.
+
+Important:
+
+- Do **not** paste a seed phrase
+- Prefer a **dedicated receiving account**
+- CryptoZing derives invoice addresses from that account key
+- Reusing the same account elsewhere can make payment attribution less reliable
+
+## Email and sharing
+
+CryptoZing supports queued email delivery for invoice sends, receipts, owner notices, and client alerts.
+
+Public invoice links are tokenized and can be:
+
+- enabled
+- disabled
+- rotated
+- set to expire
+
+## Project structure
+
+```text
+app/         Application code
+config/      Laravel configuration
+database/    Migrations and seeders
+docs/        Product, ops, and milestone docs
+public/      Public web root
+resources/   Blade views and frontend assets
+routes/      Web routes
+tests/       Feature and unit tests
+docker/      Container setup
+```
+
+## Who this is for
+
+CryptoZing is for freelancers, builders, merchants, and Bitcoin-friendly operators who want a better way to send invoices and track payments without handing the whole flow to a custodial processor.
+
+## Philosophy
+
+CryptoZing aims to be:
+
+- **clear for senders**
+- **easy for clients**
+- **grounded in real on-chain activity**
+- **simple to self-host**
+
+Invoice Bitcoin today. Track payments on-chain.
+
+Remember: Not your keys, not your coins
+
+## License
+
+MIT
