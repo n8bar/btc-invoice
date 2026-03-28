@@ -869,3 +869,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications implementation sketches moved out of the spec and into MS16 as non-binding leftovers
 `docs/specs/NOTIFICATIONS.md` Section 6 no longer hardcodes mailable classes, routes, jobs, scheduler ideas, or persistence tactics as spec requirements; those implementation-shaped notes now live in `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` under a clearly non-binding `Leftover Implementation Brain-Dump` section for later phase planning.
+
+2026-03-27 | Notifications spec no longer carries an empty deferred implementation section
+`docs/specs/NOTIFICATIONS.md` now deletes the former Section 6 deferral note entirely and renumbers the remaining copy, testing, open-questions, and future-enhancements sections.
