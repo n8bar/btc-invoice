@@ -923,3 +923,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-27 | MS16 Phase 2 codifies delivery safeguards in the notifications spec and marks the implemented checklist state
 `docs/specs/NOTIFICATIONS.md` now explicitly requires duplicate/too-recent send suppression, an outbound-mail circuit breaker, and queued-delivery truth revalidation before send; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now marks the shared safeguard and Laravel Mailgun wiring work complete while leaving provider-state confirmation and controlled Mailgun send verification open.
+
+2026-03-27 | MS16 Phase 2 expands the remaining provider and verification work into operator-ready steps
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the open Phase 2 work as vague provider-recovery and verification bullets; the remaining Mailgun/account-state confirmation, aliasing decision, controlled live-send proof, cooldown/circuit-breaker checks, and phase-close evidence are now broken into concrete nested actions, and the already-complete phase-close items are checked off.
