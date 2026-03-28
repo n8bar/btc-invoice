@@ -69,18 +69,9 @@
 7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 8. Outbound mail copy should stay concise and actionable.
 
-## 6. Testing
-1. Feature tests covering:
-   1. manual send flow queues work and writes delivery-log entries
-   2. failure paths record delivery errors
-   3. `InvoicePaid` dispatch triggers owner notice plus client receipt exactly once
-   4. automated alert classes respect cooldown and delivery-log rules
-   5. semantically ambiguous payment-triggered cases keep outbound communication truthful
-2. Optional Blade/mail snapshot tests can be used for the invoice-ready and receipt mailables.
-
-## 7. Open Questions
+## 6. Open Questions
 1. Retry strategy: keep one `invoice_deliveries` row per job fire vs. a single row with status updates. Current direction: one row per job fire for audit clarity.
 
-## 8. Future Enhancements
+## 7. Future Enhancements
 1. After base implementation, consider allowing owners to configure alert thresholds per profile (default 15%).
 2. Once we add Slack/webhook integrations, mirror these events there for ops teams.
