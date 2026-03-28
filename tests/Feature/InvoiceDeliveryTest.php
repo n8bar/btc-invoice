@@ -9,9 +9,11 @@ use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use App\Models\InvoicePayment;
 use App\Models\User;
+use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -242,6 +244,220 @@ class InvoiceDeliveryTest extends TestCase
         $this->assertNull($invoice->delivery_message_draft);
     }
 
+    public function test_manual_send_is_skipped_when_outbound_mail_is_disabled(): void
+    {
+        Queue::fake();
+        config(['mail.safety.outbound_enabled' => false]);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-DISABLED',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampledisabled',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+            'delivery_message_draft' => 'Keep this draft',
+        ]);
+        $invoice->enablePublicShare();
+
+        $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+            'message' => 'Do not send',
+            'cc_self' => true,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Outbound mail is temporarily disabled.');
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+            'status' => 'skipped',
+            'recipient' => $client->email,
+            'error_message' => 'Outbound mail is temporarily disabled.',
+        ]);
+
+        Queue::assertNothingPushed();
+
+        $invoice->refresh();
+        $this->assertSame('Keep this draft', $invoice->delivery_message_draft);
+    }
+
+    public function test_manual_send_is_skipped_within_cooldown_after_recent_send(): void
+    {
+        Queue::fake();
+        config(['mail.safety.manual_send_cooldown_minutes' => 60]);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-COOLDOWN',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplecooldown',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'dispatched_at' => now()->subMinutes(5),
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+            'message' => 'Try again too soon',
+            'cc_self' => false,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas(
+            'status',
+            'Invoice email skipped because the same notice was already queued or sent recently.'
+        );
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+            'status' => 'skipped',
+            'recipient' => $client->email,
+            'error_message' => 'Invoice email skipped because the same notice was already queued or sent recently.',
+        ]);
+
+        Queue::assertNothingPushed();
+        $this->assertSame(2, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'send')->count());
+    }
+
+    public function test_manual_send_cooldown_matches_recipient_case_insensitively(): void
+    {
+        Queue::fake();
+        config(['mail.safety.manual_send_cooldown_minutes' => 60]);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-CASE',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplecase',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'sent',
+            'recipient' => 'Billing@Example.com',
+            'dispatched_at' => now()->subMinutes(5),
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+            'message' => 'Try again too soon with lowercase recipient',
+            'cc_self' => false,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas(
+            'status',
+            'Invoice email skipped because the same notice was already queued or sent recently.'
+        );
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+            'status' => 'skipped',
+            'recipient' => $client->email,
+            'error_message' => 'Invoice email skipped because the same notice was already queued or sent recently.',
+        ]);
+
+        Queue::assertNothingPushed();
+    }
+
+    public function test_manual_send_is_skipped_when_matching_delivery_intent_is_locked(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001-LOCKED',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0examplelocked',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $deliveries = app(InvoiceDeliveryService::class);
+        $lock = Cache::lock('invoice-delivery-intent:' . $deliveries->intentKey($invoice, 'send', $client->email), 10);
+        $this->assertTrue($lock->get());
+
+        try {
+            $response = $this->actingAs($owner)->post(route('invoices.deliver', $invoice), [
+                'message' => 'Do not double queue this',
+                'cc_self' => false,
+            ]);
+        } finally {
+            $lock->release();
+        }
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'A matching delivery intent is already being processed.');
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'send',
+            'status' => 'skipped',
+            'recipient' => $client->email,
+            'error_message' => 'A matching delivery intent is already being processed.',
+        ]);
+
+        Queue::assertNothingPushed();
+    }
+
     public function test_receipt_email_queued_when_invoice_paid(): void
     {
         Queue::fake();
@@ -325,12 +541,223 @@ class InvoiceDeliveryTest extends TestCase
         ]);
 
         $job = new DeliverInvoiceMail($delivery);
-        $job->handle(app(MailAlias::class));
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
 
-        Mail::assertQueued(InvoiceReadyMail::class, function (InvoiceReadyMail $mail) {
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $delivery->id,
+            'status' => 'sent',
+        ]);
+
+        Mail::assertSent(InvoiceReadyMail::class, function (InvoiceReadyMail $mail) {
             return $mail->hasTo('client.example.com@cryptozing.app')
                 && $mail->hasCc('owner.gmail.com@cryptozing.app');
         });
+        Mail::assertNothingQueued();
+    }
+
+    public function test_delivery_job_does_not_send_again_when_delivery_is_already_claimed_for_sending(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Claimed',
+            'email' => 'claimed@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-3001-SENDING',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0examplesending',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $delivery = InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'sending',
+            'recipient' => $client->email,
+            'message' => 'Already claimed test',
+            'dispatched_at' => now(),
+        ]);
+
+        $job = new DeliverInvoiceMail($delivery);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $delivery->id,
+            'status' => 'sending',
+        ]);
+
+        Mail::assertNothingQueued();
+    }
+
+    public function test_delivery_job_skips_duplicate_queued_row_when_matching_send_is_in_progress(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Duplicate',
+            'email' => 'duplicate@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-3001-DUPLICATE',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0exampleduplicate',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'sending',
+            'recipient' => $client->email,
+            'message' => 'First claimant',
+            'dispatched_at' => now(),
+        ]);
+
+        $duplicate = $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'message' => 'Second claimant',
+            'dispatched_at' => now(),
+        ]);
+
+        $job = new DeliverInvoiceMail($duplicate);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $duplicate->id,
+            'status' => 'skipped',
+            'error_message' => 'A matching delivery send is already in progress.',
+        ]);
+
+        Mail::assertNothingQueued();
+    }
+
+    public function test_delivery_job_skips_duplicate_queued_row_when_matching_send_was_already_sent(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Sent Duplicate',
+            'email' => 'sent-duplicate@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-3001-SENT-DUPLICATE',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0examplesentduplicate',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'message' => 'Already sent',
+            'dispatched_at' => now()->subMinute(),
+            'sent_at' => now()->subMinute(),
+        ]);
+
+        $duplicate = $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'message' => 'Second send attempt',
+            'dispatched_at' => now(),
+        ]);
+
+        $job = new DeliverInvoiceMail($duplicate);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $duplicate->id,
+            'status' => 'skipped',
+            'error_message' => 'A matching delivery has already been sent.',
+        ]);
+
+        Mail::assertNothingQueued();
+    }
+
+    public function test_queued_manual_send_is_skipped_if_public_share_is_disabled_before_job_runs(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Acme Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-3002-REVALIDATE',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0examplerevalidate',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $delivery = InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'message' => 'Revalidate test',
+            'dispatched_at' => now(),
+        ]);
+
+        $invoice->forceFill([
+            'public_enabled' => false,
+            'public_token' => null,
+        ])->save();
+
+        $job = new DeliverInvoiceMail($delivery);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $delivery->id,
+            'status' => 'skipped',
+            'error_message' => 'Public share link disabled before send.',
+        ]);
+
+        Mail::assertNothingQueued();
     }
 
     public function test_non_owner_cannot_queue_invoice_email(): void

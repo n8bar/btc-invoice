@@ -917,3 +917,45 @@ The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDI
 
 2026-03-27 | MS16 Phase 1 delivery baseline audit completed and Phase 2 is now active
 `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md` now records the completed outbound delivery inventory, current guardrail matrix, concrete spam-risk findings, and the Phase 2 / Phase 3 inputs drawn from the live code; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, and `docs/PLAN.md` now advance MS16 to Phase 2 as the active next execution step.
+
+2026-03-27 | MS16 Phase 2 starts shared delivery gating and Mailgun driver wiring
+Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner paid notices, and alert deliveries now queue through one shared service; manual invoice sends now respect a configurable cooldown, outbound mail can be disabled via config, queued sends revalidate public-link and recipient state before delivery, queued overpayment alerts now skip when no longer truthful, Laravel mail config now includes the Mailgun HTTP driver path, `.env.example` now documents the Mailgun + mail-safety env vars, and the get-live docs now describe Mailgun API credentials instead of SMTP-first setup.
+
+2026-03-27 | MS16 Phase 2 codifies delivery safeguards in the notifications spec and marks the implemented checklist state
+`docs/specs/NOTIFICATIONS.md` now explicitly requires duplicate/too-recent send suppression, an outbound-mail circuit breaker, and queued-delivery truth revalidation before send; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now marks the shared safeguard and Laravel Mailgun wiring work complete while leaving provider-state confirmation and controlled Mailgun send verification open.
+
+2026-03-27 | MS16 Phase 2 expands the remaining provider and verification work into operator-ready steps
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the open Phase 2 work as vague provider-recovery and verification bullets; the remaining Mailgun/account-state confirmation, aliasing decision, controlled live-send proof, cooldown/circuit-breaker checks, and phase-close evidence are now broken into concrete nested actions, and the already-complete phase-close items are checked off.
+
+2026-03-27 | MS16 Phase 2 records the current local Mailgun/app-env inventory
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now checks off `16.2.1.1` with the current app-side mail state: the local environment is still on `MAIL_MAILER=smtp`, `MAILGUN_ENDPOINT=api.mailgun.net`, aliasing remains enabled to `mailer.cryptozing.app`, and the Mailgun domain/secret are not configured yet, which means the shipped Mailgun HTTP path cannot be verified from this workspace until the env is updated.
+
+2026-03-28 | MS16 now blocks real Mailgun verification behind a two-layer idempotency guard
+`docs/specs/NOTIFICATIONS.md` now explicitly requires idempotency at both delivery-intent creation and send execution, and it says that payment-scoped notices should dedupe on stable payment identity such as `txid` rather than rendered timestamps or body drift; `docs/PRODUCT_SPEC.md` now reflects intent-level and send-boundary idempotency as part of mailer hardening; and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now updates the current Mailgun env state, records the completed parts of the provider dashboard pass, adds `16.2.2.5` for the stronger idempotency hardening, and explicitly blocks any controlled live Mailgun send until that guard is in place.
+
+2026-03-28 | PRODUCT_SPEC is pulled back to summary-level mailer requirements
+`docs/PRODUCT_SPEC.md` no longer carries the implementation-shaped `intent-level` and `send-boundary` idempotency wording; it now stays at the higher-level requirement that outbound mail prevent duplicate sends and points to [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md) for the detailed notifications-specific idempotency rules.
+
+2026-03-28 | MS16 Phase 2 adds queue-intent idempotency before live Mailgun verification
+`App\\Services\\InvoiceDeliveryService` now uses a stable delivery-intent key plus a shared lock so concurrent duplicate queue attempts cannot create multiple real outbound intents for the same invoice/type/recipient, duplicate locked-intent attempts are recorded as `skipped`, `tests/Feature/InvoiceDeliveryTest.php` now covers that locked-intent path, and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now checks off `16.2.2.5.1` while leaving the send-boundary half of the idempotency work open.
+
+2026-03-28 | MS16 Phase 2 allows a temporary alias-off proof window on user-controlled dev addresses
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now records that, as of `2026-03-28`, aliasing may be turned off temporarily for controlled Phase 2 verification sends because the dev-database recipient addresses are user-controlled; the exception is explicitly limited to this phase’s proof sends and does not change the later RC alias-off rollout work.
+
+2026-03-28 | MS16 Phase 2 restores sequential ordering around the aliasing decision
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the future-only aliasing flip/rollback task up in the earlier aliasing decision block; that action now lives with the later verification-prep step where it actually becomes actionable, so the strategy stays sequential outside explicit parallel items.
+
+2026-03-28 | MS16 Phase 2 removes constraint-only checkboxes from later verification gates
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer renders the verification gate and exit-criteria closure conditions as fake actionable checkboxes; those constraints now sit as plain notes under the relevant steps so the ordered checklist stays focused on real executable work.
+
+2026-03-28 | MS16 Phase 2 moves the rollout-doc update to where the evidence actually exists
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the RC rollout-note update up in the early aliasing decision block; that doc update now sits in the later evidence-capture part of verification, where provider and aliasing findings are actually settled enough to document.
+
+2026-03-28 | MS16 Phase 2 keeps provider-state steps sequential around endpoint proof
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer points the early provider-state checklist item at later live-send proof without saying what to do in sequence; the dashboard step now records the endpoint match as either settled or still pending live verification, and the later verification step now explicitly closes that pending proof.
+
+2026-03-28 | MS16 Phase 2 adds send-boundary idempotency before live Mailgun proof
+`App\\Jobs\\DeliverInvoiceMail` now claims the provider boundary by transitioning queued deliveries to `sending` under a per-intent lock, skips duplicate queued rows when a matching send is already in progress or already sent, and avoids resending deliveries that were already claimed; `App\\Services\\InvoiceDeliveryService` now reuses the same stable intent-key builder at queue and send boundaries and matches recipients case-insensitively; `tests/Feature/InvoiceDeliveryTest.php` now covers claimed `sending` rows, duplicate queued rows, and recipient-case normalization; and `docs/specs/NOTIFICATIONS.md` plus `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now reflect the shipped send-boundary guard and transient `sending` state.
+
+2026-03-28 | MS16 Phase 2 closes the real provider proof after removing the nested mailable queue
+All invoice mailables under `app/Mail/` no longer implement `ShouldQueue`, so `App\\Jobs\\DeliverInvoiceMail` is now the only queue boundary and the real provider-send boundary; `tests/Feature/InvoiceDeliveryTest.php` now requires the delivery job to send mail directly instead of queueing another mailable job; controlled alias-off proof mail on invoice `MS16-PROOF-APP-20260328` now shows `accepted` and `delivered` Mailgun events plus confirmed inbox receipt; and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, `docs/PLAN.md`, and `docs/ops/RC_ROLLOUT_CHECKLIST.md` now record the completed Phase 2 recovery and the Phase 3 handoff.

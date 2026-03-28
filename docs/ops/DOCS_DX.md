@@ -10,7 +10,7 @@ Release Candidate contributor-docs and documentation-operations scope.
 
 ## Quick Start + Env Var Reference
 Audience: new contributors running the stack locally with Sail.
-- Include prerequisites (Docker/Compose, Node for Vite build, Mailgun or SMTP test credentials, optional browser extensions unnecessary).
+- Include prerequisites (Docker/Compose, Node for Vite build, Mailgun API test credentials, optional browser extensions unnecessary).
 - Steps: clone → `cp .env.example .env` → set `APP_URL`/`APP_PUBLIC_URL`, `MAIL_*`, `MAIL_ALIAS_ENABLED/MAIL_ALIAS_DOMAIN` (pre-prod) → `./vendor/bin/sail up -d` → `./vendor/bin/sail composer install` → `./vendor/bin/sail npm install && ./vendor/bin/sail npm run build` → `./vendor/bin/sail artisan migrate --seed`.
 - Env reference: table of required keys for dev/test with short descriptions (public URL for links, mail aliasing notes, database defaults).
 - Smoke check: confirm login with seeded user, visit `/wallet/settings`, create a test invoice, and render a public link without errors; remind that the scheduler container keeps `wallet:watch-payments` running.

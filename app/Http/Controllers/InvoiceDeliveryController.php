@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\DeliverInvoiceMail;
 use App\Models\Invoice;
-use App\Models\InvoiceDelivery;
+use App\Services\InvoiceDeliveryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class InvoiceDeliveryController extends Controller
 {
+    public function __construct(private readonly InvoiceDeliveryService $deliveries)
+    {
+    }
+
     public function updateDraft(Request $request, Invoice $invoice): JsonResponse|RedirectResponse
     {
         $this->authorize('update', $invoice);
@@ -56,29 +59,30 @@ class InvoiceDeliveryController extends Controller
         $recipient = $invoice->client->email;
         $cc = $request->boolean('cc_self') ? $invoice->user->email : null;
 
-        $delivery = InvoiceDelivery::create([
-            'invoice_id' => $invoice->id,
-            'user_id' => $invoice->user_id,
-            'type' => 'send',
-            'status' => 'queued',
-            'recipient' => $recipient,
-            'cc' => $cc,
-            'message' => $validated['message'] ?? null,
-            'dispatched_at' => now(),
-        ]);
+        $delivery = $this->deliveries->queue(
+            $invoice,
+            'send',
+            $recipient,
+            $cc,
+            $validated['message'] ?? null
+        );
 
-        DeliverInvoiceMail::dispatch($delivery);
+        if ($delivery->status === 'queued') {
+            $invoice->forceFill([
+                'delivery_message_draft' => null,
+            ])->save();
+        }
 
-        $invoice->forceFill([
-            'delivery_message_draft' => null,
-        ])->save();
+        $statusMessage = $delivery->status === 'queued'
+            ? 'Invoice email queued.'
+            : ($delivery->error_message ?: 'Invoice email skipped.');
 
         if ($request->boolean('getting_started')) {
             return redirect()
                 ->route('getting-started.start')
-                ->with('status', 'Invoice email queued.');
+                ->with('status', $statusMessage);
         }
 
-        return back()->with('status', 'Invoice email queued.');
+        return back()->with('status', $statusMessage);
     }
 }

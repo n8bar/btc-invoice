@@ -14,12 +14,14 @@ use App\Mail\InvoiceOwnerPaidNoticeMail;
 use App\Mail\InvoicePartialWarningClientMail;
 use App\Mail\InvoicePartialWarningOwnerMail;
 use App\Models\InvoiceDelivery;
+use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,28 +33,86 @@ class DeliverInvoiceMail implements ShouldQueue
     {
     }
 
-    public function handle(MailAlias $mailAlias): void
+    public function handle(MailAlias $mailAlias, InvoiceDeliveryService $deliveries): void
     {
         $delivery = $this->delivery->fresh();
-        if (!$delivery || $delivery->status !== 'queued') {
+        if (!$delivery) {
             return;
         }
 
-        $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
-        if (!$invoice || !$invoice->client) {
-            $delivery->update([
-                'status' => 'failed',
-                'error_message' => 'Missing invoice/client context.',
+        $sendLock = Cache::lock($this->sendLockName($deliveries->intentKeyForDelivery($delivery)), 30);
+
+        if (! $sendLock->get()) {
+            Log::info('invoice_delivery.send_locked', [
+                'delivery_id' => $delivery->id,
+                'invoice_id' => $delivery->invoice_id,
+                'type' => $delivery->type,
+                'recipient' => $delivery->recipient,
             ]);
             return;
         }
 
-        if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice)) {
-            $delivery->update([
-                'status' => 'skipped',
-                'error_message' => $skipReason,
-            ]);
-            return;
+        try {
+            $delivery = $this->delivery->fresh();
+            if (! $delivery) {
+                return;
+            }
+
+            if ($delivery->status === 'sending') {
+                Log::info('invoice_delivery.send_already_claimed', [
+                    'delivery_id' => $delivery->id,
+                    'invoice_id' => $delivery->invoice_id,
+                    'type' => $delivery->type,
+                    'recipient' => $delivery->recipient,
+                ]);
+                return;
+            }
+
+            if ($delivery->status !== 'queued') {
+                return;
+            }
+
+            $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
+            if (! $invoice || ! $invoice->client) {
+                $delivery->update([
+                    'status' => 'failed',
+                    'error_message' => 'Missing invoice/client context.',
+                ]);
+                return;
+            }
+
+            if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice, $deliveries)) {
+                $delivery->update([
+                    'status' => 'skipped',
+                    'error_message' => $skipReason,
+                ]);
+                return;
+            }
+
+            if ($duplicateReason = $this->duplicateSendReason($delivery)) {
+                $delivery->update([
+                    'status' => 'skipped',
+                    'error_message' => $duplicateReason,
+                ]);
+                return;
+            }
+
+            $claimed = InvoiceDelivery::query()
+                ->whereKey($delivery->id)
+                ->where('status', 'queued')
+                ->update([
+                    'status' => 'sending',
+                    'error_code' => null,
+                    'error_message' => null,
+                ]);
+
+            if ($claimed !== 1) {
+                return;
+            }
+
+            $delivery->refresh();
+        } finally {
+            $sendLock->release();
         }
 
         $mailable = match ($delivery->type) {
@@ -64,8 +124,8 @@ class DeliverInvoiceMail implements ShouldQueue
             'owner_overpay_alert' => new InvoiceOverpaymentOwnerMail($invoice, $delivery),
             'client_underpay_alert' => new InvoiceUnderpaymentClientMail($invoice, $delivery),
             'owner_underpay_alert' => new InvoiceUnderpaymentOwnerMail($invoice, $delivery),
-            'client_partial_warning' => new \App\Mail\InvoicePartialWarningClientMail($invoice, $delivery),
-            'owner_partial_warning' => new \App\Mail\InvoicePartialWarningOwnerMail($invoice, $delivery),
+            'client_partial_warning' => new InvoicePartialWarningClientMail($invoice, $delivery),
+            'owner_partial_warning' => new InvoicePartialWarningOwnerMail($invoice, $delivery),
             default => new InvoiceReadyMail($invoice, $delivery),
         };
 
@@ -102,15 +162,69 @@ class DeliverInvoiceMail implements ShouldQueue
         }
     }
 
-    private function shouldSkipDelivery(InvoiceDelivery $delivery, \App\Models\Invoice $invoice): ?string
+    private function duplicateSendReason(InvoiceDelivery $delivery): ?string
+    {
+        $existing = InvoiceDelivery::query()
+            ->where('invoice_id', $delivery->invoice_id)
+            ->where('user_id', $delivery->user_id)
+            ->where('type', $delivery->type)
+            ->whereRaw('LOWER(TRIM(recipient)) = ?', [strtolower(trim($delivery->recipient))])
+            ->where('id', '!=', $delivery->id)
+            ->whereIn('status', ['sending', 'sent'])
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $existing) {
+            return null;
+        }
+
+        return $existing->status === 'sent'
+            ? 'A matching delivery has already been sent.'
+            : 'A matching delivery send is already in progress.';
+    }
+
+    private function sendLockName(string $intentKey): string
+    {
+        return 'invoice-delivery-send:' . $intentKey;
+    }
+
+    private function shouldSkipDelivery(
+        InvoiceDelivery $delivery,
+        \App\Models\Invoice $invoice,
+        InvoiceDeliveryService $deliveries
+    ): ?string
     {
         if ($delivery->status !== 'queued') {
             return 'Delivery no longer queued.';
         }
 
+        if (! $deliveries->outboundEnabled()) {
+            return 'Outbound mail is temporarily disabled.';
+        }
+
+        if ($delivery->type === 'send') {
+            $currentRecipient = trim((string) ($invoice->client?->email ?? ''));
+            if ($currentRecipient === '') {
+                return 'Client email missing before send.';
+            }
+
+            if (strcasecmp($currentRecipient, trim((string) $delivery->recipient)) !== 0) {
+                return 'Recipient no longer matches the current client email.';
+            }
+
+            if (! $invoice->public_enabled || ! $invoice->public_token) {
+                return 'Public share link disabled before send.';
+            }
+        }
+
         $paidTypes = ['receipt', 'owner_paid_notice'];
         if (in_array($delivery->type, $paidTypes, true) && $invoice->status !== 'paid') {
             return 'Invoice no longer paid.';
+        }
+
+        $overpayTypes = ['client_overpay_alert', 'owner_overpay_alert'];
+        if (in_array($delivery->type, $overpayTypes, true) && !$invoice->requiresClientOverpayAlert()) {
+            return 'Overpayment resolved before send.';
         }
 
         $underpayTypes = ['client_underpay_alert', 'owner_underpay_alert'];

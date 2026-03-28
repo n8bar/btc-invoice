@@ -99,7 +99,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ### Active plan-linked requirements
 - Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, distinguish unsupported shared-wallet evidence from stale-address wrong-invoice reuse, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
-- Mailer and alerts hardening must add duplicate-send safeguards, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email, including owner validation gates for later payment-triggered mail on already-funded invoices.
+- Mailer and alerts hardening must prevent duplicate outbound mail, support owner-editable templates with safe variables and preview/reset flows, and tighten queue and delivery safety around outbound email, including owner validation gates for later payment-triggered mail on already-funded invoices; the detailed outbound-mail rules live in [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md).
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 
 ## Canonical Spec Map
