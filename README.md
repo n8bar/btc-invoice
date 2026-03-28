@@ -6,6 +6,8 @@ CryptoZing is a self-hosted Bitcoin invoicing app built for people who want clea
 
 Create an invoice in USD, present a live BTC quote and QR code your client can trust, assign a unique payment address, and let CryptoZing watch the chain for payment activity from send to settle. No manual checking. No guesswork. Just clean invoices, an easy payment path, and real on-chain signals.
 
+Website: <https://cryptozing.app/>
+
 
 ## Why CryptoZing?
 
@@ -42,7 +44,7 @@ That means:
 - Rotate or disable public links at any time
 - Support expiration windows for shared links
 - Send invoice emails
-- Auto-send receipts when invoices are paid
+- Track delivery and receipt flows when invoices are paid
 
 ### Stay in control
 - Connect a wallet account public key
@@ -98,8 +100,8 @@ The goal is a smoother path between **invoice created** and **invoice settled**.
 ### Clone the repo
 
 ```bash
-git clone https://github.com/n8bar/btc-invoice.git
-cd btc-invoice
+git clone https://github.com/n8bar/CryptoZing.git
+cd CryptoZing
 ```
 
 ### Copy your environment file
@@ -108,17 +110,24 @@ cd btc-invoice
 cp .env.example .env
 ```
 
-### Install dependencies
+### Bootstrap dependencies
 
 ```bash
 composer install
-npm install
 ```
+
+Run this once to install vendor dependencies and make `./vendor/bin/sail` available. After that, use Sail for Composer, npm, and Artisan commands in this repo.
 
 ### Start the app with Sail
 
 ```bash
 ./vendor/bin/sail up -d
+```
+
+### Install frontend dependencies with Sail
+
+```bash
+./vendor/bin/sail npm install
 ```
 
 ### Generate the app key and run migrations
@@ -141,7 +150,7 @@ Then open the app in your browser.
 ### Run the dev stack
 
 ```bash
-composer run dev
+./vendor/bin/sail npm run dev
 ```
 
 ### Run tests
@@ -191,6 +200,21 @@ routes/      Web routes
 tests/       Feature and unit tests
 docker/      Container setup
 ```
+
+## Documentation & Specs
+
+- Plan: [`docs/PLAN.md`](docs/PLAN.md)
+- Product spec: [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
+- Backlog: [`docs/BACKLOG.md`](docs/BACKLOG.md)
+- Changelog: [`docs/CHANGELOG.log`](docs/CHANGELOG.log)
+- Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)
+- RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
+- Active milestone: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
+- Notifications spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
+- Payment corrections spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
+- Partial payments spec: [`docs/specs/PARTIAL_PAYMENTS.md`](docs/specs/PARTIAL_PAYMENTS.md)
+
+For coding conventions, workflow expectations, and environment reminders, see [`AGENTS.md`](AGENTS.md).
 
 ## Who this is for
 
