@@ -12,9 +12,9 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS16 - Mailer & Alerts Polish + Audit**
 - Status: `active`
-- Next action: review the notifications spec and define the initial MS16 safety/recovery scope before broader mailer and alerts polish.
-- Primary next doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
-- Supporting docs: [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
+- Next action: establish a trustworthy outbound-mail baseline for MS16 before broader notification polish.
+- Primary next doc: [`docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`](strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
+- Supporting docs: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md), [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
 - Most recently completed milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 
 ## Active and Upcoming Milestones

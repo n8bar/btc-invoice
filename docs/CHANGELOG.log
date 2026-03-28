@@ -899,3 +899,18 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 current focus now defines the breakout rule directly
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now expands `Current Focus` to say the phase-doc breakout must be derived from the real work, dependency chain, and exit criteria, not from the current placeholder phase count or spec section shape, while still treating the new phase docs as sequential once they exist.
+
+2026-03-27 | MS16 phase breakout re-cut the milestone into strategy-owned execution docs
+Added `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md`; trimmed `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` back to milestone-level summary with the new four-phase rollup; and updated `docs/PLAN.md` so the active next doc is now the Phase 1 baseline-audit strategy instead of the pre-breakout milestone stub.
+
+2026-03-27 | MS16 now locks Mailgun HTTP API as the intended transport direction
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer frame transport as an open `SMTP` versus `Mailgun HTTP API` choice; MS16 now treats Mailgun HTTP API as the intended path unless a concrete blocking constraint forces an explicitly documented fallback.
+
+2026-03-27 | MS16 strategy docs now fold constraints into tasks and inline sidecars near the work they depend on
+`docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` no longer leave constraint-only notes as separate checklist items or bury safe parallel sidecars in end sections; those requirements and sidecars now live inline with the owning steps so the ordered path stays obvious while parallel work remains visible at the moment it becomes safe.
+
+2026-03-27 | MS16 strategy sidecars now use numbered nested checkboxes under their owning tasks
+The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` now appears as numbered nested checkbox items directly under the parent task they depend on, making them easier to reference, assign, and check off without reviving separate sidecar sections.
+
+2026-03-27 | MS16 Phase 2 now spells out the Mailgun HTTP API implementation checklist
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the Mailgun HTTP API work at the level of generic prerequisites; `16.2.3.2` is now an executable nested checklist covering package install, `config/services.php`, `config/mail.php`, the `MAIL_MAILER=mailgun` default path, and the corresponding ops/env documentation updates.
