@@ -929,3 +929,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-27 | MS16 Phase 2 records the current local Mailgun/app-env inventory
 `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now checks off `16.2.1.1` with the current app-side mail state: the local environment is still on `MAIL_MAILER=smtp`, `MAILGUN_ENDPOINT=api.mailgun.net`, aliasing remains enabled to `mailer.cryptozing.app`, and the Mailgun domain/secret are not configured yet, which means the shipped Mailgun HTTP path cannot be verified from this workspace until the env is updated.
+
+2026-03-28 | MS16 now blocks real Mailgun verification behind a two-layer idempotency guard
+`docs/specs/NOTIFICATIONS.md` now explicitly requires idempotency at both delivery-intent creation and send execution, and it says that payment-scoped notices should dedupe on stable payment identity such as `txid` rather than rendered timestamps or body drift; `docs/PRODUCT_SPEC.md` now reflects intent-level and send-boundary idempotency as part of mailer hardening; and `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now updates the current Mailgun env state, records the completed parts of the provider dashboard pass, adds `16.2.2.5` for the stronger idempotency hardening, and explicitly blocks any controlled live Mailgun send until that guard is in place.
