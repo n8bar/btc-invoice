@@ -18,6 +18,11 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - Current objective: review the notifications spec and lock the initial MS16 safety/recovery scope before broader notification polish.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current mailer/delivery implementation, and Mailgun account state.
 
+## Temporary Doc Restructure Task
+- Reorganize this milestone doc back toward milestone-level summary only.
+- Break Phase 1, Phase 2, and Phase 3 into their own execution docs before broader MS16 implementation proceeds.
+- Resolve, relocate, or deliberately discard the current `Open Scope Questions` and `Leftover Implementation Brain-Dump` contents so this milestone doc no longer carries either section once the phase docs exist.
+
 ## Phase Rollup
 1. [ ] Phase 1 - Mailer Safety + Spam-Bug Triage
    Identify the runaway-send failure mode, define the app-side safeguards required before broader mailer work, and decide whether any notification behaviors need owner confirmation/validation before outbound mail can safely send.
