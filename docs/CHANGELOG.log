@@ -846,6 +846,9 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 2026-03-27 | Notifications item 5.8 no longer keeps milestone-history wording inside the spec
 `docs/specs/NOTIFICATIONS.md` no longer says the later-payment owner-validation gate is “planned MS16 work, not an MS14 Phase 5 reattribution gate”; that sequencing note now lives in `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, where the milestone history and follow-up planning belong.
 
+2026-03-27 | Notifications item 5.7 now states the later-payment ambiguity warning more readably
+`docs/specs/NOTIFICATIONS.md` now splits the later-payment ambiguity warning into a shorter main statement plus an examples sub-line, keeping the important “supported wallet config does not eliminate semantic ambiguity” idea without the old overlong sentence shape.
+
 2026-03-27 | Notifications Goal 2 now keeps “automatic” scoped to acknowledgments instead of dropping it entirely
 `docs/specs/NOTIFICATIONS.md` again says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails; this preserves the automatic acknowledgment idea without forcing the spec to treat receipt emails themselves as fully automatic.
 
