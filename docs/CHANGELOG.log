@@ -866,3 +866,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec now explicitly keeps later-payment ambiguity from suppressing safe acknowledgments
 `docs/specs/NOTIFICATIONS.md` now adds `3.2.2.3`, which says later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
+
+2026-03-27 | Notifications implementation sketches moved out of the spec and into MS16 as non-binding leftovers
+`docs/specs/NOTIFICATIONS.md` Section 6 no longer hardcodes mailable classes, routes, jobs, scheduler ideas, or persistence tactics as spec requirements; those implementation-shaped notes now live in `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` under a clearly non-binding `Leftover Implementation Brain-Dump` section for later phase planning.

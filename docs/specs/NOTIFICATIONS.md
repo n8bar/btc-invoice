@@ -69,24 +69,7 @@
 7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 
 ## 6. Mailables, Routes, and Jobs
-1. Base communication classes:
-   1. `App\Mail\InvoiceReadyMail`
-   2. `App\Mail\InvoicePaidReceipt`
-2. New mailable classes:
-   1. `InvoiceOwnerPaidNoticeMail`
-   2. `InvoicePastDueOwnerMail`
-   3. `InvoicePastDueClientMail`
-   4. `InvoiceOverpaymentClientMail`
-   5. `InvoiceUnderpaymentClientMail`
-   6. (Optional) `InvoiceUnderpaymentOwnerMail` if we want a distinct copy instead of CCing.
-   7. `InvoicePartialPaymentWarningClientMail` (plus owner FYI mail/CC)
-3. Shared Blade partials should keep invoice header/footer branding aligned across email types.
-4. `POST /invoices/{invoice}/deliver` remains the base manual-send endpoint and must validate ownership, client email presence, and public-link availability before enqueueing work.
-5. Add a lightweight service that raises “notification intents” from watcher/manual-adjustment flows and deduplicates sends (e.g., don’t send multiple overpay emails for the same invoice unless the percentage keeps climbing and a configured interval has passed).
-6. Persist last-alert timestamps on `invoices` (columns such as `last_overpayment_alert_at`, `last_underpayment_alert_at`, `last_past_due_alert_at`) to prevent repeated sends within 24h.
-7. Scheduler additions:
-   1. Extend the existing `scheduler` service to run a new artisan command (`invoices:send-past-due-alerts`) nightly.
-   2. Reuse `wallet:watch-payments` (or hook into `InvoicePaymentDetector`) to trigger over/under payment emails immediately after each detection.
+1. Detailed class, route, job, scheduler, and persistence sketches are deferred to MS16 planning and are not hard requirements in this spec.
 
 ## 7. Copy Guidelines
 1. Keep subjects/actionable text short (<=60 chars). Example subjects:

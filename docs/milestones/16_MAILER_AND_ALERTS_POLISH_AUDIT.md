@@ -42,6 +42,28 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - The spec no longer treats repeated partial payments as a distinct client-facing alert family. If MS16 still wants to react specially to multiple partial payments, treat that as an owner-side or operational signal to design later rather than as a separate client alert category.
 - Temporary catch-all aliasing is not a spec-level rule, but MS16 strategy work should still account for it explicitly. The later phase doc should decide when aliasing remains useful for safe testing, when it becomes misleading for delivery validation, and when it must be disabled before real-recipient traffic or RC rollout.
 
+## Leftover Implementation Brain-Dump
+These notes were moved out of `docs/specs/NOTIFICATIONS.md` because they are implementation-shaped leftovers, not approved hard requirements. Keep them only as MS16 reference material until the phase docs decide which ideas, if any, survive.
+
+- Candidate base communication classes:
+  - `App\Mail\InvoiceReadyMail`
+  - `App\Mail\InvoicePaidReceipt`
+- Candidate additional mailables:
+  - `InvoiceOwnerPaidNoticeMail`
+  - `InvoicePastDueOwnerMail`
+  - `InvoicePastDueClientMail`
+  - `InvoiceOverpaymentClientMail`
+  - `InvoiceUnderpaymentClientMail`
+  - optional distinct underpayment-owner copy instead of relying only on issuer copies/CC
+  - previously brainstormed partial-payment warning mailables/FYIs if that idea ever returns in a narrower owner-side form
+- Shared Blade partials may still be a good way to keep invoice header/footer branding aligned across email types.
+- The current manual-send entry point is `POST /invoices/{invoice}/deliver`; if that remains the long-term path, Phase 3 should preserve ownership, client-email, and public-link validation before enqueueing work.
+- A lightweight notification-intent or dedupe service may still be useful if watcher/manual-adjustment flows need shared send gating.
+- Persisted last-alert timestamps on `invoices` may still be one way to prevent repeated sends within a cooldown window.
+- Scheduler ideas worth revisiting later:
+  - a dedicated past-due alert command run on a schedule
+  - immediate over/under-payment alert triggering from payment-detection flows
+
 ## Exit Criteria
 - [ ] The runaway/spam-prone outbound-mail bug is understood and fixed.
 - [ ] App-side delivery safeguards are in place and documented.
