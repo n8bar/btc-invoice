@@ -64,7 +64,7 @@
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
 7. After an invoice has already received detected on-chain payment activity, later payments to that invoice’s address may still be semantically ambiguous even when the wallet configuration remains supported.
    1. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
-8. MS16 delivery-log polish should replace raw underscore-separated delivery `type` keys with concise human-readable owner-facing labels.
+8. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 
 ## 6. Mailables, Routes, and Jobs
 1. Base communication classes:
