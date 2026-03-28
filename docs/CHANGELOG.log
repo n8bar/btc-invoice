@@ -893,3 +893,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 current focus now reflects the pre-phase restructure step explicitly
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` no longer says the active focus is `Phase 1`; it now says `Milestone doc restructure + phase breakout` and restores the fuller restructure intent inside `Current objective` so the milestone doc matches the actual pre-phase work in progress.
+
+2026-03-27 | MS16 now explicitly treats its current phase count as provisional
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now says the current three-phase breakdown is provisional and should be re-cut during the phase-doc breakout if the real dependency chain points to a different shape.
