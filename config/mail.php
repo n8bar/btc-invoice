@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'mailgun'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,6 +47,10 @@ return [
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'mailgun' => [
+            'transport' => 'mailgun',
         ],
 
         'ses' => [
@@ -129,6 +133,12 @@ return [
     'aliasing' => [
         'enabled' => env('MAIL_ALIAS_ENABLED', false),
         'domain' => env('MAIL_ALIAS_DOMAIN'),
+    ],
+
+    'safety' => [
+        'outbound_enabled' => env('MAIL_OUTBOUND_ENABLED', true),
+        'manual_send_cooldown_minutes' => env('MAIL_MANUAL_SEND_COOLDOWN_MINUTES', 60),
+        'alert_cooldown_minutes' => env('MAIL_ALERT_COOLDOWN_MINUTES', 1440),
     ],
 
 ];

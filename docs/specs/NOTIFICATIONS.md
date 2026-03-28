@@ -65,6 +65,9 @@
 4. Client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior.
 5. Outbound mail capability is a required part of a valid recipient-facing deployment.
    1. Development and test environments may intentionally run without outbound mail, but production-ready deployments must have it configured.
-6. The delivery history should surface queued, sent, skipped, and failed outcomes.
-7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
-8. Outbound mail copy should stay concise and actionable.
+6. The shared delivery path must suppress duplicate or too-recent outbound attempts by notice class and record those suppressed attempts as `skipped` rather than silently dropping them.
+7. The outbound mail path must support an operator-controlled send-disable or circuit-breaker state that records attempted deliveries truthfully while outbound mail is disabled.
+8. Queued deliveries must revalidate current invoice truth before sending and mark the delivery `skipped` if the queued notice no longer matches the current recipient, public-share state, or payment state.
+9. The delivery history should surface queued, sent, skipped, and failed outcomes.
+10. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
+11. Outbound mail copy should stay concise and actionable.

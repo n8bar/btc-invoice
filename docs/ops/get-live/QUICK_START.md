@@ -5,7 +5,7 @@ Fast path to run the app locally with Laravel Sail.
 ## Prerequisites
 - Docker + Docker Compose
 - Node 20+ (for Vite build)
-- Mailgun or another SMTP provider (pre-prod can use aliasing)
+- Mailgun API credentials (pre-prod can use aliasing)
 
 ## Setup
 1. Copy env template and set required keys:
@@ -13,7 +13,8 @@ Fast path to run the app locally with Laravel Sail.
    cp .env.example .env
    ```
    - `APP_URL` / `APP_PUBLIC_URL` for links (localhost in dev).
-   - Mail: `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_*`.
+   - Mail: `MAIL_MAILER=mailgun`, `MAILGUN_DOMAIN`, `MAILGUN_SECRET`, optional `MAILGUN_ENDPOINT`, and `MAIL_FROM_*`.
+   - Mail safety: `MAIL_OUTBOUND_ENABLED`, `MAIL_MANUAL_SEND_COOLDOWN_MINUTES`, `MAIL_ALERT_COOLDOWN_MINUTES`.
    - Aliasing for pre-prod safety: `MAIL_ALIAS_ENABLED=true`, `MAIL_ALIAS_DOMAIN=mailer.cryptozing.app`.
    - Wallet network: `WALLET_NETWORK=mainnet` (real payments) or `testnet4`/`testnet3` (testing; matches the watcher’s mempool endpoint).
 2. Start Sail and install dependencies:
@@ -39,8 +40,12 @@ Fast path to run the app locally with Laravel Sail.
 | --- | --- | --- |
 | APP_URL / APP_PUBLIC_URL | Base URLs for app/public links | http://localhost |
 | WALLET_NETWORK | Derivation + mempool network | mainnet / testnet4 / testnet3 |
-| MAIL_MAILER / HOST / PORT / USERNAME / PASSWORD | SMTP settings | mailgun sandbox creds |
+| MAIL_MAILER | Default transport | mailgun |
+| MAILGUN_DOMAIN / MAILGUN_SECRET / MAILGUN_ENDPOINT | Mailgun HTTP API settings | sandbox domain / key / api.mailgun.net |
 | MAIL_FROM_ADDRESS / MAIL_FROM_NAME | Default sender | no-reply@cryptozing.app / CryptoZing |
+| MAIL_OUTBOUND_ENABLED | Emergency outbound-mail circuit breaker | true |
+| MAIL_MANUAL_SEND_COOLDOWN_MINUTES | Manual invoice-send cooldown | 60 |
+| MAIL_ALERT_COOLDOWN_MINUTES | Automated alert cooldown | 1440 |
 | MAIL_ALIAS_ENABLED / MAIL_ALIAS_DOMAIN | Catch-all rewrite during pre-prod | true / mailer.cryptozing.app |
 | DB_DATABASE / DB_USERNAME / DB_PASSWORD | Sail MySQL | from .env defaults |
 

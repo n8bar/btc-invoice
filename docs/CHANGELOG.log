@@ -917,3 +917,9 @@ The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDI
 
 2026-03-27 | MS16 Phase 1 delivery baseline audit completed and Phase 2 is now active
 `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md` now records the completed outbound delivery inventory, current guardrail matrix, concrete spam-risk findings, and the Phase 2 / Phase 3 inputs drawn from the live code; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, and `docs/PLAN.md` now advance MS16 to Phase 2 as the active next execution step.
+
+2026-03-27 | MS16 Phase 2 starts shared delivery gating and Mailgun driver wiring
+Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner paid notices, and alert deliveries now queue through one shared service; manual invoice sends now respect a configurable cooldown, outbound mail can be disabled via config, queued sends revalidate public-link and recipient state before delivery, queued overpayment alerts now skip when no longer truthful, Laravel mail config now includes the Mailgun HTTP driver path, `.env.example` now documents the Mailgun + mail-safety env vars, and the get-live docs now describe Mailgun API credentials instead of SMTP-first setup.
+
+2026-03-27 | MS16 Phase 2 codifies delivery safeguards in the notifications spec and marks the implemented checklist state
+`docs/specs/NOTIFICATIONS.md` now explicitly requires duplicate/too-recent send suppression, an outbound-mail circuit breaker, and queued-delivery truth revalidation before send; `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now marks the shared safeguard and Laravel Mailgun wiring work complete while leaving provider-state confirmation and controlled Mailgun send verification open.

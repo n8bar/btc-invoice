@@ -182,6 +182,64 @@ class InvoiceNotificationTest extends TestCase
         ]);
     }
 
+    public function test_resolving_overpayment_skips_queued_overpay_alerts(): void
+    {
+        Queue::fake();
+
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $overpaySats = (int) round($expectedSats * 1.2);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-overpay-resolved',
+            'sats_received' => $overpaySats,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        $clientDelivery = $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'client_overpay_alert',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'dispatched_at' => now(),
+        ]);
+
+        $ownerDelivery = $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'owner_overpay_alert',
+            'status' => 'queued',
+            'recipient' => $owner->email,
+            'dispatched_at' => now(),
+        ]);
+
+        $invoice->forceFill([
+            'amount_usd' => 300,
+            'amount_btc' => 0.006,
+        ])->save();
+
+        app(InvoiceAlertService::class)->skipInvalidQueuedDeliveries(
+            $invoice->fresh('payments'),
+            'Skipped after invoice change.'
+        );
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $clientDelivery->id,
+            'status' => 'skipped',
+            'error_message' => 'Skipped after invoice change. Overpayment alert no longer applies.',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $ownerDelivery->id,
+            'status' => 'skipped',
+            'error_message' => 'Skipped after invoice change. Overpayment alert no longer applies.',
+        ]);
+    }
+
     public function test_past_due_command_sends_alerts(): void
     {
         Queue::fake();

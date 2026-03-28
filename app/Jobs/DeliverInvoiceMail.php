@@ -14,6 +14,7 @@ use App\Mail\InvoiceOwnerPaidNoticeMail;
 use App\Mail\InvoicePartialWarningClientMail;
 use App\Mail\InvoicePartialWarningOwnerMail;
 use App\Models\InvoiceDelivery;
+use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,7 +32,7 @@ class DeliverInvoiceMail implements ShouldQueue
     {
     }
 
-    public function handle(MailAlias $mailAlias): void
+    public function handle(MailAlias $mailAlias, InvoiceDeliveryService $deliveries): void
     {
         $delivery = $this->delivery->fresh();
         if (!$delivery || $delivery->status !== 'queued') {
@@ -47,7 +48,7 @@ class DeliverInvoiceMail implements ShouldQueue
             return;
         }
 
-        if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice)) {
+        if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice, $deliveries)) {
             $delivery->update([
                 'status' => 'skipped',
                 'error_message' => $skipReason,
@@ -64,8 +65,8 @@ class DeliverInvoiceMail implements ShouldQueue
             'owner_overpay_alert' => new InvoiceOverpaymentOwnerMail($invoice, $delivery),
             'client_underpay_alert' => new InvoiceUnderpaymentClientMail($invoice, $delivery),
             'owner_underpay_alert' => new InvoiceUnderpaymentOwnerMail($invoice, $delivery),
-            'client_partial_warning' => new \App\Mail\InvoicePartialWarningClientMail($invoice, $delivery),
-            'owner_partial_warning' => new \App\Mail\InvoicePartialWarningOwnerMail($invoice, $delivery),
+            'client_partial_warning' => new InvoicePartialWarningClientMail($invoice, $delivery),
+            'owner_partial_warning' => new InvoicePartialWarningOwnerMail($invoice, $delivery),
             default => new InvoiceReadyMail($invoice, $delivery),
         };
 
@@ -102,15 +103,43 @@ class DeliverInvoiceMail implements ShouldQueue
         }
     }
 
-    private function shouldSkipDelivery(InvoiceDelivery $delivery, \App\Models\Invoice $invoice): ?string
+    private function shouldSkipDelivery(
+        InvoiceDelivery $delivery,
+        \App\Models\Invoice $invoice,
+        InvoiceDeliveryService $deliveries
+    ): ?string
     {
         if ($delivery->status !== 'queued') {
             return 'Delivery no longer queued.';
         }
 
+        if (! $deliveries->outboundEnabled()) {
+            return 'Outbound mail is temporarily disabled.';
+        }
+
+        if ($delivery->type === 'send') {
+            $currentRecipient = trim((string) ($invoice->client?->email ?? ''));
+            if ($currentRecipient === '') {
+                return 'Client email missing before send.';
+            }
+
+            if (strcasecmp($currentRecipient, trim((string) $delivery->recipient)) !== 0) {
+                return 'Recipient no longer matches the current client email.';
+            }
+
+            if (! $invoice->public_enabled || ! $invoice->public_token) {
+                return 'Public share link disabled before send.';
+            }
+        }
+
         $paidTypes = ['receipt', 'owner_paid_notice'];
         if (in_array($delivery->type, $paidTypes, true) && $invoice->status !== 'paid') {
             return 'Invoice no longer paid.';
+        }
+
+        $overpayTypes = ['client_overpay_alert', 'owner_overpay_alert'];
+        if (in_array($delivery->type, $overpayTypes, true) && !$invoice->requiresClientOverpayAlert()) {
+            return 'Overpayment resolved before send.';
         }
 
         $underpayTypes = ['client_underpay_alert', 'owner_underpay_alert'];
