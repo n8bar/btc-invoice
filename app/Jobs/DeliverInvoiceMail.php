@@ -21,6 +21,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -35,25 +36,83 @@ class DeliverInvoiceMail implements ShouldQueue
     public function handle(MailAlias $mailAlias, InvoiceDeliveryService $deliveries): void
     {
         $delivery = $this->delivery->fresh();
-        if (!$delivery || $delivery->status !== 'queued') {
+        if (!$delivery) {
             return;
         }
 
-        $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
-        if (!$invoice || !$invoice->client) {
-            $delivery->update([
-                'status' => 'failed',
-                'error_message' => 'Missing invoice/client context.',
+        $sendLock = Cache::lock($this->sendLockName($deliveries->intentKeyForDelivery($delivery)), 30);
+
+        if (! $sendLock->get()) {
+            Log::info('invoice_delivery.send_locked', [
+                'delivery_id' => $delivery->id,
+                'invoice_id' => $delivery->invoice_id,
+                'type' => $delivery->type,
+                'recipient' => $delivery->recipient,
             ]);
             return;
         }
 
-        if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice, $deliveries)) {
-            $delivery->update([
-                'status' => 'skipped',
-                'error_message' => $skipReason,
-            ]);
-            return;
+        try {
+            $delivery = $this->delivery->fresh();
+            if (! $delivery) {
+                return;
+            }
+
+            if ($delivery->status === 'sending') {
+                Log::info('invoice_delivery.send_already_claimed', [
+                    'delivery_id' => $delivery->id,
+                    'invoice_id' => $delivery->invoice_id,
+                    'type' => $delivery->type,
+                    'recipient' => $delivery->recipient,
+                ]);
+                return;
+            }
+
+            if ($delivery->status !== 'queued') {
+                return;
+            }
+
+            $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
+            if (! $invoice || ! $invoice->client) {
+                $delivery->update([
+                    'status' => 'failed',
+                    'error_message' => 'Missing invoice/client context.',
+                ]);
+                return;
+            }
+
+            if ($skipReason = $this->shouldSkipDelivery($delivery, $invoice, $deliveries)) {
+                $delivery->update([
+                    'status' => 'skipped',
+                    'error_message' => $skipReason,
+                ]);
+                return;
+            }
+
+            if ($duplicateReason = $this->duplicateSendReason($delivery)) {
+                $delivery->update([
+                    'status' => 'skipped',
+                    'error_message' => $duplicateReason,
+                ]);
+                return;
+            }
+
+            $claimed = InvoiceDelivery::query()
+                ->whereKey($delivery->id)
+                ->where('status', 'queued')
+                ->update([
+                    'status' => 'sending',
+                    'error_code' => null,
+                    'error_message' => null,
+                ]);
+
+            if ($claimed !== 1) {
+                return;
+            }
+
+            $delivery->refresh();
+        } finally {
+            $sendLock->release();
         }
 
         $mailable = match ($delivery->type) {
@@ -101,6 +160,32 @@ class DeliverInvoiceMail implements ShouldQueue
             ]);
             throw $e;
         }
+    }
+
+    private function duplicateSendReason(InvoiceDelivery $delivery): ?string
+    {
+        $existing = InvoiceDelivery::query()
+            ->where('invoice_id', $delivery->invoice_id)
+            ->where('user_id', $delivery->user_id)
+            ->where('type', $delivery->type)
+            ->whereRaw('LOWER(TRIM(recipient)) = ?', [strtolower(trim($delivery->recipient))])
+            ->where('id', '!=', $delivery->id)
+            ->whereIn('status', ['sending', 'sent'])
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $existing) {
+            return null;
+        }
+
+        return $existing->status === 'sent'
+            ? 'A matching delivery has already been sent.'
+            : 'A matching delivery send is already in progress.';
+    }
+
+    private function sendLockName(string $intentKey): string
+    {
+        return 'invoice-delivery-send:' . $intentKey;
     }
 
     private function shouldSkipDelivery(

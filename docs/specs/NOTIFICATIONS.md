@@ -71,6 +71,7 @@
 8. Idempotency keys must be derived from stable business intent such as invoice, notice class, normalized recipient, and when applicable payment identity like `txid`, rather than rendered email bytes, provider-added headers, or variable timestamps in the subject/body.
 9. The outbound mail path must support an operator-controlled send-disable or circuit-breaker state that records attempted deliveries truthfully while outbound mail is disabled.
 10. Queued deliveries must revalidate current invoice truth before sending and mark the delivery `skipped` if the queued notice no longer matches the current recipient, public-share state, or payment state.
-11. The delivery history should surface queued, sent, skipped, and failed outcomes.
+11. The delivery history should surface queued, sending, sent, skipped, and failed outcomes.
+   1. `sending` is the claimed provider-boundary state used to prevent duplicate job execution from producing a second outbound send while a delivery is already in progress or awaiting operator review after an ambiguous worker failure.
 12. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 13. Outbound mail copy should stay concise and actionable.

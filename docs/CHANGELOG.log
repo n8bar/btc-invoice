@@ -953,3 +953,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-28 | MS16 Phase 2 keeps provider-state steps sequential around endpoint proof
 `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer points the early provider-state checklist item at later live-send proof without saying what to do in sequence; the dashboard step now records the endpoint match as either settled or still pending live verification, and the later verification step now explicitly closes that pending proof.
+
+2026-03-28 | MS16 Phase 2 adds send-boundary idempotency before live Mailgun proof
+`App\\Jobs\\DeliverInvoiceMail` now claims the provider boundary by transitioning queued deliveries to `sending` under a per-intent lock, skips duplicate queued rows when a matching send is already in progress or already sent, and avoids resending deliveries that were already claimed; `App\\Services\\InvoiceDeliveryService` now reuses the same stable intent-key builder at queue and send boundaries and matches recipients case-insensitively; `tests/Feature/InvoiceDeliveryTest.php` now covers claimed `sending` rows, duplicate queued rows, and recipient-case normalization; and `docs/specs/NOTIFICATIONS.md` plus `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` now reflect the shipped send-boundary guard and transient `sending` state.

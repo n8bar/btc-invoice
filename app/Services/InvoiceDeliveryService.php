@@ -49,12 +49,12 @@ class InvoiceDeliveryService
 
     public function intentKey(Invoice $invoice, string $type, string $recipient): string
     {
-        return hash('sha256', implode('|', [
-            $invoice->id,
-            $invoice->user_id,
-            $type,
-            $this->normalizeRecipient($recipient),
-        ]));
+        return $this->buildIntentKey($invoice->id, $invoice->user_id, $type, $recipient);
+    }
+
+    public function intentKeyForDelivery(InvoiceDelivery $delivery): string
+    {
+        return $this->buildIntentKey($delivery->invoice_id, $delivery->user_id, $delivery->type, $delivery->recipient);
     }
 
     public function outboundEnabled(): bool
@@ -177,12 +177,22 @@ class InvoiceDeliveryService
     {
         return $invoice->deliveries()
             ->where('type', $type)
-            ->where('recipient', $recipient);
+            ->whereRaw('LOWER(TRIM(recipient)) = ?', [$this->normalizeRecipient($recipient)]);
     }
 
     private function intentLockName(string $intentKey): string
     {
         return 'invoice-delivery-intent:' . $intentKey;
+    }
+
+    private function buildIntentKey(int $invoiceId, int $userId, string $type, string $recipient): string
+    {
+        return hash('sha256', implode('|', [
+            $invoiceId,
+            $userId,
+            $type,
+            $this->normalizeRecipient($recipient),
+        ]));
     }
 
     private function normalizeRecipient(string $recipient): string
