@@ -14,8 +14,8 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - Finish the remaining mailer/alerts polish and audit work once sending is trustworthy again.
 
 ## Current Focus
-- Active phase: **Phase 1**
-- Current objective: break Phase 1 through Phase 3 into their own execution docs and remove the milestone doc's temporary open-question / brain-dump sprawl before broader MS16 implementation proceeds.
+- Active focus: **Milestone doc restructure + phase breakout**
+- Current objective: reorganize this milestone doc back toward milestone-level summary only, break Phase 1 through Phase 3 into their own execution docs, and resolve, relocate, or deliberately discard the current open-question / brain-dump sprawl before broader MS16 implementation proceeds.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current mailer/delivery implementation, and Mailgun account state.
 
 ## Phase Rollup
