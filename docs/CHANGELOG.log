@@ -878,3 +878,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | Notifications spec no longer carries a standalone testing section
 `docs/specs/NOTIFICATIONS.md` now deletes the former `Testing` section entirely and renumbers the remaining `Open Questions` and `Future Enhancements` sections, since the current test list was not something we would add fresh at this stage of the spec cleanup.
+
+2026-03-27 | Notifications spec no longer carries a stale open question or post-RC future section
+`docs/specs/NOTIFICATIONS.md` now ends after the outbound-mail/history rules; the stale retry-row question is deleted because the app already follows that direction, and the out-of-RC items move into `docs/BACKLOG.md` as `Notification Preference Expansion` plus the existing notification-hub backlog work.

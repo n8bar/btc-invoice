@@ -68,10 +68,3 @@
 6. The delivery history should surface queued, sent, skipped, and failed outcomes.
 7. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
 8. Outbound mail copy should stay concise and actionable.
-
-## 6. Open Questions
-1. Retry strategy: keep one `invoice_deliveries` row per job fire vs. a single row with status updates. Current direction: one row per job fire for audit clarity.
-
-## 7. Future Enhancements
-1. After base implementation, consider allowing owners to configure alert thresholds per profile (default 15%).
-2. Once we add Slack/webhook integrations, mirror these events there for ops teams.
