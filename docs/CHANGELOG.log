@@ -911,3 +911,6 @@ Added `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_S
 
 2026-03-27 | MS16 strategy sidecars now use numbered nested checkboxes under their owning tasks
 The executable parallel work inside `docs/strategies/16.1_DELIVERY_BASELINE_AUDIT.md`, `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`, `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`, and `docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` now appears as numbered nested checkbox items directly under the parent task they depend on, making them easier to reference, assign, and check off without reviving separate sidecar sections.
+
+2026-03-27 | MS16 Phase 2 now spells out the Mailgun HTTP API implementation checklist
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the Mailgun HTTP API work at the level of generic prerequisites; `16.2.3.2` is now an executable nested checklist covering package install, `config/services.php`, `config/mail.php`, the `MAIL_MAILER=mailgun` default path, and the corresponding ops/env documentation updates.
