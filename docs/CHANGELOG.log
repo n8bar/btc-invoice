@@ -947,3 +947,6 @@ Added `App\\Services\\InvoiceDeliveryService` so manual sends, receipts, owner p
 
 2026-03-28 | MS16 Phase 2 removes constraint-only checkboxes from later verification gates
 `docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer renders the verification gate and exit-criteria closure conditions as fake actionable checkboxes; those constraints now sit as plain notes under the relevant steps so the ordered checklist stays focused on real executable work.
+
+2026-03-28 | MS16 Phase 2 moves the rollout-doc update to where the evidence actually exists
+`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md` no longer leaves the RC rollout-note update up in the early aliasing decision block; that doc update now sits in the later evidence-capture part of verification, where provider and aliasing findings are actually settled enough to document.
