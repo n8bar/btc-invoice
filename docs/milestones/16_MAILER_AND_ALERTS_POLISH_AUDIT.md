@@ -15,8 +15,9 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 
 ## Current Focus
 - Active focus: **Milestone doc restructure + phase breakout**
-- Current objective: reorganize this milestone doc back toward milestone-level summary only, break Phase 1 through Phase 3 into their own execution docs, and resolve, relocate, or deliberately discard the current open-question / brain-dump sprawl before broader MS16 implementation proceeds.
-- Phase-count note: the current three-phase breakdown is provisional; when the phase docs are broken out, recut the phase structure around the real dependency chain instead of preserving the current count by inertia.
+- Current objective: reorganize this milestone doc back toward milestone-level summary only, break the real MS16 work into execution docs, and resolve, relocate, or deliberately discard the current open-question / brain-dump sprawl before broader MS16 implementation proceeds.
+- Breakout rule: derive the new phase docs from the actual work, dependency chain, and exit criteria instead of preserving the current placeholder phase count or spec section shape by inertia.
+- Sequencing note: once the new phase docs exist, their ordered work is sequential by default.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current mailer/delivery implementation, and Mailgun account state.
 
 ## Phase Rollup

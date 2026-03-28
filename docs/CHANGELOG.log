@@ -896,3 +896,6 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS16 now explicitly treats its current phase count as provisional
 `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now says the current three-phase breakdown is provisional and should be re-cut during the phase-doc breakout if the real dependency chain points to a different shape.
+
+2026-03-27 | MS16 current focus now defines the breakout rule directly
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now expands `Current Focus` to say the phase-doc breakout must be derived from the real work, dependency chain, and exit criteria, not from the current placeholder phase count or spec section shape, while still treating the new phase docs as sequential once they exist.
