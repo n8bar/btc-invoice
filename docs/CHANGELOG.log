@@ -743,3 +743,159 @@ The GitHub repository homepage now points at `https://cryptozing.app`, `README.m
 
 2026-03-27 | MS15 phase rollup now makes the conditional Phase 3 scope explicit in-line
 `docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md` now adds a short parenthetical on the Phase 3 rollup line to make it clear that the metadata/search-signal phase only would have applied if the existing placeholder content had been deemed too thin.
+
+2026-03-27 | Notifications spec no longer locks MS16 to the current delivery plumbing
+`docs/specs/NOTIFICATIONS.md` no longer treats preserving the existing queued/SMTP/Mailgun-aliasing shape as a rigid goal, leaving MS16 free to evaluate safer delivery safeguards and transport choices without fighting the canonical notifications scope.
+
+2026-03-27 | MS16 now has a milestone stub for mailer safety, provider recovery, and transport decisions
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now exists as the active MS16 execution doc, `docs/PLAN.md` now points at it as the primary next doc, and `README.md` now lists it in the documentation map; the stub captures the four immediate MS16 fronts (spam-bug triage, app-side safeguards, Mailgun recovery, and SMTP-vs-HTTP-API evaluation) plus the open question about whether some payment-triggered mail needs broader owner confirmation before send.
+
+2026-03-27 | Notifications spec no longer mislabels the public invoice URL as signed
+`docs/specs/NOTIFICATIONS.md` now refers to the invoice email including a public link rather than a signed public link, matching the actual tokenized public-share implementation instead of implying cryptographic signing.
+
+2026-03-27 | Notifications spec now uses consistent numbering through its checklist-style sections
+`docs/specs/NOTIFICATIONS.md` now extends the user's numbered-section cleanup through the remaining goals, flows, alert triggers, implementation requirements, mailables, copy, testing, open-questions, and future-enhancement lists so the whole spec uses one numbering style instead of mixing bullets and numbered items.
+
+2026-03-27 | MS16 now preserves the candidate low-information payment-acknowledgment copy and follow-through requirement
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now records the current candidate client-facing acknowledgment copy for a detected Bitcoin payment plus the matching MS16 reminder that the operator side must actually notify the invoice issuer promptly and surface a visible review/receipt CTA if that acknowledgment path is adopted.
+
+2026-03-27 | MS16 payment-acknowledgment draft copy is now less self-undermining
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now trims the candidate client acknowledgment from “was detected and is being reviewed” down to “was detected” so the notification reassures without sounding like it is backpedaling the same claim in its next line.
+
+2026-03-27 | Notifications Goal 2 now matches the emerging MS16 acknowledgment-vs-receipt split
+`docs/specs/NOTIFICATIONS.md` no longer promises an automatic watcher-driven paid receipt; Goal 2 now says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails, leaving room for owner-reviewed receipts and the narrower client acknowledgment idea recorded in MS16.
+
+2026-03-27 | Notifications Goal 3 now covers only the non-receipt alert family
+`docs/specs/NOTIFICATIONS.md` no longer uses Goal 3 as a generic overlapping “owners and clients get key alerts” statement; it now explicitly covers truthful alert emails for past-due, overpayment, underpayment, and partial-payment events so Goal 2 can keep the payment acknowledgment/receipt lane.
+
+2026-03-27 | Notifications Goals 3 and 4 are now one clean non-receipt alert goal
+`docs/specs/NOTIFICATIONS.md` now folds the useful trigger language from the old Goal 4 into Goal 3, deletes the redundant standalone Goal 4, and renumbers the remaining ambiguity/truthfulness goal so the goals section no longer repeats the same alert scope in two adjacent items.
+
+2026-03-27 | Notifications ambiguity goal now states the cross-cutting truthfulness rule directly
+`docs/specs/NOTIFICATIONS.md` no longer phrases the final goal as one narrow later-payment scenario; it now says payment-triggered mail must not overstate certainty when the underlying payment state is semantically ambiguous, which better matches the broader MS14/MS16 correction and acknowledgment concerns.
+
+2026-03-27 | Notifications ambiguity goal is now less suppression-coded
+`docs/specs/NOTIFICATIONS.md` now says to keep payment-triggered mail truthful when the underlying payment state is semantically ambiguous, which preserves the truthfulness goal without implying that ambiguity should automatically suppress all communication.
+
+2026-03-27 | Notifications ambiguity goal now explicitly leaves room for safe acknowledgment
+`docs/specs/NOTIFICATIONS.md` now ends the ambiguity goal with “while still acknowledging what it safely can,” closing the lingering “truth via silence” loophole without prematurely dropping down into flow-level rules.
+
+2026-03-27 | Notifications spec now treats manual send as the action that issues a draft invoice
+`docs/specs/NOTIFICATIONS.md` now states that the manual send flow is available when the invoice has a client email and its public link is enabled, and that sending the invoice queues outbound delivery, records the attempt in the delivery log, and issues the invoice out of `draft`.
+
+2026-03-27 | Notifications flow 3.2 now separates detected-payment acknowledgment from receipt follow-up
+`docs/specs/NOTIFICATIONS.md` no longer treats the second base communication flow as a simple automatic paid receipt; section 3.2 now distinguishes a low-information detected-payment acknowledgment from the higher-certainty receipt follow-up and adds owner-facing manual-follow-up expectations when no client email exists.
+
+2026-03-27 | Notifications flow 3.2 no longer carries a dead missing-client-email fallback
+`docs/specs/NOTIFICATIONS.md` no longer says receipt follow-up should fall back to manual sharing when the client email is missing, because client email is now required both by the client form validation and by the non-null schema constraint.
+
+2026-03-27 | Notifications flow 3.2 now resolves ambiguity by narrowing the acknowledgment instead of suppressing it
+`docs/specs/NOTIFICATIONS.md` no longer says an ambiguous detected payment should hold the client-facing acknowledgment; `3.2.1.4` now says the acknowledgment should stay limited to what the system can safely say and avoid certainty about how the payment applies.
+
+2026-03-27 | Notifications flow 3.3 now stays at the product-behavior level
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes the `invoice_deliveries` table name, per-row field list, or the invoice detail page as the primary operator view inside the base communication flows; `3.3` now describes only the enduring shared delivery-history behavior and the operator outcomes it must expose.
+
+2026-03-27 | Notifications Section 5 now preserves the delivery-history implementation details that no longer belong in Section 3
+`docs/specs/NOTIFICATIONS.md` now carries the `invoice_deliveries` table name, delivery-row field expectations, current invoice-detail operator view note, and the full queued/sent/skipped/failed outcome set under Shared Implementation Requirements instead of letting those implementation-shaped details disappear when Section 3 was cleaned up.
+
+2026-03-27 | Notifications alert 4.1 now stays at the product-behavior level
+`docs/specs/NOTIFICATIONS.md` no longer describes the owner paid notice in terms of the `InvoicePaid` event, watcher/manual-adjustment trigger paths, or raw delivery types; `4.1` now simply states that when an invoice becomes paid, the invoice issuer gets a succinct owner notice that stays distinct from client-facing payment acknowledgments and receipts.
+
+2026-03-27 | Notifications alert 4.2 now keeps only the past-due behavior while MS16 holds the cadence/storage details
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes nightly scheduling, 48-hour resend spacing, or raw delivery-log storage detail inside the Past Due alert; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now preserves those as MS16 Phase 3 decisions to flesh out later.
+
+2026-03-27 | Notifications Section 4 now uses content requirements instead of verbatim alert copy
+`docs/specs/NOTIFICATIONS.md` no longer hardcodes owner/client alert sentences inside the Past Due, Overpayment, Underpayment, and Partial-Payment sections; those lines now describe what each alert must communicate while leaving the exact wording to the later copy-guidelines and implementation work.
+
+2026-03-27 | Notifications over/underpayment alerts now read as significant RC thresholds with neutral underpayment tone
+`docs/specs/NOTIFICATIONS.md` now names Sections 4.3 and 4.4 as significant overpayment/underpayment alerts, phrases the 15% trigger as an RC threshold instead of a method call, and explicitly requires the underpayment alert to communicate the remaining balance neutrally rather than implying the client necessarily made a mistake.
+
+2026-03-27 | Notifications spec no longer treats repeated partial payments as a separate client alert family
+`docs/specs/NOTIFICATIONS.md` now removes the standalone partial-payment warning from Section 4 and folds any remaining-balance convenience guidance into the significant underpayment alert; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` preserves the idea that repeated partials may still matter later as an owner-side or operational signal rather than as a distinct client-facing alert class.
+
+2026-03-27 | Notifications spec now defines issuer copies of client-facing notifications as a general behavior, with the MS16 toggle captured separately
+`docs/specs/NOTIFICATIONS.md` now says client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior; the old per-alert owner-copy special casing has been removed from Section 4, and `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now explicitly captures the concrete Phase 3 toggle implementation with a default-on RC posture.
+
+2026-03-27 | Notifications Section 5 is temporarily unnamed while its contents are being recategorized
+`docs/specs/NOTIFICATIONS.md` now uses `## 5. ____` as a placeholder heading so we can clean the mixed-role contents first and choose an honest section name afterward instead of locking in another misleading “implementation requirements” bucket.
+
+2026-03-27 | Notifications item 5.1 now keeps the audit/queue invariant without hardcoding the current plumbing names
+`docs/specs/NOTIFICATIONS.md` now says outbound invoice communication should use a shared queued delivery path and shared delivery history so outcomes remain auditable, replacing the older wording that hardcoded the existing queue/mailer/table implementation details.
+
+2026-03-27 | Notifications item 5.2 now expresses delivery-history context as a product requirement instead of a row schema checklist
+`docs/specs/NOTIFICATIONS.md` now says the shared delivery history must preserve enough context to identify the invoice, issuer, recipients, communication class, outcome, and timing/error details for each outbound attempt, instead of spelling that out as delivery-log row fields.
+
+2026-03-27 | Notifications item 5.3 no longer freezes the delivery-history UI to today’s owner invoice page
+`docs/specs/NOTIFICATIONS.md` no longer says the owner invoice detail page is the primary operator view for delivery history, because that is current UI placement rather than an enduring notification invariant and future versions may expose delivery history elsewhere too.
+
+2026-03-27 | Notifications item 5.3 now defines the public-host rule without hardcoding a specific domain or runtime host
+`docs/specs/NOTIFICATIONS.md` no longer ties outbound email links to `APP_PUBLIC_URL`, the currently running host, or a single production domain; it now says public-share links must use the explicitly configured public host for the intended recipient-facing environment, including cases where a dev/staging environment deliberately targets another deployment.
+
+2026-03-27 | Notifications spec no longer carries temporary aliasing config, but MS16 preserves it for later strategy work
+`docs/specs/NOTIFICATIONS.md` no longer treats catch-all aliasing as a product invariant; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now preserves the operational question for later phase planning so MS16 can decide when aliasing is still useful for safe testing, when it distorts delivery validation, and when it must be turned off before real-recipient traffic.
+
+2026-03-27 | Notifications spec no longer treats automatic paid receipts as a settled cross-cutting rule
+`docs/specs/NOTIFICATIONS.md` no longer says automatic paid receipts remain part of the owner communication model; that receipt-model decision is still being reconsidered in MS16, so it no longer belongs as a stable item in Section 5.
+
+2026-03-27 | Notifications item 5.5 now treats outbound mail as a required deployment capability rather than a global feature-flag escape hatch
+`docs/specs/NOTIFICATIONS.md` no longer says a global feature flag may disable outbound communication entirely when mail is not configured; it now says outbound mail is required for any valid recipient-facing deployment, while still allowing development and test environments to run without it intentionally.
+
+2026-03-27 | Notifications item 5.6 now states the delivery-history outcome requirement without job/plumbing wording
+`docs/specs/NOTIFICATIONS.md` now says the delivery history should surface queued, sent, skipped, and failed outcomes, replacing the more implementation-shaped wording about delivery jobs surfacing those states through a shared log.
+
+2026-03-27 | Notifications item 5.8 no longer keeps milestone-history wording inside the spec
+`docs/specs/NOTIFICATIONS.md` no longer says the later-payment owner-validation gate is “planned MS16 work, not an MS14 Phase 5 reattribution gate”; that sequencing note now lives in `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`, where the milestone history and follow-up planning belong.
+
+2026-03-27 | Notifications item 5.7 now states the later-payment ambiguity warning more readably
+`docs/specs/NOTIFICATIONS.md` now splits the later-payment ambiguity warning into a shorter main statement plus an examples sub-line, keeping the important “supported wallet config does not eliminate semantic ambiguity” idea without the old overlong sentence shape.
+
+2026-03-27 | Notifications Goal 2 now keeps “automatic” scoped to acknowledgments instead of dropping it entirely
+`docs/specs/NOTIFICATIONS.md` again says the system should enable automatic, non-promissory payment acknowledgments and truthful receipt emails; this preserves the automatic acknowledgment idea without forcing the spec to treat receipt emails themselves as fully automatic.
+
+2026-03-27 | Product spec header date now reflects the current synced doc set
+`docs/PRODUCT_SPEC.md` now updates its `_Last updated` header to `2026-03-27` after the MS15 closeout and MS16 kickoff docs moved forward elsewhere, without changing the underlying product-level requirements.
+
+2026-03-27 | Notifications spec no longer treats the later-payment validation gate as a settled cross-cutting rule
+`docs/specs/NOTIFICATIONS.md` now stops after the later-payment ambiguity warning instead of hardcoding the owner-validation gate itself, and its testing section now expects only the durable truthfulness behavior for semantically ambiguous payment-triggered communication; `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` preserves the real MS16 design question about whether such a gate is needed at all, how it coexists with safe low-information acknowledgments, which outbound classes it would cover, and whether manual sends/past-due reminders remain outside it.
+
+2026-03-27 | Notifications spec item 5.8 now states the delivery-label invariant instead of milestone work
+`docs/specs/NOTIFICATIONS.md` no longer says `MS16 delivery-log polish` in Section 5; it now simply requires the delivery history to use concise, human-friendly labels for communication classes and outcomes.
+
+2026-03-27 | Notifications spec now keeps outbound-mail/history rules together and moves payment ambiguity into the payment flow
+`docs/specs/NOTIFICATIONS.md` now renames Section 5 to `Outbound Mail and History`, moves the later-payment ambiguity note into Section 3.2 where payment acknowledgments and receipts are defined, and leaves Section 5 focused on outbound-mail and delivery-history invariants.
+
+2026-03-27 | Notifications spec now explicitly keeps later-payment ambiguity from suppressing safe acknowledgments
+`docs/specs/NOTIFICATIONS.md` now adds `3.2.2.3`, which says later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
+
+2026-03-27 | Notifications implementation sketches moved out of the spec and into MS16 as non-binding leftovers
+`docs/specs/NOTIFICATIONS.md` Section 6 no longer hardcodes mailable classes, routes, jobs, scheduler ideas, or persistence tactics as spec requirements; those implementation-shaped notes now live in `docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` under a clearly non-binding `Leftover Implementation Brain-Dump` section for later phase planning.
+
+2026-03-27 | Notifications spec no longer carries an empty deferred implementation section
+`docs/specs/NOTIFICATIONS.md` now deletes the former Section 6 deferral note entirely and renumbers the remaining copy, testing, open-questions, and future-enhancements sections.
+
+2026-03-27 | Notifications spec now keeps copy guidance as a single outbound-mail principle instead of a whole section
+`docs/specs/NOTIFICATIONS.md` now deletes the standalone `Copy Guidelines` section, folds the durable rule into Section 5 as `Outbound mail copy should stay concise and actionable`, and renumbers the testing/open-questions/future-enhancements sections.
+
+2026-03-27 | Notifications spec no longer carries a standalone testing section
+`docs/specs/NOTIFICATIONS.md` now deletes the former `Testing` section entirely and renumbers the remaining `Open Questions` and `Future Enhancements` sections, since the current test list was not something we would add fresh at this stage of the spec cleanup.
+
+2026-03-27 | Notifications spec no longer carries a stale open question or post-RC future section
+`docs/specs/NOTIFICATIONS.md` now ends after the outbound-mail/history rules; the stale retry-row question is deleted because the app already follows that direction, and the out-of-RC items move into `docs/BACKLOG.md` as `Notification Preference Expansion` plus the existing notification-hub backlog work.
+
+2026-03-27 | MS16 milestone doc now records its own pending restructure task
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now includes a temporary doc-restructure task near the top: reorganize the milestone doc back to milestone-level summary, break Phase 1 through Phase 3 into their own execution docs, and eliminate the current `Open Scope Questions` and `Leftover Implementation Brain-Dump` sections by resolving or relocating their contents.
+
+2026-03-27 | MS16 current objective now owns the doc-restructure task directly
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` no longer carries a separate temporary restructure section; the work now lives where it belongs, in `Current objective`, so the milestone doc keeps one obvious top-level statement of what we are doing now.
+
+2026-03-27 | MS16 current objective no longer pretends the notifications spec cleanup is still in progress
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now tightens `Current objective` to the actual next work: break out the phase docs and remove the milestone doc's temporary open-question / brain-dump sprawl before broader MS16 implementation proceeds.
+
+2026-03-27 | MS16 current focus now reflects the pre-phase restructure step explicitly
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` no longer says the active focus is `Phase 1`; it now says `Milestone doc restructure + phase breakout` and restores the fuller restructure intent inside `Current objective` so the milestone doc matches the actual pre-phase work in progress.
+
+2026-03-27 | MS16 now explicitly treats its current phase count as provisional
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now says the current three-phase breakdown is provisional and should be re-cut during the phase-doc breakout if the real dependency chain points to a different shape.
+
+2026-03-27 | MS16 current focus now defines the breakout rule directly
+`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md` now expands `Current Focus` to say the phase-doc breakout must be derived from the real work, dependency chain, and exit criteria, not from the current placeholder phase count or spec section shape, while still treating the new phase docs as sequential once they exist.
