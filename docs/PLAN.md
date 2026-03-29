@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS16 - Mailer & Alerts Polish + Audit**
 - Status: `active`
-- Next action: move MS16 into payment-communication truthfulness work now that the outbound delivery path is trustworthy and provider-backed.
+- Next action: move MS16 Phase 3 from implementation into verification prep now that the payment acknowledgment-versus-receipt split is shipped on the trustworthy outbound path.
 - Primary next doc: [`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`](strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
 - Supporting docs: [`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`](strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md), [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md), [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
 - Most recently completed milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)

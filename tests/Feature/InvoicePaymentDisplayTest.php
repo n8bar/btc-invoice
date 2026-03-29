@@ -608,7 +608,7 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertOk();
         $response->assertSee('data-receipt-review-panel="true"', false);
         $response->assertSeeText('Client receipt');
-        $response->assertSeeText('Review the payment rows below before sending a higher-certainty receipt.');
+        $response->assertSeeText('A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below before sending a higher-certainty receipt.');
         $response->assertSeeText('Send receipt');
         $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
     }

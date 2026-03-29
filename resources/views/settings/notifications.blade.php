@@ -28,7 +28,7 @@
                         <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
                             <h3 class="text-sm font-semibold text-gray-700">Receipts</h3>
                             <p class="text-xs text-gray-600">
-                                Control automatic client receipt delivery after invoices are paid. Later-payment ambiguity or payment-correction state may still require invoice review and a manual send.
+                                Detected payments can send a narrow acknowledgment right away. Higher-certainty client receipts still follow the paid path and may require invoice review before they send automatically.
                             </p>
                             <div class="flex items-start gap-3">
                                 <div>
@@ -39,7 +39,7 @@
                                 <div>
                                     <x-input-label for="auto_receipt_emails" :value="__('Auto email paid receipts')" />
                                     <p class="text-sm text-gray-500">
-                                        {{ __('When invoices are marked paid, automatically send a client receipt when the payment state is straightforward. Later-payment ambiguity and ignore/reattribution cases hold the automatic path for review, and you can still send manually from the invoice.') }}
+                                        {{ __('When payments are detected, the app can send a narrow acknowledgment immediately. Once an invoice is marked paid, automatically send the higher-certainty client receipt only when the payment state is straightforward. Later-payment ambiguity and ignore/reattribution cases hold the reviewed receipt for invoice review, and you can still send it manually from the invoice.') }}
                                     </p>
                                     <x-input-error class="mt-2" :messages="$errors->get('auto_receipt_emails')" />
                                 </div>

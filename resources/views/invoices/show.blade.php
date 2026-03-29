@@ -698,7 +698,7 @@
                                     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                         <div class="space-y-1">
                                             <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Client receipt</p>
-                                            <p>Review the payment rows below before sending a higher-certainty receipt.</p>
+                                            <p>A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below before sending a higher-certainty receipt.</p>
                                             @if ($latestReceiptDelivery)
                                                 <p class="text-xs text-amber-900">
                                                     Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Invoice;
+use App\Models\InvoicePayment;
 use Illuminate\Support\Carbon;
 
 class InvoiceAlertService
@@ -21,6 +22,46 @@ class InvoiceAlertService
         $this->deliveries->queue($invoice, 'owner_paid_notice', $owner->email);
     }
 
+    public function sendDetectedPaymentAcknowledgments(Invoice $invoice, InvoicePayment $payment): void
+    {
+        if (! filled($payment->txid)) {
+            return;
+        }
+
+        $invoice->loadMissing(['client', 'user']);
+
+        $contextKey = $payment->txid;
+        $meta = [
+            'invoice_payment_id' => $payment->id,
+            'txid' => $payment->txid,
+            'sats_received' => $payment->sats_received,
+            'detected_at' => $payment->detected_at?->toIso8601String(),
+            'confirmed_at' => $payment->confirmed_at?->toIso8601String(),
+        ];
+
+        $client = $invoice->client;
+        if ($client && filled($client->email)) {
+            $this->deliveries->queue(
+                $invoice,
+                'payment_acknowledgment_client',
+                $client->email,
+                contextKey: $contextKey,
+                meta: $meta,
+            );
+        }
+
+        $owner = $invoice->user;
+        if ($owner && filled($owner->email)) {
+            $this->deliveries->queue(
+                $invoice,
+                'payment_acknowledgment_owner',
+                $owner->email,
+                contextKey: $contextKey,
+                meta: $meta,
+            );
+        }
+    }
+
     public function checkPaymentThresholds(Invoice $invoice): void
     {
         if ($invoice->requiresClientOverpayAlert()) {
@@ -30,8 +71,6 @@ class InvoiceAlertService
         if ($invoice->requiresClientUnderpayAlert()) {
             $this->maybeSendUnderpayAlert($invoice);
         }
-
-        $this->maybeSendPartialWarning($invoice);
     }
 
     public function skipInvalidQueuedDeliveries(Invoice $invoice, string $reasonPrefix = 'Skipped after invoice state change.'): void
@@ -162,33 +201,6 @@ class InvoiceAlertService
         }
 
         return $lastSent->diffInMinutes(now()) >= $this->deliveries->alertCooldownMinutes();
-    }
-
-    private function maybeSendPartialWarning(Invoice $invoice): void
-    {
-        if (!$invoice->shouldWarnAboutPartialPayments()) {
-            return;
-        }
-
-        if (!$this->shouldSend($invoice->last_partial_warning_sent_at)) {
-            return;
-        }
-
-        $client = $invoice->client;
-        if ($client && !empty($client->email)) {
-            $delivery = $this->deliveries->queue($invoice, 'client_partial_warning', $client->email);
-            if ($delivery->status !== 'queued') {
-                return;
-            }
-        }
-
-        $owner = $invoice->user;
-        if ($owner && !empty($owner->email)) {
-            $this->deliveries->queue($invoice, 'owner_partial_warning', $owner->email);
-        }
-
-        $invoice->last_partial_warning_sent_at = now();
-        $invoice->save();
     }
 
     private function skipQueuedDeliveries(Invoice $invoice, array $types, string $reason): void

@@ -26,6 +26,7 @@
       3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
       4. If the payment state is ambiguous, the acknowledgment should stay limited to what the system can safely say and should avoid any certainty about how the payment applies.
       5. When an acknowledgment is tied to a specific detected payment identity, repeated detection of that same payment must not create a second acknowledgment for the same notice class.
+      6. RC uses paired owner/client delivery classes for this flow so the client acknowledgment and owner follow-through remain distinct in delivery history.
    2. **Later Payment Ambiguity**
       1. After an invoice has already received detected on-chain payment activity, later payments to that invoice’s address may still be semantically ambiguous even when the wallet configuration remains supported.
       2. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
@@ -84,6 +85,6 @@
    1. Manual invoice sends should display as `Invoice email`, not a raw storage key.
    2. Paired owner/client notification rows should keep the audience explicit in the label, such as `Past-due reminder (client)` and `Underpayment alert (owner)`.
    3. While the legacy repeated-partial warning rows still exist in stored history, they should display honestly as `Partial payment warning (client|owner)` rather than being hidden behind renamed copy.
-   4. Payment-triggered follow-up should keep the acknowledgment-versus-receipt split visible in history once those rows ship, using labels such as `Payment acknowledgment (client)` for the narrow automatic notice and `Receipt (client)` for the higher-certainty follow-up.
+   4. Payment-triggered follow-up should keep the acknowledgment-versus-receipt split visible in history once those rows ship, using labels such as `Payment acknowledgment (client)`, `Payment acknowledgment (owner)`, and `Receipt (client)` for the later higher-certainty follow-up.
    5. Outcome labels should display as `Queued`, `Sending`, `Sent`, `Skipped`, and `Failed`.
 13. Outbound mail copy should stay concise and actionable.

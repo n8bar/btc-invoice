@@ -15,10 +15,12 @@ class InvoiceDelivery extends Model
         'invoice_id',
         'user_id',
         'type',
+        'context_key',
         'status',
         'recipient',
         'cc',
         'message',
+        'meta',
         'dispatched_at',
         'sent_at',
         'error_code',
@@ -26,6 +28,7 @@ class InvoiceDelivery extends Model
     ];
 
     protected $casts = [
+        'meta' => 'array',
         'dispatched_at' => 'datetime',
         'sent_at' => 'datetime',
     ];
@@ -44,6 +47,8 @@ class InvoiceDelivery extends Model
     {
         return match ($this->type) {
             'send' => 'Invoice email',
+            'payment_acknowledgment_client' => 'Payment acknowledgment (client)',
+            'payment_acknowledgment_owner' => 'Payment acknowledgment (owner)',
             'receipt' => 'Receipt (client)',
             'owner_paid_notice' => 'Paid notice (owner)',
             'past_due_client' => 'Past-due reminder (client)',

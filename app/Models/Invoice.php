@@ -111,6 +111,24 @@ class Invoice extends Model
             ->first();
     }
 
+    public function activeSourcePaymentByTxid(string $txid): ?InvoicePayment
+    {
+        $normalizedTxid = strtolower(trim($txid));
+        if ($normalizedTxid === '') {
+            return null;
+        }
+
+        $sourcePayments = $this->relationLoaded('sourcePayments')
+            ? $this->sourcePayments
+            : $this->sourcePayments()->get();
+
+        return $sourcePayments->first(function (InvoicePayment $payment) use ($normalizedTxid): bool {
+            return strtolower(trim((string) $payment->txid)) === $normalizedTxid
+                && ! $payment->isIgnored()
+                && $payment->countsOnInvoice($this);
+        });
+    }
+
     public function canSendReceipt(): bool
     {
         return $this->status === 'paid'
