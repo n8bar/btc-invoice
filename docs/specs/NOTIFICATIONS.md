@@ -10,7 +10,7 @@
 
 ## 2. Goals
 1. Let invoice owners email a public link plus summary to their client from the app.
-2. Enable automatic, non-promissory payment acknowledgments and truthful receipt emails.
+2. Enable automatic, non-promissory payment acknowledgments and truthful owner-reviewed receipt emails.
 3. Support truthful alert emails when an invoice becomes past due or when on-chain payments deviate from the invoice total by more than the defined tolerance, including overpayment, underpayment, and partial-payment events.
 4. Keep payment-triggered mail truthful when the underlying payment state is semantically ambiguous, while still acknowledging what it safely can.
 
@@ -21,7 +21,7 @@
 
 2. **Payment Acknowledgment + Receipt**
    1. **Detected Payment Acknowledgment**
-      1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it should send a low-information client acknowledgment before any reviewed receipt.
+      1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it should send a low-information client acknowledgment before any later client receipt.
       2. This acknowledgment should confirm only what the system can safely say, such as the detected BTC amount, without claiming that the payment has been fully applied to a specific invoice state.
       3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
       4. If the payment state is ambiguous, the acknowledgment should stay limited to what the system can safely say and should avoid any certainty about how the payment applies.
@@ -32,14 +32,12 @@
       2. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
       3. Later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
    3. **Receipt Follow-Up**
-   1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
-   2. If later-payment ambiguity or another ambiguity gate is active, automatic reviewed receipts / paid confirmations must not send until issuer review is complete.
-   3. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
-      1. That path should stay visible from the invoice payment history and from dashboard payment-review surfaces when a paid invoice still lacks a queued or sent client receipt.
-   4. The initial Phase 3 ambiguity gate for automatic reviewed receipts should hold the automatic path when either:
-      1. the paid invoice has multiple active on-chain payments and therefore later-payment ambiguity is in play, or
-      2. ignore / reattribution state still touches the invoice’s payment history.
-   5. Holding the automatic reviewed receipt must not suppress the owner paid notice or the owner-facing manual review/send path.
+      1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from an owner-reviewed payment state.
+      2. RC does not auto-send client receipts from detected payment state alone, even when the invoice appears straightforward under current ledger rules.
+      3. The product must support a clear owner-facing path to send that receipt after review and any needed ignore or reattribution work.
+         1. That path should stay visible from the invoice payment history and from dashboard payment-review surfaces when a paid invoice still lacks a queued or sent client receipt.
+      4. Later-payment ambiguity, ignore state, and reattribution state should surface truthful review context to the owner, but they are not the only reason a client receipt requires review.
+      5. Requiring owner-reviewed client receipts must not suppress the owner paid notice or the owner-facing manual review/send path.
 
 3. **Delivery Log**
    1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.

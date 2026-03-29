@@ -15,7 +15,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 
 ## Current Focus
 - Active phase: **Phase 3 - Payment Communication Truthfulness**
-- Current objective: verify the shipped payment acknowledgment-versus-receipt split now that txid-scoped acknowledgments, automatic reviewed-receipt holds, and the paired delivery-history model are in place on the trustworthy outbound path.
+- Current objective: correct Phase 3 back to the intended manual-review-only client receipt model, then rerun Browser QA on the payment acknowledgment-versus-receipt split now that txid-scoped acknowledgments and the paired delivery-history model are in place on the trustworthy outbound path.
 - Primary next doc: [`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
 - Sequencing note: the phase breakout was re-cut from the actual dependency chain; later phases are sequential by default unless a phase strategy explicitly marks safe sidecars.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current delivery/alert code, and Mailgun account state.
@@ -26,7 +26,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 2. [x] Phase 2 - [Safeguards + Provider Recovery](../strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md)
    Completed. Shared outbound safeguards now run through a provider-backed Mailgun HTTP API path, the nested mailable queue bug was identified and removed so `DeliverInvoiceMail` is the real send boundary, controlled alias-off proof sends succeeded end-to-end, and Phase 3 can now focus on truthful payment communication semantics instead of delivery trust.
 3. [ ] Phase 3 - [Payment Communication Truthfulness](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
-   The acknowledgment-versus-receipt model, txid-scoped acknowledgments, later-payment ambiguity gate, and paired delivery-history labels are now implemented; remaining work is verification/Browser QA plus any follow-up fixes before Phase 4 polish.
+   The acknowledgment-versus-receipt split, txid-scoped acknowledgments, and paired delivery-history labels are now implemented, but the active Phase 3 correction is removing the lingering automatic client-receipt path so the product matches the intended owner-reviewed/manual receipt rule before Browser QA resumes.
 4. [ ] Phase 4 - [Template Polish + RC Mail Readiness](../strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md)
    Finish the remaining template/settings/delivery-log polish and rehearse alias-off RC mail readiness on the chosen transport.
 
