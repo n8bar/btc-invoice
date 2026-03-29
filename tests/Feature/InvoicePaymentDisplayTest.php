@@ -608,14 +608,14 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertOk();
         $response->assertSee('data-receipt-review-panel="true"', false);
         $response->assertSeeText('Client receipt');
-        $response->assertSeeText('A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below before sending a higher-certainty receipt.');
+        $response->assertSeeText('A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below, then send the client receipt from here when you are comfortable with the payment interpretation.');
         $response->assertSeeText('Send receipt');
         $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
     }
 
-    public function test_paid_invoice_receipt_panel_shows_automatic_hold_reason_when_multiple_payments_need_review(): void
+    public function test_paid_invoice_receipt_panel_shows_review_context_when_multiple_payments_need_review(): void
     {
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $invoice = $this->makeInvoice($owner, [
             'status' => 'paid',
         ]);
@@ -645,8 +645,9 @@ class InvoicePaymentDisplayTest extends TestCase
             ->get(route('invoices.show', $invoice->fresh('payments')));
 
         $response->assertOk();
-        $response->assertSeeText('Automatic receipt is currently held for review.');
-        $response->assertSeeText('Multiple active on-chain payments require owner review before a reviewed receipt can auto-send.');
+        $response->assertSeeText('Review these payment-history conditions before sending the client receipt.');
+        $response->assertSeeText('Multiple active on-chain payments are recorded on this invoice.');
+        $response->assertSeeText('Send receipt');
     }
 
     public function test_bitcoin_uri_targets_outstanding_balance(): void

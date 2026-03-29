@@ -14,42 +14,19 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <div class="overflow-hidden bg-white shadow sm:rounded-lg">
-                <div class="p-6">
-                    @if (session('status') === 'notification-settings-updated')
-                        <div class="mb-4 rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
-                            Saved notification settings.
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('settings.notifications.update') }}" class="space-y-6">
-                        @csrf
-                        @method('PATCH')
-
-                        <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
-                            <h3 class="text-sm font-semibold text-gray-700">Receipts</h3>
-                            <p class="text-xs text-gray-600">
-                                Detected payments can send a narrow acknowledgment right away. Higher-certainty client receipts still follow the paid path and may require invoice review before they send automatically.
-                            </p>
-                            <div class="flex items-start gap-3">
-                                <div>
-                                    <input id="auto_receipt_emails" type="checkbox" name="auto_receipt_emails" value="1"
-                                           @checked(old('auto_receipt_emails', $user->auto_receipt_emails))
-                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <x-input-label for="auto_receipt_emails" :value="__('Auto email paid receipts')" />
-                                    <p class="text-sm text-gray-500">
-                                        {{ __('When payments are detected, the app can send a narrow acknowledgment immediately. Once an invoice is marked paid, automatically send the higher-certainty client receipt only when the payment state is straightforward. Later-payment ambiguity and ignore/reattribution cases hold the reviewed receipt for invoice review, and you can still send it manually from the invoice.') }}
-                                    </p>
-                                    <x-input-error class="mt-2" :messages="$errors->get('auto_receipt_emails')" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <x-primary-button>Save settings</x-primary-button>
-                        </div>
-                    </form>
+                <div class="p-6 space-y-6">
+                    <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+                        <h3 class="text-sm font-semibold text-gray-700">Payment emails</h3>
+                        <p class="text-sm text-gray-600">
+                            Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            Client receipts are sent manually after owner review from the paid invoice page. When a paid invoice still needs a receipt, the dashboard and invoice payment history will point you to the review/send action.
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            Extra review context may appear when multiple active on-chain payments or payment-correction rows are present in the invoice history.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

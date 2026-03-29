@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\NotificationSettingsRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -17,13 +16,8 @@ class NotificationSettingsController extends Controller
         ]);
     }
 
-    public function update(NotificationSettingsRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->forceFill([
-            'auto_receipt_emails' => $request->boolean('auto_receipt_emails'),
-        ])->save();
-
-        return Redirect::route('settings.notifications.edit')
-            ->with('status', 'notification-settings-updated');
+        return Redirect::route('settings.notifications.edit');
     }
 }

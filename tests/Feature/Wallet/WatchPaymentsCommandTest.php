@@ -645,7 +645,6 @@ class WatchPaymentsCommandTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2025-01-06 09:00:00', 'UTC'));
 
         $invoice = $this->makeInvoice();
-        $invoice->user->update(['auto_receipt_emails' => true]);
 
         $base = config('blockchain.mempool.testnet_base');
 
@@ -733,13 +732,12 @@ class WatchPaymentsCommandTest extends TestCase
             ->count());
     }
 
-    public function test_watcher_queues_payment_acknowledgment_before_reviewed_receipt_when_payment_marks_invoice_paid(): void
+    public function test_watcher_queues_payment_acknowledgment_and_owner_paid_notice_when_payment_marks_invoice_paid(): void
     {
         Queue::fake();
         Carbon::setTestNow(Carbon::parse('2025-01-06 10:00:00', 'UTC'));
 
         $invoice = $this->makeInvoice();
-        $invoice->user->update(['auto_receipt_emails' => true]);
 
         $base = config('blockchain.mempool.testnet_base');
 
@@ -776,15 +774,14 @@ class WatchPaymentsCommandTest extends TestCase
             ->where('context_key', 'ack-before-receipt')
             ->first();
 
-        $receipt = \App\Models\InvoiceDelivery::query()
+        $ownerPaidNotice = \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
-            ->where('type', 'receipt')
+            ->where('type', 'owner_paid_notice')
             ->first();
 
         $this->assertNotNull($clientAck);
-        $this->assertNotNull($receipt);
-        $this->assertTrue($clientAck->id < $receipt->id);
-        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+        $this->assertNotNull($ownerPaidNotice);
+        $this->assertSame(0, \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
             ->where('type', 'receipt')
             ->count());

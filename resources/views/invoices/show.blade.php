@@ -689,16 +689,14 @@
                             @if ($invoice->canSendReceipt())
                                 @php
                                     $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt');
-                                    $receiptHoldReasons = $invoice->user?->auto_receipt_emails
-                                        ? $invoice->automaticReceiptHoldReasons()
-                                        : [];
+                                    $receiptReviewReasons = $invoice->receiptReviewReasons();
                                 @endphp
                                 <div data-receipt-review-panel="true"
                                      class="mb-4 rounded-lg border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
                                     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                         <div class="space-y-1">
                                             <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Client receipt</p>
-                                            <p>A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below before sending a higher-certainty receipt.</p>
+                                            <p>A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below, then send the client receipt from here when you are comfortable with the payment interpretation.</p>
                                             @if ($latestReceiptDelivery)
                                                 <p class="text-xs text-amber-900">
                                                     Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.
@@ -706,12 +704,12 @@
                                             @else
                                                 <p class="text-xs text-amber-900">No client receipt has been queued or sent yet.</p>
                                             @endif
-                                            @if ($receiptHoldReasons !== [])
+                                            @if ($receiptReviewReasons !== [])
                                                 <div class="pt-1 text-xs text-amber-900">
-                                                    <p class="font-semibold">Automatic receipt is currently held for review.</p>
+                                                    <p class="font-semibold">Review these payment-history conditions before sending the client receipt.</p>
                                                     <ul class="ml-4 mt-1 list-disc space-y-1">
-                                                        @foreach ($receiptHoldReasons as $receiptHoldReason)
-                                                            <li>{{ $receiptHoldReason }}</li>
+                                                        @foreach ($receiptReviewReasons as $receiptReviewReason)
+                                                            <li>{{ $receiptReviewReason }}</li>
                                                         @endforeach
                                                     </ul>
                                                 </div>

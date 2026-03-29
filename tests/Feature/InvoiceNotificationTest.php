@@ -18,11 +18,11 @@ class InvoiceNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_owner_paid_notice_and_receipt_dispatched(): void
+    public function test_owner_paid_notice_dispatches_when_invoice_paid(): void
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Client Test',
@@ -45,24 +45,24 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'receipt',
+            'type' => 'owner_paid_notice',
         ]);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'receipt',
         ]);
     }
 
-    public function test_owner_paid_notice_still_dispatches_when_auto_receipts_are_disabled(): void
+    public function test_owner_paid_notice_dispatches_even_when_client_email_is_missing(): void
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => false]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Client Test',
-            'email' => 'client@example.com',
+            'email' => '',
         ]);
 
         $invoice = Invoice::create([
@@ -90,11 +90,11 @@ class InvoiceNotificationTest extends TestCase
         ]);
     }
 
-    public function test_automatic_receipt_is_held_for_review_when_paid_invoice_has_multiple_active_payments(): void
+    public function test_invoice_paid_event_does_not_auto_queue_client_receipt_when_multiple_active_payments_exist(): void
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Client Test',
@@ -137,19 +137,17 @@ class InvoiceNotificationTest extends TestCase
             'status' => 'queued',
         ]);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'receipt',
-            'status' => 'skipped',
-            'error_message' => 'Automatic receipt held for review. Multiple active on-chain payments require owner review before a reviewed receipt can auto-send.',
         ]);
     }
 
-    public function test_automatic_receipt_is_held_for_review_when_ignored_payment_state_touches_history(): void
+    public function test_invoice_paid_event_does_not_auto_queue_client_receipt_when_correction_state_touches_history(): void
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Client Test',
@@ -189,11 +187,9 @@ class InvoiceNotificationTest extends TestCase
 
         event(new InvoicePaid($invoice->fresh(['client', 'user', 'payments', 'sourcePayments', 'deliveries'])));
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'receipt',
-            'status' => 'skipped',
-            'error_message' => 'Automatic receipt held for review. Ignored or reattributed payment rows require owner review before a reviewed receipt can auto-send.',
         ]);
     }
 

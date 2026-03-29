@@ -725,7 +725,7 @@ class UserSettingsTest extends TestCase
         $response->assertSee('name="show_qr_refresh_reminder"', false);
     }
 
-    public function test_user_can_update_notification_settings_page(): void
+    public function test_notification_settings_update_route_is_a_noop(): void
     {
         $owner = User::factory()->create([
             'auto_receipt_emails' => true,
@@ -739,10 +739,10 @@ class UserSettingsTest extends TestCase
             ->assertRedirect(route('settings.notifications.edit'));
 
         $owner->refresh();
-        $this->assertFalse($owner->auto_receipt_emails);
+        $this->assertTrue($owner->auto_receipt_emails);
     }
 
-    public function test_notification_settings_page_shows_auto_receipt_toggle(): void
+    public function test_notification_settings_page_explains_manual_receipt_review_model(): void
     {
         $owner = User::factory()->create();
 
@@ -751,8 +751,11 @@ class UserSettingsTest extends TestCase
             ->get(route('settings.notifications.edit'));
 
         $response->assertOk();
-        $response->assertSee('Receipts', false);
-        $response->assertSee('name="auto_receipt_emails"', false);
+        $response->assertSeeText('Payment emails');
+        $response->assertSeeText('Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.');
+        $response->assertSeeText('Client receipts are sent manually after owner review from the paid invoice page.');
+        $response->assertDontSee('name="auto_receipt_emails"', false);
+        $response->assertDontSee('Save settings');
     }
 
     public function test_settings_tabs_render_on_all_settings_pages(): void

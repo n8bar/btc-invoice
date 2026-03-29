@@ -459,10 +459,10 @@ class InvoiceDeliveryTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    public function test_receipt_email_queued_when_invoice_paid(): void
+    public function test_owner_paid_notice_is_queued_when_invoice_becomes_paid_without_auto_receipt(): void
     {
         Queue::fake();
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Acme Co',
@@ -492,10 +492,10 @@ class InvoiceDeliveryTest extends TestCase
 
         $invoice->refresh()->refreshPaymentState();
 
-        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->first();
+        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->first();
         $this->assertNotNull($delivery);
-        $this->assertSame(1, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->count());
         $this->assertSame(1, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->count());
+        $this->assertSame(0, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->count());
         Queue::assertPushed(DeliverInvoiceMail::class, function ($job) use ($delivery) {
             return $job->delivery->is($delivery);
         });
@@ -505,7 +505,7 @@ class InvoiceDeliveryTest extends TestCase
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => false]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Manual Receipt Co',
