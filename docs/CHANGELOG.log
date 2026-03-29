@@ -962,3 +962,6 @@ All invoice mailables under `app/Mail/` no longer implement `ShouldQueue`, so `A
 
 2026-03-28 | MS16 Phase 3 locks the initial payment-truthfulness decisions
 `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` and `docs/specs/NOTIFICATIONS.md` now lock the initial Phase 3 direction: automatic low-information payment acknowledgments are in, ambiguity stays a narrow gate that blocks automatic reviewed receipts / paid confirmations but not narrow acknowledgments or manual sends, repeated partial-payment warnings are retired into underpayment behavior, and RC client-facing payment notifications use explicit paired owner/client delivery classes instead of an issuer-copy toggle.
+
+2026-03-28 | MS16 Phase 3 now carries an explicit Browser QA section
+`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` now follows the established MS14/MS15 pattern with a dedicated agent-owned Browser QA prep section plus a separate `Guided User` browser-pass section, so later implementation work has an explicit human-verification target for acknowledgments, ambiguity-gated receipts, paired owner/client notice rows, and the retirement of repeated partial-payment warnings.
