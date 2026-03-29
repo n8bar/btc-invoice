@@ -558,6 +558,32 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee($expectedSentDisplay, false);
     }
 
+    public function test_delivery_log_uses_human_friendly_notice_and_status_labels(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'partial',
+        ]);
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'owner_underpay_alert',
+            'status' => 'sending',
+            'recipient' => 'owner@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 12:00:00', 'UTC'),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $response->assertOk();
+        $response->assertSeeText('Notice');
+        $response->assertSeeText('Underpayment alert (owner)');
+        $response->assertSeeText('Sending');
+        $response->assertDontSee('owner_underpay_alert', false);
+    }
+
     public function test_bitcoin_uri_targets_outstanding_balance(): void
     {
         Cache::put(BtcRate::CACHE_KEY, [

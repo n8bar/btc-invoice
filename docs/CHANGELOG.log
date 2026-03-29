@@ -968,3 +968,6 @@ All invoice mailables under `app/Mail/` no longer implement `ShouldQueue`, so `A
 
 2026-03-28 | MS16 Phase 3 folds Browser QA prep and run under phase verification
 `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` no longer splits Browser QA prep, Browser QA execution, and phase verification across three top-level sections; the former sections 5 and 6 now sit as ordered verification items under the Phase 3 verification section so the strategy stays structurally tighter.
+
+2026-03-28 | MS16 Phase 3 locks delivery-history labels to the notice model
+`App\\Models\\InvoiceDelivery` now exposes human-friendly notice and outcome labels, the invoice delivery log in `resources/views/invoices/show.blade.php` now shows `Notice` plus those labels instead of raw storage keys like `owner_underpay_alert`, `tests/Feature/InvoicePaymentDisplayTest.php` now proves the user-facing wording, and `docs/specs/NOTIFICATIONS.md` plus `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` now record the approved delivery-history label map for the current and near-term Phase 3 notice classes.

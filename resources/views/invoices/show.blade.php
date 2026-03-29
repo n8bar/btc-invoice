@@ -612,7 +612,7 @@
                                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                                         <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                                             <tr>
-                                                <th class="px-2 py-2 text-left">Type</th>
+                                                <th class="px-2 py-2 text-left">Notice</th>
                                                 <th class="px-2 py-2 text-left">Recipient</th>
                                                 <th class="px-2 py-2 text-left">Status</th>
                                                 <th class="px-2 py-2 text-left">Queued</th>
@@ -623,14 +623,14 @@
                                         <tbody class="divide-y divide-gray-100">
                                             @foreach ($invoice->deliveries as $delivery)
                                                 <tr>
-                                                    <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
+                                                    <td class="px-2 py-2 text-sm font-medium text-gray-900">{{ $delivery->typeLabel() }}</td>
                                                     <td class="px-2 py-2">
                                                         {{ $delivery->recipient }}
                                                         @if ($delivery->cc)
                                                             <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
                                                         @endif
                                                     </td>
-                                                    <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
+                                                    <td class="px-2 py-2">{{ $delivery->statusLabel() }}</td>
                                                     @php
                                                         $queued = $delivery->dispatched_at;
                                                         $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;

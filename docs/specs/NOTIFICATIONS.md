@@ -76,4 +76,9 @@
 11. The delivery history should surface queued, sending, sent, skipped, and failed outcomes.
    1. `sending` is the claimed provider-boundary state used to prevent duplicate job execution from producing a second outbound send while a delivery is already in progress or awaiting operator review after an ambiguous worker failure.
 12. The delivery history should use concise, human-friendly labels for communication classes and outcomes.
+   1. Manual invoice sends should display as `Invoice email`, not a raw storage key.
+   2. Paired owner/client notification rows should keep the audience explicit in the label, such as `Past-due reminder (client)` and `Underpayment alert (owner)`.
+   3. While the legacy repeated-partial warning rows still exist in stored history, they should display honestly as `Partial payment warning (client|owner)` rather than being hidden behind renamed copy.
+   4. Payment-triggered follow-up should keep the acknowledgment-versus-receipt split visible in history once those rows ship, using labels such as `Payment acknowledgment (client)` for the narrow automatic notice and `Receipt (client)` for the higher-certainty follow-up.
+   5. Outcome labels should display as `Queued`, `Sending`, `Sent`, `Skipped`, and `Failed`.
 13. Outbound mail copy should stay concise and actionable.
