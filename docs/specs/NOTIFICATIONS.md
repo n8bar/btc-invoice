@@ -21,7 +21,7 @@
 
 2. **Payment Acknowledgment + Receipt**
    1. **Detected Payment Acknowledgment**
-      1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it may send a low-information client acknowledgment.
+      1. When the system detects a Bitcoin payment with enough confidence to acknowledge it safely, it should send a low-information client acknowledgment before any reviewed receipt.
       2. This acknowledgment should confirm only what the system can safely say, such as the detected BTC amount, without claiming that the payment has been fully applied to a specific invoice state.
       3. The acknowledgment must remain non-promissory and should not imply that a receipt, refund, or other outcome is guaranteed.
       4. If the payment state is ambiguous, the acknowledgment should stay limited to what the system can safely say and should avoid any certainty about how the payment applies.
@@ -32,7 +32,8 @@
       3. Later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
    3. **Receipt Follow-Up**
       1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
-      2. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
+      2. If later-payment ambiguity or another ambiguity gate is active, automatic reviewed receipts / paid confirmations must not send until issuer review is complete.
+      3. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
 
 3. **Delivery Log**
    1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.
@@ -57,13 +58,14 @@
 4. **Significant Underpayment Alert (Client)**
    1. Triggered when the invoice still carries a significant remaining balance after payment activity (15% threshold for RC).
    2. The client alert should neutrally communicate that a balance remains, include the outstanding USD/BTC amounts, and link to the public invoice so the client can settle; where appropriate, it may encourage completing the remaining balance in one payment for convenience.
+   3. Fragmented or repeated partial payments should not create a separate repeated-warning alert family; they should continue to use the final underpayment behavior instead.
 
 ## 5. Outbound Mail and History
 1. Outbound invoice communication should use a shared queued delivery path and shared delivery history so send outcomes remain auditable.
 2. The shared delivery history should preserve enough context to identify the invoice, sender/issuer context, recipient(s), communication class, outcome, and timing/error details for each outbound attempt.
 3. Public-share links embedded in outbound emails must use the explicitly configured public host for the intended recipient-facing environment.
    1. That public host may differ from the host currently running the app, such as when a development or staging environment is deliberately targeting another deployment.
-4. Client-facing notification emails should also copy the invoice issuer by default, with issuer-level control over that behavior.
+4. Client-facing payment-triggered notification emails should use explicit paired owner/client delivery classes for RC rather than relying on a generic issuer-copy toggle.
 5. Outbound mail capability is a required part of a valid recipient-facing deployment.
    1. Development and test environments may intentionally run without outbound mail, but production-ready deployments must have it configured.
 6. The shared delivery path must suppress duplicate or too-recent outbound attempts by notice class and record those suppressed attempts as `skipped` rather than silently dropping them.
