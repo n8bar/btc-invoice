@@ -983,3 +983,6 @@ Paid invoices now expose a manual client-receipt send path through `App\\Http\\C
 
 2026-03-28 | MS16 Phase 3 Browser QA prep now points at clean dev fixtures
 `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` now replaces the placeholder Browser QA prep block with the actual prepared dev fixtures under owner `antonina12@nospam.site`: invoices `75` (`MS16-P3-QA-ACK-20260328`), `76` (`MS16-P3-QA-AMBIG-20260328`), and `77` (`MS16-P3-QA-UNDERPAY-20260328`), along with the exact `txid`/sats trigger plans, expected delivery rows, and expected receipt-review controls for the later human Browser QA pass.
+
+2026-03-28 | MS16 Phase 4 now explicitly includes replacing Laravel-default mail chrome
+`docs/strategies/16.4_TEMPLATE_POLISH_RC_READINESS.md` now makes the existing shared-template/partial item explicit that retained outbound mail classes must move off Laravel-default mail presentation and onto shared CryptoZing-branded mail chrome during Phase 4 template polish.
