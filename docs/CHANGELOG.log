@@ -965,3 +965,6 @@ All invoice mailables under `app/Mail/` no longer implement `ShouldQueue`, so `A
 
 2026-03-28 | MS16 Phase 3 now carries an explicit Browser QA section
 `docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` now follows the established MS14/MS15 pattern with a dedicated agent-owned Browser QA prep section plus a separate `Guided User` browser-pass section, so later implementation work has an explicit human-verification target for acknowledgments, ambiguity-gated receipts, paired owner/client notice rows, and the retirement of repeated partial-payment warnings.
+
+2026-03-28 | MS16 Phase 3 folds Browser QA prep and run under phase verification
+`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md` no longer splits Browser QA prep, Browser QA execution, and phase verification across three top-level sections; the former sections 5 and 6 now sit as ordered verification items under the Phase 3 verification section so the strategy stays structurally tighter.
