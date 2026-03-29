@@ -35,6 +35,10 @@
    2. If later-payment ambiguity or another ambiguity gate is active, automatic reviewed receipts / paid confirmations must not send until issuer review is complete.
    3. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
       1. That path should stay visible from the invoice payment history and from dashboard payment-review surfaces when a paid invoice still lacks a queued or sent client receipt.
+   4. The initial Phase 3 ambiguity gate for automatic reviewed receipts should hold the automatic path when either:
+      1. the paid invoice has multiple active on-chain payments and therefore later-payment ambiguity is in play, or
+      2. ignore / reattribution state still touches the invoice’s payment history.
+   5. Holding the automatic reviewed receipt must not suppress the owner paid notice or the owner-facing manual review/send path.
 
 3. **Delivery Log**
    1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.

@@ -123,6 +123,39 @@ class Invoice extends Model
             && ! $this->hasDeliveryOfTypeWithStatuses('receipt', ['queued', 'sending', 'sent']);
     }
 
+    public function automaticReceiptHoldReasons(): array
+    {
+        $this->loadMissing(['payments', 'sourcePayments']);
+
+        $reasons = [];
+
+        if ($this->activeOnChainPayments()->count() >= 2) {
+            $reasons[] = 'Multiple active on-chain payments require owner review before a reviewed receipt can auto-send.';
+        }
+
+        if ($this->hasReceiptCorrectionState()) {
+            $reasons[] = 'Ignored or reattributed payment rows require owner review before a reviewed receipt can auto-send.';
+        }
+
+        return $reasons;
+    }
+
+    public function shouldHoldAutomaticReceipt(): bool
+    {
+        return $this->automaticReceiptHoldReasons() !== [];
+    }
+
+    public function automaticReceiptHoldMessage(): ?string
+    {
+        $reasons = $this->automaticReceiptHoldReasons();
+
+        if ($reasons === []) {
+            return null;
+        }
+
+        return 'Automatic receipt held for review. ' . implode(' ', $reasons);
+    }
+
     public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
     {
         $this->forceFill([
@@ -175,6 +208,24 @@ class Invoice extends Model
             ->where('type', $type)
             ->whereIn('status', $statuses)
             ->exists();
+    }
+
+    private function hasReceiptCorrectionState(): bool
+    {
+        $sourcePayments = $this->relationLoaded('sourcePayments')
+            ? $this->sourcePayments
+            : $this->sourcePayments()->get();
+
+        if ($sourcePayments->contains(fn (InvoicePayment $payment): bool => $payment->isIgnored())) {
+            return true;
+        }
+
+        if ($sourcePayments->contains(fn (InvoicePayment $payment): bool => $payment->isReattributedOutFrom($this))) {
+            return true;
+        }
+
+        return $this->activePayments()
+            ->contains(fn (InvoicePayment $payment): bool => $payment->isReattributedInto($this));
     }
 
     public function billingDetails(): array

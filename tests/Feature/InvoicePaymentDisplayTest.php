@@ -613,6 +613,42 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
     }
 
+    public function test_paid_invoice_receipt_panel_shows_automatic_hold_reason_when_multiple_payments_need_review(): void
+    {
+        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-hold-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now()->subMinute(),
+            'confirmed_at' => Carbon::now()->subMinute(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-hold-2',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertSeeText('Automatic receipt is currently held for review.');
+        $response->assertSeeText('Multiple active on-chain payments require owner review before a reviewed receipt can auto-send.');
+    }
+
     public function test_bitcoin_uri_targets_outstanding_balance(): void
     {
         Cache::put(BtcRate::CACHE_KEY, [

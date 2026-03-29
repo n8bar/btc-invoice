@@ -54,6 +54,149 @@ class InvoiceNotificationTest extends TestCase
         ]);
     }
 
+    public function test_owner_paid_notice_still_dispatches_when_auto_receipts_are_disabled(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create(['auto_receipt_emails' => false]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => 'client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001B',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-b',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        event(new InvoicePaid($invoice));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'owner_paid_notice',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
+    public function test_automatic_receipt_is_held_for_review_when_paid_invoice_has_multiple_active_payments(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => 'client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001C',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-c',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-1',
+            'sats_received' => 250_000,
+            'detected_at' => Carbon::now()->subMinutes(10),
+            'confirmed_at' => Carbon::now()->subMinutes(10),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-2',
+            'sats_received' => 250_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        event(new InvoicePaid($invoice->fresh(['client', 'user', 'payments', 'sourcePayments', 'deliveries'])));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'owner_paid_notice',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+            'status' => 'skipped',
+            'error_message' => 'Automatic receipt held for review. Multiple active on-chain payments require owner review before a reviewed receipt can auto-send.',
+        ]);
+    }
+
+    public function test_automatic_receipt_is_held_for_review_when_ignored_payment_state_touches_history(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => 'client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001D',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-d',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-ignored-active',
+            'sats_received' => 500_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-ignored',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now()->subMinutes(5),
+            'confirmed_at' => Carbon::now()->subMinutes(5),
+            'ignored_at' => Carbon::now()->subMinute(),
+            'ignored_by_user_id' => $owner->id,
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        event(new InvoicePaid($invoice->fresh(['client', 'user', 'payments', 'sourcePayments', 'deliveries'])));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+            'status' => 'skipped',
+            'error_message' => 'Automatic receipt held for review. Ignored or reattributed payment rows require owner review before a reviewed receipt can auto-send.',
+        ]);
+    }
+
     public function test_overpayment_alert_sent_to_client_and_owner(): void
     {
         Queue::fake();

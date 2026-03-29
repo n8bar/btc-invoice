@@ -47,6 +47,44 @@ class InvoiceDeliveryService
         }
     }
 
+    public function skip(
+        Invoice $invoice,
+        string $type,
+        string $recipient,
+        string $reason,
+        ?string $cc = null,
+        ?string $message = null
+    ): InvoiceDelivery {
+        $intentKey = $this->intentKey($invoice, $type, $recipient);
+        $lock = Cache::lock($this->intentLockName($intentKey), 10);
+
+        if (! $lock->get()) {
+            return $this->createDelivery(
+                $invoice,
+                $type,
+                $recipient,
+                $cc,
+                $message,
+                'A matching delivery intent is already being processed.',
+                $intentKey
+            );
+        }
+
+        try {
+            return $this->createDelivery(
+                $invoice,
+                $type,
+                $recipient,
+                $cc,
+                $message,
+                $reason,
+                $intentKey
+            );
+        } finally {
+            $lock->release();
+        }
+    }
+
     public function intentKey(Invoice $invoice, string $type, string $recipient): string
     {
         return $this->buildIntentKey($invoice->id, $invoice->user_id, $type, $recipient);

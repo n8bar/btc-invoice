@@ -687,7 +687,12 @@
                         <div class="p-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
                             @if ($invoice->canSendReceipt())
-                                @php $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt'); @endphp
+                                @php
+                                    $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt');
+                                    $receiptHoldReasons = $invoice->user?->auto_receipt_emails
+                                        ? $invoice->automaticReceiptHoldReasons()
+                                        : [];
+                                @endphp
                                 <div data-receipt-review-panel="true"
                                      class="mb-4 rounded-lg border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
                                     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -700,6 +705,16 @@
                                                 </p>
                                             @else
                                                 <p class="text-xs text-amber-900">No client receipt has been queued or sent yet.</p>
+                                            @endif
+                                            @if ($receiptHoldReasons !== [])
+                                                <div class="pt-1 text-xs text-amber-900">
+                                                    <p class="font-semibold">Automatic receipt is currently held for review.</p>
+                                                    <ul class="ml-4 mt-1 list-disc space-y-1">
+                                                        @foreach ($receiptHoldReasons as $receiptHoldReason)
+                                                            <li>{{ $receiptHoldReason }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
                                             @endif
                                         </div>
                                         @if ($invoice->needsReceiptReview())
