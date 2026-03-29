@@ -117,6 +117,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('invoices/{invoice}/deliver', [InvoiceDeliveryController::class, 'store'])
         ->name('invoices.deliver');
+    Route::post('invoices/{invoice}/deliver/receipt', [InvoiceDeliveryController::class, 'storeReceipt'])
+        ->name('invoices.deliver.receipt');
     Route::patch('invoices/{invoice}/deliver/draft', [InvoiceDeliveryController::class, 'updateDraft'])
         ->name('invoices.deliver.draft');
     Route::patch('invoices/{invoice}/payments/{payment}/note', [InvoicePaymentNoteController::class, 'update'])

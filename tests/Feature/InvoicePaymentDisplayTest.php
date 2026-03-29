@@ -584,6 +584,35 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertDontSee('owner_underpay_alert', false);
     }
 
+    public function test_paid_invoice_payment_history_shows_receipt_review_panel_and_send_action(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-panel',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertSee('data-receipt-review-panel="true"', false);
+        $response->assertSeeText('Client receipt');
+        $response->assertSeeText('Review the payment rows below before sending a higher-certainty receipt.');
+        $response->assertSeeText('Send receipt');
+        $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
+    }
+
     public function test_bitcoin_uri_targets_outstanding_balance(): void
     {
         Cache::put(BtcRate::CACHE_KEY, [

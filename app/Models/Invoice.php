@@ -97,6 +97,32 @@ class Invoice extends Model
             ->values();
     }
 
+    public function latestDeliveryOfType(string $type): ?InvoiceDelivery
+    {
+        if ($this->relationLoaded('deliveries')) {
+            return $this->deliveries->first(
+                fn (InvoiceDelivery $delivery): bool => $delivery->type === $type
+            );
+        }
+
+        return $this->deliveries()
+            ->where('type', $type)
+            ->latest('id')
+            ->first();
+    }
+
+    public function canSendReceipt(): bool
+    {
+        return $this->status === 'paid'
+            && filled($this->client?->email);
+    }
+
+    public function needsReceiptReview(): bool
+    {
+        return $this->canSendReceipt()
+            && ! $this->hasDeliveryOfTypeWithStatuses('receipt', ['queued', 'sending', 'sent']);
+    }
+
     public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
     {
         $this->forceFill([
@@ -134,6 +160,21 @@ class Invoice extends Model
         return $query->whereIn('status', ['sent', 'partial'])
             ->whereDate('due_date', '>=', $today)
             ->whereDate('due_date', '<=', $end);
+    }
+
+    private function hasDeliveryOfTypeWithStatuses(string $type, array $statuses): bool
+    {
+        if ($this->relationLoaded('deliveries')) {
+            return $this->deliveries->contains(
+                fn (InvoiceDelivery $delivery): bool => $delivery->type === $type
+                    && in_array($delivery->status, $statuses, true)
+            );
+        }
+
+        return $this->deliveries()
+            ->where('type', $type)
+            ->whereIn('status', $statuses)
+            ->exists();
     }
 
     public function billingDetails(): array

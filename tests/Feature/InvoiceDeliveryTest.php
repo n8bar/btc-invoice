@@ -498,6 +498,49 @@ class InvoiceDeliveryTest extends TestCase
         });
     }
 
+    public function test_owner_can_queue_client_receipt_manually_from_paid_invoice(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create(['auto_receipt_emails' => false]);
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Manual Receipt Co',
+            'email' => 'manual-receipt@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-MANUAL-RECEIPT',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-manual-receipt',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Receipt queued.');
+
+        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)
+            ->where('type', 'receipt')
+            ->first();
+
+        $this->assertNotNull($delivery);
+        $this->assertSame('queued', $delivery->status);
+        $this->assertSame($client->email, $delivery->recipient);
+
+        Queue::assertPushed(DeliverInvoiceMail::class, function ($job) use ($delivery) {
+            return $job->delivery->is($delivery);
+        });
+    }
+
     public function test_deliver_invoice_mail_applies_alias_converter(): void
     {
         Mail::fake();

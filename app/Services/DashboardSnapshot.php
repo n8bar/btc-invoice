@@ -152,8 +152,14 @@ class DashboardSnapshot
             ->orderByDesc('invoice_payments.id')
             ->limit(5)
             ->with(['accountingInvoice' => function ($query) {
-                $query->select('id', 'user_id', 'client_id', 'number', 'status', 'amount_usd', 'btc_rate');
-            }, 'accountingInvoice.client:id,name'])
+                $query->select('id', 'user_id', 'client_id', 'number', 'status', 'amount_usd', 'btc_rate')
+                    ->with([
+                        'client:id,name,email',
+                        'deliveries' => fn ($deliveryQuery) => $deliveryQuery
+                            ->select('id', 'invoice_id', 'type', 'status')
+                            ->latest('id'),
+                    ]);
+            }])
             ->get();
 
         return $payments->map(function (InvoicePayment $payment) {
@@ -167,10 +173,12 @@ class DashboardSnapshot
                 'invoice_id' => $invoice?->id,
                 'invoice_number' => $invoice?->number,
                 'client_name' => $invoice?->client?->name,
+                'payment_id' => $payment->id,
                 'status' => $invoice?->status,
                 'amount_usd' => $amountUsd,
                 'detected_at' => $detectedAt,
                 'is_partial' => $isPartial,
+                'needs_receipt_review' => $invoice?->needsReceiptReview() ?? false,
             ];
         })->all();
     }

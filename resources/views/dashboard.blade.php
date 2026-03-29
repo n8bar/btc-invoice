@@ -218,6 +218,15 @@
                                                     <a href="{{ route('invoices.show', $payment['invoice_id']) }}" class="text-indigo-600 hover:text-indigo-500 font-semibold">
                                                         {{ $payment['invoice_number'] ?? 'Invoice' }}
                                                     </a>
+                                                    @if (!empty($payment['needs_receipt_review']) && !empty($payment['payment_id']))
+                                                        <div class="mt-1">
+                                                            <a href="{{ route('invoices.show', $payment['invoice_id']) }}#payment-row-{{ $payment['payment_id'] }}"
+                                                               data-review-receipt-link="true"
+                                                               class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100">
+                                                                Review receipt
+                                                            </a>
+                                                        </div>
+                                                    @endif
                                                 @else
                                                     {{ $payment['invoice_number'] ?? 'Invoice' }}
                                                 @endif

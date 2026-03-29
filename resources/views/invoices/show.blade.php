@@ -686,6 +686,31 @@
                     <div class="rounded-lg bg-white shadow">
                         <div class="p-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
+                            @if ($invoice->canSendReceipt())
+                                @php $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt'); @endphp
+                                <div data-receipt-review-panel="true"
+                                     class="mb-4 rounded-lg border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
+                                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                        <div class="space-y-1">
+                                            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Client receipt</p>
+                                            <p>Review the payment rows below before sending a higher-certainty receipt.</p>
+                                            @if ($latestReceiptDelivery)
+                                                <p class="text-xs text-amber-900">
+                                                    Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.
+                                                </p>
+                                            @else
+                                                <p class="text-xs text-amber-900">No client receipt has been queued or sent yet.</p>
+                                            @endif
+                                        </div>
+                                        @if ($invoice->needsReceiptReview())
+                                            <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
+                                                @csrf
+                                                <x-secondary-button type="submit">Send receipt</x-secondary-button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                                     <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">

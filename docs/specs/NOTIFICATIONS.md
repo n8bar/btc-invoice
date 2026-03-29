@@ -31,9 +31,10 @@
       2. Examples include stale-address reuse and payers intentionally using an older valid invoice address for a newer invoice.
       3. Later-payment ambiguity should narrow the acknowledgment to what the system can safely say rather than suppressing it outright.
    3. **Receipt Follow-Up**
-      1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
-      2. If later-payment ambiguity or another ambiguity gate is active, automatic reviewed receipts / paid confirmations must not send until issuer review is complete.
-      3. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
+   1. A receipt is a higher-certainty follow-up than an acknowledgment and should only be sent from a truthful reviewed payment state.
+   2. If later-payment ambiguity or another ambiguity gate is active, automatic reviewed receipts / paid confirmations must not send until issuer review is complete.
+   3. The product must support a clear owner-facing path to send that receipt after any needed review, ignore, or reattribution work.
+      1. That path should stay visible from the invoice payment history and from dashboard payment-review surfaces when a paid invoice still lacks a queued or sent client receipt.
 
 3. **Delivery Log**
    1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.
