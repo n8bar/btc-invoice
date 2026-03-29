@@ -784,6 +784,14 @@ class WatchPaymentsCommandTest extends TestCase
         $this->assertNotNull($clientAck);
         $this->assertNotNull($receipt);
         $this->assertTrue($clientAck->id < $receipt->id);
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'receipt')
+            ->count());
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'owner_paid_notice')
+            ->count());
     }
 
     public function test_command_flags_implicated_invoices_and_matching_wallets_when_payment_collision_evidence_is_detected(): void

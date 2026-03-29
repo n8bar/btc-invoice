@@ -4,17 +4,23 @@ namespace App\Providers;
 
 use App\Events\InvoicePaid;
 use App\Listeners\SendInvoiceReceipt;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-    }
+    /**
+     * The event handler mappings for the application.
+     *
+     * @var array<class-string, array<int, class-string>>
+     */
+    protected $listen = [
+        InvoicePaid::class => [
+            SendInvoiceReceipt::class.'@handle',
+        ],
+    ];
 
-    public function boot(): void
+    public function shouldDiscoverEvents(): bool
     {
-        Event::listen(InvoicePaid::class, SendInvoiceReceipt::class);
+        return false;
     }
 }

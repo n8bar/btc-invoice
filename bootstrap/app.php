@@ -5,9 +5,6 @@ use App\Console\Commands\BackfillInvoicePayments;
 use App\Console\Commands\ReassignInvoiceAddresses;
 use App\Console\Commands\SendPastDueInvoiceAlerts;
 use App\Console\Commands\WatchInvoicePayments;
-use App\Providers\AppServiceProvider;
-use App\Providers\AuthServiceProvider;
-use App\Providers\EventServiceProvider;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -19,11 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->withProviders([
-        AppServiceProvider::class,
-        AuthServiceProvider::class,
-        EventServiceProvider::class,
-    ])
+    ->withEvents(discover: false)
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('wallet:watch-payments')
             ->everyMinute()
