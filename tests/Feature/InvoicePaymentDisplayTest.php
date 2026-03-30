@@ -606,6 +606,12 @@ class InvoicePaymentDisplayTest extends TestCase
             ->get(route('invoices.show', $invoice->fresh('payments')));
 
         $response->assertOk();
+        $response->assertSee('data-receipt-action-card="true"', false);
+        $response->assertSeeText('Action needed');
+        $response->assertSeeText('Client receipt waiting for review');
+        $response->assertSeeText('This invoice is paid. Review and send the client receipt.');
+        $response->assertSee('href="#receipt-review-panel"', false);
+        $response->assertSeeText('Jump to receipt review');
         $response->assertSee('id="receipt-review-panel"', false);
         $response->assertSee('data-receipt-review-panel="true"', false);
         $response->assertSeeText('Client receipt');
@@ -647,6 +653,9 @@ class InvoicePaymentDisplayTest extends TestCase
             ->get(route('invoices.show', $invoice->fresh('payments')));
 
         $response->assertOk();
+        $response->assertSee('data-receipt-action-card="true"', false);
+        $response->assertSeeText('This invoice is paid, but payment history needs review before sending the client receipt.');
+        $response->assertSeeText('Multiple active on-chain payments are recorded on this invoice.');
         $response->assertSeeText('Review these payment-history conditions before sending the client receipt.');
         $response->assertSeeText('Multiple active on-chain payments are recorded on this invoice.');
         $response->assertSeeText('Send receipt');

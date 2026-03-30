@@ -206,6 +206,39 @@
                 $gettingStartedMarker = '👉';
             @endphp
 
+            @if ($invoice->canSendReceipt() && $invoice->needsReceiptReview())
+                @php
+                    $receiptActionReasons = $invoice->receiptReviewReasons();
+                    $receiptActionNeedsAttention = $receiptActionReasons !== [];
+                @endphp
+                <div data-receipt-action-card="true"
+                     class="rounded-lg border border-amber-200 bg-amber-50/90 p-4 text-sm text-amber-950 shadow-sm dark:border-amber-400/35 dark:bg-amber-950/30 dark:text-amber-100"
+                     style="border-color: currentColor;">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="space-y-2">
+                            <div class="space-y-1">
+                                <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800 dark:text-amber-200">Action needed</p>
+                                <p class="text-base font-semibold text-amber-950 dark:text-amber-50">Client receipt waiting for review</p>
+                                @if ($receiptActionNeedsAttention)
+                                    <p class="text-amber-900 dark:text-amber-100">This invoice is paid, but payment history needs review before sending the client receipt.</p>
+                                @else
+                                    <p class="text-amber-900 dark:text-amber-100">This invoice is paid. Review and send the client receipt.</p>
+                                @endif
+                            </div>
+                            @if ($receiptActionNeedsAttention)
+                                <p class="text-xs text-amber-900 dark:text-amber-100">
+                                    {{ $receiptActionReasons[0] }}
+                                </p>
+                            @endif
+                        </div>
+                        <a href="#receipt-review-panel"
+                           class="inline-flex items-center justify-center self-start rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:bg-amber-500 dark:text-slate-950 dark:hover:bg-amber-400 dark:focus:ring-offset-slate-900">
+                            Jump to receipt review
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <div class="rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 shadow-sm dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
                 <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
                     <p class="font-semibold">Delivery steps</p>
