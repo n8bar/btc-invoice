@@ -694,33 +694,36 @@
                                 @php
                                     $receiptPanelNeedsAttention = $receiptReviewReasons !== [];
                                     $receiptPanelClasses = $receiptPanelNeedsAttention
-                                        ? 'border-amber-200 bg-amber-50/80 text-amber-950'
-                                        : 'border-indigo-200 bg-indigo-50/80 text-indigo-950';
+                                        ? 'border-amber-200 bg-amber-50/80 text-amber-950 dark:border-amber-400/40 dark:bg-amber-950/30 dark:text-amber-100'
+                                        : 'border-slate-200 bg-slate-50/80 text-slate-950 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100';
                                     $receiptEyebrowClasses = $receiptPanelNeedsAttention
-                                        ? 'text-amber-800'
-                                        : 'text-indigo-800';
+                                        ? 'text-amber-800 dark:text-amber-200'
+                                        : 'text-indigo-800 dark:text-indigo-300';
+                                    $receiptBodyClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-900 dark:text-amber-100'
+                                        : 'text-slate-700 dark:text-slate-200';
                                     $receiptMetaClasses = $receiptPanelNeedsAttention
-                                        ? 'text-amber-900'
-                                        : 'text-indigo-900';
+                                        ? 'text-amber-900 dark:text-amber-100'
+                                        : 'text-slate-700 dark:text-slate-300';
                                 @endphp
                                 <div id="receipt-review-panel"
                                      data-receipt-review-panel="true"
                                      class="invoice-anchor-target mb-4 rounded-lg border p-4 text-sm {{ $receiptPanelClasses }}">
-                                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                    <div class="space-y-3">
                                         <div class="space-y-2">
                                             <div class="space-y-1">
                                                 <p class="text-xs font-semibold uppercase tracking-[0.15em] {{ $receiptEyebrowClasses }}">
                                                     {{ $receiptPanelNeedsAttention ? 'Review before sending' : 'Receipt ready to review' }}
                                                 </p>
-                                                <p class="text-base font-semibold">Client receipt</p>
+                                                <p class="text-base font-semibold text-slate-950 dark:text-white">Client receipt</p>
                                                 @if ($receiptPanelNeedsAttention)
-                                                    <p>Review the payment rows below before sending the client receipt. The receipt stays manual because higher-certainty payment confirmation still depends on owner review.</p>
+                                                    <p class="{{ $receiptBodyClasses }}">Review the payment rows below before sending the client receipt. The receipt stays manual because correct invoice attribution still depends on owner review.</p>
                                                 @else
-                                                    <p>The client receipt is ready for review and send. A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
+                                                    <p class="{{ $receiptBodyClasses }}">The client receipt is ready for review and send. A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
                                                 @endif
                                             </div>
                                             @if ($invoice->needsReceiptReview())
-                                                <div class="md:hidden">
+                                                <div class="pt-1">
                                                     <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
                                                         @csrf
                                                         <x-secondary-button type="submit">Send receipt</x-secondary-button>
@@ -745,12 +748,6 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        @if ($invoice->needsReceiptReview())
-                                            <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}" class="hidden md:block">
-                                                @csrf
-                                                <x-secondary-button type="submit">Send receipt</x-secondary-button>
-                                            </form>
-                                        @endif
                                     </div>
                                 </div>
                             @endif
