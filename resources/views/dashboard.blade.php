@@ -220,9 +220,10 @@
                                                     </a>
                                                     @if (!empty($payment['needs_receipt_review']) && !empty($payment['payment_id']))
                                                         <div class="mt-1">
-                                                            <a href="{{ route('invoices.show', $payment['invoice_id']) }}#payment-row-{{ $payment['payment_id'] }}"
+                                                            <a href="{{ route('invoices.show', $payment['invoice_id']) }}#receipt-review-panel"
                                                                data-review-receipt-link="true"
                                                                class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100">
+                                                                <span aria-hidden="true" class="mr-1.5 inline-flex h-2 w-2 rounded-full bg-red-500"></span>
                                                                 Review receipt
                                                             </a>
                                                         </div>

@@ -122,7 +122,7 @@
                 </div>
             @endif
 
-            <div class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90">
+            <div data-invoice-sticky-nav="true" class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90">
                 <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:underline">← Back to Invoices</a>
                 @php
                     $st = $invoice->status ?? 'draft';
@@ -691,18 +691,48 @@
                                     $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt');
                                     $receiptReviewReasons = $invoice->receiptReviewReasons();
                                 @endphp
-                                <div data-receipt-review-panel="true"
-                                     class="mb-4 rounded-lg border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
-                                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                        <div class="space-y-1">
-                                            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Client receipt</p>
-                                            <p>A narrow payment acknowledgment may already have gone out automatically. Review the payment rows below, then send the client receipt from here when you are comfortable with the payment interpretation.</p>
+                                @php
+                                    $receiptPanelNeedsAttention = $receiptReviewReasons !== [];
+                                    $receiptPanelClasses = $receiptPanelNeedsAttention
+                                        ? 'border-amber-200 bg-amber-50/80 text-amber-950'
+                                        : 'border-indigo-200 bg-indigo-50/80 text-indigo-950';
+                                    $receiptEyebrowClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-800'
+                                        : 'text-indigo-800';
+                                    $receiptMetaClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-900'
+                                        : 'text-indigo-900';
+                                @endphp
+                                <div id="receipt-review-panel"
+                                     data-receipt-review-panel="true"
+                                     class="invoice-anchor-target mb-4 rounded-lg border p-4 text-sm {{ $receiptPanelClasses }}">
+                                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                        <div class="space-y-2">
+                                            <div class="space-y-1">
+                                                <p class="text-xs font-semibold uppercase tracking-[0.15em] {{ $receiptEyebrowClasses }}">
+                                                    {{ $receiptPanelNeedsAttention ? 'Review before sending' : 'Receipt ready to review' }}
+                                                </p>
+                                                <p class="text-base font-semibold">Client receipt</p>
+                                                @if ($receiptPanelNeedsAttention)
+                                                    <p>Review the payment rows below before sending the client receipt. The receipt stays manual because higher-certainty payment confirmation still depends on owner review.</p>
+                                                @else
+                                                    <p>The client receipt is ready for review and send. A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
+                                                @endif
+                                            </div>
+                                            @if ($invoice->needsReceiptReview())
+                                                <div class="md:hidden">
+                                                    <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
+                                                        @csrf
+                                                        <x-secondary-button type="submit">Send receipt</x-secondary-button>
+                                                    </form>
+                                                </div>
+                                            @endif
                                             @if ($latestReceiptDelivery)
-                                                <p class="text-xs text-amber-900">
+                                                <p class="text-xs {{ $receiptMetaClasses }}">
                                                     Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.
                                                 </p>
                                             @else
-                                                <p class="text-xs text-amber-900">No client receipt has been queued or sent yet.</p>
+                                                <p class="text-xs {{ $receiptMetaClasses }}">No client receipt has been queued or sent yet.</p>
                                             @endif
                                             @if ($receiptReviewReasons !== [])
                                                 <div class="pt-1 text-xs text-amber-900">
@@ -716,7 +746,7 @@
                                             @endif
                                         </div>
                                         @if ($invoice->needsReceiptReview())
-                                            <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
+                                            <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}" class="hidden md:block">
                                                 @csrf
                                                 <x-secondary-button type="submit">Send receipt</x-secondary-button>
                                             </form>
@@ -782,7 +812,7 @@
 
                                                 $correctionLabelText = implode(' ', $correctionLabelLines);
                                             @endphp
-                                            <tr id="payment-row-{{ $payment->id }}">
+                                            <tr id="payment-row-{{ $payment->id }}" class="invoice-anchor-target">
                                                 @php
                                                     $paymentDetectedAt = $payment->detected_at;
                                                     $paymentDetectedIso = $paymentDetectedAt ? $paymentDetectedAt->copy()->utc()->toIso8601String() : null;
@@ -1184,7 +1214,7 @@
                 @endif
 
                 {{-- Public link (shareable print view) --}}
-                <div id="public-link-card" class="rounded-lg border border-gray-200 bg-white p-4">
+            <div id="public-link-card" class="invoice-anchor-target rounded-lg border border-gray-200 bg-white p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-700">Public link</h3>
                     @if ($invoice->public_enabled && $invoice->public_url)
@@ -1321,7 +1351,7 @@
             </div>
             </div>
 
-            <div id="send-invoice-email-card" class="rounded-lg bg-white p-6 shadow">
+            <div id="send-invoice-email-card" class="invoice-anchor-target rounded-lg bg-white p-6 shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
@@ -1412,10 +1442,58 @@
             const correctionFocusRowId = @json(session('correction_focus_row'));
             const hasHashTarget = typeof window.location.hash === 'string' && window.location.hash.length > 1;
             const restoreScrollY = Number(@json(session('restore_scroll_y')));
+            const stickyNav = document.querySelector('[data-invoice-sticky-nav]');
+            const hashLinks = document.querySelectorAll('a[href^="#"]');
+
+            const scrollToInvoiceAnchor = (target, behavior = 'auto') => {
+                if (!target) {
+                    return;
+                }
+
+                const stickyNavStyles = stickyNav ? window.getComputedStyle(stickyNav) : null;
+                const stickyNavTop = stickyNavStyles ? parseFloat(stickyNavStyles.top || '0') || 0 : 0;
+                const stickyNavHeight = stickyNav ? stickyNav.getBoundingClientRect().height : 0;
+                const offset = stickyNavTop + stickyNavHeight + 20;
+                const targetTop = window.scrollY + target.getBoundingClientRect().top - offset;
+
+                window.scrollTo({
+                    top: Math.max(targetTop, 0),
+                    left: 0,
+                    behavior,
+                });
+            };
+
             if (!hasHashTarget && !correctionFocusFieldId && !correctionFocusRowId && Number.isFinite(restoreScrollY) && restoreScrollY >= 0) {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         window.scrollTo({ top: restoreScrollY, left: 0, behavior: 'auto' });
+                    });
+                });
+            }
+
+            hashLinks.forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    const href = link.getAttribute('href');
+                    if (!href || href === '#') {
+                        return;
+                    }
+
+                    const target = document.querySelector(href);
+                    if (!target) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    history.pushState(null, '', href);
+                    requestAnimationFrame(() => scrollToInvoiceAnchor(target, 'smooth'));
+                });
+            });
+
+            if (hasHashTarget) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const target = document.querySelector(window.location.hash);
+                        scrollToInvoiceAnchor(target);
                     });
                 });
             }
@@ -1428,7 +1506,7 @@
 
                     const correctionRow = correctionFocusRowId ? document.getElementById(correctionFocusRowId) : null;
                     if (correctionRow) {
-                        correctionRow.scrollIntoView({ block: 'center', inline: 'nearest' });
+                        scrollToInvoiceAnchor(correctionRow);
                     }
 
                     const correctionField = correctionFocusFieldId ? document.getElementById(correctionFocusFieldId) : null;
@@ -1438,7 +1516,9 @@
                             const valueLength = correctionField.value?.length ?? 0;
                             correctionField.setSelectionRange(valueLength, valueLength);
                         }
-                        correctionRow?.scrollIntoView({ block: 'center', inline: 'nearest' });
+                        if (correctionRow) {
+                            scrollToInvoiceAnchor(correctionRow);
+                        }
                         return;
                     }
 

@@ -15,7 +15,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 
 ## Current Focus
 - Active phase: **Phase 3 - Payment Communication Truthfulness + Notification UX**
-- Current objective: finish Phase 3 Browser QA on the payment acknowledgment-versus-receipt split while landing the remaining active notification UX work there too: simple shared mail branding, clearer manual-receipt discovery, and invoice-page anchor/CTA cleanup.
+- Current objective: rerun the straightforward Phase 3 Browser QA pass against the branded mails and improved receipt-review UX, then continue the remaining ambiguity/manual-follow-through verification.
 - Primary next doc: [`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
 - Sequencing note: the phase breakout was re-cut from the actual dependency chain; later phases are sequential by default unless a phase strategy explicitly marks safe sidecars.
 - Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current delivery/alert code, and Mailgun account state.
@@ -26,7 +26,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 2. [x] Phase 2 - [Safeguards + Provider Recovery](../strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md)
    Completed. Shared outbound safeguards now run through a provider-backed Mailgun HTTP API path, the nested mailable queue bug was identified and removed so `DeliverInvoiceMail` is the real send boundary, controlled alias-off proof sends succeeded end-to-end, and Phase 3 can now focus on truthful payment communication semantics instead of delivery trust.
 3. [ ] Phase 3 - [Payment Communication Truthfulness + Notification UX](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
-   The acknowledgment-versus-receipt split, txid-scoped acknowledgments, and paired delivery-history labels are implemented; the active remaining work is Phase 3 Browser QA plus the last active notification UX fixes needed to make the manual-receipt model obvious and the active mails branded before verification continues.
+   The acknowledgment-versus-receipt split, txid-scoped acknowledgments, paired delivery-history labels, branded mail chrome, and the active receipt-review UX fixes are implemented; the remaining work is the Browser QA pass that proves the branded/manual-review model in straightforward and ambiguous scenarios.
 4. [ ] Phase 4 - [RC Mail Readiness](../strategies/16.4_RC_MAIL_READINESS.md)
    Rehearse alias-off RC mail readiness on the chosen transport once the Phase 3 notification UX and Browser QA are complete.
 

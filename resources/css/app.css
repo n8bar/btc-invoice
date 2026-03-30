@@ -82,6 +82,10 @@
         border: 1px solid var(--error-border);
         color: var(--error-text);
     }
+
+    .invoice-anchor-target {
+        scroll-margin-top: 10rem;
+    }
 }
 
 /* Light/dark overrides for common utility classes */

@@ -470,9 +470,10 @@ class DashboardSnapshotTest extends TestCase
         $response->assertOk();
         $response->assertSee('Review receipt', false);
         $response->assertSee(
-            'href="' . route('invoices.show', $invoice) . '#payment-row-' . $payment->id . '"',
+            'href="' . route('invoices.show', $invoice) . '#receipt-review-panel"',
             false
         );
+        $response->assertSee('bg-red-500', false);
     }
 
     private int $invoiceSequence = 0;
