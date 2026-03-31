@@ -17,6 +17,7 @@ class NotificationSettingsRequest extends FormRequest
             'mail_brand_name' => ['nullable', 'string', 'max:80'],
             'mail_brand_tagline' => ['nullable', 'string', 'max:120'],
             'mail_footer_blurb' => ['nullable', 'string', 'max:280'],
+            'show_mail_logo' => ['nullable', 'boolean'],
         ];
     }
 

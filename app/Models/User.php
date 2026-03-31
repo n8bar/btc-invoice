@@ -42,6 +42,7 @@ class User extends Authenticatable
         'mail_brand_name',
         'mail_brand_tagline',
         'mail_footer_blurb',
+        'show_mail_logo',
         'invoice_default_description',
         'invoice_default_terms_days',
         'theme',
@@ -85,6 +86,7 @@ class User extends Authenticatable
             'mail_brand_name' => 'string',
             'mail_brand_tagline' => 'string',
             'mail_footer_blurb' => 'string',
+            'show_mail_logo' => 'boolean',
             'invoice_default_terms_days' => 'integer',
             'theme' => 'string',
             'support_access_granted_at' => 'datetime',
@@ -125,6 +127,11 @@ class User extends Authenticatable
     public function effectiveMailFooterBlurb(): string
     {
         return trim((string) ($this->mail_footer_blurb ?: self::defaultMailFooterBlurb()));
+    }
+
+    public function shouldShowMailLogo(): bool
+    {
+        return $this->show_mail_logo !== false;
     }
 
 

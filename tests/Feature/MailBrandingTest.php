@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\InvoicePaymentAcknowledgmentClientMail;
+use App\Mail\NotificationBrandingPreviewMail;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
@@ -157,5 +158,25 @@ class MailBrandingTest extends TestCase
         $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
         $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
         $this->assertStringNotContainsString('Watch-only bitcoin invoicing app', $html);
+    }
+
+    public function test_notification_branding_preview_mail_uses_saved_branding_and_can_hide_logo(): void
+    {
+        $owner = User::factory()->create([
+            'name' => 'Antonina Owner',
+            'email' => 'antonina12@nospam.site',
+            'mail_brand_name' => 'Phase 3 Mail',
+            'mail_brand_tagline' => 'Owner-reviewed bitcoin receipts',
+            'mail_footer_blurb' => 'Phase 3 custom footer blurb.',
+            'show_mail_logo' => false,
+        ]);
+
+        $html = (new NotificationBrandingPreviewMail($owner))->render();
+
+        $this->assertStringContainsString('Branded test message', $html);
+        $this->assertStringContainsString('Phase 3 Mail', $html);
+        $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
+        $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
+        $this->assertStringNotContainsString('images/CZ.png', $html);
     }
 }

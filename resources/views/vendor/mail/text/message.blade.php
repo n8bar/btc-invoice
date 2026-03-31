@@ -1,6 +1,6 @@
 @php
     $mailBrandInvoice = $invoice ?? null;
-    $mailBrandUser = $mailBrandInvoice?->user;
+    $mailBrandUser = $mailBrandInvoice?->user ?? ($user ?? null);
     $mailBrandUser = $mailBrandUser instanceof \App\Models\User ? $mailBrandUser : null;
     $brandName = $mailBrandUser?->effectiveMailBrandName() ?? \App\Models\User::defaultMailBrandName();
     $brandTagline = $mailBrandUser?->effectiveMailBrandTagline() ?? \App\Models\User::defaultMailBrandTagline();

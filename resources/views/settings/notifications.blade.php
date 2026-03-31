@@ -19,6 +19,14 @@
                         <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
                             Saved notification settings.
                         </div>
+                    @elseif (session('status') === 'notification-preview-sent')
+                        <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
+                            Sent a branded test email to {{ session('preview_email') }}.
+                        </div>
+                    @elseif (session('status') === 'notification-preview-throttled')
+                        <div class="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800" style="border-color: currentColor;">
+                            Test email already sent recently. Please wait a minute before sending another.
+                        </div>
                     @endif
 
                     <form method="POST" action="{{ route('settings.notifications.update') }}" class="space-y-6">
@@ -77,12 +85,44 @@
                                 <p class="mt-1 text-xs text-gray-500">Shown in the shared footer under active notification emails.</p>
                                 <x-input-error class="mt-2" :messages="$errors->get('mail_footer_blurb')" />
                             </div>
+
+                            <div class="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4">
+                                <div>
+                                    <input id="show_mail_logo" type="checkbox" name="show_mail_logo" value="1"
+                                           @checked(old('show_mail_logo', $user->shouldShowMailLogo()))
+                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <x-input-label for="show_mail_logo" :value="__('Show the default CryptoZing logo in email headers')" />
+                                    <p class="text-sm text-gray-500">
+                                        Keep the shared email shell simple for RC. Custom logo uploads stay out of scope for now.
+                                    </p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('show_mail_logo')" />
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex items-center gap-4">
                             <x-primary-button>Save settings</x-primary-button>
                         </div>
                     </form>
+
+                    <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-semibold text-gray-700">Send yourself a test email</h3>
+                            <p class="text-xs text-gray-600">
+                                Save settings first, then send a branded test message to {{ $user->email }} using the current saved mail-branding settings.
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                This does not send to clients and does not create an invoice delivery-history row.
+                            </p>
+                        </div>
+
+                        <form method="POST" action="{{ route('settings.notifications.preview') }}">
+                            @csrf
+                            <x-secondary-button type="submit">Send me a test email</x-secondary-button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

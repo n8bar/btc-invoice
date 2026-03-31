@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/settings/invoice', [InvoiceSettingsController::class, 'update'])->name('settings.invoice.update');
     Route::get('/settings/notifications', [NotificationSettingsController::class, 'edit'])->name('settings.notifications.edit');
     Route::patch('/settings/notifications', [NotificationSettingsController::class, 'update'])->name('settings.notifications.update');
+    Route::post('/settings/notifications/test-email', [NotificationSettingsController::class, 'sendPreview'])->name('settings.notifications.preview');
     Route::get('/wallet/settings', [WalletSettingsController::class, 'edit'])->name('wallet.settings.edit');
     Route::post('/wallet/settings', [WalletSettingsController::class, 'update'])->name('wallet.settings.update');
     Route::post('/wallet/settings/validate', [WalletSettingsController::class, 'validateKey'])
