@@ -185,5 +185,7 @@ class MailBrandingTest extends TestCase
         $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
         $this->assertStringNotContainsString('cid:', $html);
         $this->assertStringNotContainsString('data:image/png;base64,', $html);
+        $this->assertStringNotContainsString(' RC', $html);
+        $this->assertStringNotContainsString('MS16', $html);
     }
 }

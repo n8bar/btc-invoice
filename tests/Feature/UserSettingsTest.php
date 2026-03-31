@@ -786,6 +786,8 @@ class UserSettingsTest extends TestCase
         $response->assertSeeText('Send yourself a test email');
         $response->assertSee(route('settings.notifications.preview'), false);
         $response->assertDontSee('name="auto_receipt_emails"', false);
+        $response->assertDontSeeText('RC');
+        $response->assertDontSeeText('MS16');
         $response->assertSee('Save settings');
     }
 

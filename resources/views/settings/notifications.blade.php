@@ -50,7 +50,7 @@
                             <div class="space-y-2">
                                 <h3 class="text-sm font-semibold text-gray-700">Mail branding</h3>
                                 <p class="text-xs text-gray-600">
-                                    These fields only change the shared mail shell for active notification emails. Subjects and body copy for payment acknowledgments, receipts, paid notices, and alerts stay product-controlled in MS16.
+                                    These fields only change the shared mail shell for active notification emails. Payment acknowledgments, receipts, paid notices, and alerts keep their own standard subject and body copy.
                                 </p>
                                 <p class="text-xs text-gray-500">
                                     Fields start with the current CryptoZing defaults. Clear any field to fall back to the shipped default again.
@@ -95,7 +95,7 @@
                                 <div>
                                     <x-input-label for="show_mail_logo" :value="__('Show the default CryptoZing logo in email headers')" />
                                     <p class="text-sm text-gray-500">
-                                        Keep the shared email shell simple for RC. Custom logo uploads stay out of scope for now.
+                                        Use the default CryptoZing logo for now, or turn it off. Custom logo uploads are not available yet.
                                     </p>
                                     <x-input-error class="mt-2" :messages="$errors->get('show_mail_logo')" />
                                 </div>
