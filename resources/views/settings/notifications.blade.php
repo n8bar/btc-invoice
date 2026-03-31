@@ -33,16 +33,6 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
-                            <h3 class="text-sm font-semibold text-gray-700">Payment emails</h3>
-                            <p class="text-sm text-gray-600">
-                                Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.
-                            </p>
-                            <p class="text-sm text-gray-600">
-                                Client receipts are always reviewed before sending from the paid invoice page.
-                            </p>
-                        </div>
-
                         <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4 space-y-4">
                             <div class="space-y-2">
                                 <h3 class="text-sm font-semibold text-gray-700">Mail branding</h3>
