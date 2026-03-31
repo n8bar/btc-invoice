@@ -41,9 +41,6 @@
                             <p class="text-sm text-gray-600">
                                 Client receipts are always reviewed before sending from the paid invoice page.
                             </p>
-                            <p class="text-xs text-gray-500">
-                                If the invoice history includes multiple active on-chain payments or ignored/reattributed payment rows, extra review context will appear here.
-                            </p>
                         </div>
 
                         <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4 space-y-4">
