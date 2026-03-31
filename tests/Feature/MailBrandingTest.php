@@ -78,7 +78,8 @@ class MailBrandingTest extends TestCase
         $html = $html->render();
 
         $this->assertStringContainsString('CryptoZing', $html);
-        $this->assertStringContainsString('Watch-only bitcoin invoicing app', $html);
+        $this->assertStringContainsString('Non-custodial bitcoin invoicing', $html);
+        $this->assertStringContainsString('Create bitcoin invoices, monitor incoming payments, and send receipts with CryptoZing.', $html);
         $this->assertStringContainsString('Bitcoin payment detected', $html);
         $this->assertStringContainsString('A Bitcoin payment of', $html);
         $this->assertStringNotContainsString('for Invoice ' . $invoice->number, $html);
@@ -157,7 +158,7 @@ class MailBrandingTest extends TestCase
         $this->assertStringContainsString('Phase 3 Mail', $html);
         $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
         $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
-        $this->assertStringNotContainsString('Watch-only bitcoin invoicing app', $html);
+        $this->assertStringNotContainsString('Non-custodial bitcoin invoicing', $html);
     }
 
     public function test_notification_branding_preview_mail_uses_saved_branding_and_can_hide_logo(): void

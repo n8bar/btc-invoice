@@ -16,9 +16,9 @@ class User extends Authenticatable
 
     public const DEFAULT_MAIL_BRAND_NAME = 'CryptoZing';
 
-    public const DEFAULT_MAIL_BRAND_TAGLINE = 'Watch-only bitcoin invoicing app';
+    public const DEFAULT_MAIL_BRAND_TAGLINE = 'Non-custodial bitcoin invoicing';
 
-    public const DEFAULT_MAIL_FOOTER_BLURB = 'CryptoZing is a watch-only bitcoin invoicing app and leaves final payment interpretation with the invoice issuer.';
+    public const DEFAULT_MAIL_FOOTER_BLURB = 'Create bitcoin invoices, monitor incoming payments, and send receipts with CryptoZing.';
 
     /**
      * The attributes that are mass assignable.

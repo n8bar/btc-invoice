@@ -1,6 +1,6 @@
 @props([
     'brand' => 'CryptoZing',
-    'footerBlurb' => 'CryptoZing is a watch-only bitcoin invoicing app and leaves final payment interpretation with the invoice issuer.',
+    'footerBlurb' => 'Create bitcoin invoices, monitor incoming payments, and send receipts with CryptoZing.',
 ])
 <tr>
 <td>

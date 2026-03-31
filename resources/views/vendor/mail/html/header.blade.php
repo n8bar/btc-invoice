@@ -1,7 +1,7 @@
 @props([
     'url',
     'brand' => 'CryptoZing',
-    'tagline' => 'Watch-only bitcoin invoicing app',
+    'tagline' => 'Non-custodial bitcoin invoicing',
     'showLogo' => true,
 ])
 <tr>
