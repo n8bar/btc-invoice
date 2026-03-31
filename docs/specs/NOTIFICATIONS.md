@@ -87,6 +87,10 @@
    5. Outcome labels should display as `Queued`, `Sending`, `Sent`, `Skipped`, and `Failed`.
 13. Outbound mail copy should stay concise and actionable.
 14. Owner-facing mail-branding settings for RC may expose only constrained brand-shell controls, not arbitrary message editing.
-   1. Allowed MS16 fields are limited to simple mail chrome values such as brand name, short tagline, and footer blurb.
+   1. Allowed MS16 fields are limited to simple mail chrome values such as brand name, short tagline, footer blurb, and whether the default CryptoZing logo is shown in the shared mail header.
    2. Those settings should be prepopulated from the current shipped defaults so leaving them unchanged preserves the current mail output.
    3. Truthfulness-critical subjects and message bodies remain product-controlled in MS16, including payment acknowledgments, receipts, owner paid notices, and alert copy.
+   4. RC may include a simple owner-facing `send me a test email` action that sends a neutral mail-branding preview to the authenticated owner account email using the current saved branding-shell settings.
+      1. That preview should not send to client recipients or create invoice-linked delivery-history rows.
+      2. That preview should be lightly rate-limited or cooldown-protected so repeated clicks do not spam the owner mailbox.
+   5. RC does not include arbitrary custom logo uploads for outbound mail; at most it may show or hide the default CryptoZing logo in the shared mail chrome.
