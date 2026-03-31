@@ -84,7 +84,12 @@ class MailBrandingTest extends TestCase
         $this->assertStringContainsString('A Bitcoin payment of', $html);
         $this->assertStringNotContainsString('for Invoice ' . $invoice->number, $html);
         $this->assertStringNotContainsString('for this invoice', $html);
-        $this->assertStringContainsString('images/CZ.png', $html);
+        $this->assertTrue(
+            str_contains($html, 'cid:')
+            || str_contains($html, 'data:image/png;base64,'),
+            'Expected inline email logo markup.'
+        );
+        $this->assertStringNotContainsString('https://cryptozing.app/images/CZ.png', $html);
         $this->assertStringNotContainsString('notification-logo.png', $html);
         $this->assertStringNotContainsString('Laravel Logo', $html);
         $this->assertSame('Bitcoin payment detected', (new InvoicePaymentAcknowledgmentClientMail(
@@ -178,6 +183,7 @@ class MailBrandingTest extends TestCase
         $this->assertStringContainsString('Phase 3 Mail', $html);
         $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
         $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
-        $this->assertStringNotContainsString('images/CZ.png', $html);
+        $this->assertStringNotContainsString('cid:', $html);
+        $this->assertStringNotContainsString('data:image/png;base64,', $html);
     }
 }
