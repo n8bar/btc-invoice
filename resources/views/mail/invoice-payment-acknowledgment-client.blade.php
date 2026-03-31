@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Bitcoin payment detected
 
 Hi {{ $client->name ?? 'there' }},

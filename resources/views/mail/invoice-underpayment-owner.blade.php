@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Underpayment alert for invoice {{ $invoice->number ?? $invoice->id }}
 
 The latest payment left roughly **{{ number_format($invoice->underpaymentPercent() ?? 0, 1) }}%** unpaid.

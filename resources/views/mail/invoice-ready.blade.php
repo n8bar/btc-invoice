@@ -1,4 +1,4 @@
-<x-mail::message>
+<x-mail::message :invoice="$invoice">
 # Invoice {{ $invoice->number ?? $invoice->id }} is ready
 
 Hi {{ $client->name ?? 'there' }},

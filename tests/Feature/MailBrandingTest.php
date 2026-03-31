@@ -91,4 +91,71 @@ class MailBrandingTest extends TestCase
             $payment
         ))->envelope()->subject);
     }
+
+    public function test_payment_acknowledgment_mail_uses_owner_mail_branding_overrides(): void
+    {
+        $owner = User::factory()->create([
+            'name' => 'Antonina Owner',
+            'email' => 'antonina12@nospam.site',
+            'mail_brand_name' => 'Phase 3 Mail',
+            'mail_brand_tagline' => 'Owner-reviewed bitcoin receipts',
+            'mail_footer_blurb' => 'Phase 3 custom footer blurb.',
+        ]);
+
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Phase 3 QA Client',
+            'email' => 'ms16-phase3-qa@nospam.site',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-MAIL-BRAND-CUSTOM',
+            'description' => 'Branding proof',
+            'amount_usd' => 80,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080',
+            'status' => 'paid',
+            'public_enabled' => true,
+            'public_token' => 'mail-branding-proof-custom',
+            'public_expires_at' => Carbon::now()->addDay(),
+            'invoice_date' => Carbon::now()->toDateString(),
+            'due_date' => Carbon::now()->addWeek()->toDateString(),
+        ]);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'accounting_invoice_id' => $invoice->id,
+            'txid' => 'mail-branding-proof-custom-tx',
+            'sats_received' => 200_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 80.00,
+        ]);
+
+        $delivery = InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'payment_acknowledgment_client',
+            'context_key' => $payment->txid,
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'dispatched_at' => Carbon::now(),
+            'sent_at' => Carbon::now(),
+        ]);
+
+        $html = (new InvoicePaymentAcknowledgmentClientMail(
+            $invoice->fresh(['client', 'user']),
+            $delivery,
+            $payment
+        ))->render();
+
+        $this->assertStringContainsString('Phase 3 Mail', $html);
+        $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
+        $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
+        $this->assertStringNotContainsString('Watch-only bitcoin invoicing app', $html);
+    }
 }

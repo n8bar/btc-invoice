@@ -725,24 +725,40 @@ class UserSettingsTest extends TestCase
         $response->assertSee('name="show_qr_refresh_reminder"', false);
     }
 
-    public function test_notification_settings_update_route_is_a_noop(): void
+    public function test_user_can_update_notification_mail_branding_settings(): void
     {
-        $owner = User::factory()->create([
-            'auto_receipt_emails' => true,
-        ]);
+        $owner = User::factory()->create();
 
         $this
             ->actingAs($owner)
             ->patch(route('settings.notifications.update'), [
-                'auto_receipt_emails' => false,
+                'mail_brand_name' => 'Phase 3 Mail',
+                'mail_brand_tagline' => 'Client receipts reviewed by humans',
+                'mail_footer_blurb' => 'Phase 3 footer blurb.',
             ])
             ->assertRedirect(route('settings.notifications.edit'));
 
         $owner->refresh();
-        $this->assertTrue($owner->auto_receipt_emails);
+        $this->assertSame('Phase 3 Mail', $owner->mail_brand_name);
+        $this->assertSame('Client receipts reviewed by humans', $owner->mail_brand_tagline);
+        $this->assertSame('Phase 3 footer blurb.', $owner->mail_footer_blurb);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('settings.notifications.update'), [
+                'mail_brand_name' => '',
+                'mail_brand_tagline' => '',
+                'mail_footer_blurb' => '',
+            ])
+            ->assertRedirect(route('settings.notifications.edit'));
+
+        $owner->refresh();
+        $this->assertNull($owner->mail_brand_name);
+        $this->assertNull($owner->mail_brand_tagline);
+        $this->assertNull($owner->mail_footer_blurb);
     }
 
-    public function test_notification_settings_page_explains_manual_receipt_review_model(): void
+    public function test_notification_settings_page_explains_manual_receipt_review_model_and_mail_branding_scope(): void
     {
         $owner = User::factory()->create();
 
@@ -754,8 +770,13 @@ class UserSettingsTest extends TestCase
         $response->assertSeeText('Payment emails');
         $response->assertSeeText('Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.');
         $response->assertSeeText('Client receipts are sent manually after owner review from the paid invoice page.');
+        $response->assertSeeText('Mail branding');
+        $response->assertSeeText('These fields only change the shared mail shell for active notification emails.');
+        $response->assertSee('name="mail_brand_name"', false);
+        $response->assertSee('name="mail_brand_tagline"', false);
+        $response->assertSee('name="mail_footer_blurb"', false);
         $response->assertDontSee('name="auto_receipt_emails"', false);
-        $response->assertDontSee('Save settings');
+        $response->assertSee('Save settings');
     }
 
     public function test_settings_tabs_render_on_all_settings_pages(): void

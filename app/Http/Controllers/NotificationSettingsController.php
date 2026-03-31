@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NotificationSettingsRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -16,8 +18,24 @@ class NotificationSettingsController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(NotificationSettingsRequest $request): RedirectResponse
     {
-        return Redirect::route('settings.notifications.edit');
+        $data = $request->validated();
+        $data['mail_brand_name'] = $this->normalizeDefaultValue($data['mail_brand_name'] ?? null, User::defaultMailBrandName());
+        $data['mail_brand_tagline'] = $this->normalizeDefaultValue($data['mail_brand_tagline'] ?? null, User::defaultMailBrandTagline());
+        $data['mail_footer_blurb'] = $this->normalizeDefaultValue($data['mail_footer_blurb'] ?? null, User::defaultMailFooterBlurb());
+
+        $request->user()->fill($data)->save();
+
+        return Redirect::route('settings.notifications.edit')->with('status', 'notification-settings-updated');
+    }
+
+    private function normalizeDefaultValue(?string $value, string $default): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return $value === $default ? null : $value;
     }
 }

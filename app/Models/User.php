@@ -14,6 +14,12 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    public const DEFAULT_MAIL_BRAND_NAME = 'CryptoZing';
+
+    public const DEFAULT_MAIL_BRAND_TAGLINE = 'Watch-only bitcoin invoicing app';
+
+    public const DEFAULT_MAIL_FOOTER_BLURB = 'CryptoZing is a watch-only bitcoin invoicing app and leaves final payment interpretation with the invoice issuer.';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -33,6 +39,9 @@ class User extends Authenticatable
         'billing_address',
         'invoice_footer_note',
         'branding_heading',
+        'mail_brand_name',
+        'mail_brand_tagline',
+        'mail_footer_blurb',
         'invoice_default_description',
         'invoice_default_terms_days',
         'theme',
@@ -73,6 +82,9 @@ class User extends Authenticatable
             'billing_email' => 'string',
             'billing_phone' => 'string',
             'branding_heading' => 'string',
+            'mail_brand_name' => 'string',
+            'mail_brand_tagline' => 'string',
+            'mail_footer_blurb' => 'string',
             'invoice_default_terms_days' => 'integer',
             'theme' => 'string',
             'support_access_granted_at' => 'datetime',
@@ -83,6 +95,36 @@ class User extends Authenticatable
             'getting_started_replay_started_at' => 'datetime',
             'getting_started_replay_wallet_verified_at' => 'datetime',
         ];
+    }
+
+    public static function defaultMailBrandName(): string
+    {
+        return self::DEFAULT_MAIL_BRAND_NAME;
+    }
+
+    public static function defaultMailBrandTagline(): string
+    {
+        return self::DEFAULT_MAIL_BRAND_TAGLINE;
+    }
+
+    public static function defaultMailFooterBlurb(): string
+    {
+        return self::DEFAULT_MAIL_FOOTER_BLURB;
+    }
+
+    public function effectiveMailBrandName(): string
+    {
+        return trim((string) ($this->mail_brand_name ?: self::defaultMailBrandName()));
+    }
+
+    public function effectiveMailBrandTagline(): string
+    {
+        return trim((string) ($this->mail_brand_tagline ?: self::defaultMailBrandTagline()));
+    }
+
+    public function effectiveMailFooterBlurb(): string
+    {
+        return trim((string) ($this->mail_footer_blurb ?: self::defaultMailFooterBlurb()));
     }
 
 

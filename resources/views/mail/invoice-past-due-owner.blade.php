@@ -3,7 +3,7 @@
     $outstandingUsd = $summary['outstanding_usd'] ?? 0;
 @endphp
 
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Invoice {{ $invoice->number ?? $invoice->id }} is past due
 
 This invoice is now past its due date and still has an outstanding balance.

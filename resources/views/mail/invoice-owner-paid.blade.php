@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Invoice {{ $invoice->number ?? $invoice->id }} paid
 
 Good news — this invoice is now marked **paid**.
