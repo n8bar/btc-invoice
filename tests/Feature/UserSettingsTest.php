@@ -776,7 +776,8 @@ class UserSettingsTest extends TestCase
         $response->assertOk();
         $response->assertSeeText('Payment emails');
         $response->assertSeeText('Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.');
-        $response->assertSeeText('Client receipts are sent manually after owner review from the paid invoice page.');
+        $response->assertSeeText('Client receipts are always reviewed before sending from the paid invoice page.');
+        $response->assertSeeText('If the invoice history includes multiple active on-chain payments or ignored/reattributed payment rows, extra review context will appear here.');
         $response->assertSeeText('Mail branding');
         $response->assertSeeText('These fields only change the shared mail shell for active notification emails.');
         $response->assertSee('name="mail_brand_name"', false);
@@ -786,6 +787,7 @@ class UserSettingsTest extends TestCase
         $response->assertSeeText('Send yourself a test email');
         $response->assertSee(route('settings.notifications.preview'), false);
         $response->assertDontSee('name="auto_receipt_emails"', false);
+        $response->assertDontSeeText('dashboard, invoices list, and invoice payment history will point you to the review/send action');
         $response->assertDontSeeText('RC');
         $response->assertDontSeeText('MS16');
         $response->assertSee('Save settings');

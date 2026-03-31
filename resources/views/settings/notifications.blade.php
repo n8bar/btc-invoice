@@ -39,10 +39,10 @@
                                 Detected payments can send a narrow acknowledgment right away when the app can safely say only that a payment was detected.
                             </p>
                             <p class="text-sm text-gray-600">
-                                Client receipts are sent manually after owner review from the paid invoice page. When a paid invoice still needs a receipt, the dashboard, invoices list, and invoice payment history will point you to the review/send action.
+                                Client receipts are always reviewed before sending from the paid invoice page.
                             </p>
                             <p class="text-xs text-gray-500">
-                                Extra review context may appear when multiple active on-chain payments or payment-correction rows are present in the invoice history.
+                                If the invoice history includes multiple active on-chain payments or ignored/reattributed payment rows, extra review context will appear here.
                             </p>
                         </div>
 
