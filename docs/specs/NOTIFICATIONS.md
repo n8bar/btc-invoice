@@ -86,3 +86,7 @@
    4. Payment-triggered follow-up should keep the acknowledgment-versus-receipt split visible in history once those rows ship, using labels such as `Payment acknowledgment (client)`, `Payment acknowledgment (owner)`, and `Receipt (client)` for the later higher-certainty follow-up.
    5. Outcome labels should display as `Queued`, `Sending`, `Sent`, `Skipped`, and `Failed`.
 13. Outbound mail copy should stay concise and actionable.
+14. Owner-facing mail-branding settings for RC may expose only constrained brand-shell controls, not arbitrary message editing.
+   1. Allowed MS16 fields are limited to simple mail chrome values such as brand name, short tagline, and footer blurb.
+   2. Those settings should be prepopulated from the current shipped defaults so leaving them unchanged preserves the current mail output.
+   3. Truthfulness-critical subjects and message bodies remain product-controlled in MS16, including payment acknowledgments, receipts, owner paid notices, and alert copy.
