@@ -72,12 +72,23 @@ class MailBrandingTest extends TestCase
             $invoice->fresh(['client', 'user']),
             $delivery,
             $payment
-        ))->render();
+        ));
+
+        $html = $html->render();
 
         $this->assertStringContainsString('CryptoZing', $html);
-        $this->assertStringContainsString('Watch-only BTC invoicing', $html);
+        $this->assertStringContainsString('Watch-only bitcoin invoicing app', $html);
+        $this->assertStringContainsString('Bitcoin payment detected', $html);
+        $this->assertStringContainsString('A Bitcoin payment of', $html);
+        $this->assertStringNotContainsString('for Invoice ' . $invoice->number, $html);
+        $this->assertStringNotContainsString('for this invoice', $html);
         $this->assertStringContainsString('images/CZ.png', $html);
         $this->assertStringNotContainsString('notification-logo.png', $html);
         $this->assertStringNotContainsString('Laravel Logo', $html);
+        $this->assertSame('Bitcoin payment detected', (new InvoicePaymentAcknowledgmentClientMail(
+            $invoice->fresh(['client', 'user']),
+            $delivery,
+            $payment
+        ))->envelope()->subject);
     }
 }

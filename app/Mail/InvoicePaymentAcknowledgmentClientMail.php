@@ -24,7 +24,7 @@ class InvoicePaymentAcknowledgmentClientMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Bitcoin payment detected for Invoice ' . ($this->invoice->number ?? $this->invoice->id),
+            subject: 'Bitcoin payment detected',
         );
     }
 

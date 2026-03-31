@@ -1,9 +1,9 @@
 @component('mail::message')
-# Bitcoin payment detected for Invoice {{ $invoice->number ?? $invoice->id }}
+# Bitcoin payment detected
 
 Hi {{ $client->name ?? 'there' }},
 
-A Bitcoin payment of **{{ $invoice->formatBitcoinAmount(($payment?->sats_received ?? 0) / \App\Models\Invoice::SATS_PER_BTC) ?? '0' }} BTC** was detected for this invoice.
+A Bitcoin payment of **{{ $invoice->formatBitcoinAmount(($payment?->sats_received ?? 0) / \App\Models\Invoice::SATS_PER_BTC) ?? '0' }} BTC** was detected.
 
 No action is needed right now.
 

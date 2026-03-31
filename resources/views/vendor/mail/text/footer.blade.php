@@ -1,2 +1,2 @@
 CryptoZing
-Watch-only BTC invoicing
+Watch-only bitcoin invoicing app

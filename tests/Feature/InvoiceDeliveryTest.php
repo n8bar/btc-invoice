@@ -654,7 +654,17 @@ class InvoiceDeliveryTest extends TestCase
             'status' => 'sent',
         ]);
 
-        Mail::assertSent(InvoicePaymentAcknowledgmentClientMail::class);
+        Mail::assertSent(InvoicePaymentAcknowledgmentClientMail::class, function (InvoicePaymentAcknowledgmentClientMail $mail) {
+            $this->assertSame('Bitcoin payment detected', $mail->envelope()->subject);
+
+            $html = $mail->render();
+
+            $this->assertStringContainsString('Bitcoin payment detected', $html);
+            $this->assertStringNotContainsString('for Invoice', $html);
+            $this->assertStringNotContainsString('for this invoice', $html);
+
+            return true;
+        });
     }
 
     public function test_payment_acknowledgment_delivery_skips_when_payment_no_longer_counts_on_the_invoice(): void
