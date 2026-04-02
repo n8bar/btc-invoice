@@ -348,6 +348,8 @@ class InvoiceDeliveryService
             'owner_paid_notice',
             'payment_acknowledgment_client',
             'payment_acknowledgment_owner',
+            'past_due_owner',
+            'past_due_client',
         ], true);
     }
 
@@ -358,6 +360,8 @@ class InvoiceDeliveryService
             'owner_paid_notice' => 'An owner paid notice has already been queued or sent for this invoice.',
             'payment_acknowledgment_client',
             'payment_acknowledgment_owner' => 'A payment acknowledgment has already been queued or sent for this detected payment.',
+            'past_due_owner',
+            'past_due_client' => 'This past-due notice has already been queued or sent.',
             default => 'A matching delivery has already been queued or sent.',
         };
     }

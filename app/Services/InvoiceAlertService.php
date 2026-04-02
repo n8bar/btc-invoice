@@ -123,25 +123,42 @@ class InvoiceAlertService
             return;
         }
 
-        $contextKey = now()->toDateString();
+        $daysPastDue = (int) $invoice->due_date->diffInDays(now());
+
+        // Sequence slot => minimum days past due required before sending.
+        // One new slot fires per cron run; already-sent slots are blocked by the
+        // delivery service's preventsRepeatAfterSend guard on the context key.
+        $schedule = [1 => 1, 2 => 7, 3 => 14];
 
         $owner = $invoice->user;
-        if ($owner && $this->shouldSend($invoice->last_past_due_owner_alert_at)) {
-            $delivery = $this->deliveries->queue($invoice, 'past_due_owner', $owner->email, contextKey: $contextKey);
-            if ($delivery->status === 'queued') {
-                $invoice->last_past_due_owner_alert_at = now();
-            }
-        }
-
         $client = $invoice->client;
-        if ($client && !empty($client->email) && $this->shouldSend($invoice->last_past_due_client_alert_at)) {
-            $delivery = $this->deliveries->queue($invoice, 'past_due_client', $client->email, contextKey: $contextKey);
-            if ($delivery->status === 'queued') {
-                $invoice->last_past_due_client_alert_at = now();
+
+        foreach ($schedule as $seq => $minDays) {
+            if ($daysPastDue < $minDays) {
+                break;
+            }
+
+            $contextKey = "past_due_{$seq}";
+            $newlyQueued = false;
+
+            if ($owner && filled($owner->email)) {
+                $delivery = $this->deliveries->queue($invoice, 'past_due_owner', $owner->email, contextKey: $contextKey);
+                if ($delivery->status === 'queued') {
+                    $newlyQueued = true;
+                }
+            }
+
+            if ($client && filled($client->email)) {
+                $delivery = $this->deliveries->queue($invoice, 'past_due_client', $client->email, contextKey: $contextKey);
+                if ($delivery->status === 'queued') {
+                    $newlyQueued = true;
+                }
+            }
+
+            if ($newlyQueued) {
+                break;
             }
         }
-
-        $invoice->save();
     }
 
     private function maybeSendOverpayAlert(Invoice $invoice): void

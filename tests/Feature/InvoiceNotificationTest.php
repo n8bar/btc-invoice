@@ -398,13 +398,156 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_owner',
-            'context_key' => now()->toDateString(),
+            'context_key' => 'past_due_1',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_client',
-            'context_key' => now()->toDateString(),
+            'context_key' => 'past_due_1',
+        ]);
+    }
+
+    public function test_past_due_slot_not_resent_after_already_queued(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(3)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already queued
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'queued',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subHour(),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_owner',
+            'status' => 'queued',
+            'context_key' => 'past_due_2',
+        ]);
+    }
+
+    public function test_past_due_slot_2_not_sent_before_day_7(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(3)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already sent
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'sent',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(3),
+        ]);
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_client',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(3),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        // Day 3 is past threshold for slot 1 (already sent) but not slot 2 (needs day 7)
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_2',
+        ]);
+    }
+
+    public function test_past_due_slot_2_fires_after_day_7_when_slot_1_sent(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(8)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already sent
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'sent',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_client',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_owner',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_client',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+    }
+
+    public function test_past_due_catchup_sends_only_one_slot_per_run(): void
+    {
+        Queue::fake();
+        [$invoice] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(15)->toDateString(),
+        ])->save();
+
+        // No past-due deliveries yet — invoice has been overdue 15 days unnoticed
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        // Only slot 1 should fire on first run, not slot 2 or 3
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_1',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_2',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_3',
         ]);
     }
 
