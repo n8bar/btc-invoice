@@ -11,5 +11,5 @@ Good news — this invoice is now marked **paid**.
 Review invoice
 @endcomponent
 
-Thanks for using CryptoZing Invoice.
+CryptoZing
 @endcomponent

@@ -203,6 +203,10 @@ class InvoiceDeliveryService
             return 'A matching delivery is already queued.';
         }
 
+        if ($contextKey !== null && $this->hasFailedDelivery($invoice, $type, $recipient, $contextKey)) {
+            return 'A matching delivery has already been attempted for this trigger.';
+        }
+
         if ($this->preventsRepeatAfterSend($type)
             && $this->hasSentDelivery($invoice, $type, $recipient, $contextKey)) {
             return $this->sentDuplicateReason($type);
@@ -232,6 +236,18 @@ class InvoiceDeliveryService
     {
         return $this->matchingDeliveries($invoice, $type, $recipient, $contextKey)
             ->where('status', 'queued')
+            ->exists();
+    }
+
+    private function hasFailedDelivery(
+        Invoice $invoice,
+        string $type,
+        string $recipient,
+        ?string $contextKey = null
+    ): bool
+    {
+        return $this->matchingDeliveries($invoice, $type, $recipient, $contextKey)
+            ->where('status', 'failed')
             ->exists();
     }
 

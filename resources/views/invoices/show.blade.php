@@ -746,15 +746,25 @@
                                         <div class="space-y-2">
                                             <div class="space-y-1">
                                                 <p class="text-xs font-semibold uppercase tracking-[0.15em] {{ $receiptEyebrowClasses }}">
-                                                    {{ $receiptPanelNeedsAttention ? 'Review before sending' : 'Receipt ready to review' }}
+                                                    {{ $receiptPanelNeedsAttention ? 'Review before sending  Client receipt' : 'Receipt ready to review' }}
                                                 </p>
-                                                <p class="text-base font-semibold text-slate-950 dark:text-white">Client receipt</p>
-                                                @if ($receiptPanelNeedsAttention)
-                                                    <p class="{{ $receiptBodyClasses }}">Review the payment rows below before sending the client receipt. The receipt stays manual because correct invoice attribution still depends on owner review.</p>
-                                                @else
-                                                    <p class="{{ $receiptBodyClasses }}">The client receipt is ready for review and send. A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
+                                                <p class="text-base font-semibold text-slate-950 dark:text-white">
+                                                    {{ $receiptPanelNeedsAttention ? 'Your attention is needed.' : 'The client receipt is ready to send.' }}
+                                                </p>
+                                                @if (!$receiptPanelNeedsAttention)
+                                                    <p class="{{ $receiptBodyClasses }}">A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
                                                 @endif
                                             </div>
+                                            @if ($receiptReviewReasons !== [])
+                                                <div class="pt-1 text-xs text-amber-900">
+                                                    <p class="font-semibold">Review these payment-history conditions before sending the client receipt.</p>
+                                                    <ul class="ml-4 mt-1 list-disc space-y-1">
+                                                        @foreach ($receiptReviewReasons as $receiptReviewReason)
+                                                            <li>{{ $receiptReviewReason }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
                                             @if ($invoice->needsReceiptReview())
                                                 <div class="pt-1">
                                                     <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
@@ -772,16 +782,6 @@
                                                 </p>
                                             @else
                                                 <p class="text-xs {{ $receiptMetaClasses }}">No client receipt has been queued or sent yet.</p>
-                                            @endif
-                                            @if ($receiptReviewReasons !== [])
-                                                <div class="pt-1 text-xs text-amber-900">
-                                                    <p class="font-semibold">Review these payment-history conditions before sending the client receipt.</p>
-                                                    <ul class="ml-4 mt-1 list-disc space-y-1">
-                                                        @foreach ($receiptReviewReasons as $receiptReviewReason)
-                                                            <li>{{ $receiptReviewReason }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
                                             @endif
                                         </div>
                                     </div>

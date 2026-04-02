@@ -616,7 +616,8 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('data-receipt-review-panel="true"', false);
         $response->assertSeeText('Client receipt');
         $response->assertSeeText('Receipt ready to review');
-        $response->assertSeeText('The client receipt is ready for review and send. A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.');
+        $response->assertSeeText('The client receipt is ready to send.');
+        $response->assertSeeText('A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.');
         $response->assertSeeText('Send receipt');
         $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
     }

@@ -123,9 +123,11 @@ class InvoiceAlertService
             return;
         }
 
+        $contextKey = now()->toDateString();
+
         $owner = $invoice->user;
         if ($owner && $this->shouldSend($invoice->last_past_due_owner_alert_at)) {
-            $delivery = $this->deliveries->queue($invoice, 'past_due_owner', $owner->email);
+            $delivery = $this->deliveries->queue($invoice, 'past_due_owner', $owner->email, contextKey: $contextKey);
             if ($delivery->status === 'queued') {
                 $invoice->last_past_due_owner_alert_at = now();
             }
@@ -133,7 +135,7 @@ class InvoiceAlertService
 
         $client = $invoice->client;
         if ($client && !empty($client->email) && $this->shouldSend($invoice->last_past_due_client_alert_at)) {
-            $delivery = $this->deliveries->queue($invoice, 'past_due_client', $client->email);
+            $delivery = $this->deliveries->queue($invoice, 'past_due_client', $client->email, contextKey: $contextKey);
             if ($delivery->status === 'queued') {
                 $invoice->last_past_due_client_alert_at = now();
             }
@@ -153,7 +155,9 @@ class InvoiceAlertService
             return;
         }
 
-        $delivery = $this->deliveries->queue($invoice, 'client_overpay_alert', $client->email);
+        $contextKey = $this->latestPaymentTxid($invoice);
+
+        $delivery = $this->deliveries->queue($invoice, 'client_overpay_alert', $client->email, contextKey: $contextKey);
         if ($delivery->status !== 'queued') {
             return;
         }
@@ -162,7 +166,7 @@ class InvoiceAlertService
 
         $owner = $invoice->user;
         if ($owner && !empty($owner->email)) {
-            $this->deliveries->queue($invoice, 'owner_overpay_alert', $owner->email);
+            $this->deliveries->queue($invoice, 'owner_overpay_alert', $owner->email, contextKey: $contextKey);
         }
 
         $invoice->save();
@@ -179,7 +183,9 @@ class InvoiceAlertService
             return;
         }
 
-        $delivery = $this->deliveries->queue($invoice, 'client_underpay_alert', $client->email);
+        $contextKey = $this->latestPaymentTxid($invoice);
+
+        $delivery = $this->deliveries->queue($invoice, 'client_underpay_alert', $client->email, contextKey: $contextKey);
         if ($delivery->status !== 'queued') {
             return;
         }
@@ -188,10 +194,16 @@ class InvoiceAlertService
 
         $owner = $invoice->user;
         if ($owner && !empty($owner->email)) {
-            $this->deliveries->queue($invoice, 'owner_underpay_alert', $owner->email);
+            $this->deliveries->queue($invoice, 'owner_underpay_alert', $owner->email, contextKey: $contextKey);
         }
 
         $invoice->save();
+    }
+
+    private function latestPaymentTxid(Invoice $invoice): ?string
+    {
+        $txid = $invoice->payments()->orderBy('id', 'desc')->value('txid');
+        return filled($txid) ? $txid : null;
     }
 
     private function shouldSend(?Carbon $lastSent): bool

@@ -5,6 +5,7 @@ Release Candidate contributor-docs and documentation-operations scope.
 ## Outputs
 - `docs/ops/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
 - `docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`: end-to-end contributor walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
+- `docs/specs/POST_PAYMENT_ONBOARDING.md`: small Part 2 onboarding spec for the first reviewed client receipt and its receipt-review blockers.
 - `docs/specs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
 - `README.md`, `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/BACKLOG.md` updated to link the above and keep RC scope separate from post-MVP backlog.
 
@@ -29,7 +30,15 @@ Goal: show the first successful invoice lifecycle with minimal branching.
 - Must cover: paid notices (owner + client receipt), past-due (owner + client), overpayment alert (client + optional owner), underpayment alert (client + owner notice).
 - Note any gaps and whether they are deferred to `docs/BACKLOG.md`; align copy guidelines with the spec.
 
+## Post-Payment Onboarding (early MS17)
+Goal: make the first owner-reviewed client receipt feel intentional without turning RC into a broad operator-training project.
+- Keep onboarding Part 2 mostly invisible until a first paid invoice is actually receipt-eligible.
+- Teach the owner-reviewed receipt step, the acknowledgment-versus-receipt distinction, and the fact that correction work should happen before any untruthful receipt.
+- Use lightweight contextual guidance and existing review surfaces rather than fake invoices, scenario simulation, or a dedicated tutorial sandbox.
+- If the first paid invoice needs ignore or reattribution work before a truthful receipt can be sent, suspend the Part 2 prompt and point the owner at the correction surface instead.
+
 ## Definition of Done
 - Quick start and contributor walkthrough docs exist, are linked from README and `docs/PLAN.md`, and match current UX/commands.
+- Post-payment onboarding scope is documented and linked from the canonical spec docs, with MS17 treating it as early activation/help UX rather than a separate milestone.
 - Notification coverage is documented with live vs. stub status and test pointers in `docs/specs/NOTIFICATIONS.md`.
 - `docs/PLAN.md` keeps RC scope for Docs & DX; anything deferred is explicitly routed to `docs/BACKLOG.md`.

@@ -100,6 +100,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 ### Active plan-linked requirements
 - Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, distinguish unsupported shared-wallet evidence from stale-address wrong-invoice reuse, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
 - Mailer and alerts hardening must prevent duplicate outbound mail, support owner-editable templates with safe variables and preview/reset flows, and keep payment-triggered outbound communication truthful and reviewable, including low-information payment acknowledgments plus owner-reviewed client receipts; the detailed outbound-mail rules live in [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md).
+- Post-payment onboarding should remain lightweight in RC: Part 1 still gets owners to first invoice delivery, while Part 2 should activate only once a first paid invoice is receipt-eligible, suspend when ignore/reattribution review would make a receipt untruthful, and complete when the owner sends the first reviewed client receipt.
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 
 ## Canonical Spec Map
@@ -110,6 +111,7 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Print/public behavior: [`docs/specs/PRINT_PUBLIC_POLISH.md`](specs/PRINT_PUBLIC_POLISH.md)
 - MS13 UX overhaul milestone doc: [`docs/milestones/13_UX_OVERHAUL.md`](milestones/13_UX_OVERHAUL.md)
 - Onboarding flow: [`docs/specs/ONBOARD_SPEC.md`](specs/ONBOARD_SPEC.md)
+- Post-payment onboarding: [`docs/specs/POST_PAYMENT_ONBOARDING.md`](specs/POST_PAYMENT_ONBOARDING.md)
 - Wallet import and wallet UX: [`docs/specs/WALLET_XPUB_UX_SPEC.md`](specs/WALLET_XPUB_UX_SPEC.md)
 - Support access: [`docs/specs/SUPPORT_ACCESS.md`](specs/SUPPORT_ACCESS.md)
 - Cross-cutting UX and accessibility rules: [`docs/UX_GUARDRAILS.md`](UX_GUARDRAILS.md)

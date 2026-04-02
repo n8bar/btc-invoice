@@ -217,11 +217,13 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_overpay_alert',
+            'context_key' => 'tx-overpay',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_overpay_alert',
+            'context_key' => 'tx-overpay',
         ]);
     }
 
@@ -248,11 +250,13 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
+            'context_key' => 'tx-underpay',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_underpay_alert',
+            'context_key' => 'tx-underpay',
         ]);
     }
 
@@ -394,11 +398,58 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_owner',
+            'context_key' => now()->toDateString(),
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_client',
+            'context_key' => now()->toDateString(),
+        ]);
+    }
+
+    public function test_alert_skipped_when_failed_delivery_exists_for_same_trigger(): void
+    {
+        Queue::fake();
+        [$invoice] = $this->makeInvoiceWithClient();
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $partialSats = (int) round($expectedSats * 0.6);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-underpay-failed',
+            'sats_received' => $partialSats,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        // Simulate a previously failed delivery for the same txid trigger
+        $invoice->deliveries()->create([
+            'user_id' => $invoice->user_id,
+            'type' => 'client_underpay_alert',
+            'status' => 'failed',
+            'recipient' => 'client@example.com',
+            'context_key' => 'tx-underpay-failed',
+            'dispatched_at' => now()->subHour(),
+        ]);
+
+        app(InvoiceAlertService::class)->checkPaymentThresholds($invoice->fresh('payments'));
+
+        // Second attempt should be skipped, not queued
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'client_underpay_alert',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'client_underpay_alert',
+            'status' => 'skipped',
+            'context_key' => 'tx-underpay-failed',
         ]);
     }
 

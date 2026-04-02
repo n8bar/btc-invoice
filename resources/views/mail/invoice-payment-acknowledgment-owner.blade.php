@@ -12,5 +12,5 @@ Review the payment rows and send any higher-certainty follow-up only after the i
 Review invoice
 @endcomponent
 
-— CryptoZing Invoice
+CryptoZing
 @endcomponent

@@ -12,11 +12,11 @@ This invoice is now past its due date and still has an outstanding balance.
 - **Due date:** {{ optional($invoice->due_date)->toDateString() ?? '—' }}
 - **Outstanding:** ${{ number_format($outstandingUsd, 2) }} (approx.)
 
-Consider nudging the client or recording a manual adjustment if you’ve already reconciled it.
+Consider nudging the client or recording a manual adjustment if you've already reconciled it.
 
 @component('mail::button', ['url' => route('invoices.show', $invoice)])
 Open invoice
 @endcomponent
 
-— CryptoZing Invoice
+CryptoZing
 @endcomponent
