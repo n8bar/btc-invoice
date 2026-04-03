@@ -41,6 +41,8 @@
     @php
         $counts = $snapshot['counts'] ?? [];
         $totals = $snapshot['totals'] ?? [];
+        $actionItems = $snapshot['action_items'] ?? [];
+        $receiptReviewItems = $actionItems['receipt_reviews'] ?? [];
         $recent = $snapshot['recent_payments'] ?? [];
     @endphp
 
@@ -92,6 +94,51 @@
                         </form>
                     </div>
                 </div>
+            @endif
+
+            @if (!empty($receiptReviewItems))
+                <section class="rounded-xl border border-amber-200 bg-amber-50/90 p-5 shadow-sm dark:border-amber-400/35 dark:bg-amber-950/30"
+                         style="border-color: currentColor;"
+                         data-dashboard-action-items>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800 dark:text-amber-200">Action items</p>
+                            <h3 class="mt-1 text-base font-semibold text-amber-950 dark:text-amber-50">Receipts waiting for review</h3>
+                            <p class="mt-1 text-sm text-amber-900 dark:text-amber-100">
+                                Review and send the client receipts that are still waiting on owner action.
+                            </p>
+                        </div>
+                        <div class="inline-flex items-center self-start rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-amber-900 shadow-sm ring-1 ring-amber-200 dark:bg-slate-900/70 dark:text-amber-100 dark:ring-amber-400/30">
+                            {{ count($receiptReviewItems) }} pending
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3">
+                        @foreach ($receiptReviewItems as $receiptReview)
+                            <div class="flex flex-col gap-3 rounded-lg border border-amber-200/80 bg-white/80 px-4 py-3 shadow-sm dark:border-amber-400/25 dark:bg-slate-900/70 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span aria-hidden="true" class="inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                                        <a href="{{ route('invoices.show', $receiptReview['invoice_id']) }}"
+                                           class="text-sm font-semibold text-indigo-700 hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-indigo-200">
+                                            {{ $receiptReview['invoice_number'] }}
+                                        </a>
+                                        <span class="text-sm text-amber-900 dark:text-amber-100">
+                                            {{ $receiptReview['client_name'] ?? 'Client' }}
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-sm text-amber-900 dark:text-amber-100">
+                                        {{ $receiptReview['summary'] }}
+                                    </p>
+                                </div>
+                                <a href="{{ route('invoices.show', $receiptReview['invoice_id']) }}#receipt-review-panel"
+                                   data-review-receipt-link="true"
+                                   class="inline-flex items-center justify-center self-start rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:bg-amber-500 dark:text-slate-950 dark:hover:bg-amber-400 dark:focus:ring-offset-slate-900">
+                                    Review receipt
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
             @endif
 
             <div class="grid gap-4"
@@ -218,6 +265,16 @@
                                                     <a href="{{ route('invoices.show', $payment['invoice_id']) }}" class="text-indigo-600 hover:text-indigo-500 font-semibold">
                                                         {{ $payment['invoice_number'] ?? 'Invoice' }}
                                                     </a>
+                                                    @if (!empty($payment['needs_receipt_review']) && !empty($payment['payment_id']))
+                                                        <div class="mt-1">
+                                                            <a href="{{ route('invoices.show', $payment['invoice_id']) }}#receipt-review-panel"
+                                                               data-review-receipt-link="true"
+                                                               class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100">
+                                                                <span aria-hidden="true" class="mr-1.5 inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                                                                Review receipt
+                                                            </a>
+                                                        </div>
+                                                    @endif
                                                 @else
                                                     {{ $payment['invoice_number'] ?? 'Invoice' }}
                                                 @endif

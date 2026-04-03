@@ -2,6 +2,8 @@
 
 Purpose: define the guided onboarding flow that helps a signed-in owner reach first invoice delivery without bypassing existing auth/policy checks.
 
+Scope note: this doc defines onboarding Part 1 only (`connect wallet -> create invoice -> enable share + deliver`). The later post-payment activation flow now lives in [`docs/specs/POST_PAYMENT_ONBOARDING.md`](POST_PAYMENT_ONBOARDING.md).
+
 ## Scope (from UX Overhaul Task 11)
 - Guide users through: connect wallet -> create invoice -> enable share + deliver.
 - The flow links into existing wallet/invoice pages; it does not replace policy checks or controller authorization.

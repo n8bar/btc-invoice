@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class InvoiceDelivery extends Model
 {
@@ -14,10 +15,12 @@ class InvoiceDelivery extends Model
         'invoice_id',
         'user_id',
         'type',
+        'context_key',
         'status',
         'recipient',
         'cc',
         'message',
+        'meta',
         'dispatched_at',
         'sent_at',
         'error_code',
@@ -25,6 +28,7 @@ class InvoiceDelivery extends Model
     ];
 
     protected $casts = [
+        'meta' => 'array',
         'dispatched_at' => 'datetime',
         'sent_at' => 'datetime',
     ];
@@ -37,5 +41,37 @@ class InvoiceDelivery extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function typeLabel(): string
+    {
+        return match ($this->type) {
+            'send' => 'Invoice email',
+            'payment_acknowledgment_client' => 'Payment acknowledgment (client)',
+            'payment_acknowledgment_owner' => 'Payment acknowledgment (owner)',
+            'receipt' => 'Receipt (client)',
+            'owner_paid_notice' => 'Paid notice (owner)',
+            'past_due_client' => 'Past-due reminder (client)',
+            'past_due_owner' => 'Past-due reminder (owner)',
+            'client_overpay_alert' => 'Overpayment alert (client)',
+            'owner_overpay_alert' => 'Overpayment alert (owner)',
+            'client_underpay_alert' => 'Underpayment alert (client)',
+            'owner_underpay_alert' => 'Underpayment alert (owner)',
+            'client_partial_warning' => 'Partial payment warning (client)',
+            'owner_partial_warning' => 'Partial payment warning (owner)',
+            default => Str::of($this->type)->replace('_', ' ')->headline()->toString(),
+        };
+    }
+
+    public function statusLabel(): string
+    {
+        return match ($this->status) {
+            'queued' => 'Queued',
+            'sending' => 'Sending',
+            'sent' => 'Sent',
+            'skipped' => 'Skipped',
+            'failed' => 'Failed',
+            default => Str::of($this->status)->replace('_', ' ')->headline()->toString(),
+        };
     }
 }

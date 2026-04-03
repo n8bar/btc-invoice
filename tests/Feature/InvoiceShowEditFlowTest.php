@@ -184,6 +184,60 @@ class InvoiceShowEditFlowTest extends TestCase
             ->assertDontSee('Unsupported invoice', false);
     }
 
+    public function test_invoice_index_shows_review_receipt_cta_for_paid_invoice_without_sent_receipt(): void
+    {
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Receipt Co',
+            'email' => 'billing@example.com',
+        ]);
+
+        $needsReview = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-INDEX-REVIEW',
+            'description' => 'Needs receipt review',
+            'amount_usd' => 150,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.003,
+            'payment_address' => 'tb1qq0reviewinvoice',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $receiptSent = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-INDEX-SENT',
+            'description' => 'Receipt already sent',
+            'amount_usd' => 175,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.0035,
+            'payment_address' => 'tb1qq0sentinvoice',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $receiptSent->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'queued_at' => now()->subMinute(),
+            'sent_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.index'));
+
+        $response->assertOk();
+        $response->assertSee('href="' . route('invoices.show', $needsReview) . '#receipt-review-panel"', false);
+        $response->assertSee('Review receipt', false);
+        $response->assertDontSee('href="' . route('invoices.show', $receiptSent) . '#receipt-review-panel"', false);
+    }
+
     public function test_invoice_update_redirects_back_to_show_with_status_flash(): void
     {
         $owner = User::factory()->create();

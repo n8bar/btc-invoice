@@ -34,7 +34,10 @@ class InvoiceController extends Controller
             $rate['as_of'] = Carbon::parse($rate['as_of']);
         }
 
-        $invoices = Invoice::with('client')
+        $invoices = Invoice::with([
+            'client',
+            'deliveries' => fn ($query) => $query->latest('id'),
+        ])
             ->where('user_id', $request->user()->id)
             ->latest('id')
             ->paginate(15)

@@ -122,7 +122,7 @@
                 </div>
             @endif
 
-            <div class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90">
+            <div data-invoice-sticky-nav="true" class="sticky top-16 z-20 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 dark:border-white/10 dark:bg-slate-900/90">
                 <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:underline">← Back to Invoices</a>
                 @php
                     $st = $invoice->status ?? 'draft';
@@ -205,6 +205,39 @@
                 $onboardingGlow = 'ring-2 ring-indigo-300 ring-offset-2 ring-offset-white dark:ring-indigo-400/70 dark:ring-offset-slate-900';
                 $gettingStartedMarker = '👉';
             @endphp
+
+            @if ($invoice->canSendReceipt() && $invoice->needsReceiptReview())
+                @php
+                    $receiptActionReasons = $invoice->receiptReviewReasons();
+                    $receiptActionNeedsAttention = $receiptActionReasons !== [];
+                @endphp
+                <div data-receipt-action-card="true"
+                     class="rounded-lg border border-amber-200 bg-amber-50/90 p-4 text-sm text-amber-950 shadow-sm dark:border-amber-400/35 dark:bg-amber-950/30 dark:text-amber-100"
+                     style="border-color: currentColor;">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="space-y-2">
+                            <div class="space-y-1">
+                                <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800 dark:text-amber-200">Action needed</p>
+                                <p class="text-base font-semibold text-amber-950 dark:text-amber-50">Client receipt waiting for review</p>
+                                @if ($receiptActionNeedsAttention)
+                                    <p class="text-amber-900 dark:text-amber-100">This invoice is paid, but payment history needs review before sending the client receipt.</p>
+                                @else
+                                    <p class="text-amber-900 dark:text-amber-100">This invoice is paid. Review and send the client receipt.</p>
+                                @endif
+                            </div>
+                            @if ($receiptActionNeedsAttention)
+                                <p class="text-xs text-amber-900 dark:text-amber-100">
+                                    {{ $receiptActionReasons[0] }}
+                                </p>
+                            @endif
+                        </div>
+                        <a href="#receipt-review-panel"
+                           class="inline-flex items-center justify-center self-start rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:bg-amber-500 dark:text-slate-950 dark:hover:bg-amber-400 dark:focus:ring-offset-slate-900">
+                            Jump to receipt review
+                        </a>
+                    </div>
+                </div>
+            @endif
 
             <div class="rounded-lg border border-indigo-100 bg-indigo-50/70 p-4 text-sm text-indigo-900 shadow-sm dark:border-indigo-400/30 dark:bg-indigo-950/30 dark:text-indigo-100">
                 <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
@@ -612,7 +645,7 @@
                                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                                         <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                                             <tr>
-                                                <th class="px-2 py-2 text-left">Type</th>
+                                                <th class="px-2 py-2 text-left">Notice</th>
                                                 <th class="px-2 py-2 text-left">Recipient</th>
                                                 <th class="px-2 py-2 text-left">Status</th>
                                                 <th class="px-2 py-2 text-left">Queued</th>
@@ -623,14 +656,14 @@
                                         <tbody class="divide-y divide-gray-100">
                                             @foreach ($invoice->deliveries as $delivery)
                                                 <tr>
-                                                    <td class="px-2 py-2 uppercase text-xs">{{ $delivery->type }}</td>
+                                                    <td class="px-2 py-2 text-sm font-medium text-gray-900">{{ $delivery->typeLabel() }}</td>
                                                     <td class="px-2 py-2">
                                                         {{ $delivery->recipient }}
                                                         @if ($delivery->cc)
                                                             <div class="text-xs text-gray-500">cc: {{ $delivery->cc }}</div>
                                                         @endif
                                                     </td>
-                                                    <td class="px-2 py-2">{{ ucfirst($delivery->status) }}</td>
+                                                    <td class="px-2 py-2">{{ $delivery->statusLabel() }}</td>
                                                     @php
                                                         $queued = $delivery->dispatched_at;
                                                         $queuedIso = $queued ? $queued->copy()->utc()->toIso8601String() : null;
@@ -686,6 +719,74 @@
                     <div class="rounded-lg bg-white shadow">
                         <div class="p-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-700">Payment history</h3>
+                            @if ($invoice->canSendReceipt())
+                                @php
+                                    $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt');
+                                    $receiptReviewReasons = $invoice->receiptReviewReasons();
+                                @endphp
+                                @php
+                                    $receiptPanelNeedsAttention = $receiptReviewReasons !== [];
+                                    $receiptPanelClasses = $receiptPanelNeedsAttention
+                                        ? 'border-amber-200 bg-amber-50/80 text-amber-950 dark:border-amber-400/40 dark:bg-amber-950/30 dark:text-amber-100'
+                                        : 'border-slate-200 bg-slate-50/80 text-slate-950 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100';
+                                    $receiptEyebrowClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-800 dark:text-amber-200'
+                                        : 'text-indigo-800 dark:text-indigo-300';
+                                    $receiptBodyClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-900 dark:text-amber-100'
+                                        : 'text-slate-700 dark:text-slate-200';
+                                    $receiptMetaClasses = $receiptPanelNeedsAttention
+                                        ? 'text-amber-900 dark:text-amber-100'
+                                        : 'text-slate-700 dark:text-slate-300';
+                                @endphp
+                                <div id="receipt-review-panel"
+                                     data-receipt-review-panel="true"
+                                     class="invoice-anchor-target mb-4 rounded-lg border p-4 text-sm {{ $receiptPanelClasses }}">
+                                    <div class="space-y-3">
+                                        <div class="space-y-2">
+                                            <div class="space-y-1">
+                                                <p class="text-xs font-semibold uppercase tracking-[0.15em] {{ $receiptEyebrowClasses }}">
+                                                    {{ $receiptPanelNeedsAttention ? 'Review before sending  Client receipt' : 'Receipt ready to review' }}
+                                                </p>
+                                                <p class="text-base font-semibold text-slate-950 dark:text-white">
+                                                    {{ $receiptPanelNeedsAttention ? 'Your attention is needed.' : 'The client receipt is ready to send.' }}
+                                                </p>
+                                                @if (!$receiptPanelNeedsAttention)
+                                                    <p class="{{ $receiptBodyClasses }}">A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.</p>
+                                                @endif
+                                            </div>
+                                            @if ($receiptReviewReasons !== [])
+                                                <div class="pt-1 text-xs text-amber-900">
+                                                    <p class="font-semibold">Review these payment-history conditions before sending the client receipt.</p>
+                                                    <ul class="ml-4 mt-1 list-disc space-y-1">
+                                                        @foreach ($receiptReviewReasons as $receiptReviewReason)
+                                                            <li>{{ $receiptReviewReason }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                            @if ($invoice->needsReceiptReview())
+                                                <div class="pt-1">
+                                                    <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                                class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition ease-in-out duration-150 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 dark:focus:ring-offset-slate-900">
+                                                            Send receipt
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endif
+                                            @if ($latestReceiptDelivery)
+                                                <p class="text-xs {{ $receiptMetaClasses }}">
+                                                    Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.
+                                                </p>
+                                            @else
+                                                <p class="text-xs {{ $receiptMetaClasses }}">No client receipt has been queued or sent yet.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                                     <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
@@ -744,7 +845,7 @@
 
                                                 $correctionLabelText = implode(' ', $correctionLabelLines);
                                             @endphp
-                                            <tr id="payment-row-{{ $payment->id }}">
+                                            <tr id="payment-row-{{ $payment->id }}" class="invoice-anchor-target">
                                                 @php
                                                     $paymentDetectedAt = $payment->detected_at;
                                                     $paymentDetectedIso = $paymentDetectedAt ? $paymentDetectedAt->copy()->utc()->toIso8601String() : null;
@@ -1146,7 +1247,7 @@
                 @endif
 
                 {{-- Public link (shareable print view) --}}
-                <div id="public-link-card" class="rounded-lg border border-gray-200 bg-white p-4">
+            <div id="public-link-card" class="invoice-anchor-target rounded-lg border border-gray-200 bg-white p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-700">Public link</h3>
                     @if ($invoice->public_enabled && $invoice->public_url)
@@ -1283,7 +1384,7 @@
             </div>
             </div>
 
-            <div id="send-invoice-email-card" class="rounded-lg bg-white p-6 shadow">
+            <div id="send-invoice-email-card" class="invoice-anchor-target rounded-lg bg-white p-6 shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-semibold text-gray-700">Send invoice email</h3>
@@ -1374,10 +1475,58 @@
             const correctionFocusRowId = @json(session('correction_focus_row'));
             const hasHashTarget = typeof window.location.hash === 'string' && window.location.hash.length > 1;
             const restoreScrollY = Number(@json(session('restore_scroll_y')));
+            const stickyNav = document.querySelector('[data-invoice-sticky-nav]');
+            const hashLinks = document.querySelectorAll('a[href^="#"]');
+
+            const scrollToInvoiceAnchor = (target, behavior = 'auto') => {
+                if (!target) {
+                    return;
+                }
+
+                const stickyNavStyles = stickyNav ? window.getComputedStyle(stickyNav) : null;
+                const stickyNavTop = stickyNavStyles ? parseFloat(stickyNavStyles.top || '0') || 0 : 0;
+                const stickyNavHeight = stickyNav ? stickyNav.getBoundingClientRect().height : 0;
+                const offset = stickyNavTop + stickyNavHeight + 20;
+                const targetTop = window.scrollY + target.getBoundingClientRect().top - offset;
+
+                window.scrollTo({
+                    top: Math.max(targetTop, 0),
+                    left: 0,
+                    behavior,
+                });
+            };
+
             if (!hasHashTarget && !correctionFocusFieldId && !correctionFocusRowId && Number.isFinite(restoreScrollY) && restoreScrollY >= 0) {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         window.scrollTo({ top: restoreScrollY, left: 0, behavior: 'auto' });
+                    });
+                });
+            }
+
+            hashLinks.forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    const href = link.getAttribute('href');
+                    if (!href || href === '#') {
+                        return;
+                    }
+
+                    const target = document.querySelector(href);
+                    if (!target) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    history.pushState(null, '', href);
+                    requestAnimationFrame(() => scrollToInvoiceAnchor(target, 'smooth'));
+                });
+            });
+
+            if (hasHashTarget) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const target = document.querySelector(window.location.hash);
+                        scrollToInvoiceAnchor(target);
                     });
                 });
             }
@@ -1390,7 +1539,7 @@
 
                     const correctionRow = correctionFocusRowId ? document.getElementById(correctionFocusRowId) : null;
                     if (correctionRow) {
-                        correctionRow.scrollIntoView({ block: 'center', inline: 'nearest' });
+                        scrollToInvoiceAnchor(correctionRow);
                     }
 
                     const correctionField = correctionFocusFieldId ? document.getElementById(correctionFocusFieldId) : null;
@@ -1400,7 +1549,9 @@
                             const valueLength = correctionField.value?.length ?? 0;
                             correctionField.setSelectionRange(valueLength, valueLength);
                         }
-                        correctionRow?.scrollIntoView({ block: 'center', inline: 'nearest' });
+                        if (correctionRow) {
+                            scrollToInvoiceAnchor(correctionRow);
+                        }
                         return;
                     }
 

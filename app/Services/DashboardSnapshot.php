@@ -20,9 +20,46 @@ class DashboardSnapshot
             return [
                 'counts' => $this->counts($user),
                 'totals' => $this->totals($user),
+                'action_items' => $this->actionItems($user),
                 'recent_payments' => $this->recentPayments($user),
             ];
         });
+    }
+
+    private function actionItems(User $user): array
+    {
+        $receiptReviews = Invoice::query()
+            ->ownedBy($user)
+            ->where('status', 'paid')
+            ->with([
+                'client:id,name,email',
+                'payments:id,invoice_id,accounting_invoice_id,txid,sats_received,detected_at,confirmed_at,ignored_at,is_adjustment,meta',
+                'sourcePayments:id,invoice_id,accounting_invoice_id,txid,sats_received,detected_at,confirmed_at,ignored_at,is_adjustment,meta',
+                'deliveries' => fn ($query) => $query
+                    ->select('id', 'invoice_id', 'type', 'status')
+                    ->latest('id'),
+            ])
+            ->orderByDesc('paid_at')
+            ->orderByDesc('id')
+            ->get(['id', 'user_id', 'client_id', 'number', 'status', 'paid_at'])
+            ->filter(fn (Invoice $invoice): bool => $invoice->needsReceiptReview())
+            ->map(function (Invoice $invoice): array {
+                $reasons = $invoice->receiptReviewReasons();
+
+                return [
+                    'invoice_id' => $invoice->id,
+                    'invoice_number' => $invoice->number,
+                    'client_name' => $invoice->client?->name,
+                    'summary' => $reasons[0] ?? 'Client receipt is ready for review and send.',
+                    'needs_attention' => $reasons !== [],
+                ];
+            })
+            ->values()
+            ->all();
+
+        return [
+            'receipt_reviews' => $receiptReviews,
+        ];
     }
 
     private function counts(User $user): array
@@ -152,8 +189,14 @@ class DashboardSnapshot
             ->orderByDesc('invoice_payments.id')
             ->limit(5)
             ->with(['accountingInvoice' => function ($query) {
-                $query->select('id', 'user_id', 'client_id', 'number', 'status', 'amount_usd', 'btc_rate');
-            }, 'accountingInvoice.client:id,name'])
+                $query->select('id', 'user_id', 'client_id', 'number', 'status', 'amount_usd', 'btc_rate')
+                    ->with([
+                        'client:id,name,email',
+                        'deliveries' => fn ($deliveryQuery) => $deliveryQuery
+                            ->select('id', 'invoice_id', 'type', 'status')
+                            ->latest('id'),
+                    ]);
+            }])
             ->get();
 
         return $payments->map(function (InvoicePayment $payment) {
@@ -167,10 +210,12 @@ class DashboardSnapshot
                 'invoice_id' => $invoice?->id,
                 'invoice_number' => $invoice?->number,
                 'client_name' => $invoice?->client?->name,
+                'payment_id' => $payment->id,
                 'status' => $invoice?->status,
                 'amount_usd' => $amountUsd,
                 'detected_at' => $detectedAt,
                 'is_partial' => $isPartial,
+                'needs_receipt_review' => $invoice?->needsReceiptReview() ?? false,
             ];
         })->all();
     }

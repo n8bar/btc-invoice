@@ -558,6 +558,110 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee($expectedSentDisplay, false);
     }
 
+    public function test_delivery_log_uses_human_friendly_notice_and_status_labels(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'partial',
+        ]);
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'owner_underpay_alert',
+            'status' => 'sending',
+            'recipient' => 'owner@example.com',
+            'dispatched_at' => Carbon::parse('2025-01-04 12:00:00', 'UTC'),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('deliveries')));
+
+        $response->assertOk();
+        $response->assertSeeText('Notice');
+        $response->assertSeeText('Underpayment alert (owner)');
+        $response->assertSeeText('Sending');
+        $response->assertDontSee('owner_underpay_alert', false);
+    }
+
+    public function test_paid_invoice_payment_history_shows_receipt_review_panel_and_send_action(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-panel',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertSee('data-receipt-action-card="true"', false);
+        $response->assertSeeText('Action needed');
+        $response->assertSeeText('Client receipt waiting for review');
+        $response->assertSeeText('This invoice is paid. Review and send the client receipt.');
+        $response->assertSee('href="#receipt-review-panel"', false);
+        $response->assertSeeText('Jump to receipt review');
+        $response->assertSee('id="receipt-review-panel"', false);
+        $response->assertSee('data-receipt-review-panel="true"', false);
+        $response->assertSeeText('Client receipt');
+        $response->assertSeeText('Receipt ready to review');
+        $response->assertSeeText('The client receipt is ready to send.');
+        $response->assertSeeText('A narrow payment acknowledgment may already have gone out automatically, but the client receipt still goes out only after you review it here.');
+        $response->assertSeeText('Send receipt');
+        $response->assertSee('action="' . route('invoices.deliver.receipt', $invoice) . '"', false);
+    }
+
+    public function test_paid_invoice_receipt_panel_shows_review_context_when_multiple_payments_need_review(): void
+    {
+        $owner = User::factory()->create();
+        $invoice = $this->makeInvoice($owner, [
+            'status' => 'paid',
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-hold-1',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now()->subMinute(),
+            'confirmed_at' => Carbon::now()->subMinute(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-receipt-hold-2',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+            'usd_rate' => 40_000,
+            'fiat_amount' => 40.00,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->get(route('invoices.show', $invoice->fresh('payments')));
+
+        $response->assertOk();
+        $response->assertSee('data-receipt-action-card="true"', false);
+        $response->assertSeeText('This invoice is paid, but payment history needs review before sending the client receipt.');
+        $response->assertSeeText('Multiple active on-chain payments are recorded on this invoice.');
+        $response->assertSeeText('Review these payment-history conditions before sending the client receipt.');
+        $response->assertSeeText('Multiple active on-chain payments are recorded on this invoice.');
+        $response->assertSeeText('Send receipt');
+    }
+
     public function test_bitcoin_uri_targets_outstanding_balance(): void
     {
         Cache::put(BtcRate::CACHE_KEY, [

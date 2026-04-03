@@ -18,11 +18,11 @@ class InvoiceNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_owner_paid_notice_and_receipt_dispatched(): void
+    public function test_owner_paid_notice_dispatches_when_invoice_paid(): void
     {
         Queue::fake();
 
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Client Test',
@@ -45,12 +45,151 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
+            'type' => 'owner_paid_notice',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
             'type' => 'receipt',
         ]);
+    }
+
+    public function test_owner_paid_notice_dispatches_even_when_client_email_is_missing(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => '',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001B',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-b',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        event(new InvoicePaid($invoice));
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_paid_notice',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
+    public function test_invoice_paid_event_does_not_auto_queue_client_receipt_when_multiple_active_payments_exist(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => 'client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001C',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-c',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-1',
+            'sats_received' => 250_000,
+            'detected_at' => Carbon::now()->subMinutes(10),
+            'confirmed_at' => Carbon::now()->subMinutes(10),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-2',
+            'sats_received' => 250_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        event(new InvoicePaid($invoice->fresh(['client', 'user', 'payments', 'sourcePayments', 'deliveries'])));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'owner_paid_notice',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
+    public function test_invoice_paid_event_does_not_auto_queue_client_receipt_when_correction_state_touches_history(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Client Test',
+            'email' => 'client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-1001D',
+            'amount_usd' => 200,
+            'btc_rate' => 40_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-d',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-ignored-active',
+            'sats_received' => 500_000,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-auto-hold-ignored',
+            'sats_received' => 100_000,
+            'detected_at' => Carbon::now()->subMinutes(5),
+            'confirmed_at' => Carbon::now()->subMinutes(5),
+            'ignored_at' => Carbon::now()->subMinute(),
+            'ignored_by_user_id' => $owner->id,
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        event(new InvoicePaid($invoice->fresh(['client', 'user', 'payments', 'sourcePayments', 'deliveries'])));
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
         ]);
     }
 
@@ -78,11 +217,13 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_overpay_alert',
+            'context_key' => 'tx-overpay',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_overpay_alert',
+            'context_key' => 'tx-overpay',
         ]);
     }
 
@@ -109,11 +250,13 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
+            'context_key' => 'tx-underpay',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_underpay_alert',
+            'context_key' => 'tx-underpay',
         ]);
     }
 
@@ -255,11 +398,201 @@ class InvoiceNotificationTest extends TestCase
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_owner',
+            'context_key' => 'past_due_1',
         ]);
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'past_due_client',
+            'context_key' => 'past_due_1',
+        ]);
+    }
+
+    public function test_past_due_slot_not_resent_after_already_queued(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(3)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already queued
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'queued',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subHour(),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_owner',
+            'status' => 'queued',
+            'context_key' => 'past_due_2',
+        ]);
+    }
+
+    public function test_past_due_slot_2_not_sent_before_day_7(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(3)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already sent
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'sent',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(3),
+        ]);
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_client',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(3),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        // Day 3 is past threshold for slot 1 (already sent) but not slot 2 (needs day 7)
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_2',
+        ]);
+    }
+
+    public function test_past_due_slot_2_fires_after_day_7_when_slot_1_sent(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(8)->toDateString(),
+        ])->save();
+
+        // Simulate slot 1 already sent
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_owner',
+            'status' => 'sent',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_client',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_owner',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_client',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+    }
+
+    public function test_past_due_catchup_sends_only_one_slot_per_run(): void
+    {
+        Queue::fake();
+        [$invoice] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(15)->toDateString(),
+        ])->save();
+
+        // No past-due deliveries yet — invoice has been overdue 15 days unnoticed
+        $this->artisan('invoices:send-past-due-alerts')->assertExitCode(0);
+
+        // Only slot 1 should fire on first run, not slot 2 or 3
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_1',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_2',
+        ]);
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_3',
+        ]);
+    }
+
+    public function test_alert_skipped_when_failed_delivery_exists_for_same_trigger(): void
+    {
+        Queue::fake();
+        [$invoice] = $this->makeInvoiceWithClient();
+
+        $expectedSats = (int) round($invoice->amount_btc * Invoice::SATS_PER_BTC);
+        $partialSats = (int) round($expectedSats * 0.6);
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-underpay-failed',
+            'sats_received' => $partialSats,
+            'detected_at' => Carbon::now(),
+            'confirmed_at' => Carbon::now(),
+        ]);
+
+        $invoice->refresh()->refreshPaymentState();
+
+        // Simulate a previously failed delivery for the same txid trigger
+        $invoice->deliveries()->create([
+            'user_id' => $invoice->user_id,
+            'type' => 'client_underpay_alert',
+            'status' => 'failed',
+            'recipient' => 'client@example.com',
+            'context_key' => 'tx-underpay-failed',
+            'dispatched_at' => now()->subHour(),
+        ]);
+
+        app(InvoiceAlertService::class)->checkPaymentThresholds($invoice->fresh('payments'));
+
+        // Second attempt should be skipped, not queued
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'client_underpay_alert',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'client_underpay_alert',
+            'status' => 'skipped',
+            'context_key' => 'tx-underpay-failed',
         ]);
     }
 

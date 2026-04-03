@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Invoice {{ $invoice->number ?? $invoice->id }} paid
 
 Good news — this invoice is now marked **paid**.
@@ -11,5 +11,5 @@ Good news — this invoice is now marked **paid**.
 Review invoice
 @endcomponent
 
-Thanks for using CryptoZing Invoice.
+Thanks for using CryptoZing
 @endcomponent

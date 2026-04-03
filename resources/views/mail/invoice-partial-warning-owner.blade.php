@@ -4,7 +4,7 @@
     $outstandingBtc = $summary['outstanding_btc_formatted'] ?? null;
 @endphp
 
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Heads up: Invoice {{ $invoice->number ?? $invoice->id }} received multiple payments
 
 We just emailed the client reminding them that splitting payments adds miner fees and can slow settlement. This usually happens when they try to “top up” the invoice across several transactions.

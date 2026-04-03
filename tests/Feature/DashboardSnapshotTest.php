@@ -445,6 +445,74 @@ class DashboardSnapshotTest extends TestCase
         $this->assertSame(100.0, $snapshot['recent_payments'][0]['amount_usd']);
     }
 
+    public function test_dashboard_shows_review_receipt_cta_for_paid_invoice_without_sent_receipt(): void
+    {
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, 'Receipt Co');
+
+        $invoice = $this->makeInvoice($owner, $client, [
+            'status' => 'paid',
+            'number' => 'INV-REVIEW-RECEIPT',
+        ]);
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'tx-review-receipt',
+            'sats_received' => 100_000,
+            'usd_rate' => 50_000,
+            'fiat_amount' => 50.00,
+            'detected_at' => Carbon::now()->subHour(),
+            'confirmed_at' => Carbon::now()->subHour(),
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('Action items', false);
+        $response->assertSee('Receipts waiting for review', false);
+        $response->assertSee('Review receipt', false);
+        $response->assertSee(
+            'href="' . route('invoices.show', $invoice) . '#receipt-review-panel"',
+            false
+        );
+        $response->assertSee('bg-red-500', false);
+
+        $snapshot = app(DashboardSnapshot::class)->forUser($owner);
+
+        $this->assertCount(1, $snapshot['action_items']['receipt_reviews']);
+        $this->assertSame($invoice->id, $snapshot['action_items']['receipt_reviews'][0]['invoice_id']);
+        $this->assertSame('Client receipt is ready for review and send.', $snapshot['action_items']['receipt_reviews'][0]['summary']);
+    }
+
+    public function test_dashboard_hides_action_items_card_when_no_receipts_need_review(): void
+    {
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, 'Settled Co');
+
+        $invoice = $this->makeInvoice($owner, $client, [
+            'status' => 'paid',
+            'number' => 'INV-NO-ACTIONS',
+        ]);
+
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'queued_at' => Carbon::now()->subMinute(),
+            'sent_at' => Carbon::now(),
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertDontSee('data-dashboard-action-items', false);
+
+        $snapshot = app(DashboardSnapshot::class)->forUser($owner);
+
+        $this->assertSame([], $snapshot['action_items']['receipt_reviews']);
+    }
+
     private int $invoiceSequence = 0;
 
     private function makeClient(User $owner, string $name = 'Client'): Client

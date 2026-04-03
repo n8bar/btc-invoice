@@ -11,8 +11,9 @@ use App\Services\Blockchain\MempoolClient;
 use App\Services\WalletKeyLineage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class WatchPaymentsCommandTest extends TestCase
@@ -67,6 +68,18 @@ class WatchPaymentsCommandTest extends TestCase
             'invoice_id' => $invoice->id,
             'txid' => 'abc123',
             'sats_received' => 1_000_000,
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'payment_acknowledgment_client',
+            'context_key' => 'abc123',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'payment_acknowledgment_owner',
+            'context_key' => 'abc123',
         ]);
     }
 
@@ -508,7 +521,7 @@ class WatchPaymentsCommandTest extends TestCase
         ]);
     }
 
-    public function test_partial_warning_emails_sent_on_second_payment_attempt(): void
+    public function test_repeated_partial_payment_detection_no_longer_creates_a_separate_partial_warning_family(): void
     {
         Carbon::setTestNow(Carbon::parse('2025-01-05 08:00:00', 'UTC'));
         $invoice = $this->makeInvoice();
@@ -558,20 +571,20 @@ class WatchPaymentsCommandTest extends TestCase
 
         $invoice->refresh();
         $this->assertSame('pending', $invoice->status);
-        $this->assertNotNull($invoice->last_partial_warning_sent_at);
+        $this->assertNull($invoice->last_partial_warning_sent_at);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_partial_warning',
         ]);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'owner_partial_warning',
         ]);
     }
 
-    public function test_partial_warning_not_resent_within_cooldown(): void
+    public function test_repeated_partial_payment_detection_does_not_enqueue_legacy_partial_warnings_on_repeat_runs(): void
     {
         Carbon::setTestNow(Carbon::parse('2025-01-06 08:00:00', 'UTC'));
         $invoice = $this->makeInvoice();
@@ -622,8 +635,160 @@ class WatchPaymentsCommandTest extends TestCase
         $this->artisan('wallet:watch-payments')->assertExitCode(0);
         $this->artisan('wallet:watch-payments')->assertExitCode(0);
 
-        $this->assertEquals(1, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'client_partial_warning')->count());
-        $this->assertEquals(1, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_partial_warning')->count());
+        $this->assertEquals(0, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'client_partial_warning')->count());
+        $this->assertEquals(0, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_partial_warning')->count());
+    }
+
+    public function test_watcher_keeps_payment_acknowledgment_deduped_per_txid_but_allows_a_second_txid(): void
+    {
+        Queue::fake();
+        Carbon::setTestNow(Carbon::parse('2025-01-06 09:00:00', 'UTC'));
+
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 46_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::sequence()
+                ->push([
+                    [
+                        'txid' => 'ack-tx-1',
+                        'status' => [
+                            'confirmed' => false,
+                            'block_height' => null,
+                            'block_time' => null,
+                        ],
+                        'vout' => [
+                            [
+                                'scriptpubkey_address' => $invoice->payment_address,
+                                'value' => 300_000,
+                            ],
+                        ],
+                    ],
+                ], 200)
+                ->push([
+                    [
+                        'txid' => 'ack-tx-1',
+                        'status' => [
+                            'confirmed' => false,
+                            'block_height' => null,
+                            'block_time' => null,
+                        ],
+                        'vout' => [
+                            [
+                                'scriptpubkey_address' => $invoice->payment_address,
+                                'value' => 300_000,
+                            ],
+                        ],
+                    ],
+                    [
+                        'txid' => 'ack-tx-2',
+                        'status' => [
+                            'confirmed' => false,
+                            'block_height' => null,
+                            'block_time' => null,
+                        ],
+                        'vout' => [
+                            [
+                                'scriptpubkey_address' => $invoice->payment_address,
+                                'value' => 200_000,
+                            ],
+                        ],
+                    ],
+                ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'payment_acknowledgment_client')
+            ->where('context_key', 'ack-tx-1')
+            ->count());
+
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'payment_acknowledgment_owner')
+            ->where('context_key', 'ack-tx-1')
+            ->count());
+
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'payment_acknowledgment_client')
+            ->where('context_key', 'ack-tx-2')
+            ->count());
+
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'payment_acknowledgment_owner')
+            ->where('context_key', 'ack-tx-2')
+            ->count());
+    }
+
+    public function test_watcher_queues_payment_acknowledgment_and_owner_paid_notice_when_payment_marks_invoice_paid(): void
+    {
+        Queue::fake();
+        Carbon::setTestNow(Carbon::parse('2025-01-06 10:00:00', 'UTC'));
+
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Cache::put(BtcRate::CACHE_KEY, [
+            'rate_usd' => 40_000,
+            'as_of' => Carbon::now(),
+            'source' => 'test',
+        ], BtcRate::TTL);
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([
+                [
+                    'txid' => 'ack-before-receipt',
+                    'status' => [
+                        'confirmed' => true,
+                        'block_height' => 250100,
+                        'block_time' => Carbon::now()->subMinute()->timestamp,
+                    ],
+                    'vout' => [
+                        [
+                            'scriptpubkey_address' => $invoice->payment_address,
+                            'value' => 1_000_000,
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $this->artisan('wallet:watch-payments')->assertExitCode(0);
+
+        $clientAck = \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'payment_acknowledgment_client')
+            ->where('context_key', 'ack-before-receipt')
+            ->first();
+
+        $ownerPaidNotice = \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'owner_paid_notice')
+            ->first();
+
+        $this->assertNotNull($clientAck);
+        $this->assertNotNull($ownerPaidNotice);
+        $this->assertSame(0, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'receipt')
+            ->count());
+        $this->assertSame(1, \App\Models\InvoiceDelivery::query()
+            ->where('invoice_id', $invoice->id)
+            ->where('type', 'owner_paid_notice')
+            ->count());
     }
 
     public function test_command_flags_implicated_invoices_and_matching_wallets_when_payment_collision_evidence_is_detected(): void

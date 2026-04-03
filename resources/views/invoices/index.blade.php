@@ -71,6 +71,16 @@
                         @endif
                             <td class="px-6 py-3 text-sm font-medium text-gray-900">
                                 <a href="{{ route('invoices.show', $inv) }}" class="text-indigo-600 hover:underline">{{ $inv->number }}</a>
+                                @if ($inv->canSendReceipt() && $inv->needsReceiptReview())
+                                    <div class="mt-2">
+                                        <a href="{{ route('invoices.show', $inv) }}#receipt-review-panel"
+                                           data-review-receipt-link="true"
+                                           class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-100 dark:hover:bg-amber-950/55">
+                                            <span aria-hidden="true" class="mr-1.5 inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                                            Review receipt
+                                        </a>
+                                    </div>
+                                @endif
                                 @if ($inv->unsupported_configuration_flagged)
                                     <div class="mt-2">
                                         <span data-unsupported-invoice-badge="{{ $inv->id }}"

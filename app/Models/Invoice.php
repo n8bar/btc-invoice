@@ -97,6 +97,67 @@ class Invoice extends Model
             ->values();
     }
 
+    public function latestDeliveryOfType(string $type): ?InvoiceDelivery
+    {
+        if ($this->relationLoaded('deliveries')) {
+            return $this->deliveries->first(
+                fn (InvoiceDelivery $delivery): bool => $delivery->type === $type
+            );
+        }
+
+        return $this->deliveries()
+            ->where('type', $type)
+            ->latest('id')
+            ->first();
+    }
+
+    public function activeSourcePaymentByTxid(string $txid): ?InvoicePayment
+    {
+        $normalizedTxid = strtolower(trim($txid));
+        if ($normalizedTxid === '') {
+            return null;
+        }
+
+        $sourcePayments = $this->relationLoaded('sourcePayments')
+            ? $this->sourcePayments
+            : $this->sourcePayments()->get();
+
+        return $sourcePayments->first(function (InvoicePayment $payment) use ($normalizedTxid): bool {
+            return strtolower(trim((string) $payment->txid)) === $normalizedTxid
+                && ! $payment->isIgnored()
+                && $payment->countsOnInvoice($this);
+        });
+    }
+
+    public function canSendReceipt(): bool
+    {
+        return $this->status === 'paid'
+            && filled($this->client?->email);
+    }
+
+    public function needsReceiptReview(): bool
+    {
+        return $this->canSendReceipt()
+            && ! $this->hasDeliveryOfTypeWithStatuses('receipt', ['queued', 'sending', 'sent']);
+    }
+
+    public function receiptReviewReasons(): array
+    {
+        $this->loadMissing(['payments', 'sourcePayments']);
+
+        $reasons = [];
+
+        if ($this->activeOnChainPayments()->count() >= 2) {
+            $reasons[] = 'Multiple active on-chain payments are recorded on this invoice.';
+        }
+
+        if ($this->hasReceiptCorrectionState()) {
+            $reasons[] = 'Ignored or reattributed payment rows are present in this invoice history.';
+        }
+
+        return $reasons;
+    }
+
     public function markUnsupportedConfiguration(string $source, string $reason, ?string $details = null, ?Carbon $flaggedAt = null): void
     {
         $this->forceFill([
@@ -134,6 +195,39 @@ class Invoice extends Model
         return $query->whereIn('status', ['sent', 'partial'])
             ->whereDate('due_date', '>=', $today)
             ->whereDate('due_date', '<=', $end);
+    }
+
+    private function hasDeliveryOfTypeWithStatuses(string $type, array $statuses): bool
+    {
+        if ($this->relationLoaded('deliveries')) {
+            return $this->deliveries->contains(
+                fn (InvoiceDelivery $delivery): bool => $delivery->type === $type
+                    && in_array($delivery->status, $statuses, true)
+            );
+        }
+
+        return $this->deliveries()
+            ->where('type', $type)
+            ->whereIn('status', $statuses)
+            ->exists();
+    }
+
+    private function hasReceiptCorrectionState(): bool
+    {
+        $sourcePayments = $this->relationLoaded('sourcePayments')
+            ? $this->sourcePayments
+            : $this->sourcePayments()->get();
+
+        if ($sourcePayments->contains(fn (InvoicePayment $payment): bool => $payment->isIgnored())) {
+            return true;
+        }
+
+        if ($sourcePayments->contains(fn (InvoicePayment $payment): bool => $payment->isReattributedOutFrom($this))) {
+            return true;
+        }
+
+        return $this->activePayments()
+            ->contains(fn (InvoicePayment $payment): bool => $payment->isReattributedInto($this));
     }
 
     public function billingDetails(): array

@@ -210,6 +210,8 @@ docker/      Container setup
 - Quick start: [`docs/ops/get-live/QUICK_START.md`](docs/ops/get-live/QUICK_START.md)
 - RC rollout checklist: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](docs/ops/RC_ROLLOUT_CHECKLIST.md)
 - Active milestone: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
+- Onboarding Part 1 spec: [`docs/specs/ONBOARD_SPEC.md`](docs/specs/ONBOARD_SPEC.md)
+- Post-payment onboarding spec: [`docs/specs/POST_PAYMENT_ONBOARDING.md`](docs/specs/POST_PAYMENT_ONBOARDING.md)
 - Notifications spec: [`docs/specs/NOTIFICATIONS.md`](docs/specs/NOTIFICATIONS.md)
 - Payment corrections spec: [`docs/specs/PAYMENT_CORRECTIONS.md`](docs/specs/PAYMENT_CORRECTIONS.md)
 - Partial payments spec: [`docs/specs/PARTIAL_PAYMENTS.md`](docs/specs/PARTIAL_PAYMENTS.md)

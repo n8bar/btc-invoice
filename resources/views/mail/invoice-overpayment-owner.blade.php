@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Overpayment flagged on invoice {{ $invoice->number ?? $invoice->id }}
 
 The latest payment puts this invoice roughly **{{ number_format($invoice->overpaymentPercent() ?? 0, 1) }}%** above the total.
@@ -9,5 +9,5 @@ Decide whether to keep it as a tip, credit the client, or record a manual adjust
 Review invoice
 @endcomponent
 
-— CryptoZing Invoice
+Thanks for using CryptoZing
 @endcomponent

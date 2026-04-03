@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\DeliverInvoiceMail;
+use App\Mail\InvoicePaymentAcknowledgmentClientMail;
 use App\Mail\InvoiceReadyMail;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -458,10 +459,10 @@ class InvoiceDeliveryTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    public function test_receipt_email_queued_when_invoice_paid(): void
+    public function test_owner_paid_notice_is_queued_when_invoice_becomes_paid_without_auto_receipt(): void
     {
         Queue::fake();
-        $owner = User::factory()->create(['auto_receipt_emails' => true]);
+        $owner = User::factory()->create();
         $client = Client::create([
             'user_id' => $owner->id,
             'name' => 'Acme Co',
@@ -491,8 +492,53 @@ class InvoiceDeliveryTest extends TestCase
 
         $invoice->refresh()->refreshPaymentState();
 
-        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->first();
+        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->first();
         $this->assertNotNull($delivery);
+        $this->assertSame(1, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->count());
+        $this->assertSame(0, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->count());
+        Queue::assertPushed(DeliverInvoiceMail::class, function ($job) use ($delivery) {
+            return $job->delivery->is($delivery);
+        });
+    }
+
+    public function test_owner_can_queue_client_receipt_manually_from_paid_invoice(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Manual Receipt Co',
+            'email' => 'manual-receipt@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-MANUAL-RECEIPT',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0example-manual-receipt',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Receipt queued.');
+
+        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)
+            ->where('type', 'receipt')
+            ->first();
+
+        $this->assertNotNull($delivery);
+        $this->assertSame('queued', $delivery->status);
+        $this->assertSame($client->email, $delivery->recipient);
+
         Queue::assertPushed(DeliverInvoiceMail::class, function ($job) use ($delivery) {
             return $job->delivery->is($delivery);
         });
@@ -553,6 +599,135 @@ class InvoiceDeliveryTest extends TestCase
                 && $mail->hasCc('owner.gmail.com@cryptozing.app');
         });
         Mail::assertNothingQueued();
+    }
+
+    public function test_payment_acknowledgment_delivery_sends_the_client_acknowledgment_mail(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Ack Client',
+            'email' => 'ack-client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-ACK-CLIENT',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0exampleackclient',
+            'status' => 'pending',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'ack-client-tx',
+            'sats_received' => 200_000,
+            'detected_at' => now(),
+        ]);
+
+        $delivery = InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'payment_acknowledgment_client',
+            'context_key' => 'ack-client-tx',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'meta' => [
+                'txid' => 'ack-client-tx',
+                'sats_received' => 200_000,
+            ],
+            'dispatched_at' => now(),
+        ]);
+
+        $job = new DeliverInvoiceMail($delivery);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $delivery->id,
+            'status' => 'sent',
+        ]);
+
+        Mail::assertSent(InvoicePaymentAcknowledgmentClientMail::class, function (InvoicePaymentAcknowledgmentClientMail $mail) {
+            $this->assertSame('Bitcoin payment detected', $mail->envelope()->subject);
+
+            $html = $mail->render();
+
+            $this->assertStringContainsString('Bitcoin payment detected', $html);
+            $this->assertStringNotContainsString('for Invoice', $html);
+            $this->assertStringNotContainsString('for this invoice', $html);
+
+            return true;
+        });
+    }
+
+    public function test_payment_acknowledgment_delivery_skips_when_payment_no_longer_counts_on_the_invoice(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Ack Client',
+            'email' => 'ack-client@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-ACK-SKIP',
+            'amount_usd' => 120,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.004,
+            'payment_address' => 'tb1qq0exampleackskip',
+            'status' => 'pending',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $payment = InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'ack-skip-tx',
+            'sats_received' => 200_000,
+            'detected_at' => now(),
+        ]);
+
+        $delivery = InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'payment_acknowledgment_client',
+            'context_key' => 'ack-skip-tx',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'meta' => [
+                'txid' => 'ack-skip-tx',
+                'sats_received' => 200_000,
+            ],
+            'dispatched_at' => now(),
+        ]);
+
+        $payment->update([
+            'ignored_at' => now(),
+            'ignored_by_user_id' => $owner->id,
+            'ignore_reason' => 'Wrong invoice',
+        ]);
+
+        $job = new DeliverInvoiceMail($delivery);
+        $job->handle(app(MailAlias::class), app(InvoiceDeliveryService::class));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'id' => $delivery->id,
+            'status' => 'skipped',
+            'error_message' => 'Detected payment no longer matches an active payment on this invoice.',
+        ]);
+
+        Mail::assertNothingSent();
     }
 
     public function test_delivery_job_does_not_send_again_when_delivery_is_already_claimed_for_sending(): void

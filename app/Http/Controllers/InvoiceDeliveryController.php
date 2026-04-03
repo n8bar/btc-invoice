@@ -85,4 +85,29 @@ class InvoiceDeliveryController extends Controller
 
         return back()->with('status', $statusMessage);
     }
+
+    public function storeReceipt(Request $request, Invoice $invoice): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+
+        if (!$invoice->client || empty($invoice->client->email)) {
+            return back()->with('status', 'Add a client email before sending a receipt.');
+        }
+
+        if ($invoice->status !== 'paid') {
+            return back()->with('status', 'Only paid invoices can send a receipt.');
+        }
+
+        $delivery = $this->deliveries->queue(
+            $invoice,
+            'receipt',
+            $invoice->client->email
+        );
+
+        $statusMessage = $delivery->status === 'queued'
+            ? 'Receipt queued.'
+            : ($delivery->error_message ?: 'Receipt skipped.');
+
+        return back()->with('status', $statusMessage);
+    }
 }

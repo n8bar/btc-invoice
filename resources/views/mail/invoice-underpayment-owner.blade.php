@@ -1,13 +1,13 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Underpayment alert for invoice {{ $invoice->number ?? $invoice->id }}
 
-The latest payment left roughly **{{ number_format($invoice->underpaymentPercent() ?? 0, 1) }}%** unpaid.
+The latest payment left **${{ number_format($invoice->outstanding_usd ?? 0, 2) }}** still outstanding.
 
-Consider following up with the client or recording a manual adjustment if you’ve already reconciled it elsewhere.
+Consider following up with the client or recording a manual adjustment if you've already reconciled it elsewhere.
 
 @component('mail::button', ['url' => route('invoices.show', $invoice)])
 Review invoice
 @endcomponent
 
-— CryptoZing Invoice
+Thanks for using CryptoZing
 @endcomponent

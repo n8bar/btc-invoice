@@ -6,14 +6,18 @@ use App\Mail\InvoiceOverpaymentClientMail;
 use App\Mail\InvoiceOverpaymentOwnerMail;
 use App\Mail\InvoicePastDueClientMail;
 use App\Mail\InvoicePastDueOwnerMail;
+use App\Mail\InvoicePaymentAcknowledgmentClientMail;
+use App\Mail\InvoicePaymentAcknowledgmentOwnerMail;
 use App\Mail\InvoicePaidReceiptMail;
 use App\Mail\InvoiceReadyMail;
 use App\Mail\InvoiceUnderpaymentClientMail;
 use App\Mail\InvoiceUnderpaymentOwnerMail;
 use App\Mail\InvoiceOwnerPaidNoticeMail;
+use App\Models\Invoice;
 use App\Mail\InvoicePartialWarningClientMail;
 use App\Mail\InvoicePartialWarningOwnerMail;
 use App\Models\InvoiceDelivery;
+use App\Models\InvoicePayment;
 use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
 use Illuminate\Bus\Queueable;
@@ -72,7 +76,7 @@ class DeliverInvoiceMail implements ShouldQueue
                 return;
             }
 
-            $invoice = $delivery->invoice()->with(['client','user','payments'])->first();
+            $invoice = $delivery->invoice()->with(['client', 'user', 'payments', 'sourcePayments'])->first();
             if (! $invoice || ! $invoice->client) {
                 $delivery->update([
                     'status' => 'failed',
@@ -115,7 +119,19 @@ class DeliverInvoiceMail implements ShouldQueue
             $sendLock->release();
         }
 
+        $paymentAcknowledgment = $this->paymentForAcknowledgment($invoice, $delivery);
+
         $mailable = match ($delivery->type) {
+            'payment_acknowledgment_client' => new InvoicePaymentAcknowledgmentClientMail(
+                $invoice,
+                $delivery,
+                $paymentAcknowledgment
+            ),
+            'payment_acknowledgment_owner' => new InvoicePaymentAcknowledgmentOwnerMail(
+                $invoice,
+                $delivery,
+                $paymentAcknowledgment
+            ),
             'receipt' => new InvoicePaidReceiptMail($invoice, $delivery),
             'owner_paid_notice' => new InvoiceOwnerPaidNoticeMail($invoice, $delivery),
             'past_due_owner' => new InvoicePastDueOwnerMail($invoice, $delivery),
@@ -164,15 +180,24 @@ class DeliverInvoiceMail implements ShouldQueue
 
     private function duplicateSendReason(InvoiceDelivery $delivery): ?string
     {
-        $existing = InvoiceDelivery::query()
+        $query = InvoiceDelivery::query()
             ->where('invoice_id', $delivery->invoice_id)
             ->where('user_id', $delivery->user_id)
             ->where('type', $delivery->type)
             ->whereRaw('LOWER(TRIM(recipient)) = ?', [strtolower(trim($delivery->recipient))])
             ->where('id', '!=', $delivery->id)
             ->whereIn('status', ['sending', 'sent'])
-            ->orderByDesc('id')
-            ->first();
+            ->orderByDesc('id');
+
+        $normalizedContextKey = $this->normalizeContextKey($delivery->context_key);
+
+        if ($normalizedContextKey === null) {
+            $query->whereNull('context_key');
+        } else {
+            $query->whereRaw('LOWER(TRIM(context_key)) = ?', [$normalizedContextKey]);
+        }
+
+        $existing = $query->first();
 
         if (! $existing) {
             return null;
@@ -217,6 +242,36 @@ class DeliverInvoiceMail implements ShouldQueue
             }
         }
 
+        $paymentAcknowledgmentTypes = ['payment_acknowledgment_client', 'payment_acknowledgment_owner'];
+        if (in_array($delivery->type, $paymentAcknowledgmentTypes, true)) {
+            $payment = $this->paymentForAcknowledgment($invoice, $delivery);
+            if (! $payment) {
+                return 'Detected payment no longer matches an active payment on this invoice.';
+            }
+
+            if ($delivery->type === 'payment_acknowledgment_client') {
+                $currentRecipient = trim((string) ($invoice->client?->email ?? ''));
+                if ($currentRecipient === '') {
+                    return 'Client email missing before send.';
+                }
+
+                if (strcasecmp($currentRecipient, trim((string) $delivery->recipient)) !== 0) {
+                    return 'Recipient no longer matches the current client email.';
+                }
+            }
+
+            if ($delivery->type === 'payment_acknowledgment_owner') {
+                $currentRecipient = trim((string) ($invoice->user?->email ?? ''));
+                if ($currentRecipient === '') {
+                    return 'Owner email missing before send.';
+                }
+
+                if (strcasecmp($currentRecipient, trim((string) $delivery->recipient)) !== 0) {
+                    return 'Recipient no longer matches the current owner email.';
+                }
+            }
+        }
+
         $paidTypes = ['receipt', 'owner_paid_notice'];
         if (in_array($delivery->type, $paidTypes, true) && $invoice->status !== 'paid') {
             return 'Invoice no longer paid.';
@@ -243,5 +298,29 @@ class DeliverInvoiceMail implements ShouldQueue
         }
 
         return null;
+    }
+
+    private function paymentForAcknowledgment(Invoice $invoice, InvoiceDelivery $delivery): ?InvoicePayment
+    {
+        if (! in_array($delivery->type, ['payment_acknowledgment_client', 'payment_acknowledgment_owner'], true)) {
+            return null;
+        }
+
+        if (! filled($delivery->context_key)) {
+            return null;
+        }
+
+        return $invoice->activeSourcePaymentByTxid($delivery->context_key);
+    }
+
+    private function normalizeContextKey(?string $contextKey): ?string
+    {
+        if ($contextKey === null) {
+            return null;
+        }
+
+        $normalized = strtolower(trim($contextKey));
+
+        return $normalized === '' ? null : $normalized;
     }
 }

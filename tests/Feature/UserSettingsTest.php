@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\NotificationBrandingPreviewMail;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\User;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Mockery;
 use PDOException;
 use Tests\TestCase;
@@ -725,24 +728,44 @@ class UserSettingsTest extends TestCase
         $response->assertSee('name="show_qr_refresh_reminder"', false);
     }
 
-    public function test_user_can_update_notification_settings_page(): void
+    public function test_user_can_update_notification_mail_branding_settings(): void
     {
-        $owner = User::factory()->create([
-            'auto_receipt_emails' => true,
-        ]);
+        $owner = User::factory()->create();
 
         $this
             ->actingAs($owner)
             ->patch(route('settings.notifications.update'), [
-                'auto_receipt_emails' => false,
+                'mail_brand_name' => 'Phase 3 Mail',
+                'mail_brand_tagline' => 'Client receipts reviewed by humans',
+                'mail_footer_blurb' => 'Phase 3 footer blurb.',
+                'show_mail_logo' => false,
             ])
             ->assertRedirect(route('settings.notifications.edit'));
 
         $owner->refresh();
-        $this->assertFalse($owner->auto_receipt_emails);
+        $this->assertSame('Phase 3 Mail', $owner->mail_brand_name);
+        $this->assertSame('Client receipts reviewed by humans', $owner->mail_brand_tagline);
+        $this->assertSame('Phase 3 footer blurb.', $owner->mail_footer_blurb);
+        $this->assertFalse($owner->show_mail_logo);
+
+        $this
+            ->actingAs($owner)
+            ->patch(route('settings.notifications.update'), [
+                'mail_brand_name' => '',
+                'mail_brand_tagline' => '',
+                'mail_footer_blurb' => '',
+                'show_mail_logo' => true,
+            ])
+            ->assertRedirect(route('settings.notifications.edit'));
+
+        $owner->refresh();
+        $this->assertNull($owner->mail_brand_name);
+        $this->assertNull($owner->mail_brand_tagline);
+        $this->assertNull($owner->mail_footer_blurb);
+        $this->assertTrue($owner->show_mail_logo);
     }
 
-    public function test_notification_settings_page_shows_auto_receipt_toggle(): void
+    public function test_notification_settings_page_explains_manual_receipt_review_model_and_mail_branding_scope(): void
     {
         $owner = User::factory()->create();
 
@@ -751,8 +774,65 @@ class UserSettingsTest extends TestCase
             ->get(route('settings.notifications.edit'));
 
         $response->assertOk();
-        $response->assertSee('Receipts', false);
-        $response->assertSee('name="auto_receipt_emails"', false);
+        $response->assertSeeText('Mail branding');
+        $response->assertSeeText('These fields only change the shared mail shell for active notification emails.');
+        $response->assertSee('name="mail_brand_name"', false);
+        $response->assertSee('name="mail_brand_tagline"', false);
+        $response->assertSee('name="mail_footer_blurb"', false);
+        $response->assertSee('name="show_mail_logo"', false);
+        $response->assertSeeText('Send yourself a test email');
+        $response->assertSee(route('settings.notifications.preview'), false);
+        $response->assertDontSee('name="auto_receipt_emails"', false);
+        $response->assertDontSeeText('dashboard, invoices list, and invoice payment history will point you to the review/send action');
+        $response->assertDontSeeText('RC');
+        $response->assertDontSeeText('MS16');
+        $response->assertSee('Save settings');
+    }
+
+    public function test_owner_can_send_branded_notification_test_email(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create([
+            'mail_brand_name' => 'Phase 3 Mail',
+            'mail_brand_tagline' => 'Owner-reviewed bitcoin receipts',
+            'mail_footer_blurb' => 'Phase 3 custom footer blurb.',
+            'show_mail_logo' => false,
+        ]);
+
+        $this->actingAs($owner)
+            ->post(route('settings.notifications.preview'))
+            ->assertRedirect(route('settings.notifications.edit'))
+            ->assertSessionHas('status', 'notification-preview-sent')
+            ->assertSessionHas('preview_email', $owner->email);
+
+        Mail::assertSent(NotificationBrandingPreviewMail::class, function (NotificationBrandingPreviewMail $mail) use ($owner) {
+            return $mail->hasTo($owner->email)
+                && $mail->user->is($owner);
+        });
+
+        $this->assertDatabaseCount('invoice_deliveries', 0);
+    }
+
+    public function test_notification_test_email_is_cooldown_protected(): void
+    {
+        Mail::fake();
+
+        $owner = User::factory()->create();
+        $key = 'notification-branding-preview:' . $owner->getKey();
+
+        $this->actingAs($owner)
+            ->post(route('settings.notifications.preview'))
+            ->assertRedirect(route('settings.notifications.edit'));
+
+        $this->actingAs($owner)
+            ->post(route('settings.notifications.preview'))
+            ->assertRedirect(route('settings.notifications.edit'))
+            ->assertSessionHas('status', 'notification-preview-throttled');
+
+        Mail::assertSent(NotificationBrandingPreviewMail::class, 1);
+
+        RateLimiter::clear($key);
     }
 
     public function test_settings_tabs_render_on_all_settings_pages(): void

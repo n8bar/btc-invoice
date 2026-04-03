@@ -1,4 +1,4 @@
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Invoice {{ $invoice->number ?? $invoice->id }} was overpaid
 
 We detected that the payment we received is about **{{ number_format($invoice->overpaymentPercent() ?? 0, 1) }}%** above the invoice total.

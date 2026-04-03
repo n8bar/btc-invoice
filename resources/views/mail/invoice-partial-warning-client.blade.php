@@ -4,7 +4,7 @@
     $outstandingBtc = $summary['outstanding_btc_formatted'] ?? null;
 @endphp
 
-@component('mail::message')
+@component('mail::message', ['invoice' => $invoice])
 # Quick reminder for Invoice {{ $invoice->number ?? $invoice->id }}
 
 We noticed more than one payment attempt for this invoice. Splitting a single invoice across multiple Bitcoin transactions usually means **paying extra miner fees** and might slow down processing.

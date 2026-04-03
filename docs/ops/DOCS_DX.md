@@ -5,7 +5,6 @@ Release Candidate contributor-docs and documentation-operations scope.
 ## Outputs
 - `docs/ops/get-live/QUICK_START.md`: Sail-first quick start + env var reference for new contributors.
 - `docs/ops/get-live/CONTRIBUTOR_WALKTHROUGH.md`: end-to-end contributor walkthrough from clone → wallet setup → invoice creation → delivery → payment visibility (screenshots OK).
-- `docs/specs/NOTIFICATIONS.md`: add a status/coverage section that flags which emails are live vs. stubbed and points to their tests/logging.
 - `README.md`, `docs/PLAN.md`, `docs/PRODUCT_SPEC.md`, and `docs/BACKLOG.md` updated to link the above and keep RC scope separate from post-MVP backlog.
 
 ## Quick Start + Env Var Reference
@@ -24,12 +23,6 @@ Goal: show the first successful invoice lifecycle with minimal branching.
 - Payment visibility: explain how the watcher marks payments (scheduler runs `wallet:watch-payments`; manual command if needed), where to see partials/outstanding in show/public views, and how receipts are triggered.
 - Call out where screenshots belong (wallet settings, create invoice, delivery log, public view).
 
-## Notification Coverage (tie-in to `docs/specs/NOTIFICATIONS.md`)
-- Add a matrix with columns: Audience, Trigger, Mailable/Job, Status (`live` / `stubbed` / `planned`), Tests (Feature test names/paths), Delivery log type(s).
-- Must cover: paid notices (owner + client receipt), past-due (owner + client), overpayment alert (client + optional owner), underpayment alert (client + owner notice).
-- Note any gaps and whether they are deferred to `docs/BACKLOG.md`; align copy guidelines with the spec.
-
 ## Definition of Done
 - Quick start and contributor walkthrough docs exist, are linked from README and `docs/PLAN.md`, and match current UX/commands.
-- Notification coverage is documented with live vs. stub status and test pointers in `docs/specs/NOTIFICATIONS.md`.
 - `docs/PLAN.md` keeps RC scope for Docs & DX; anything deferred is explicitly routed to `docs/BACKLOG.md`.

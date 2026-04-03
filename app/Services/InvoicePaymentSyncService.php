@@ -129,6 +129,7 @@ class InvoicePaymentSyncService
                     'invoice_id' => $invoice->id,
                     'txid' => $result['txid'],
                 ]);
+                $isNewPayment = ! $payment->exists;
 
                 $isConfirmed = ($result['confirmed'] ?? false)
                     && (($result['confirmations'] ?? 0) >= $requiredConfirmations);
@@ -158,6 +159,10 @@ class InvoicePaymentSyncService
                 }
 
                 $payment->save();
+
+                if ($isNewPayment) {
+                    $this->alerts->sendDetectedPaymentAcknowledgments($invoice, $payment);
+                }
 
                 $reference = $result['confirmed_at'] ?? $result['detected_at'];
                 if ($reference && (! $latestReference || $reference->gt($latestReference))) {
