@@ -105,7 +105,7 @@
                             <p class="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800 dark:text-amber-200">Action items</p>
                             <h3 class="mt-1 text-base font-semibold text-amber-950 dark:text-amber-50">Receipts waiting for review</h3>
                             <p class="mt-1 text-sm text-amber-900 dark:text-amber-100">
-                                Review and send the client receipts that are still waiting on owner action.
+                                Review and send the client receipts that are still waiting on your action.
                             </p>
                         </div>
                         <div class="inline-flex items-center self-start rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-amber-900 shadow-sm ring-1 ring-amber-200 dark:bg-slate-900/70 dark:text-amber-100 dark:ring-amber-400/30">

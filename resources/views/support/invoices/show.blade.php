@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="rounded-lg bg-white p-6 shadow dark:bg-slate-900/80">
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Owner</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Issuer</p>
                     <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $owner->name }}</p>
                     <p class="text-sm text-gray-500 dark:text-slate-400">{{ $owner->email }}</p>
                 </div>

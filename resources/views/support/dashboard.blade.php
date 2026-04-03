@@ -4,7 +4,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-semibold leading-tight">Support Dashboard</h2>
-                <p class="text-sm text-gray-500">Read-only access to owners who have active support grants.</p>
+                <p class="text-sm text-gray-500">Read-only access to issuers who have active support grants.</p>
             </div>
         </div>
     </x-slot>
@@ -16,7 +16,7 @@
             @endif
 
             <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-400/40 dark:bg-blue-950/30 dark:text-blue-100">
-                This surface is read-only. Support access depends on an active owner grant and expires automatically.
+                This surface is read-only. Support access depends on an active issuer grant and expires automatically.
             </div>
 
             <div class="rounded-lg bg-white shadow dark:bg-slate-900/80">
@@ -24,7 +24,7 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10">
                         <thead class="bg-gray-50 dark:bg-slate-900/90">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Owner</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Issuer</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Access expires</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Counts</th>

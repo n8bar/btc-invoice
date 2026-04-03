@@ -39,7 +39,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No clients found for this owner.</td>
+                                    <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No clients found for this issuer.</td>
                                 </tr>
                             @endforelse
                         </tbody>

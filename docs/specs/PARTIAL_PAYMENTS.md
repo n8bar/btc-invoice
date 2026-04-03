@@ -11,7 +11,7 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
 
 ## Goals
 - Record every on-chain payment that hits an invoice address, even if the amount is below the invoice total.
-- Surface a `partial` status so owners/clients know funds have arrived but more is due.
+- Surface a `partial` status so issuers/clients know funds have arrived but more is due.
 - Preserve the BTC/USD rate at the moment we detect each payment for accurate receipts/statements.
 - Provide enough metadata for future features (receipt mail, delivery logs, dashboards) to reference payment history.
 
@@ -65,14 +65,14 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
   - never drop confirmed txs
   - deduplicate by txid so a replacement is treated as the live record rather than additive
 - Recompute sats, per-payment USD, outstanding balance, and invoice status after cleanup.
-- Log dropped or replaced tx events; owner notification remains optional.
+- Log dropped or replaced tx events; issuer notification remains optional.
 
 ## USD Snapshot
 - When we log each payment, capture the USD/BTC rate:
     - Use the cached rate if it’s fresh (< defined TTL), otherwise call `BtcRate::refresh`.
     - Store `usd_rate` and `fiat_amount = sats_received / 1e8 * usd_rate`.
-- Treat the original USD invoice total as canonical; each payment reduces the outstanding USD balance using its captured `usd_rate` so owners always see dollars knocked off at the moment funds arrived (BTC volatility never retroactively changes settled USD). Multiple partials can carry different rates.
-- Owner/public summary boxes always present USD first (e.g., `Expected: $500.00 (0.0123 BTC)`, `Outstanding: $125.00 (~0.0031 BTC at current rate)`). Received/confirmed USD reflect the sum of per-payment fiat amounts, and outstanding displays the exact residual (no display-side tolerance masking).
+- Treat the original USD invoice total as canonical; each payment reduces the outstanding USD balance using its captured `usd_rate` so issuers always see dollars knocked off at the moment funds arrived (BTC volatility never retroactively changes settled USD). Multiple partials can carry different rates.
+- Issuer/public summary boxes always present USD first (e.g., `Expected: $500.00 (0.0123 BTC)`, `Outstanding: $125.00 (~0.0031 BTC at current rate)`). Received/confirmed USD reflect the sum of per-payment fiat amounts, and outstanding displays the exact residual (no display-side tolerance masking).
 - QR/BIP21 requests target the *current outstanding USD balance*, converted to BTC using the latest available rate (or cached rate) at view time; once the balance hits zero, the QR omits the `amount` parameter altogether.
 
 ## UI / API
@@ -97,17 +97,17 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
 ## Small Balance Resolution
 - Outstanding USD/BTC should display the exact residual (no UI masking for dust). Status `paid` hinges solely on confirmed USD >= expected USD.
 - When the residual is below the small-balance threshold, surface an explicit “Resolve small balance” control that records a manual credit adjustment for the remaining USD (at the latest available rate) and marks the invoice paid. The adjustment is logged in `invoice_payments` as an `is_adjustment` row for auditability. Threshold rule: `max($1.00, min(1% of expected USD, $50.00 cap))`.
-- Do not auto-settle residuals; owners must opt-in via the control.
+- Do not auto-settle residuals; issuers must opt-in via the control.
 
 ## Manual Adjustment Reversal
-- Manual adjustments are append-only ledger entries. Owners must not edit or delete the recorded amount/direction in place.
-- Owner invoice payment history should expose an inline reversal path for manual adjustment rows:
+- Manual adjustments are append-only ledger entries. Issuers must not edit or delete the recorded amount/direction in place.
+- Issuer invoice payment history should expose an inline reversal path for manual adjustment rows:
   - first click on `Reverse` / `adjustment` reveals `Confirm` / `reverse` / `entry`
   - clicking `Reverse adjustment` again before confirmation re-hides the confirm control
 - Confirming the reversal creates a second manual adjustment row on the same invoice with equal-and-opposite `sats_received` and `fiat_amount` values so the original accounting effect is cancelled exactly.
 - Reversal rows preserve the original adjustment's USD/BTC snapshot rather than repricing at the latest rate.
 - The generated reversal note is `reversal of {txid}` where `{txid}` is the original manual adjustment row identifier.
-- Both rows remain visible in payment history after reversal. Reversal is the supported owner-facing `oops` path for manual adjustments.
+- Both rows remain visible in payment history after reversal. Reversal is the supported issuer-facing `oops` path for manual adjustments.
 
 ## Testing
 - Unit tests for `Invoice` accessors (paid/confirmed USD and sats, outstanding USD/BTC, status transitions).
@@ -130,16 +130,16 @@ Ignore/restore correction handling for wrongly attributed on-chain rows is defin
 2. ✅ Watcher (`wallet:watch-payments`) records multiple partials per invoice and refreshes status/outstanding totals automatically.
 3. ✅ UI shows payment history, USD-first summary, and QR codes that target the outstanding balance.
 4. ✅ Watcher tolerance (±100 sats) is enforced and detection/confirmation timestamps surface in the payment history UI.
-5. ✅ Payment history rows display the captured USD rate/fiat amount and owners can annotate each payment with short notes.
+5. ✅ Payment history rows display the captured USD rate/fiat amount and issuers can annotate each payment with short notes.
 6. ✅ Automatic invoice delivery + paid receipt emails log to `invoice_deliveries`, with queue-backed mailers and profile toggles.
-7. ✅ Owners can record manual adjustments (credit/debit) when a payment exceeds tolerance, and both owners + clients see alerts when over/under payments exceed 15% of the invoice total (client messaging reiterates that overpayments default to gratuities unless they notify the sender).
-8. ✅ Proactive partial-payment alerts: clients see “send one payment” guidance across invoice emails/public views, watchers send a one-time warning email (plus owner FYI + delivery log) after the second payment attempt, and tests cover the new flow.
+7. ✅ Issuers can record manual adjustments (credit/debit) when a payment exceeds tolerance, and both issuers + clients see alerts when over/under payments exceed 15% of the invoice total (client messaging reiterates that overpayments default to gratuities unless they notify the sender).
+8. ✅ Proactive partial-payment alerts: clients see “send one payment” guidance across invoice emails/public views, watchers send a one-time warning email (plus issuer FYI + delivery log) after the second payment attempt, and tests cover the new flow.
 
 ## Clarifications
 - **Draft invoices**: payments may arrive even while status is `draft` (each invoice address is unique), so the watcher still logs them immediately. The UI simply defers showing payment history until the invoice is marked `sent` to avoid confusing “pending drafts.”
 - **Overpayments / Tips**: record the surplus (treat it as a tip by default), keep status `paid`, and introduce two levels of handling:
     - **Noise tolerance** (≤ $10 USD equivalent or ≤ 1% of invoice) — simply show the extra as part of the payment history without alerts.
-    - **Significant overpay** (> tolerance) — flag the invoice for the owner (UI + notification) and make clear that the surplus may be an intentional tip or an accidental overpayment. Owner guidance may suggest refund/credit follow-up when the surplus looks accidental, but the default copy should avoid sounding overly prescriptive about what to do with intentional tips. If a client has multiple overpaid invoices, batch the refund/credit calculation so the owner can settle them in one transaction. Future automation can email the client with those options if we don’t act within a configured SLA so mistaken overpayments can be corrected.
+    - **Significant overpay** (> tolerance) — flag the invoice for the issuer (UI + notification) and make clear that the surplus may be an intentional tip or an accidental overpayment. Issuer guidance may suggest refund/credit follow-up when the surplus looks accidental, but the default copy should avoid sounding overly prescriptive about what to do with intentional tips. If a client has multiple overpaid invoices, batch the refund/credit calculation so the issuer can settle them in one transaction. Future automation can email the client with those options if we don’t act within a configured SLA so mistaken overpayments can be corrected.
 
 ## Post-RC Direction
 - Add a per-user required-confirmations setting (1-6) used by the watcher, with app-default fallback.

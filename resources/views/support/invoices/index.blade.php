@@ -55,7 +55,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No invoices found for this owner.</td>
+                                    <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No invoices found for this issuer.</td>
                                 </tr>
                             @endforelse
                         </tbody>
