@@ -197,7 +197,7 @@
                 @if ($showOverpaymentGratuityNote)
                     <p>Overpayments are treated as gratuities by default. If a payment went over in error, coordinate with your client to refund or apply the surplus as a credit.</p>
                 @endif
-                <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Enter a manual adjustment near the bottom of the page so the ledger stays accurate without touching the original chain data.</p>
+                <p class="text-xs text-yellow-800">Need to reconcile an over/under payment? Use the manual adjustments card below the payment history to keep the ledger accurate without touching the original chain data.</p>
             </div>
 
             @php
@@ -1246,6 +1246,45 @@
                     </div>
                 @endif
 
+                <div class="rounded-lg bg-white p-6 shadow">
+                <h3 class="text-sm font-semibold text-gray-700">Manual adjustments</h3>
+                <p class="mt-1 text-xs text-gray-500">
+                    Credit or reopen balances without editing on-chain payments. Use this when a payment misses the tolerance threshold.
+                </p>
+                <form method="POST" action="{{ route('invoices.payments.adjustments.store', $invoice) }}" class="mt-4 space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
+                            <input type="number" name="amount_usd" step="0.01" min="0.01"
+                                   value="{{ old('amount_usd') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('amount_usd')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Direction</label>
+                            <select name="direction"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="increase" @selected(old('direction') === 'increase')>Credit invoice (reduce outstanding)</option>
+                                <option value="decrease" @selected(old('direction') === 'decrease')>Reopen balance (increase outstanding)</option>
+                            </select>
+                            @error('direction')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Note</label>
+                        <textarea name="note" rows="2" required
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                  placeholder="Document the reason for this adjustment">{{ old('note') }}</textarea>
+                        @error('note')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="flex justify-end">
+                        <x-primary-button>Add adjustment</x-primary-button>
+                    </div>
+                </form>
+            </div>
+
                 {{-- Public link (shareable print view) --}}
             <div id="public-link-card" class="invoice-anchor-target rounded-lg border border-gray-200 bg-white p-4">
                 <div class="flex items-center justify-between">
@@ -1422,45 +1461,6 @@
                             :data-getting-started-highlight="$gettingStartedContext ? 'deliver-send-invoice' : null">
                             {{ $gettingStartedContext ? $gettingStartedMarker . ' Send invoice' : 'Send invoice' }}
                         </x-primary-button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="mt-6 rounded-lg bg-white p-6 shadow">
-                <h3 class="text-sm font-semibold text-gray-700">Manual adjustments</h3>
-                <p class="mt-1 text-xs text-gray-500">
-                    Credit or reopen balances without editing on-chain payments. Use this when a payment misses the tolerance threshold.
-                </p>
-                <form method="POST" action="{{ route('invoices.payments.adjustments.store', $invoice) }}" class="mt-4 space-y-4">
-                    @csrf
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Amount (USD)</label>
-                            <input type="number" name="amount_usd" step="0.01" min="0.01"
-                                   value="{{ old('amount_usd') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            @error('amount_usd')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Direction</label>
-                            <select name="direction"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="increase" @selected(old('direction') === 'increase')>Credit invoice (reduce outstanding)</option>
-                                <option value="decrease" @selected(old('direction') === 'decrease')>Reopen balance (increase outstanding)</option>
-                            </select>
-                            @error('direction')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Note (optional)</label>
-                        <textarea name="note" rows="2"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                  placeholder="Document the reason for this adjustment">{{ old('note') }}</textarea>
-                        @error('note')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                    </div>
-                    <div class="flex justify-end">
-                        <x-primary-button>Add adjustment</x-primary-button>
                     </div>
                 </form>
             </div>
