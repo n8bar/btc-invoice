@@ -22,9 +22,9 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 ### Phase 1 — "owner" → "issuer" sweep (inline)
 Find and replace all instances of "owner" with "issuer" across UI views, mail templates, and docs. The word "owner" must not appear in any copy visible to the app user, and docs should reflect correct terminology going forward.
 
-- [ ] Audit all Blade views and mail templates for "owner" in user-facing copy.
-- [ ] Audit all docs (PLAN, milestone docs, strategy docs, specs, ops docs) for "owner" used to mean the invoice issuer.
-- [ ] Replace each instance with "issuer" or rephrase naturally where a direct swap reads awkwardly.
+- [x] Audit all Blade views and mail templates for "owner" in user-facing copy.
+- [x] Audit all docs (PLAN, milestone docs, strategy docs, specs, ops docs) for "owner" used to mean the invoice issuer.
+- [x] Replace each instance with "issuer" or rephrase naturally where a direct swap reads awkwardly.
 - [ ] Browser-verify: spot-check invoice, dashboard, mail previews, and support UI for any remaining "owner" copy.
 - [ ] Commit and push.
 
