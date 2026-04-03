@@ -6,7 +6,7 @@ A Bitcoin payment of **{{ $invoice->formatBitcoinAmount(($payment?->sats_receive
 - **Client:** {{ $invoice->client->name ?? 'N/A' }}
 - **TXID:** {{ $payment?->txid ?? $delivery->context_key ?? 'N/A' }}
 
-Review the payment rows and send any higher-certainty follow-up only after the invoice payment history looks correct.
+Review the payment history on the invoice page.@if(($invoice->outstanding_usd ?? 0) > 0) You may want to follow up with the client on the remaining balance of ${{ number_format($invoice->outstanding_usd, 2) }}.@endif
 
 @component('mail::button', ['url' => route('invoices.show', $invoice)])
 Review invoice

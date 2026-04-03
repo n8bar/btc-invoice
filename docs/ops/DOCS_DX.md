@@ -37,6 +37,17 @@ Goal: make the first owner-reviewed client receipt feel intentional without turn
 - Use lightweight contextual guidance and existing review surfaces rather than fake invoices, scenario simulation, or a dedicated tutorial sandbox.
 - If the first paid invoice needs ignore or reattribution work before a truthful receipt can be sent, suspend the Part 2 prompt and point the owner at the correction surface instead.
 
+## Off-Chain Payment Recording
+Goal: allow the issuer to record a payment received outside the Bitcoin network (wire transfer, cash, check, etc.) so the invoice ledger stays accurate without requiring a voided and recreated invoice.
+
+- Add an owner-facing "Record manual payment" form on the invoice page, alongside existing adjustment tools.
+- Fields: amount (USD), optional reference/note (e.g. "Wire transfer ref #12345"), date received.
+- On save: create an `InvoicePayment` record flagged as manual (no on-chain txid), recalculate the payment ledger, and transition the invoice to `paid` if the balance is fully closed.
+- Manual payment rows must be clearly distinguishable from on-chain payments in the payment history UI.
+- The existing small-balance resolver and reattribution tools remain unchanged.
+- If a manual payment closes the balance, the receipt panel should become available as with any other paid state.
+- Do not allow manual payments on voided invoices.
+
 ## Definition of Done
 - Quick start and contributor walkthrough docs exist, are linked from README and `docs/PLAN.md`, and match current UX/commands.
 - Post-payment onboarding scope is documented and linked from the canonical spec docs, with MS17 treating it as early activation/help UX rather than a separate milestone.
