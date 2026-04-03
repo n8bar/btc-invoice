@@ -94,3 +94,6 @@
       1. That preview should not send to client recipients or create invoice-linked delivery-history rows.
       2. That preview should be lightly rate-limited or cooldown-protected so repeated clicks do not spam the owner mailbox.
    5. RC does not include arbitrary custom logo uploads for outbound mail; at most it may show or hide the default CryptoZing logo in the shared mail chrome.
+
+## Coverage & Status (MS17 deliverable)
+A coverage matrix must be added to this spec during MS17 to document the live state of all outbound notice classes. Columns: Audience, Trigger, Mailable class, Status (`live` / `stubbed` / `planned`), Feature test(s), Delivery log type. Must cover all active notice classes including paid notices, past-due reminders, overpayment and underpayment alerts, payment acknowledgments, and receipt. Note any gaps and route deferred items to `docs/BACKLOG.md`.
