@@ -9,5 +9,5 @@ Consider following up with the client or recording a manual adjustment if you've
 Review invoice
 @endcomponent
 
-CryptoZing
+Thanks for using CryptoZing
 @endcomponent

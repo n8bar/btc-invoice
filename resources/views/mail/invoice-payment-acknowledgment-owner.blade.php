@@ -12,5 +12,5 @@ Review the payment history on the invoice page.@if(($invoice->outstanding_usd ??
 Review invoice
 @endcomponent
 
-CryptoZing
+Thanks for using CryptoZing
 @endcomponent

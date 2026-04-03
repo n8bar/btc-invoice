@@ -9,5 +9,5 @@ Decide whether to keep it as a tip, credit the client, or record a manual adjust
 Review invoice
 @endcomponent
 
-CryptoZing
+Thanks for using CryptoZing
 @endcomponent

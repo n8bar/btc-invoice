@@ -18,5 +18,5 @@ Consider nudging the client or recording a manual adjustment if you've already r
 Open invoice
 @endcomponent
 
-CryptoZing
+Thanks for using CryptoZing
 @endcomponent
