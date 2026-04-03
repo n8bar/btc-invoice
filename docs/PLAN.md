@@ -12,8 +12,8 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS16 - Mailer & Alerts Polish + Audit**
 - Status: `active`
-- Next action: correct MS16 Phase 3 so docs, code, and Browser QA all align with the intended manual-review-only client receipt rule, then resume Phase 3 verification.
-- Primary next doc: [`docs/strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md`](strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
+- Next action: implement MS16 Phase 4 starting with the Mailgun webhook integration for delivery status feedback.
+- Primary next doc: [`docs/strategies/16.4_RC_MAIL_READINESS.md`](strategies/16.4_RC_MAIL_READINESS.md)
 - Supporting docs: [`docs/strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md`](strategies/16.2_SAFEGUARDS_PROVIDER_RECOVERY.md), [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md), [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md)
 - Most recently completed milestone doc: [`docs/milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md`](milestones/15_CRYPTOZING_APP_SEO_BOOTSTRAP.md)
 
