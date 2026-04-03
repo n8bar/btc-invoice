@@ -146,15 +146,16 @@ class DeliverInvoiceMail implements ShouldQueue
         };
 
         try {
-            $message = Mail::to($mailAlias->convert($delivery->recipient));
+            $mailer = Mail::to($mailAlias->convert($delivery->recipient));
             if ($delivery->cc) {
-                $message->cc($mailAlias->convert($delivery->cc));
+                $mailer->cc($mailAlias->convert($delivery->cc));
             }
-            $message->send($mailable);
+            $sentMessage = $mailer->send($mailable);
 
             $delivery->update([
                 'status' => 'sent',
                 'sent_at' => now(),
+                'provider_message_id' => $sentMessage?->getMessageId(),
                 'error_code' => null,
                 'error_message' => null,
             ]);

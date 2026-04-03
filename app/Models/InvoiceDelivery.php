@@ -25,6 +25,7 @@ class InvoiceDelivery extends Model
         'sent_at',
         'error_code',
         'error_message',
+        'provider_message_id',
     ];
 
     protected $casts = [
