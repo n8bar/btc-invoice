@@ -16,6 +16,7 @@ use App\Http\Controllers\ThemePreferenceController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\GettingStartedController;
 use App\Http\Controllers\Support\SupportClientController;
+use App\Http\Controllers\Webhooks\MailgunWebhookController;
 use App\Http\Controllers\Support\SupportDashboardController;
 use App\Http\Controllers\Support\SupportInvoiceController;
 use App\Http\Controllers\SupportAccessSettingsController;
@@ -29,6 +30,10 @@ use App\Http\Middleware\EnsureSupportAgent;
 
 // Simple health probe for uptime checks / container orchestrators
 Route::get('/health', HealthController::class);
+
+// Mailgun delivery event webhooks (signature-verified, no auth)
+Route::post('/webhooks/mailgun', [MailgunWebhookController::class, 'handle'])
+    ->name('webhooks.mailgun');
 
 // Landing page (keep Breeze welcome)
 Route::get('/', fn () => view('welcome'));

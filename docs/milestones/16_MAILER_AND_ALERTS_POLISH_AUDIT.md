@@ -1,6 +1,6 @@
 # MS16 - Mailer & Alerts Polish + Audit
 
-Status: Active as of 2026-03-28.
+Status: Complete as of 2026-04-02.
 Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
 Supporting docs: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), [`docs/PRODUCT_SPEC.md`](../PRODUCT_SPEC.md), [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](../ops/RC_ROLLOUT_CHECKLIST.md)
 
@@ -14,11 +14,7 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
 - Finish the remaining mailer/alerts polish and audit work once sending is trustworthy again.
 
 ## Current Focus
-- Active phase: **Phase 4 - RC Mail Readiness**
-- Current objective: implement Mailgun webhook integration for delivery status feedback, then rehearse alias-off RC mail readiness.
-- Primary next doc: [`docs/strategies/16.4_RC_MAIL_READINESS.md`](../strategies/16.4_RC_MAIL_READINESS.md)
-- Sequencing note: the phase breakout was re-cut from the actual dependency chain; later phases are sequential by default unless a phase strategy explicitly marks safe sidecars.
-- Primary surfaces: [`docs/specs/NOTIFICATIONS.md`](../specs/NOTIFICATIONS.md), current delivery/alert code, and Mailgun account state.
+- All four phases complete. Milestone closed 2026-04-02.
 
 ## Phase Rollup
 1. [x] Phase 1 - [Delivery Baseline Audit](../strategies/16.1_DELIVERY_BASELINE_AUDIT.md)
@@ -27,12 +23,12 @@ This is the milestone execution doc for MS16. It tracks milestone-level objectiv
    Completed. Shared outbound safeguards now run through a provider-backed Mailgun HTTP API path, the nested mailable queue bug was identified and removed so `DeliverInvoiceMail` is the real send boundary, controlled alias-off proof sends succeeded end-to-end, and Phase 3 can now focus on truthful payment communication semantics instead of delivery trust.
 3. [x] Phase 3 - [Payment Communication Truthfulness + Notification UX](../strategies/16.3_PAYMENT_COMMUNICATION_TRUTHFULNESS.md)
    Completed. Acknowledgment-versus-receipt split shipped, txid-scoped acknowledgments live, paired delivery-history labels accurate, branded mail chrome in place, receipt-review UX verified, past-due alert scheduling fixed with sequence-keyed idempotency, alert idempotency hardened, persistent queue worker added, and Browser QA passed across all six verification scenarios.
-4. [ ] Phase 4 - [RC Mail Readiness](../strategies/16.4_RC_MAIL_READINESS.md)
-   Rehearse alias-off RC mail readiness on the chosen transport once the Phase 3 notification UX and Browser QA are complete.
+4. [x] Phase 4 - [RC Mail Readiness](../strategies/16.4_RC_MAIL_READINESS.md)
+   Completed. Mailgun webhook integration shipped (provider_message_id tracking, HMAC signature verification, delivered/failed/bounced event handling, 5 feature tests). RC rollout checklist updated with webhook signing key and Mailgun dashboard registration steps. Alias-off posture confirmed via Phase 2 proof; transport and outbound settings documented and ready.
 
 ## Exit Criteria
 - [x] The runaway/spam-prone outbound-mail bug is understood and fixed.
 - [x] App-side delivery safeguards are in place and documented.
 - [x] Mailgun sendability is restored or an explicit alternate path is chosen.
 - [x] Mailgun HTTP API is documented as the chosen MS16 transport and implemented unless a concrete blocking constraint forces a temporary fallback.
-- [ ] The remaining notifications/alerts/RC-readiness work ships on top of a trustworthy delivery path.
+- [x] The remaining notifications/alerts/RC-readiness work ships on top of a trustworthy delivery path.

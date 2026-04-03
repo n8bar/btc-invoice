@@ -37,7 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ReassignInvoiceAddresses::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/mailgun',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $renderForbidden = function (Request $request, ?string $details = null) {
