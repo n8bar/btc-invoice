@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\CreatesTestInvoices;
 
 class WatchPaymentsCommandTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, CreatesTestInvoices;
 
     public function test_command_uses_testnet4_base_when_wallet_network_is_testnet4(): void
     {
@@ -960,37 +961,6 @@ class WatchPaymentsCommandTest extends TestCase
     private function makeInvoice(): Invoice
     {
         return $this->makeInvoiceWithNetwork('testnet');
-    }
-
-    private function makeInvoiceWithNetwork(string $network): Invoice
-    {
-        $user = User::factory()->create();
-        $user->walletSetting()->create([
-            'network' => $network,
-            'bip84_xpub' => 'tpubD6Nz...',
-        ]);
-
-        $client = Client::create([
-            'user_id' => $user->id,
-            'name' => 'Acme',
-            'email' => 'billing@example.com',
-        ]);
-
-        return Invoice::create([
-            'user_id' => $user->id,
-            'client_id' => $client->id,
-            'number' => 'INV-1001',
-            'description' => 'Consulting',
-            'amount_usd' => 400,
-            'btc_rate' => 40000,
-            'amount_btc' => 0.01,
-            'payment_address' => 'tb1qq0exampleaddress0000000000000',
-            'wallet_key_fingerprint' => app(WalletKeyLineage::class)->fingerprint($network, 'tpubD6Nz...'),
-            'wallet_network' => $network,
-            'status' => 'sent',
-            'invoice_date' => Carbon::now()->toDateString(),
-            'due_date' => Carbon::now()->addWeek()->toDateString(),
-        ]);
     }
 
     private function createInvoiceForUser(User $user, string $number, string $address, string $xpub, string $network = 'testnet'): Invoice

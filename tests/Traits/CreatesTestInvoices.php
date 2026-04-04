@@ -42,7 +42,11 @@ trait CreatesTestInvoices
             'due_date' => Carbon::now()->addWeek()->toDateString(),
         ];
 
-        $invoice = Invoice::create(array_merge($defaults, $overrides));
+        $invoice = Invoice::create($defaults);
+
+        if (!empty($overrides)) {
+            $invoice->forceFill($overrides)->save();
+        }
 
         return $invoice->refresh();
     }

@@ -179,7 +179,7 @@ class MailBrandingTest extends TestCase
 
         $html = (new NotificationBrandingPreviewMail($owner))->render();
 
-        $this->assertStringContainsString('Branded test message', $html);
+        $this->assertStringContainsString('Test email', $html);
         $this->assertStringContainsString('Phase 3 Mail', $html);
         $this->assertStringContainsString('Owner-reviewed bitcoin receipts', $html);
         $this->assertStringContainsString('Phase 3 custom footer blurb.', $html);
