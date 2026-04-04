@@ -1,5 +1,5 @@
 # PLAN
-_Last updated: 2026-04-02_
+_Last updated: 2026-04-04_
 
 This is the human-facing execution dashboard for Release Candidate work.
 
@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS17 - Product Readiness**
 - Status: `active`
-- Next action: begin MS17 Phase 1 — "owner" → "issuer" copy sweep.
+- Next action: MS17 Phase 1 complete — begin Phase 2 (test suite rationalization) and/or Phase 3 (support monitoring panel).
 - Primary next doc: [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md)
 - Most recently completed milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
 

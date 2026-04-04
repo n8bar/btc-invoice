@@ -13,12 +13,14 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 - Add post-payment onboarding so paid-state invoices have a clear issuer path to receipt delivery and ledger review.
 
 ## Current Focus
-- Active phase: **Phase 1 - "owner" → "issuer" sweep**
-- Primary next doc: [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md)
+- Active phase: **Phase 2 - Test suite rationalization** (or Phase 3 — can run in parallel)
+- Phase 1 complete: [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md)
+- Phase 2 next doc: [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md)
+- Phase 3 next doc: [`docs/strategies/17.3_SUPPORT_UI_AND_MONITORING.md`](../strategies/17.3_SUPPORT_UI_AND_MONITORING.md)
 
 ## Phase Rollup
 
-### Phase 1 — "owner" → "issuer" sweep
+### Phase 1 — "owner" → "issuer" sweep ✓
 Full rename across UI copy, URLs, route names, code variables and method names, mail classes, mail templates, delivery type strings, database columns, and tests. See [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md) for the ordered checklist.
 
 ### Phase 2 — Test suite rationalization
