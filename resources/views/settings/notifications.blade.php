@@ -98,7 +98,7 @@
                         <div class="space-y-1">
                             <h3 class="text-sm font-semibold text-gray-700">Send yourself a test email</h3>
                             <p class="text-xs text-gray-600">
-                                Save settings first, then send a branded test message to {{ $user->email }} using the current saved mail-branding settings.
+                                Send a test email to {{ $user->email }} to confirm outgoing delivery is working.
                             </p>
                             <p class="text-xs text-gray-500">
                                 This does not send to clients and does not create an invoice delivery-history row.
