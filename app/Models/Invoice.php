@@ -141,6 +141,16 @@ class Invoice extends Model
             && ! $this->hasDeliveryOfTypeWithStatuses('receipt', ['queued', 'sending', 'sent']);
     }
 
+    /**
+     * Returns true when there are ignored or reattributed payment rows that
+     * make the receipt's accounting picture unreliable. The issuer must
+     * resolve or acknowledge them before the receipt can be sent.
+     */
+    public function receiptIsBlockedByCorrectionState(): bool
+    {
+        return $this->hasReceiptCorrectionState();
+    }
+
     public function receiptReviewReasons(): array
     {
         $this->loadMissing(['payments', 'sourcePayments']);

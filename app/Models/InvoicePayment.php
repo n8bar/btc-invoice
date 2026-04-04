@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class InvoicePayment extends Model
 {
@@ -17,6 +18,21 @@ class InvoicePayment extends Model
                 $payment->accounting_invoice_id = $payment->invoice_id;
             }
         });
+
+        $invalidateDashboard = static function (InvoicePayment $payment): void {
+            $invoiceId = $payment->invoice_id;
+            if (!$invoiceId) {
+                return;
+            }
+            $userId = Invoice::query()->where('id', $invoiceId)->value('user_id');
+            if ($userId) {
+                Cache::forget("dashboard:snapshot:user:{$userId}");
+            }
+        };
+
+        static::created($invalidateDashboard);
+        static::saved($invalidateDashboard);
+        static::deleted($invalidateDashboard);
     }
 
     protected $fillable = [

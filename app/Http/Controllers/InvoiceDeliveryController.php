@@ -98,6 +98,10 @@ class InvoiceDeliveryController extends Controller
             return back()->with('status', 'Only paid invoices can send a receipt.');
         }
 
+        if ($invoice->receiptIsBlockedByCorrectionState()) {
+            return back()->with('error', 'Resolve the ignored or reattributed payment before sending the receipt.');
+        }
+
         $delivery = $this->deliveries->queue(
             $invoice,
             'receipt',
