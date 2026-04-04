@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS17 - Product Readiness**
 - Status: `active`
-- Next action: MS17 Phase 1 complete — begin Phase 2 (test suite rationalization) and/or Phase 3 (support monitoring panel).
+- Next action: MS17 Phases 1 and 2 complete — Phase 3 (support monitoring panel) user BQA in progress; Phase 4 (post-payment onboarding) queued after Phase 3 merges.
 - Primary next doc: [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md)
 - Most recently completed milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
 

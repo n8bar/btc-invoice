@@ -13,9 +13,9 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 - Add post-payment onboarding so paid-state invoices have a clear issuer path to receipt delivery and ledger review.
 
 ## Current Focus
-- Active phase: **Phase 2 - Test suite rationalization** (or Phase 3 — can run in parallel)
+- Active phase: **Phase 3 — Support UI + monitoring** (user BQA in progress)
 - Phase 1 complete: [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md)
-- Phase 2 next doc: [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md)
+- Phase 2 complete: [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md)
 - Phase 3 next doc: [`docs/strategies/17.3_SUPPORT_UI_AND_MONITORING.md`](../strategies/17.3_SUPPORT_UI_AND_MONITORING.md)
 
 ## Phase Rollup
@@ -23,7 +23,7 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 ### Phase 1 — "owner" → "issuer" sweep ✓
 Full rename across UI copy, URLs, route names, code variables and method names, mail classes, mail templates, delivery type strings, database columns, and tests. See [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md) for the ordered checklist.
 
-### Phase 2 — Test suite rationalization
+### Phase 2 — Test suite rationalization ✓
 The suite has grown large and was written opportunistically. This phase audits every test file, produces a written recommendation table, gets approval, and executes agreed changes so the suite is intentional going into RC. See [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md).
 
 ### Phase 3 — Support UI + monitoring
@@ -34,6 +34,6 @@ Extends the getting-started flow (MS13 task 11) with a Part 2 receipt step that 
 
 ## Exit Criteria
 - [ ] No "owner" copy remains in UI, mail templates, or docs where "issuer" is the correct term.
-- [ ] Test suite is intentional and passes cleanly.
+- [x] Test suite is intentional and passes cleanly.
 - [ ] Support UI and service health monitoring are usable by a support agent.
 - [ ] Paid invoices have a clear issuer path to receipt delivery and ledger review.
