@@ -21,7 +21,7 @@
                         </div>
                     @elseif (session('status') === 'notification-preview-sent')
                         <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
-                            Sent a branded test email to {{ session('preview_email') }}.
+                            Sent a test email to {{ session('preview_email') }}.
                         </div>
                     @elseif (session('status') === 'notification-preview-throttled')
                         <div class="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800" style="border-color: currentColor;">
