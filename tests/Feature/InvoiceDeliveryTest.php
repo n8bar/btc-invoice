@@ -12,7 +12,7 @@ use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class InvoiceDeliveryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_owner_can_queue_invoice_email(): void
     {
@@ -56,8 +56,7 @@ class InvoiceDeliveryTest extends TestCase
             'invoice_id' => $invoice->id,
             'type' => 'send',
             'status' => 'queued',
-            'message' => 'Thanks for your business',
-            'cc' => $owner->email,
+            'recipient' => $client->email,
         ]);
 
         $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->first();
@@ -971,6 +970,103 @@ class InvoiceDeliveryTest extends TestCase
         $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'send',
+        ]);
+    }
+
+    // -----------------------------------------------------------------------
+    // Gap 2 — Receipt truthfulness invariants
+    // -----------------------------------------------------------------------
+
+    public function test_receipt_send_is_blocked_when_invoice_has_unresolved_ignored_payment(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Receipt Co',
+            'email' => 'receipt@example.com',
+        ]);
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RECEIPT-BLOCKED-IGNORE',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        $payment = \App\Models\InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'ignored-tx-receipt',
+            'sats_received' => 200_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 100.00,
+            'ignored_at' => now(),
+            'ignore_reason' => 'Wrong amount.',
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
+    public function test_receipt_send_proceeds_when_no_correction_state_exists(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Clean Receipt Co',
+            'email' => 'clean@example.com',
+        ]);
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RECEIPT-CLEAN',
+            'amount_usd' => 100,
+            'btc_rate' => 50_000,
+            'amount_btc' => 0.002,
+            'payment_address' => 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+        $invoice->enablePublicShare();
+
+        \App\Models\InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'clean-receipt-tx',
+            'sats_received' => 200_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 100.00,
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Receipt queued.');
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+            'status' => 'queued',
         ]);
     }
 

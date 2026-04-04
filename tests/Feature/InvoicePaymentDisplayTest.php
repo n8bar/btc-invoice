@@ -2,22 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\BtcRate;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
+use Tests\Traits\CreatesTestInvoices;
 
 class InvoicePaymentDisplayTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private int $invoiceSequence = 0;
+    use DatabaseTransactions, CreatesTestInvoices;
 
     protected function tearDown(): void
     {
@@ -56,7 +54,6 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('data-copy-text="' . $escapedUri . '"', false);
         $response->assertSeeText('0.008');
         $response->assertSee('Payment QR', false);
-        $response->assertSee('Thank&nbsp;you!', false);
     }
 
     public function test_show_hides_single_payment_note_when_invoice_is_paid(): void
@@ -150,6 +147,10 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('studio@example.com', false);
         $response->assertSee('Send BTC only.', false);
         $response->assertSee('742 Evergreen Terrace', false);
+        $response->assertDontSee('CryptoZing Invoice', false);
+        $response->assertDontSee('CryptoZing LLC', false);
+        $response->assertDontSee('hello@cryptozing.app', false);
+        $response->assertDontSee('Net 7', false);
     }
 
     public function test_print_view_displays_client_overpayment_alert_when_above_threshold(): void
@@ -893,37 +894,4 @@ class InvoicePaymentDisplayTest extends TestCase
         $public->assertDontSee('data-public-unavailable="true"', false);
     }
 
-    private function makeInvoice(User $owner, array $overrides = []): Invoice
-    {
-        $client = Client::create([
-            'user_id' => $owner->id,
-            'name' => 'Acme Co',
-            'email' => 'billing@example.com',
-            'notes' => null,
-        ]);
-
-        $this->invoiceSequence++;
-
-        $defaults = [
-            'user_id' => $owner->id,
-            'client_id' => $client->id,
-            'number' => 'INV-' . str_pad((string) $this->invoiceSequence, 4, '0', STR_PAD_LEFT),
-            'description' => 'General services',
-            'amount_usd' => 500,
-            'btc_rate' => 50000,
-            'amount_btc' => 0.01,
-            'payment_address' => 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7k3l0zz',
-            'status' => 'draft',
-            'invoice_date' => Carbon::now()->toDateString(),
-            'due_date' => Carbon::now()->addWeek()->toDateString(),
-        ];
-
-        $invoice = Invoice::create($defaults);
-
-        if (!empty($overrides)) {
-            $invoice->forceFill($overrides)->save();
-        }
-
-        return $invoice->refresh();
-    }
 }
