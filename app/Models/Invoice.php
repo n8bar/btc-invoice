@@ -309,6 +309,16 @@ class Invoice extends Model
             ->sum('sats_received');
     }
 
+    public function getOutstandingUsdAttribute(): ?float
+    {
+        $expected = $this->amount_usd !== null ? (float) $this->amount_usd : null;
+        if ($expected === null) {
+            return null;
+        }
+
+        return round(max($expected - $this->sumPaymentsUsd(true), 0.0), 2);
+    }
+
     public function getOutstandingSatsAttribute(): ?int
     {
         $expected = $this->expectedPaymentSats();
