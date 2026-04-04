@@ -492,9 +492,9 @@ class InvoiceDeliveryTest extends TestCase
 
         $invoice->refresh()->refreshPaymentState();
 
-        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->first();
+        $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'issuer_paid_notice')->first();
         $this->assertNotNull($delivery);
-        $this->assertSame(1, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_paid_notice')->count());
+        $this->assertSame(1, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'issuer_paid_notice')->count());
         $this->assertSame(0, InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'receipt')->count());
         Queue::assertPushed(DeliverInvoiceMail::class, function ($job) use ($delivery) {
             return $job->delivery->is($delivery);

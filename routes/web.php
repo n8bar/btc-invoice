@@ -152,10 +152,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', EnsureSupportAgent::class])->prefix('support')->name('support.')->group(function () {
     Route::get('/', SupportDashboardController::class)->name('dashboard');
-    Route::get('/owners/{owner}/invoices', [SupportInvoiceController::class, 'index'])->name('owners.invoices.index');
-    Route::get('/owners/{owner}/invoices/{invoice}', [SupportInvoiceController::class, 'show'])->name('owners.invoices.show');
-    Route::get('/owners/{owner}/clients', [SupportClientController::class, 'index'])->name('owners.clients.index');
-    Route::get('/owners/{owner}/clients/{client}', [SupportClientController::class, 'show'])->name('owners.clients.show');
+    Route::get('/issuers/{issuer}/invoices', [SupportInvoiceController::class, 'index'])->name('issuers.invoices.index');
+    Route::get('/issuers/{issuer}/invoices/{invoice}', [SupportInvoiceController::class, 'show'])->name('issuers.invoices.show');
+    Route::get('/issuers/{issuer}/clients', [SupportClientController::class, 'index'])->name('issuers.clients.index');
+    Route::get('/issuers/{issuer}/clients/{client}', [SupportClientController::class, 'show'])->name('issuers.clients.show');
 });
 
 // Breeze auth scaffolding (login, register, password reset, etc.)

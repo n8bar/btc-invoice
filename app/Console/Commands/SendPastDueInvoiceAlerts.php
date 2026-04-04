@@ -10,7 +10,7 @@ class SendPastDueInvoiceAlerts extends Command
 {
     protected $signature = 'invoices:send-past-due-alerts';
 
-    protected $description = 'Email owners and clients about past-due invoices.';
+    protected $description = 'Email issuers and clients about past-due invoices.';
 
     public function __construct(private readonly InvoiceAlertService $alerts)
     {

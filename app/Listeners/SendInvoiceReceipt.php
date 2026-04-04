@@ -20,6 +20,6 @@ class SendInvoiceReceipt
             return;
         }
 
-        $this->alerts->sendOwnerPaidNotice($invoice);
+        $this->alerts->sendIssuerPaidNotice($invoice);
     }
 }

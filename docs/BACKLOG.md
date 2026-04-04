@@ -1,5 +1,5 @@
 # Backlog (Post-MVP)
-_Last updated: 2026-03-18_
+_Last updated: 2026-04-03_
 
 This is the canonical post-MVP backlog.
 
@@ -47,6 +47,15 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Allow issuers to upload a custom logo for outbound mail instead of only showing or hiding the default CryptoZing logo.
    - Include storage, validation, replacement/removal, and email-client-safe fallback behavior.
    - Keep this separate from the RC KISS mail-branding controls, which are limited to brand-shell text fields plus a default-logo on/off toggle.
+
+## Support & Admin Roles
+
+20. **Support agent / maintainer role separation**
+   - For RC, the support agent role doubles as the operational maintainer: one email allowlist, one dashboard, full visibility into both issuer grants and service health monitoring.
+   - Post-MVP, split these into distinct roles if the team grows:
+     - A **maintainer** role that has access to the monitoring panel (queue depth, delivery failures, watcher health) but not to issuer grant browsing.
+     - A **support agent** role that has access to issuer grant browsing but not to the monitoring panel, if a dedicated support function separate from engineering is needed.
+   - Current `SUPPORT_AGENT_EMAILS` allowlist covers both concerns until separation is warranted.
 
 ## Observability & Ops
 9. **Structured Logging & Alerting**

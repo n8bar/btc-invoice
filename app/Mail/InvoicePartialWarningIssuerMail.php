@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoicePartialWarningOwnerMail extends Mailable
+class InvoicePartialWarningIssuerMail extends Mailable
 {
     use SerializesModels;
 
@@ -27,7 +27,7 @@ class InvoicePartialWarningOwnerMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.invoice-partial-warning-owner',
+            markdown: 'mail.invoice-partial-warning-issuer',
             with: [
                 'invoice' => $this->invoice,
             ],

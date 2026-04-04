@@ -192,7 +192,7 @@
                 </div>
 
                 {{--
-                Legacy invoice-level TXID input kept here for quick restore, but hidden from owner edit UX.
+                Legacy invoice-level TXID input kept here for quick restore, but hidden from issuer edit UX.
                 <div>
                     <label class="block text-sm font-medium text-gray-700">TXID (optional)</label>
                     <input name="txid" value="{{ old('txid',$invoice->txid) }}"

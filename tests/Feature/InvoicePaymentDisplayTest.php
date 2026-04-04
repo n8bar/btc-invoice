@@ -567,7 +567,7 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'owner_underpay_alert',
+            'type' => 'issuer_underpay_alert',
             'status' => 'sending',
             'recipient' => 'owner@example.com',
             'dispatched_at' => Carbon::parse('2025-01-04 12:00:00', 'UTC'),
@@ -579,9 +579,9 @@ class InvoicePaymentDisplayTest extends TestCase
 
         $response->assertOk();
         $response->assertSeeText('Notice');
-        $response->assertSeeText('Underpayment alert (owner)');
+        $response->assertSeeText('Underpayment alert (issuer)');
         $response->assertSeeText('Sending');
-        $response->assertDontSee('owner_underpay_alert', false);
+        $response->assertDontSee('issuer_underpay_alert', false);
     }
 
     public function test_paid_invoice_payment_history_shows_receipt_review_panel_and_send_action(): void

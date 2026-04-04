@@ -74,7 +74,7 @@ class InvoicePaymentCorrectionTest extends TestCase
         $ownerNotice = $invoice->deliveries()->create([
             'invoice_id' => $invoice->id,
             'user_id' => $owner->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'issuer_paid_notice',
             'status' => 'queued',
             'recipient' => $owner->email,
             'dispatched_at' => now(),
@@ -193,7 +193,7 @@ class InvoicePaymentCorrectionTest extends TestCase
             $invoice->deliveries()->create([
                 'invoice_id' => $invoice->id,
                 'user_id' => $owner->id,
-                'type' => 'owner_underpay_alert',
+                'type' => 'issuer_underpay_alert',
                 'status' => 'queued',
                 'recipient' => $owner->email,
                 'dispatched_at' => now(),
@@ -209,7 +209,7 @@ class InvoicePaymentCorrectionTest extends TestCase
             $invoice->deliveries()->create([
                 'invoice_id' => $invoice->id,
                 'user_id' => $owner->id,
-                'type' => 'owner_partial_warning',
+                'type' => 'issuer_partial_warning',
                 'status' => 'queued',
                 'recipient' => $owner->email,
                 'dispatched_at' => now(),
@@ -306,7 +306,7 @@ class InvoicePaymentCorrectionTest extends TestCase
         $ownerNotice = $sourceInvoice->deliveries()->create([
             'invoice_id' => $sourceInvoice->id,
             'user_id' => $owner->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'issuer_paid_notice',
             'status' => 'queued',
             'recipient' => $owner->email,
             'dispatched_at' => now(),

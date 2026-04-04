@@ -28,7 +28,7 @@ class Invoice extends Model
         'billing_name_override','billing_email_override','billing_phone_override',
         'billing_address_override','invoice_footer_note_override','branding_heading_override',
         'last_overpayment_alert_at','last_underpayment_alert_at',
-        'last_past_due_owner_alert_at','last_past_due_client_alert_at',
+        'last_past_due_issuer_alert_at','last_past_due_client_alert_at',
         'last_partial_warning_sent_at',
     ];
 
@@ -56,7 +56,7 @@ class Invoice extends Model
         'payment_confirmed_at' => 'datetime',
         'last_overpayment_alert_at' => 'datetime',
         'last_underpayment_alert_at' => 'datetime',
-        'last_past_due_owner_alert_at' => 'datetime',
+        'last_past_due_issuer_alert_at' => 'datetime',
         'last_past_due_client_alert_at' => 'datetime',
         'last_partial_warning_sent_at' => 'datetime',
     ];
