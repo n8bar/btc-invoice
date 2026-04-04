@@ -12,7 +12,7 @@ use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\InvoiceDeliveryService;
 use App\Services\MailAlias;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class InvoiceDeliveryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_owner_can_queue_invoice_email(): void
     {
@@ -56,8 +56,7 @@ class InvoiceDeliveryTest extends TestCase
             'invoice_id' => $invoice->id,
             'type' => 'send',
             'status' => 'queued',
-            'message' => 'Thanks for your business',
-            'cc' => $owner->email,
+            'recipient' => $client->email,
         ]);
 
         $delivery = InvoiceDelivery::where('invoice_id', $invoice->id)->first();

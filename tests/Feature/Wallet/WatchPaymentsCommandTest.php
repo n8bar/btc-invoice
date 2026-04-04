@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Services\BtcRate;
 use App\Services\Blockchain\MempoolClient;
 use App\Services\WalletKeyLineage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 class WatchPaymentsCommandTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_command_uses_testnet4_base_when_wallet_network_is_testnet4(): void
     {

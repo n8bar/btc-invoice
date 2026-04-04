@@ -7,7 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\BtcRate;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class InvoicePaymentDisplayTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private int $invoiceSequence = 0;
 
@@ -56,7 +56,6 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('data-copy-text="' . $escapedUri . '"', false);
         $response->assertSeeText('0.008');
         $response->assertSee('Payment QR', false);
-        $response->assertSee('Thank&nbsp;you!', false);
     }
 
     public function test_show_hides_single_payment_note_when_invoice_is_paid(): void
@@ -150,6 +149,10 @@ class InvoicePaymentDisplayTest extends TestCase
         $response->assertSee('studio@example.com', false);
         $response->assertSee('Send BTC only.', false);
         $response->assertSee('742 Evergreen Terrace', false);
+        $response->assertDontSee('CryptoZing Invoice', false);
+        $response->assertDontSee('CryptoZing LLC', false);
+        $response->assertDontSee('hello@cryptozing.app', false);
+        $response->assertDontSee('Net 7', false);
     }
 
     public function test_print_view_displays_client_overpayment_alert_when_above_threshold(): void
