@@ -11,4 +11,5 @@ return [
     ))),
     'grant_hours' => max((int) env('SUPPORT_ACCESS_HOURS', 72), 1),
     'terms_version' => (string) env('SUPPORT_ACCESS_TERMS_VERSION', 'v1'),
+    'watcher_stale_minutes' => max((int) env('WATCHER_STALE_MINUTES', 60), 1),
 ];

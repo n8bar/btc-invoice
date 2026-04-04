@@ -56,6 +56,70 @@
             </div>
 
             <div>{{ $issuers->onEachSide(1)->links() }}</div>
+
+            {{-- Monitoring panel --}}
+            <div class="rounded-lg border border-gray-200 bg-white shadow dark:border-white/10 dark:bg-slate-900/80">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-white/10">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">Service Health</h3>
+                </div>
+                <div class="grid grid-cols-1 divide-y divide-gray-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/10">
+
+                    {{-- Queue depth --}}
+                    <div class="px-6 py-5">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">Queue depth</p>
+                        <p class="mt-1 text-2xl font-semibold
+                            {{ $monitoring['queue_depth'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }}">
+                            {{ $monitoring['queue_depth'] }}
+                        </p>
+                        <p class="mt-0.5 text-xs text-gray-500 dark:text-slate-400">deliveries queued or sending</p>
+                    </div>
+
+                    {{-- Recent failures --}}
+                    <div class="px-6 py-5">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">Failures (24h)</p>
+                        <p class="mt-1 text-2xl font-semibold
+                            {{ count($monitoring['recent_failures']) > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                            {{ count($monitoring['recent_failures']) }}
+                        </p>
+                        @if (count($monitoring['recent_failures']) > 0)
+                            <ul class="mt-2 space-y-1">
+                                @foreach ($monitoring['recent_failures'] as $failure)
+                                    <li class="text-xs text-gray-600 dark:text-slate-300">
+                                        <span class="font-medium">{{ $failure->type }}</span>
+                                        → {{ $failure->recipient }}
+                                        @if ($failure->error_message)
+                                            — <span class="text-red-600 dark:text-red-400">{{ $failure->error_message }}</span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="mt-0.5 text-xs text-gray-500 dark:text-slate-400">no failures</p>
+                        @endif
+                    </div>
+
+                    {{-- Watcher health --}}
+                    <div class="px-6 py-5">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">Watcher last seen</p>
+                        @if ($monitoring['last_payment_at'])
+                            <p class="mt-1 text-sm font-semibold
+                                {{ $monitoring['watcher_stale'] ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }}">
+                                {{ \Illuminate\Support\Carbon::parse($monitoring['last_payment_at'])->setTimezone(config('app.timezone'))->toDayDateTimeString() }}
+                            </p>
+                            @if ($monitoring['watcher_stale'])
+                                <p class="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
+                                    No activity in over {{ $monitoring['stale_minutes'] }} minutes — worth checking.
+                                </p>
+                            @else
+                                <p class="mt-0.5 text-xs text-green-600 dark:text-green-400">recent</p>
+                            @endif
+                        @else
+                            <p class="mt-1 text-sm text-gray-400 dark:text-slate-500">No on-chain payments recorded yet.</p>
+                        @endif
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>
