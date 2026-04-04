@@ -17,12 +17,12 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 - Most recently completed milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
 
 ## Active and Upcoming Milestones
-| Status | ID | Milestone | Short intent | Primary doc |
-|---|---|---|---|---|
-| [ ] | 17 | Product Readiness | Rationalize the test suite, replace "owner" with "issuer" in all UI and mail copy, add service health monitoring to the support dashboard, and extend the getting-started flow with a post-payment receipt step. | [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md) |
-| [ ] | 18 | RC Hardening & Ops | Document notification coverage, add auth/password policy hardening (including 419-to-login redirect and site-wide session expiry logout), and keep contributor docs current. | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
-| [ ] | 19 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
-| [ ] | 20 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
+| Status | ID | Milestone | Short intent | Target | Primary doc |
+|---|---|---|---|---|---|
+| [ ] | 17 | Product Readiness | Rationalize the test suite, replace "owner" with "issuer" in all UI and mail copy, add service health monitoring to the support dashboard, and extend the getting-started flow with a post-payment receipt step. | 2026-04-30 | [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md) |
+| [ ] | 18 | RC Hardening & Ops | Document notification coverage, add auth/password policy hardening (including 419-to-login redirect and site-wide session expiry logout), and keep contributor docs current. | 2026-05-31 | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
+| [ ] | 19 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | 2026-06-15 | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
+| [ ] | 20 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | 2026-06-30 | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
 
 ## Completed Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
