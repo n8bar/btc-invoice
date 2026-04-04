@@ -958,6 +958,24 @@ class WatchPaymentsCommandTest extends TestCase
         $this->assertSame('payment_collision', $ownerB->walletSetting->unsupported_configuration_reason);
     }
 
+    public function test_command_continues_without_crashing_when_mempool_api_returns_error(): void
+    {
+        $invoice = $this->makeInvoice();
+
+        $base = config('blockchain.mempool.testnet_base');
+
+        Http::fake([
+            "{$base}/address/{$invoice->payment_address}/txs" => Http::response([], 500),
+        ]);
+
+        $this->artisan('wallet:watch-payments')
+            ->assertExitCode(0);
+
+        $this->assertDatabaseCount('invoice_payments', 0);
+        $invoice->refresh();
+        $this->assertSame('sent', $invoice->status);
+    }
+
     private function makeInvoice(): Invoice
     {
         return $this->makeInvoiceWithNetwork('testnet');
