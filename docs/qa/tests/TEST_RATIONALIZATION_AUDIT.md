@@ -2,7 +2,7 @@
 
 _Produced for MS17 Phase 2. See [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../../strategies/17.2_TEST_RATIONALIZATION.md) for process._
 
-Status: **Awaiting review.** No changes to the test suite until Section 2 sign-off.
+Status: **Pass 2 complete. Awaiting review before execution.**
 
 ---
 
@@ -76,3 +76,83 @@ Surfaces with zero or near-zero test coverage that matter for RC:
 5. **Dashboard cache invalidation on payment events** — TTL behavior tested; event-driven invalidation is not.
 
 Gaps 3–5 are deferred to the backlog unless the review in Section 2 surfaces a specific RC risk. Gap 1 should be confirmed once `WatchPaymentsCommandTest` is fully read. Gap 2 is partially mitigated by `MailBrandingTest` but receipt truthfulness invariants (no receipt on unresolved correction state) are untested.
+
+---
+
+## Efficiency Recommendations
+
+_Pass 2 — produced after full reads of all Tweak files and cross-file redundancy scan._
+
+### Critical: Unit test using RefreshDatabase
+
+`Unit/InvoicePaymentSummaryTest` uses `RefreshDatabase` and took **16.83s** in timing — nearly the entire rest of the suite. It creates real DB rows to test in-memory math that could be tested with model stubs or `DatabaseTransactions`. This is the single biggest win in the suite.
+
+**Action:** Switch to `DatabaseTransactions` or replace DB-backed setup with direct model instantiation where the math doesn't require persisted relationships.
+
+---
+
+### RefreshDatabase → DatabaseTransactions
+
+Switch these files from `RefreshDatabase` to `DatabaseTransactions`. Each file's tests are isolated single requests with no cross-request shared state.
+
+| File | Tests | Estimated savings |
+|---|---|---|
+| `Feature/InvoiceDeliveryTest.php` | 20 | ~0.3s |
+| `Feature/InvoicePaymentCorrectionTest.php` | 17 | ~0.25s |
+| `Feature/InvoicePaymentDisplayTest.php` | 27 | ~0.4s |
+| `Feature/Wallet/WatchPaymentsCommandTest.php` | 17 | ~0.25s |
+
+Keep `RefreshDatabase` in `InvoiceShowEditFlowTest` (multi-step request sequences) and `UserSettingsTest` (heavy config mutation).
+
+---
+
+### Shared invoice creation trait
+
+Five files define their own `makeInvoice()` helper with incompatible signatures. Consolidate into `Tests/Traits/CreatesTestInvoices.php`:
+
+```php
+trait CreatesTestInvoices {
+    protected function makeInvoice(?User $owner = null, array $overrides = []): Invoice { ... }
+    protected function makeInvoiceWithNetwork(string $network, ?User $owner = null): Invoice { ... }
+}
+```
+
+Affected files: `InvoicePaymentCorrectionTest`, `InvoicePaymentDisplayTest`, `DashboardSnapshotTest`, `GettingStartedFlowTest`, `WatchPaymentsCommandTest`.
+
+---
+
+### Tests to delete (no behavioral value)
+
+1. `InvoicePaymentCorrectionTest::test_ignore_validation_page_does_not_render_native_autofocus_on_teleported_correction_fields` — asserts HTML attribute absence, not behavior.
+2. `InvoicePaymentCorrectionTest::test_reattribution_validation_page_does_not_render_native_autofocus_on_teleported_correction_fields` — same issue, mirror test.
+
+---
+
+### Cross-file redundancy to collapse
+
+| Scenario | Files | Action |
+|---|---|---|
+| Owner paid notice queued on payment | `InvoiceDeliveryTest`, `WatchPaymentsCommandTest`, `InvoiceNotificationTest` | Keep Delivery + WatchPayments (different triggers); remove `InvoiceNotificationTest` version unless it uniquely tests event dispatch |
+| Unsupported wallet flag | `UserSettingsTest` (state persistence), `InvoiceShowEditFlowTest` (view rendering) | Keep both — different concerns. Clarify test names. |
+
+---
+
+### Over-asserting: specific fixes
+
+| Test | Problem | Fix |
+|---|---|---|
+| `InvoiceShowEditFlowTest::test_invoice_index_empty_state_*` | Asserts CSS class `overflow-x-auto` | Remove CSS assertion |
+| `InvoiceDeliveryTest::test_owner_can_queue_invoice_email` | Asserts all delivery row fields including cc/message | Reduce to type, status, recipient |
+| `InvoicePaymentDisplayTest::test_show_displays_bip21_link_*` | Asserts `Thank&nbsp;you!` incidental copy | Remove copy assertion |
+| `InvoicePaymentDisplayTest` overpay/underpay/tolerance tests | Three separate tests for threshold variants | Consolidate with `@dataProvider` |
+
+---
+
+### Under-asserting: specific fixes
+
+| Test | Problem | Fix |
+|---|---|---|
+| `InvoiceShowEditFlowTest::test_invoice_update_redirects_*` | Asserts flash only; doesn't verify updated data renders | Chain GET to show page, assert updated values |
+| `InvoicePaymentDisplayTest::test_print_view_uses_billing_overrides_*` | Asserts custom values appear; doesn't verify defaults gone | Add `assertDontSee` for default values |
+| `UserSettingsTest::test_user_can_add_and_remove_additional_wallet_accounts` | Asserts redirect only | Follow with GET to settings, verify account listed |
+| `WatchPaymentsCommandTest::test_command_marks_invoice_partial_when_underpaid` | Asserts status='partial' only | Add assertion for `payment_amount_sat` |
