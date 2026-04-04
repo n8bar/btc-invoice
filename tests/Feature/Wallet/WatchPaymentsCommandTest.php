@@ -78,7 +78,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'payment_acknowledgment_owner',
+            'type' => 'payment_acknowledgment_issuer',
             'context_key' => 'abc123',
         ]);
     }
@@ -580,7 +580,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_partial_warning',
+            'type' => 'issuer_partial_warning',
         ]);
     }
 
@@ -636,7 +636,7 @@ class WatchPaymentsCommandTest extends TestCase
         $this->artisan('wallet:watch-payments')->assertExitCode(0);
 
         $this->assertEquals(0, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'client_partial_warning')->count());
-        $this->assertEquals(0, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'owner_partial_warning')->count());
+        $this->assertEquals(0, \App\Models\InvoiceDelivery::where('invoice_id', $invoice->id)->where('type', 'issuer_partial_warning')->count());
     }
 
     public function test_watcher_keeps_payment_acknowledgment_deduped_per_txid_but_allows_a_second_txid(): void
@@ -715,7 +715,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         $this->assertSame(1, \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
-            ->where('type', 'payment_acknowledgment_owner')
+            ->where('type', 'payment_acknowledgment_issuer')
             ->where('context_key', 'ack-tx-1')
             ->count());
 
@@ -727,7 +727,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         $this->assertSame(1, \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
-            ->where('type', 'payment_acknowledgment_owner')
+            ->where('type', 'payment_acknowledgment_issuer')
             ->where('context_key', 'ack-tx-2')
             ->count());
     }
@@ -776,7 +776,7 @@ class WatchPaymentsCommandTest extends TestCase
 
         $ownerPaidNotice = \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
-            ->where('type', 'owner_paid_notice')
+            ->where('type', 'issuer_paid_notice')
             ->first();
 
         $this->assertNotNull($clientAck);
@@ -787,7 +787,7 @@ class WatchPaymentsCommandTest extends TestCase
             ->count());
         $this->assertSame(1, \App\Models\InvoiceDelivery::query()
             ->where('invoice_id', $invoice->id)
-            ->where('type', 'owner_paid_notice')
+            ->where('type', 'issuer_paid_notice')
             ->count());
     }
 

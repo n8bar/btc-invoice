@@ -1,11 +1,9 @@
 @component('mail::message', ['user' => $user])
-# Branded test message
+# Test email
 
 Hi {{ $user->name ?? 'there' }},
 
-This is a branded test message using your current saved email branding settings.
-
-Payment acknowledgments, receipts, paid notices, and alerts keep their own standard subject and body copy.
+This confirms that outgoing email delivery is working for your account. Payment acknowledgments, receipts, paid notices, and alerts will be sent from this address.
 
 @component('mail::button', ['url' => route('settings.notifications.edit')])
 Review notification settings

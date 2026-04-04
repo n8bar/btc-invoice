@@ -12,14 +12,14 @@ class InvoiceAlertService
     {
     }
 
-    public function sendOwnerPaidNotice(Invoice $invoice): void
+    public function sendIssuerPaidNotice(Invoice $invoice): void
     {
-        $owner = $invoice->user;
-        if (!$owner || empty($owner->email)) {
+        $issuer = $invoice->user;
+        if (!$issuer || empty($issuer->email)) {
             return;
         }
 
-        $this->deliveries->queue($invoice, 'owner_paid_notice', $owner->email);
+        $this->deliveries->queue($invoice, 'issuer_paid_notice', $issuer->email);
     }
 
     public function sendDetectedPaymentAcknowledgments(Invoice $invoice, InvoicePayment $payment): void
@@ -50,12 +50,12 @@ class InvoiceAlertService
             );
         }
 
-        $owner = $invoice->user;
-        if ($owner && filled($owner->email)) {
+        $issuer = $invoice->user;
+        if ($issuer && filled($issuer->email)) {
             $this->deliveries->queue(
                 $invoice,
-                'payment_acknowledgment_owner',
-                $owner->email,
+                'payment_acknowledgment_issuer',
+                $issuer->email,
                 contextKey: $contextKey,
                 meta: $meta,
             );
@@ -78,7 +78,7 @@ class InvoiceAlertService
         if ($invoice->status !== 'paid') {
             $this->skipQueuedDeliveries(
                 $invoice,
-                ['receipt', 'owner_paid_notice'],
+                ['receipt', 'issuer_paid_notice'],
                 "{$reasonPrefix} Invoice no longer paid."
             );
         }
@@ -86,7 +86,7 @@ class InvoiceAlertService
         if (! $invoice->requiresClientUnderpayAlert()) {
             $this->skipQueuedDeliveries(
                 $invoice,
-                ['client_underpay_alert', 'owner_underpay_alert'],
+                ['client_underpay_alert', 'issuer_underpay_alert'],
                 "{$reasonPrefix} Underpayment alert no longer applies."
             );
         }
@@ -94,7 +94,7 @@ class InvoiceAlertService
         if (! $invoice->requiresClientOverpayAlert()) {
             $this->skipQueuedDeliveries(
                 $invoice,
-                ['client_overpay_alert', 'owner_overpay_alert'],
+                ['client_overpay_alert', 'issuer_overpay_alert'],
                 "{$reasonPrefix} Overpayment alert no longer applies."
             );
         }
@@ -102,7 +102,7 @@ class InvoiceAlertService
         if (! $invoice->shouldWarnAboutPartialPayments()) {
             $this->skipQueuedDeliveries(
                 $invoice,
-                ['client_partial_warning', 'owner_partial_warning'],
+                ['client_partial_warning', 'issuer_partial_warning'],
                 "{$reasonPrefix} Partial-payment warning no longer applies."
             );
         }
@@ -130,7 +130,7 @@ class InvoiceAlertService
         // delivery service's preventsRepeatAfterSend guard on the context key.
         $schedule = [1 => 1, 2 => 7, 3 => 14];
 
-        $owner = $invoice->user;
+        $issuer = $invoice->user;
         $client = $invoice->client;
 
         foreach ($schedule as $seq => $minDays) {
@@ -141,8 +141,8 @@ class InvoiceAlertService
             $contextKey = "past_due_{$seq}";
             $newlyQueued = false;
 
-            if ($owner && filled($owner->email)) {
-                $delivery = $this->deliveries->queue($invoice, 'past_due_owner', $owner->email, contextKey: $contextKey);
+            if ($issuer && filled($issuer->email)) {
+                $delivery = $this->deliveries->queue($invoice, 'past_due_issuer', $issuer->email, contextKey: $contextKey);
                 if ($delivery->status === 'queued') {
                     $newlyQueued = true;
                 }
@@ -181,9 +181,9 @@ class InvoiceAlertService
 
         $invoice->last_overpayment_alert_at = now();
 
-        $owner = $invoice->user;
-        if ($owner && !empty($owner->email)) {
-            $this->deliveries->queue($invoice, 'owner_overpay_alert', $owner->email, contextKey: $contextKey);
+        $issuer = $invoice->user;
+        if ($issuer && !empty($issuer->email)) {
+            $this->deliveries->queue($invoice, 'issuer_overpay_alert', $issuer->email, contextKey: $contextKey);
         }
 
         $invoice->save();
@@ -209,9 +209,9 @@ class InvoiceAlertService
 
         $invoice->last_underpayment_alert_at = now();
 
-        $owner = $invoice->user;
-        if ($owner && !empty($owner->email)) {
-            $this->deliveries->queue($invoice, 'owner_underpay_alert', $owner->email, contextKey: $contextKey);
+        $issuer = $invoice->user;
+        if ($issuer && !empty($issuer->email)) {
+            $this->deliveries->queue($invoice, 'issuer_underpay_alert', $issuer->email, contextKey: $contextKey);
         }
 
         $invoice->save();

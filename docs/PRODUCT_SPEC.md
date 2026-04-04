@@ -21,7 +21,7 @@ Use detailed docs under `docs/specs/` and `docs/milestones/` for local scope, ac
 ## Product Purpose
 CryptoZing is a BTC-native invoicing product.
 
-Owners create invoices in USD, derive a unique Bitcoin receive address per invoice, share public invoice links, monitor on-chain payments, and deliver invoice and receipt emails without giving up custody of funds.
+Issuers create invoices in USD, derive a unique Bitcoin receive address per invoice, share public invoice links, monitor on-chain payments, and deliver invoice and receipt emails without giving up custody of funds.
 
 ## Principles / Invariants
 1. Respect property rights and access to funds.
@@ -50,11 +50,11 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 
 ## Cross-Feature Requirements
 ### Ownership and access
-- Client and invoice data are owner-scoped.
-- Temporary support access may exist only when the owner explicitly grants CryptoZing tech support time-limited read-only access to that owner's invoices and clients.
-- Support access must expire automatically, remain revocable by the owner at any time, and must not broaden into wallet/settings/write access.
+- Client and invoice data are issuer-scoped.
+- Temporary support access may exist only when the issuer explicitly grants CryptoZing tech support time-limited read-only access to that issuer's invoices and clients.
+- Support access must expire automatically, remain revocable by the issuer at any time, and must not broaden into wallet/settings/write access.
 - Public links are the only intended unauthenticated invoice surface and must remain public-safe.
-- Denied or missing-resource states must avoid leaking owner data and should preserve a clear, friendly recovery path.
+- Denied or missing-resource states must avoid leaking issuer data and should preserve a clear, friendly recovery path.
 
 ### Currency and invoice model
 - `amount_usd` is canonical for invoice settlement.
@@ -67,9 +67,9 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - BTC request amounts, BIP21 links, and QR output must follow the rate behavior defined in [`docs/specs/RATES.md`](specs/RATES.md).
 - Per-payment USD snapshots are preserved when on-chain payments are detected so settled USD does not float retroactively with BTC price changes.
 - Outstanding payment requests target the current outstanding balance rather than the original invoice BTC snapshot.
-- Small-balance resolution, adjustment handling, manual-adjustment reversal, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md). Manual adjustments are append-only ledger rows; owner-facing undo is handled by creating an equal-and-opposite reversal entry rather than editing or deleting the original row in place.
+- Small-balance resolution, adjustment handling, manual-adjustment reversal, over/underpayment thresholds, and payment history rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md). Manual adjustments are append-only ledger rows; issuer-facing undo is handled by creating an equal-and-opposite reversal entry rather than editing or deleting the original row in place.
 - Confirmation thresholds, RBF handling, and unconfirmed-transaction cleanup rules are defined in [`docs/specs/PARTIAL_PAYMENTS.md`](specs/PARTIAL_PAYMENTS.md).
-- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); this includes wrong-invoice cases caused by later use of an old valid CryptoZing invoice address. Ignored rows must remain auditable while being excluded from active settlement math, owner/support audit views may still show the ignored state, reattributed payments must remain visible in owner audit history on both source and destination invoices, active reattributions must expose an explicit undo path back to the immutable source invoice and must not offer ignore until that undo returns the payment there, source-invoice public/print surfaces must not show or count reattributed-out payments, destination-invoice public/print surfaces must show and count the active payment without exposing source-invoice provenance or related-invoice links, public/print and dashboard settlement surfaces must exclude ignored rows, queued payment-related deliveries that become untruthful after a correction must be skipped rather than deleted, and destructive invoice deletion must be treated as a purge path that is blocked at both the app and persistence layers until related bookkeeping history has been intentionally removed or resolved.
+- Owner correction handling for wrongly attributed on-chain payments is defined in [`docs/specs/PAYMENT_CORRECTIONS.md`](specs/PAYMENT_CORRECTIONS.md); this includes wrong-invoice cases caused by later use of an old valid CryptoZing invoice address. Ignored rows must remain auditable while being excluded from active settlement math, issuer/support audit views may still show the ignored state, reattributed payments must remain visible in issuer audit history on both source and destination invoices, active reattributions must expose an explicit undo path back to the immutable source invoice and must not offer ignore until that undo returns the payment there, source-invoice public/print surfaces must not show or count reattributed-out payments, destination-invoice public/print surfaces must show and count the active payment without exposing source-invoice provenance or related-invoice links, public/print and dashboard settlement surfaces must exclude ignored rows, queued payment-related deliveries that become untruthful after a correction must be skipped rather than deleted, and destructive invoice deletion must be treated as a purge path that is blocked at both the app and persistence layers until related bookkeeping history has been intentionally removed or resolved.
 
 ### Wallets and automatic payment attribution
 - On-chain payment detection is a core product feature.
@@ -98,9 +98,9 @@ Owners create invoices in USD, derive a unique Bitcoin receive address per invoi
 - Viewer-facing time localization may differ from server calculation time where explicitly documented.
 
 ### Active plan-linked requirements
-- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the owner, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, distinguish unsupported shared-wallet evidence from stale-address wrong-invoice reuse, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
-- Mailer and alerts hardening must prevent duplicate outbound mail, support owner-editable templates with safe variables and preview/reset flows, and keep payment-triggered outbound communication truthful and reviewable, including low-information payment acknowledgments plus owner-reviewed client receipts; the detailed outbound-mail rules live in [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md).
-- Post-payment onboarding should remain lightweight in RC: Part 1 still gets owners to first invoice delivery, while Part 2 should activate only once a first paid invoice is receipt-eligible, suspend when ignore/reattribution review would make a receipt untruthful, and complete when the owner sends the first reviewed client receipt.
+- Automatic attribution hardening must make derivation state key-aware, preserve invoice key identity for auditability, detect and flag unsupported wallet reuse without hard-blocking the issuer, snapshot unsupported state onto newly created invoices while avoiding blanket retroactive invoice flagging, distinguish unsupported shared-wallet evidence from stale-address wrong-invoice reuse, reinforce the dedicated-account requirement in wallet and onboarding UX, and provide an auditable correction path for wrongly attributed on-chain payments.
+- Mailer and alerts hardening must prevent duplicate outbound mail, support issuer-editable templates with safe variables and preview/reset flows, and keep payment-triggered outbound communication truthful and reviewable, including low-information payment acknowledgments plus issuer-reviewed client receipts; the detailed outbound-mail rules live in [`docs/specs/NOTIFICATIONS.md`](specs/NOTIFICATIONS.md).
+- Post-payment onboarding should remain lightweight in RC: Part 1 still gets issuers to first invoice delivery, while Part 2 should activate only once a first paid invoice is receipt-eligible, suspend when ignore/reattribution review would make a receipt untruthful, and complete when the issuer sends the first reviewed client receipt.
 - Mainnet cutover and RC deployment must preserve invoice integrity while switching environments, include a backout path, and verify alias-off mail behavior plus public-link correctness before real-customer rollout.
 
 ## Canonical Spec Map

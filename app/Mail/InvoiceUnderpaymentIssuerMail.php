@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoiceOverpaymentOwnerMail extends Mailable
+class InvoiceUnderpaymentIssuerMail extends Mailable
 {
     use SerializesModels;
 
@@ -20,14 +20,14 @@ class InvoiceOverpaymentOwnerMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Client overpaid invoice ' . ($this->invoice->number ?? $this->invoice->id),
+            subject: 'Client underpayment alert for invoice ' . ($this->invoice->number ?? $this->invoice->id),
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.invoice-overpayment-owner',
+            markdown: 'mail.invoice-underpayment-issuer',
             with: [
                 'invoice' => $this->invoice,
             ],

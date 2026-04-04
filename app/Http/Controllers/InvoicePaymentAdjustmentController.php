@@ -75,7 +75,7 @@ class InvoicePaymentAdjustmentController extends Controller
         $data = $request->validate([
             'amount_usd' => ['required', 'numeric', 'min:0.01'],
             'direction' => ['required', Rule::in(['increase', 'decrease'])],
-            'note' => ['nullable', 'string', 'max:500'],
+            'note' => ['required', 'string', 'max:500'],
         ]);
 
         $rateInfo = BtcRate::current();

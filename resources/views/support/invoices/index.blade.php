@@ -4,7 +4,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-semibold leading-tight">Support Invoice View</h2>
-                <p class="text-sm text-gray-500">{{ $owner->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
+                <p class="text-sm text-gray-500">{{ $issuer->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
             </div>
             <a href="{{ route('support.dashboard') }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support dashboard</a>
         </div>
@@ -13,7 +13,7 @@
     <div class="py-8">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-400/40 dark:bg-blue-950/30 dark:text-blue-100">
-                Support is viewing {{ $owner->name }}'s invoices in read-only mode.
+                Support is viewing {{ $issuer->name }}'s invoices in read-only mode.
             </div>
 
             <div class="rounded-lg bg-white shadow dark:bg-slate-900/80">
@@ -33,7 +33,7 @@
                             @forelse ($invoices as $invoice)
                                 <tr>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                                        <a href="{{ route('support.owners.invoices.show', [$owner, $invoice]) }}" class="text-indigo-600 hover:underline dark:text-indigo-300">{{ $invoice->number }}</a>
+                                        <a href="{{ route('support.issuers.invoices.show', [$issuer, $invoice]) }}" class="text-indigo-600 hover:underline dark:text-indigo-300">{{ $invoice->number }}</a>
                                         @if ($invoice->unsupported_configuration_flagged)
                                             <div class="mt-2">
                                                 <span class="inline-flex items-center rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-800 dark:border-red-400/50 dark:bg-red-950/40 dark:text-red-200">
@@ -50,12 +50,12 @@
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-slate-300">{{ optional($invoice->due_date)->toDateString() ?: '—' }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-slate-300">{{ $invoice->status ?? 'draft' }}</td>
                                     <td class="px-6 py-4 text-right text-sm">
-                                        <a href="{{ route('support.owners.invoices.show', [$owner, $invoice]) }}" class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 dark:border-white/20 dark:text-slate-100 dark:hover:bg-white/10">View</a>
+                                        <a href="{{ route('support.issuers.invoices.show', [$issuer, $invoice]) }}" class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 dark:border-white/20 dark:text-slate-100 dark:hover:bg-white/10">View</a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No invoices found for this owner.</td>
+                                    <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No invoices found for this issuer.</td>
                                 </tr>
                             @endforelse
                         </tbody>

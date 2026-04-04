@@ -4,9 +4,9 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-semibold leading-tight">Support Client Detail</h2>
-                <p class="text-sm text-gray-500">{{ $owner->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
+                <p class="text-sm text-gray-500">{{ $issuer->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
             </div>
-            <a href="{{ route('support.owners.clients.index', $owner) }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support clients</a>
+            <a href="{{ route('support.issuers.clients.index', $issuer) }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support clients</a>
         </div>
     </x-slot>
 
@@ -56,7 +56,7 @@
                             <tbody class="divide-y divide-gray-100 dark:divide-white/10">
                                 @foreach ($recentInvoices as $invoice)
                                     <tr>
-                                        <td class="py-2 pr-4"><a href="{{ route('support.owners.invoices.show', [$owner, $invoice]) }}" class="text-indigo-600 hover:underline dark:text-indigo-300">{{ $invoice->number }}</a></td>
+                                        <td class="py-2 pr-4"><a href="{{ route('support.issuers.invoices.show', [$issuer, $invoice]) }}" class="text-indigo-600 hover:underline dark:text-indigo-300">{{ $invoice->number }}</a></td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">${{ number_format((float) $invoice->amount_usd, 2) }}</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ $invoice->status ?? 'draft' }}</td>
                                         <td class="py-2 pr-4 text-gray-700 dark:text-slate-300">{{ optional($invoice->due_date)->toDateString() ?: '—' }}</td>

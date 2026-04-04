@@ -4,7 +4,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-semibold leading-tight">Support Client View</h2>
-                <p class="text-sm text-gray-500">{{ $owner->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
+                <p class="text-sm text-gray-500">{{ $issuer->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
             </div>
             <a href="{{ route('support.dashboard') }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support dashboard</a>
         </div>
@@ -13,7 +13,7 @@
     <div class="py-8">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-400/40 dark:bg-blue-950/30 dark:text-blue-100">
-                Support is viewing {{ $owner->name }}'s clients in read-only mode.
+                Support is viewing {{ $issuer->name }}'s clients in read-only mode.
             </div>
 
             <div class="rounded-lg bg-white shadow dark:bg-slate-900/80">
@@ -34,12 +34,12 @@
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-slate-300">{{ $client->email }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-slate-300">{{ \Illuminate\Support\Str::limit($client->notes ?? '', 120) ?: '—' }}</td>
                                     <td class="px-6 py-4 text-right text-sm">
-                                        <a href="{{ route('support.owners.clients.show', [$owner, $client]) }}" class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 dark:border-white/20 dark:text-slate-100 dark:hover:bg-white/10">View</a>
+                                        <a href="{{ route('support.issuers.clients.show', [$issuer, $client]) }}" class="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 dark:border-white/20 dark:text-slate-100 dark:hover:bg-white/10">View</a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No clients found for this owner.</td>
+                                    <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-slate-400">No clients found for this issuer.</td>
                                 </tr>
                             @endforelse
                         </tbody>

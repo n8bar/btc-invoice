@@ -1,5 +1,5 @@
 # Backlog (Post-MVP)
-_Last updated: 2026-03-18_
+_Last updated: 2026-04-03_
 
 This is the canonical post-MVP backlog.
 
@@ -37,16 +37,25 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Reuse `InvoicePaid` events and delivery log updates to emit notifications without polling.
 
 6. **Notification Preference Expansion**
-   - Consider allowing owners to configure alert thresholds per profile instead of keeping the RC-wide default threshold.
+   - Consider allowing issuers to configure alert thresholds per profile instead of keeping the RC-wide default threshold.
 
 7. **Configurable Past-Due Reminder Cadence**
-   - Expose the hardcoded day-offset schedule (day 1, 7, 14 past due) as owner-configurable notification settings.
-   - RC ships a sane fixed default; this item adds owner control post-RC.
+   - Expose the hardcoded day-offset schedule (day 1, 7, 14 past due) as issuer-configurable notification settings.
+   - RC ships a sane fixed default; this item adds issuer control post-RC.
 
 8. **Custom Outbound Mail Logo Uploads**
-   - Allow owners to upload a custom logo for outbound mail instead of only showing or hiding the default CryptoZing logo.
+   - Allow issuers to upload a custom logo for outbound mail instead of only showing or hiding the default CryptoZing logo.
    - Include storage, validation, replacement/removal, and email-client-safe fallback behavior.
    - Keep this separate from the RC KISS mail-branding controls, which are limited to brand-shell text fields plus a default-logo on/off toggle.
+
+## Support & Admin Roles
+
+20. **Support agent / maintainer role separation**
+   - For RC, the support agent role doubles as the operational maintainer: one email allowlist, one dashboard, full visibility into both issuer grants and service health monitoring.
+   - Post-MVP, split these into distinct roles if the team grows:
+     - A **maintainer** role that has access to the monitoring panel (queue depth, delivery failures, watcher health) but not to issuer grant browsing.
+     - A **support agent** role that has access to issuer grant browsing but not to the monitoring panel, if a dedicated support function separate from engineering is needed.
+   - Current `SUPPORT_AGENT_EMAILS` allowlist covers both concerns until separation is warranted.
 
 ## Observability & Ops
 9. **Structured Logging & Alerting**
@@ -68,9 +77,9 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Track alternate chain addresses per invoice and support derivation/sending for other cryptocurrencies once Bitcoin MVP stabilizes.
 
 14. **Advanced payment-ledger admin tooling**
-   - This is not the existing owner-facing manual adjustment flow that already closes small balances or records credit/debit adjustments on an invoice.
+   - This is not the existing issuer-facing manual adjustment flow that already closes small balances or records credit/debit adjustments on an invoice.
    - This is post-MVP operator tooling to edit or annotate logged payment records themselves: fix tx metadata, override imported amounts in exceptional cases, reconcile disputes, or correct ledger history without relying solely on automated watcher flows.
-   - Build atop the `invoice_payments` ledger + owner notes so changes stay auditable and raw tx history is preserved rather than silently overwritten.
+   - Build atop the `invoice_payments` ledger + issuer notes so changes stay auditable and raw tx history is preserved rather than silently overwritten.
 
 ## Content & SEO
 15. **CMS-style Help Center (public)**
@@ -95,7 +104,7 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
 18. **Client balance tracking + credits**
    - Track per-client credit balances that can be issued manually (refunds, overpayments, goodwill adjustments) and applied to future invoices.
    - Show each client’s net outstanding balance as: total open invoice balances minus unspent credit balance.
-   - Surface an owner-facing ledger so credit issuance, application, reversal, and remaining credit are auditable over time.
+   - Surface an issuer-facing ledger so credit issuance, application, reversal, and remaining credit are auditable over time.
 
 19. **Spending-only companion wallet ecosystem idea**
    - Separate product idea, not RC scope for CryptoZing itself.

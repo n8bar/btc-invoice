@@ -11,7 +11,7 @@ class SupportDashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $owners = User::query()
+        $issuers = User::query()
             ->whereNotNull('support_access_granted_at')
             ->where('support_access_expires_at', '>', now())
             ->withCount(['clients', 'invoices'])
@@ -20,7 +20,7 @@ class SupportDashboardController extends Controller
             ->withQueryString();
 
         return view('support.dashboard', [
-            'owners' => $owners,
+            'issuers' => $issuers,
         ]);
     }
 }

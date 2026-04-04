@@ -11,30 +11,30 @@ use Illuminate\Http\Request;
 
 class SupportClientController extends Controller
 {
-    public function index(Request $request, User $owner): View
+    public function index(Request $request, User $issuer): View
     {
-        $this->authorizeSupportOwner($request, $owner);
+        $this->authorizeSupportIssuer($request, $issuer);
 
         $clients = Client::query()
-            ->where('user_id', $owner->id)
+            ->where('user_id', $issuer->id)
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
         return view('support.clients.index', [
-            'owner' => $owner,
+            'issuer' => $issuer,
             'clients' => $clients,
-            'supportAccessExpiresAt' => $owner->support_access_expires_at,
+            'supportAccessExpiresAt' => $issuer->support_access_expires_at,
         ]);
     }
 
-    public function show(Request $request, User $owner, Client $client): View
+    public function show(Request $request, User $issuer, Client $client): View
     {
-        $this->authorizeSupportOwner($request, $owner);
-        abort_unless($client->user_id === $owner->id, 404);
+        $this->authorizeSupportIssuer($request, $issuer);
+        abort_unless($client->user_id === $issuer->id, 404);
 
         $recentInvoices = Invoice::query()
-            ->ownedBy($owner)
+            ->ownedBy($issuer)
             ->where('client_id', $client->id)
             ->latest('invoice_date')
             ->latest('id')
@@ -42,16 +42,16 @@ class SupportClientController extends Controller
             ->get();
 
         return view('support.clients.show', [
-            'owner' => $owner,
+            'issuer' => $issuer,
             'client' => $client,
             'recentInvoices' => $recentInvoices,
-            'supportAccessExpiresAt' => $owner->support_access_expires_at,
+            'supportAccessExpiresAt' => $issuer->support_access_expires_at,
         ]);
     }
 
-    private function authorizeSupportOwner(Request $request, User $owner): void
+    private function authorizeSupportIssuer(Request $request, User $issuer): void
     {
         abort_unless($request->user()?->isSupportAgent(), 403);
-        abort_unless($owner->hasActiveSupportAccessGrant(), 403);
+        abort_unless($issuer->hasActiveSupportAccessGrant(), 403);
     }
 }

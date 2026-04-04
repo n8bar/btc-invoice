@@ -115,7 +115,7 @@ class SupportAccessTest extends TestCase
         ]);
 
         $this->actingAs($support)
-            ->get(route('support.owners.invoices.index', $owner))
+            ->get(route('support.issuers.invoices.index', $owner))
             ->assertOk()
             ->assertSee('Support Invoice View')
             ->assertSee('Owner Alpha')
@@ -123,20 +123,20 @@ class SupportAccessTest extends TestCase
             ->assertSee('read-only support access');
 
         $this->actingAs($support)
-            ->get(route('support.owners.invoices.show', [$owner, $invoice]))
+            ->get(route('support.issuers.invoices.show', [$owner, $invoice]))
             ->assertOk()
             ->assertSee('Support Invoice Detail')
             ->assertSee('tb1qsupportinvoicealpha')
             ->assertSee('Support is viewing this invoice in read-only mode.');
 
         $this->actingAs($support)
-            ->get(route('support.owners.clients.index', $owner))
+            ->get(route('support.issuers.clients.index', $owner))
             ->assertOk()
             ->assertSee('Support Client View')
             ->assertSee('Client Alpha');
 
         $this->actingAs($support)
-            ->get(route('support.owners.clients.show', [$owner, $client]))
+            ->get(route('support.issuers.clients.show', [$owner, $client]))
             ->assertOk()
             ->assertSee('Support Client Detail')
             ->assertSee('Needs wire fallback.');
@@ -168,7 +168,7 @@ class SupportAccessTest extends TestCase
         ]);
 
         $this->actingAs($support)
-            ->get(route('support.owners.invoices.index', $owner))
+            ->get(route('support.issuers.invoices.index', $owner))
             ->assertForbidden();
 
         $owner->grantSupportAccess(now()->subDays(4));
@@ -177,7 +177,7 @@ class SupportAccessTest extends TestCase
         ])->save();
 
         $this->actingAs($support)
-            ->get(route('support.owners.invoices.show', [$owner, $invoice]))
+            ->get(route('support.issuers.invoices.show', [$owner, $invoice]))
             ->assertForbidden();
     }
 

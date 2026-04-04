@@ -39,7 +39,7 @@ This is not the end-user onboarding wizard spec (see `docs/specs/ONBOARD_SPEC.md
   ./vendor/bin/sail artisan wallet:watch-payments
   ```
 - When a tx hits the derived address, the invoice shows partial/paid status, outstanding summaries update, and (when fully paid) a receipt email logs/sends.
-- Partial-payment alerts remind clients to send one payment; owners get an FYI in the log.
+- Partial-payment alerts remind clients to send one payment; issuers get an FYI in the log.
 - (Screenshot: invoice show with payment history/outstanding card.)
 
 ## 7) Wrap-up

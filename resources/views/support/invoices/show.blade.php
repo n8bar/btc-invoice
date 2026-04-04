@@ -4,9 +4,9 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-xl font-semibold leading-tight">Support Invoice Detail</h2>
-                <p class="text-sm text-gray-500">{{ $owner->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
+                <p class="text-sm text-gray-500">{{ $issuer->name }} · read-only support access · expires {{ $supportAccessExpiresAt?->setTimezone(config('app.timezone'))->toDayDateTimeString() }}</p>
             </div>
-            <a href="{{ route('support.owners.invoices.index', $owner) }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support invoices</a>
+            <a href="{{ route('support.issuers.invoices.index', $issuer) }}" class="text-sm text-gray-600 hover:underline dark:text-slate-300">Back to support invoices</a>
         </div>
     </x-slot>
 
@@ -64,9 +64,9 @@
                 </div>
 
                 <div class="rounded-lg bg-white p-6 shadow dark:bg-slate-900/80">
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Owner</p>
-                    <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $owner->name }}</p>
-                    <p class="text-sm text-gray-500 dark:text-slate-400">{{ $owner->email }}</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Issuer</p>
+                    <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $issuer->name }}</p>
+                    <p class="text-sm text-gray-500 dark:text-slate-400">{{ $issuer->email }}</p>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                                                     @if ($relatedDestinationInvoice)
                                                         <div class="text-xs text-sky-800 dark:text-sky-200">
                                                             Counting on
-                                                            <a href="{{ route('support.owners.invoices.show', [$owner, $relatedDestinationInvoice]) }}" class="font-semibold underline">
+                                                            <a href="{{ route('support.issuers.invoices.show', [$issuer, $relatedDestinationInvoice]) }}" class="font-semibold underline">
                                                                 {{ $relatedDestinationInvoice->number }}
                                                             </a>
                                                         </div>
@@ -129,7 +129,7 @@
                                                     @if ($relatedSourceInvoice)
                                                         <div class="text-xs text-emerald-800 dark:text-emerald-200">
                                                             Detected on
-                                                            <a href="{{ route('support.owners.invoices.show', [$owner, $relatedSourceInvoice]) }}" class="font-semibold underline">
+                                                            <a href="{{ route('support.issuers.invoices.show', [$issuer, $relatedSourceInvoice]) }}" class="font-semibold underline">
                                                                 {{ $relatedSourceInvoice->number }}
                                                             </a>
                                                         </div>

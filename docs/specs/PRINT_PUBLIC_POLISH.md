@@ -7,7 +7,7 @@
 
 ## Scope
 1. **Header & Branding**
-   - Display the invoice owner’s name (and optional company field once profile settings support it) at the top-left of both print/public views.
+   - Display the issuer’s name (and optional company field once profile settings support it) at the top-left of both print/public views.
    - Reserve a placeholder area for a future logo upload; for now, allow custom text like “CryptoZing Invoice” that can be set per user and overridden per invoice via `branding_heading` / `branding_heading_override`.
    - Include contact info (email/phone) pulled from the user profile; make these fields editable per invoice before printing.
 
@@ -19,7 +19,7 @@
 3. **Status Messaging**
    - Public share page must show:
      - Active invoice: badge + “as of” timestamp + outstanding summary.
-     - Disabled/expired link: friendly message + call to contact the owner (no payment details exposed).
+     - Disabled/expired link: friendly message + call to contact the issuer (no payment details exposed).
    - Print view should display a watermark only when status = `paid`; otherwise show a subtle “Outstanding balance” note with the remaining USD/BTC amounts.
 
 4. **User Customizable Fields**

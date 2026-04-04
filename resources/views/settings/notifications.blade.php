@@ -21,7 +21,7 @@
                         </div>
                     @elseif (session('status') === 'notification-preview-sent')
                         <div class="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800" style="border-color: currentColor;">
-                            Sent a branded test email to {{ session('preview_email') }}.
+                            Sent a test email to {{ session('preview_email') }}.
                         </div>
                     @elseif (session('status') === 'notification-preview-throttled')
                         <div class="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800" style="border-color: currentColor;">
@@ -98,7 +98,7 @@
                         <div class="space-y-1">
                             <h3 class="text-sm font-semibold text-gray-700">Send yourself a test email</h3>
                             <p class="text-xs text-gray-600">
-                                Save settings first, then send a branded test message to {{ $user->email }} using the current saved mail-branding settings.
+                                Send a test email to {{ $user->email }} to confirm outgoing delivery is working.
                             </p>
                             <p class="text-xs text-gray-500">
                                 This does not send to clients and does not create an invoice delivery-history row.

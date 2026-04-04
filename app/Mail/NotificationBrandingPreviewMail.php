@@ -19,7 +19,7 @@ class NotificationBrandingPreviewMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mail branding preview',
+            subject: 'Test email from CryptoZing',
         );
     }
 

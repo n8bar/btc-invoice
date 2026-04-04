@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoiceOwnerPaidNoticeMail extends Mailable
+class InvoiceIssuerPaidNoticeMail extends Mailable
 {
     use SerializesModels;
 
@@ -27,7 +27,7 @@ class InvoiceOwnerPaidNoticeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.invoice-owner-paid',
+            markdown: 'mail.invoice-issuer-paid',
             with: [
                 'invoice' => $this->invoice,
             ],

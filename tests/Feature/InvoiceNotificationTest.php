@@ -45,7 +45,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'issuer_paid_notice',
         ]);
 
         $this->assertDatabaseMissing('invoice_deliveries', [
@@ -81,7 +81,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'issuer_paid_notice',
         ]);
 
         $this->assertDatabaseMissing('invoice_deliveries', [
@@ -133,7 +133,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_paid_notice',
+            'type' => 'issuer_paid_notice',
             'status' => 'queued',
         ]);
 
@@ -222,7 +222,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_overpay_alert',
+            'type' => 'issuer_overpay_alert',
             'context_key' => 'tx-overpay',
         ]);
     }
@@ -255,7 +255,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'owner_underpay_alert',
+            'type' => 'issuer_underpay_alert',
             'context_key' => 'tx-underpay',
         ]);
     }
@@ -299,7 +299,7 @@ class InvoiceNotificationTest extends TestCase
 
         $ownerDelivery = $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'owner_underpay_alert',
+            'type' => 'issuer_underpay_alert',
             'status' => 'queued',
             'recipient' => $owner->email,
             'dispatched_at' => now(),
@@ -354,7 +354,7 @@ class InvoiceNotificationTest extends TestCase
 
         $ownerDelivery = $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'owner_overpay_alert',
+            'type' => 'issuer_overpay_alert',
             'status' => 'queued',
             'recipient' => $owner->email,
             'dispatched_at' => now(),
@@ -397,7 +397,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'context_key' => 'past_due_1',
         ]);
 
@@ -421,7 +421,7 @@ class InvoiceNotificationTest extends TestCase
         // Simulate slot 1 already queued
         $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'status' => 'queued',
             'recipient' => $owner->email,
             'context_key' => 'past_due_1',
@@ -432,7 +432,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'status' => 'queued',
             'context_key' => 'past_due_2',
         ]);
@@ -451,7 +451,7 @@ class InvoiceNotificationTest extends TestCase
         // Simulate slot 1 already sent
         $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'status' => 'sent',
             'recipient' => $owner->email,
             'context_key' => 'past_due_1',
@@ -488,7 +488,7 @@ class InvoiceNotificationTest extends TestCase
         // Simulate slot 1 already sent
         $invoice->deliveries()->create([
             'user_id' => $owner->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'status' => 'sent',
             'recipient' => $owner->email,
             'context_key' => 'past_due_1',
@@ -507,7 +507,7 @@ class InvoiceNotificationTest extends TestCase
 
         $this->assertDatabaseHas('invoice_deliveries', [
             'invoice_id' => $invoice->id,
-            'type' => 'past_due_owner',
+            'type' => 'past_due_issuer',
             'context_key' => 'past_due_2',
             'status' => 'queued',
         ]);

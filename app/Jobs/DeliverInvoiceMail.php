@@ -3,19 +3,19 @@
 namespace App\Jobs;
 
 use App\Mail\InvoiceOverpaymentClientMail;
-use App\Mail\InvoiceOverpaymentOwnerMail;
+use App\Mail\InvoiceOverpaymentIssuerMail;
 use App\Mail\InvoicePastDueClientMail;
-use App\Mail\InvoicePastDueOwnerMail;
+use App\Mail\InvoicePastDueIssuerMail;
 use App\Mail\InvoicePaymentAcknowledgmentClientMail;
-use App\Mail\InvoicePaymentAcknowledgmentOwnerMail;
+use App\Mail\InvoicePaymentAcknowledgmentIssuerMail;
 use App\Mail\InvoicePaidReceiptMail;
 use App\Mail\InvoiceReadyMail;
 use App\Mail\InvoiceUnderpaymentClientMail;
-use App\Mail\InvoiceUnderpaymentOwnerMail;
-use App\Mail\InvoiceOwnerPaidNoticeMail;
+use App\Mail\InvoiceUnderpaymentIssuerMail;
+use App\Mail\InvoiceIssuerPaidNoticeMail;
 use App\Models\Invoice;
 use App\Mail\InvoicePartialWarningClientMail;
-use App\Mail\InvoicePartialWarningOwnerMail;
+use App\Mail\InvoicePartialWarningIssuerMail;
 use App\Models\InvoiceDelivery;
 use App\Models\InvoicePayment;
 use App\Services\InvoiceDeliveryService;
@@ -127,21 +127,21 @@ class DeliverInvoiceMail implements ShouldQueue
                 $delivery,
                 $paymentAcknowledgment
             ),
-            'payment_acknowledgment_owner' => new InvoicePaymentAcknowledgmentOwnerMail(
+            'payment_acknowledgment_issuer' => new InvoicePaymentAcknowledgmentIssuerMail(
                 $invoice,
                 $delivery,
                 $paymentAcknowledgment
             ),
             'receipt' => new InvoicePaidReceiptMail($invoice, $delivery),
-            'owner_paid_notice' => new InvoiceOwnerPaidNoticeMail($invoice, $delivery),
-            'past_due_owner' => new InvoicePastDueOwnerMail($invoice, $delivery),
+            'issuer_paid_notice' => new InvoiceIssuerPaidNoticeMail($invoice, $delivery),
+            'past_due_issuer' => new InvoicePastDueIssuerMail($invoice, $delivery),
             'past_due_client' => new InvoicePastDueClientMail($invoice, $delivery),
             'client_overpay_alert' => new InvoiceOverpaymentClientMail($invoice, $delivery),
-            'owner_overpay_alert' => new InvoiceOverpaymentOwnerMail($invoice, $delivery),
+            'issuer_overpay_alert' => new InvoiceOverpaymentIssuerMail($invoice, $delivery),
             'client_underpay_alert' => new InvoiceUnderpaymentClientMail($invoice, $delivery),
-            'owner_underpay_alert' => new InvoiceUnderpaymentOwnerMail($invoice, $delivery),
+            'issuer_underpay_alert' => new InvoiceUnderpaymentIssuerMail($invoice, $delivery),
             'client_partial_warning' => new InvoicePartialWarningClientMail($invoice, $delivery),
-            'owner_partial_warning' => new InvoicePartialWarningOwnerMail($invoice, $delivery),
+            'issuer_partial_warning' => new InvoicePartialWarningIssuerMail($invoice, $delivery),
             default => new InvoiceReadyMail($invoice, $delivery),
         };
 
@@ -243,7 +243,7 @@ class DeliverInvoiceMail implements ShouldQueue
             }
         }
 
-        $paymentAcknowledgmentTypes = ['payment_acknowledgment_client', 'payment_acknowledgment_owner'];
+        $paymentAcknowledgmentTypes = ['payment_acknowledgment_client', 'payment_acknowledgment_issuer'];
         if (in_array($delivery->type, $paymentAcknowledgmentTypes, true)) {
             $payment = $this->paymentForAcknowledgment($invoice, $delivery);
             if (! $payment) {
@@ -261,39 +261,39 @@ class DeliverInvoiceMail implements ShouldQueue
                 }
             }
 
-            if ($delivery->type === 'payment_acknowledgment_owner') {
+            if ($delivery->type === 'payment_acknowledgment_issuer') {
                 $currentRecipient = trim((string) ($invoice->user?->email ?? ''));
                 if ($currentRecipient === '') {
-                    return 'Owner email missing before send.';
+                    return 'Issuer email missing before send.';
                 }
 
                 if (strcasecmp($currentRecipient, trim((string) $delivery->recipient)) !== 0) {
-                    return 'Recipient no longer matches the current owner email.';
+                    return 'Recipient no longer matches the current issuer email.';
                 }
             }
         }
 
-        $paidTypes = ['receipt', 'owner_paid_notice'];
+        $paidTypes = ['receipt', 'issuer_paid_notice'];
         if (in_array($delivery->type, $paidTypes, true) && $invoice->status !== 'paid') {
             return 'Invoice no longer paid.';
         }
 
-        $overpayTypes = ['client_overpay_alert', 'owner_overpay_alert'];
+        $overpayTypes = ['client_overpay_alert', 'issuer_overpay_alert'];
         if (in_array($delivery->type, $overpayTypes, true) && !$invoice->requiresClientOverpayAlert()) {
             return 'Overpayment resolved before send.';
         }
 
-        $underpayTypes = ['client_underpay_alert', 'owner_underpay_alert'];
+        $underpayTypes = ['client_underpay_alert', 'issuer_underpay_alert'];
         if (in_array($delivery->type, $underpayTypes, true) && !$invoice->requiresClientUnderpayAlert()) {
             return 'Underpayment resolved before send.';
         }
 
-        $partialTypes = ['client_partial_warning', 'owner_partial_warning'];
+        $partialTypes = ['client_partial_warning', 'issuer_partial_warning'];
         if (in_array($delivery->type, $partialTypes, true) && !$invoice->shouldWarnAboutPartialPayments()) {
             return 'Partial-payment warning no longer applicable.';
         }
 
-        $pastDueTypes = ['past_due_owner', 'past_due_client'];
+        $pastDueTypes = ['past_due_issuer', 'past_due_client'];
         if (in_array($delivery->type, $pastDueTypes, true) && in_array($invoice->status, ['paid', 'void'], true)) {
             return 'Invoice settled before past-due alert.';
         }
@@ -303,7 +303,7 @@ class DeliverInvoiceMail implements ShouldQueue
 
     private function paymentForAcknowledgment(Invoice $invoice, InvoiceDelivery $delivery): ?InvoicePayment
     {
-        if (! in_array($delivery->type, ['payment_acknowledgment_client', 'payment_acknowledgment_owner'], true)) {
+        if (! in_array($delivery->type, ['payment_acknowledgment_client', 'payment_acknowledgment_issuer'], true)) {
             return null;
         }
 

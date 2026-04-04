@@ -345,10 +345,10 @@ class InvoiceDeliveryService
     {
         return in_array($type, [
             'receipt',
-            'owner_paid_notice',
+            'issuer_paid_notice',
             'payment_acknowledgment_client',
-            'payment_acknowledgment_owner',
-            'past_due_owner',
+            'payment_acknowledgment_issuer',
+            'past_due_issuer',
             'past_due_client',
         ], true);
     }
@@ -357,10 +357,10 @@ class InvoiceDeliveryService
     {
         return match ($type) {
             'receipt' => 'A receipt has already been queued or sent for this invoice.',
-            'owner_paid_notice' => 'An owner paid notice has already been queued or sent for this invoice.',
+            'issuer_paid_notice' => 'An issuer paid notice has already been queued or sent for this invoice.',
             'payment_acknowledgment_client',
-            'payment_acknowledgment_owner' => 'A payment acknowledgment has already been queued or sent for this detected payment.',
-            'past_due_owner',
+            'payment_acknowledgment_issuer' => 'A payment acknowledgment has already been queued or sent for this detected payment.',
+            'past_due_issuer',
             'past_due_client' => 'This past-due notice has already been queued or sent.',
             default => 'A matching delivery has already been queued or sent.',
         };
