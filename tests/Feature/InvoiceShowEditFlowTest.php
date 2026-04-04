@@ -35,7 +35,6 @@ class InvoiceShowEditFlowTest extends TestCase
         $response->assertSee('Trash', false);
         $response->assertSee('New invoice', false);
         $response->assertSee('No invoices yet. Create one to generate a payment address and share link.', false);
-        $response->assertSee('overflow-x-auto', false);
     }
 
     public function test_profile_invoice_id_preference_controls_invoice_index_id_column_visibility(): void

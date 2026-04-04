@@ -513,6 +513,33 @@ class DashboardSnapshotTest extends TestCase
         $this->assertSame([], $snapshot['action_items']['receipt_reviews']);
     }
 
+    public function test_dashboard_cache_is_invalidated_when_payment_is_recorded(): void
+    {
+        $owner = User::factory()->create();
+        $client = $this->makeClient($owner, 'Payment Invalidation Co');
+        $invoice = $this->makeInvoice($owner, $client, [
+            'status' => 'sent',
+            'amount_usd' => 200,
+        ]);
+
+        // Warm the cache
+        $this->actingAs($owner)->get(route('dashboard'))->assertOk();
+
+        // Record a payment — should invalidate the cache
+        \App\Models\InvoicePayment::create([
+            'invoice_id' => $invoice->id,
+            'txid' => 'cache-bust-tx',
+            'sats_received' => 400_000,
+            'detected_at' => now(),
+            'confirmed_at' => now(),
+            'usd_rate' => 50_000,
+            'fiat_amount' => 200.00,
+        ]);
+
+        // Cache should be gone — fresh load reflects new payment state
+        $this->assertFalse(Cache::has("dashboard:snapshot:user:{$owner->id}"));
+    }
+
     private int $invoiceSequence = 0;
 
     private function makeClient(User $owner, string $name = 'Client'): Client
