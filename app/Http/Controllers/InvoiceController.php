@@ -231,7 +231,13 @@ class InvoiceController extends Controller
             'paymentHistory'    => $paymentHistory,
             'reattributeDestinations' => $reattributeDestinations,
             'gettingStartedStrip' => $request->boolean('getting_started')
-                ? $gettingStartedFlow->progressStrip($request->user(), GettingStartedFlow::STEP_DELIVER, $invoice)
+                ? (static function () use ($gettingStartedFlow, $request, $invoice): array {
+                    $snapshot = $gettingStartedFlow->snapshot($request->user());
+                    $step = ($snapshot['receipt_step_active'] ?? false)
+                        ? GettingStartedFlow::STEP_RECEIPT
+                        : GettingStartedFlow::STEP_DELIVER;
+                    return $gettingStartedFlow->progressStrip($request->user(), $step, $invoice);
+                })()
                 : null,
         ] + $display);
     }

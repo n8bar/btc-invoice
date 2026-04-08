@@ -13,6 +13,7 @@ class GettingStartedFlow
     public const STEP_WALLET = 'wallet';
     public const STEP_INVOICE = 'invoice';
     public const STEP_DELIVER = 'deliver';
+    public const STEP_RECEIPT = 'receipt';
 
     public function __construct(
         private readonly InvoicePaymentSyncService $paymentSyncService
@@ -28,6 +29,7 @@ class GettingStartedFlow
             self::STEP_WALLET,
             self::STEP_INVOICE,
             self::STEP_DELIVER,
+            self::STEP_RECEIPT,
         ];
     }
 
@@ -74,6 +76,13 @@ class GettingStartedFlow
                 'cta_label' => 'Open invoice',
                 'criteria' => $deliverCriteria,
             ],
+            self::STEP_RECEIPT => [
+                'label' => 'Send receipt',
+                'title' => 'Send your first client receipt',
+                'body' => 'An invoice has been paid. Review it and send the client a receipt.',
+                'cta_label' => 'Open paid invoice',
+                'criteria' => 'Send a reviewed client receipt for a paid invoice.',
+            ],
         ];
     }
 
@@ -108,18 +117,26 @@ class GettingStartedFlow
         $walletComplete = $this->walletStepComplete($user, $replayStartedAt);
         $invoiceComplete = $this->invoiceStepComplete($user, $replayStartedAt);
         $deliverComplete = $this->deliverStepComplete($user, $replayStartedAt);
+        $receiptActive = $this->receiptStepActive($user);
+        $receiptComplete = $receiptActive && $this->receiptStepComplete($user);
 
         $completionMap = [
             self::STEP_WALLET => $walletComplete,
             self::STEP_INVOICE => $invoiceComplete,
             self::STEP_DELIVER => $deliverComplete,
+            self::STEP_RECEIPT => $receiptComplete,
         ];
 
         $steps = [];
         $firstIncomplete = null;
+        $position = 1;
         $definitions = $this->stepDefinitions($replayStartedAt !== null);
 
-        foreach ($this->stepOrder() as $index => $step) {
+        foreach ($this->stepOrder() as $step) {
+            if ($step === self::STEP_RECEIPT && ! $receiptActive) {
+                continue;
+            }
+
             $complete = $completionMap[$step];
 
             if (! $complete && $firstIncomplete === null) {
@@ -128,9 +145,11 @@ class GettingStartedFlow
 
             $steps[$step] = $definitions[$step] + [
                 'key' => $step,
-                'position' => $index + 1,
+                'position' => $position,
                 'complete' => $complete,
             ];
+
+            $position++;
         }
 
         return [
@@ -138,6 +157,7 @@ class GettingStartedFlow
             'first_incomplete_step' => $firstIncomplete,
             'is_complete' => $firstIncomplete === null,
             'is_replay' => $replayStartedAt !== null,
+            'receipt_step_active' => $receiptActive,
         ];
     }
 
@@ -162,6 +182,65 @@ class GettingStartedFlow
         }
 
         return (clone $query)->latest('id')->first();
+    }
+
+    public function receiptStepActive(User $user): bool
+    {
+        return Invoice::query()
+            ->ownedBy($user)
+            ->where('status', 'paid')
+            ->whereHas('client', fn ($q) => $q->whereNotNull('email')->where('email', '<>', ''))
+            ->whereDoesntHave('deliveries', fn ($q) => $q->where('type', 'receipt')->whereIn('status', ['queued', 'sending', 'sent']))
+            ->with([
+                'client:id,email',
+                'payments',
+                'sourcePayments',
+                'deliveries:id,invoice_id,type,status',
+            ])
+            ->get(['id', 'user_id', 'client_id', 'status'])
+            ->some(fn (Invoice $invoice) => $invoice->receiptReviewReasons() === []);
+    }
+
+    public function receiptStepComplete(User $user): bool
+    {
+        return Invoice::query()
+            ->ownedBy($user)
+            ->where('status', 'paid')
+            ->whereHas('deliveries', fn ($q) => $q->where('type', 'receipt')->whereIn('status', ['queued', 'sending', 'sent']))
+            ->exists();
+    }
+
+    public function resolveReceiptInvoice(User $user): ?Invoice
+    {
+        return Invoice::query()
+            ->ownedBy($user)
+            ->where('status', 'paid')
+            ->whereHas('client', fn ($q) => $q->whereNotNull('email')->where('email', '<>', ''))
+            ->whereDoesntHave('deliveries', fn ($q) => $q->where('type', 'receipt')->whereIn('status', ['queued', 'sending', 'sent']))
+            ->with([
+                'client:id,name,email',
+                'payments',
+                'sourcePayments',
+                'deliveries:id,invoice_id,type,status',
+            ])
+            ->latest('paid_at')
+            ->latest('id')
+            ->get(['id', 'user_id', 'client_id', 'number', 'status', 'paid_at'])
+            ->first(fn (Invoice $invoice) => $invoice->receiptReviewReasons() === []);
+    }
+
+    public function receiptStepPending(User $user): bool
+    {
+        return $this->receiptStepActive($user) && ! $this->receiptStepComplete($user);
+    }
+
+    public function hasPartialInvoiceWithNoReceipt(User $user): bool
+    {
+        return ! $this->receiptStepActive($user)
+            && Invoice::query()
+                ->ownedBy($user)
+                ->where('status', 'partial')
+                ->exists();
     }
 
     /**
@@ -294,6 +373,10 @@ class GettingStartedFlow
             self::STEP_DELIVER => [
                 route('getting-started.step', ['step' => self::STEP_INVOICE]),
                 'Back to create invoice',
+            ],
+            self::STEP_RECEIPT => [
+                route('getting-started.step', ['step' => self::STEP_DELIVER]),
+                'Back to share and deliver',
             ],
         };
 

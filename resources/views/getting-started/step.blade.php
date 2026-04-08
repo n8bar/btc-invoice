@@ -73,6 +73,33 @@
                             </div>
                         @endif
 
+                        @if ($currentStepKey === 'receipt' && $receiptInvoice ?? null)
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-200">
+                                <p class="font-semibold text-gray-900 dark:text-slate-100">Paid invoice</p>
+                                <p class="mt-1">
+                                    <span class="font-medium">#{{ $receiptInvoice->number }}</span>
+                                    @if ($receiptInvoice->client)
+                                        <span class="text-gray-500 dark:text-slate-400">for {{ $receiptInvoice->client->name }}</span>
+                                    @endif
+                                </p>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                                    Open the invoice, review the payment details, then use the receipt panel to send the client receipt.
+                                </p>
+                            </div>
+                        @endif
+
+                        @if ($partialPaymentPending ?? false)
+                            <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" style="border-color: currentColor;">
+                                <p class="font-semibold">A client sent a partial payment.</p>
+                                <p class="mt-1">
+                                    The client paid less than the full invoice amount. You can wait for the remainder, apply a manual credit to close the balance, or contact the client directly.
+                                </p>
+                                <p class="mt-1">
+                                    Once the invoice is marked paid, this step will activate automatically.
+                                </p>
+                            </div>
+                        @endif
+
                         @if ($currentStepKey === 'deliver' && $deliverInvoice)
                             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-200">
                                 <div class="flex flex-wrap items-start justify-between gap-3">

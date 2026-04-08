@@ -47,7 +47,10 @@
                     $themeEndpoint = auth()->check() ? route('theme.update') : '';
                     $authUser = Auth::user();
                     $walletUnsupported = (bool) ($authUser?->walletSetting?->unsupported_configuration_active ?? false);
-                    $requiresReplayConfirm = $authUser?->gettingStartedIsDone() && ! $authUser->gettingStartedWasDismissed();
+                    $receiptStepPending = $authUser?->gettingStartedIsDone()
+                        && ! $authUser->gettingStartedWasDismissed()
+                        && app(\App\Services\GettingStartedFlow::class)->receiptStepPending($authUser);
+                    $requiresReplayConfirm = $authUser?->gettingStartedIsDone() && ! $authUser->gettingStartedWasDismissed() && ! $receiptStepPending;
                     $gettingStartedCompletedOn = $authUser?->getting_started_completed_at?->setTimezone(config('app.timezone'))->format('F j, Y');
                     $gettingStartedReplayConfirmMessage = $gettingStartedCompletedOn
                         ? "You already completed this on {$gettingStartedCompletedOn}. Would you like to run through it again?"
@@ -109,7 +112,11 @@
                                     <span>{{ __('Settings') }}</span>
                                 </span>
                             </x-dropdown-link>
-                            @if (! $supportAgent && Auth::user()->gettingStartedIsDone())
+                            @if (! $supportAgent && $receiptStepPending)
+                                <x-dropdown-link :href="route('getting-started.start')">
+                                    {{ __('Getting started') }}
+                                </x-dropdown-link>
+                            @elseif (! $supportAgent && Auth::user()->gettingStartedIsDone())
                                 <form method="POST"
                                       action="{{ route('getting-started.reopen') }}"
                                       data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"
@@ -258,7 +265,11 @@
                             <span>{{ __('Settings') }}</span>
                         </span>
                     </x-responsive-nav-link>
-                    @if (! $supportAgent && Auth::user()->gettingStartedIsDone())
+                    @if (! $supportAgent && $receiptStepPending)
+                        <x-responsive-nav-link :href="route('getting-started.start')" :active="request()->routeIs('getting-started.*')">
+                            {{ __('Getting started') }}
+                        </x-responsive-nav-link>
+                    @elseif (! $supportAgent && Auth::user()->gettingStartedIsDone())
                         <form method="POST"
                               action="{{ route('getting-started.reopen') }}"
                               data-getting-started-reopen-mode="{{ $requiresReplayConfirm ? 'confirm' : 'direct' }}"

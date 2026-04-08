@@ -67,8 +67,13 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200">Getting Started</p>
-                            <h3 class="mt-1 text-base font-semibold text-indigo-950 dark:text-indigo-100">Finish your setup flow</h3>
-                            <p class="mt-1 text-sm text-indigo-900 dark:text-indigo-200">Connect a wallet, create an invoice, and send your first share-enabled invoice.</p>
+                            @if (!empty($gettingStartedReceiptStepPending))
+                                <h3 class="mt-1 text-base font-semibold text-indigo-950 dark:text-indigo-100">Step 4: Send your first client receipt</h3>
+                                <p class="mt-1 text-sm text-indigo-900 dark:text-indigo-200">An invoice has been paid. Review it and send the client a receipt to complete your setup.</p>
+                            @else
+                                <h3 class="mt-1 text-base font-semibold text-indigo-950 dark:text-indigo-100">Finish your setup flow</h3>
+                                <p class="mt-1 text-sm text-indigo-900 dark:text-indigo-200">Connect a wallet, create an invoice, and send your first share-enabled invoice.</p>
+                            @endif
                         </div>
                         <button type="button"
                                 data-getting-started-temp-hide
