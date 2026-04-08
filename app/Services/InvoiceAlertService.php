@@ -184,6 +184,10 @@ class InvoiceAlertService
 
         $contextKey = $this->latestPaymentTxid($invoice);
 
+        if ($contextKey !== null && $this->deliveries->deliveryExists($invoice, 'client_overpay_alert', $client->email, $contextKey)) {
+            return;
+        }
+
         $delivery = $this->deliveries->queue($invoice, 'client_overpay_alert', $client->email, contextKey: $contextKey);
         if ($delivery->status !== 'queued') {
             return;
@@ -211,6 +215,10 @@ class InvoiceAlertService
         }
 
         $contextKey = $this->latestPaymentTxid($invoice);
+
+        if ($contextKey !== null && $this->deliveries->deliveryExists($invoice, 'client_underpay_alert', $client->email, $contextKey)) {
+            return;
+        }
 
         $delivery = $this->deliveries->queue($invoice, 'client_underpay_alert', $client->email, contextKey: $contextKey);
         if ($delivery->status !== 'queued') {

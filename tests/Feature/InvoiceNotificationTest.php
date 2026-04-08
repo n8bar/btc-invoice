@@ -582,18 +582,17 @@ class InvoiceNotificationTest extends TestCase
 
         app(InvoiceAlertService::class)->checkPaymentThresholds($invoice->fresh('payments'));
 
-        // Second attempt should be skipped, not queued
+        // The deliveryExists() guard fires before queue() — no new row is created at all.
         $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
             'status' => 'queued',
         ]);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
             'status' => 'skipped',
-            'context_key' => 'tx-underpay-failed',
         ]);
     }
 

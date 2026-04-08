@@ -624,7 +624,10 @@
 
             <div class="space-y-6">
                 @if ($invoice->deliveries->isNotEmpty())
-                    @php $deliveryCount = $invoice->deliveries->count(); @endphp
+                    @php
+                        $displayDeliveries = $invoice->deliveries->where('status', '!=', 'skipped');
+                        $deliveryCount = $displayDeliveries->count();
+                    @endphp
                     <style>
                         details.delivery-log[open] .show-label { display: none; }
                         details.delivery-log:not([open]) .hide-label { display: none; }
@@ -654,7 +657,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-gray-100">
-                                            @foreach ($invoice->deliveries as $delivery)
+                                            @foreach ($displayDeliveries as $delivery)
                                                 <tr>
                                                     <td class="px-2 py-2 text-sm font-medium text-gray-900">{{ $delivery->typeLabel() }}</td>
                                                     <td class="px-2 py-2">
