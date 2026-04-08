@@ -1,5 +1,5 @@
 # Backlog (Post-MVP)
-_Last updated: 2026-04-03_
+_Last updated: 2026-04-08_
 
 This is the canonical post-MVP backlog.
 
@@ -32,7 +32,13 @@ _Carry-forward guardrail from active roadmap scope: suppress duplicate sends for
    - Email customers/owners with attachments + status history.
    - Extend the current `InvoiceReadyMail` and `InvoicePaidReceipt` flows so `invoice_deliveries` rows capture PDF metadata + sent status in one place.
 
-5. **Notification Hub**
+5. **Delivery log as full outgoing mail record**
+   - Evolve `invoice_deliveries` into a full record of outgoing email that issuers can browse and open from the invoice screen and from the client screen.
+   - Each row should surface the mail type, recipient, send time, and status in a readable list; ideally show a preview or summary of what was sent.
+   - Client screen view would show all mail sent to that client across all their invoices in one place.
+   - Build on the existing `InvoiceDelivery` model and `typeLabel()`/`statusLabel()` methods already in place.
+
+6. **Notification Hub**
    - Slack/webhook integrations for payment events, delivery failures, etc.
    - Reuse `InvoicePaid` events and delivery log updates to emit notifications without polling.
 

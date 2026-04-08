@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use App\Models\InvoicePayment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -25,6 +26,7 @@ class InvoicePaymentAcknowledgmentClientMail extends Mailable
     {
         return new Envelope(
             subject: 'Bitcoin payment detected',
+            replyTo: [new Address($this->invoice->user->email, $this->invoice->user->name)],
         );
     }
 

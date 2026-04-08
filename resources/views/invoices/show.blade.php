@@ -624,7 +624,10 @@
 
             <div class="space-y-6">
                 @if ($invoice->deliveries->isNotEmpty())
-                    @php $deliveryCount = $invoice->deliveries->count(); @endphp
+                    @php
+                        $displayDeliveries = $invoice->deliveries->where('status', '!=', 'skipped');
+                        $deliveryCount = $displayDeliveries->count();
+                    @endphp
                     <style>
                         details.delivery-log[open] .show-label { display: none; }
                         details.delivery-log:not([open]) .hide-label { display: none; }
@@ -654,7 +657,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-gray-100">
-                                            @foreach ($invoice->deliveries as $delivery)
+                                            @foreach ($displayDeliveries as $delivery)
                                                 <tr>
                                                     <td class="px-2 py-2 text-sm font-medium text-gray-900">{{ $delivery->typeLabel() }}</td>
                                                     <td class="px-2 py-2">
@@ -722,9 +725,26 @@
                             @if ($invoice->canSendReceipt())
                                 @php
                                     $latestReceiptDelivery = $invoice->latestDeliveryOfType('receipt');
-                                    $receiptReviewReasons = $invoice->receiptReviewReasons();
+                                    $receiptAlreadySent = $latestReceiptDelivery && in_array($latestReceiptDelivery->status, ['queued', 'sending', 'sent']);
                                 @endphp
+                                @if ($receiptAlreadySent)
+                                <div id="receipt-review-panel"
+                                     data-receipt-review-panel="true"
+                                     class="invoice-anchor-target mb-4 rounded-lg border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-950 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                        <p class="text-slate-700 dark:text-slate-300">A receipt has been sent. You can resend it if needed.</p>
+                                        <form method="POST" action="{{ route('invoices.deliver.receipt.resend', $invoice) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-slate-400 bg-transparent px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-slate-700 shadow-sm transition ease-in-out duration-150 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-offset-slate-900">
+                                                Resend receipt
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                @else
                                 @php
+                                    $receiptReviewReasons = $invoice->receiptReviewReasons();
                                     $receiptPanelNeedsAttention = $receiptReviewReasons !== [];
                                     $receiptPanelClasses = $receiptPanelNeedsAttention
                                         ? 'border-amber-200 bg-amber-50/80 text-amber-950 dark:border-amber-400/40 dark:bg-amber-950/30 dark:text-amber-100'
@@ -769,6 +789,9 @@
                                                 <div class="pt-1">
                                                     <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
                                                         @csrf
+                                                        @if ($gettingStartedContext)
+                                                            <input type="hidden" name="getting_started" value="1">
+                                                        @endif
                                                         <button type="submit"
                                                                 class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition ease-in-out duration-150 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 dark:focus:ring-offset-slate-900">
                                                             Send receipt
@@ -786,6 +809,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             @endif
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm">

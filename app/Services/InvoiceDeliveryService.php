@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class InvoiceDeliveryService
 {
@@ -116,6 +117,43 @@ class InvoiceDeliveryService
             $delivery->recipient,
             $delivery->context_key
         );
+    }
+
+    public function queueResend(Invoice $invoice, string $type, string $recipient): ?InvoiceDelivery
+    {
+        $cooldownMinutes = $this->manualSendCooldownMinutes();
+
+        if ($cooldownMinutes > 0) {
+            $cutoff = now()->subMinutes($cooldownMinutes);
+
+            $recentExists = $invoice->deliveries()
+                ->where('type', $type)
+                ->whereRaw('LOWER(TRIM(recipient)) = ?', [$this->normalizeRecipient($recipient)])
+                ->whereIn('status', ['queued', 'sending', 'sent'])
+                ->where(function ($query) use ($cutoff) {
+                    $query->where('dispatched_at', '>=', $cutoff)
+                        ->orWhere('sent_at', '>=', $cutoff)
+                        ->orWhere('created_at', '>=', $cutoff);
+                })
+                ->exists();
+
+            if ($recentExists) {
+                return null;
+            }
+        }
+
+        $contextKey = 'resend_' . Str::uuid();
+
+        return $this->queue($invoice, $type, $recipient, contextKey: $contextKey);
+    }
+
+    public function deliveryExists(
+        Invoice $invoice,
+        string $type,
+        string $recipient,
+        string $contextKey
+    ): bool {
+        return $this->matchingDeliveries($invoice, $type, $recipient, $contextKey)->exists();
     }
 
     public function outboundEnabled(): bool

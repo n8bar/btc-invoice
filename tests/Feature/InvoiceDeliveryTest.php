@@ -1070,4 +1070,180 @@ class InvoiceDeliveryTest extends TestCase
         ]);
     }
 
+    // -----------------------------------------------------------------------
+    // Receipt resend
+    // -----------------------------------------------------------------------
+
+    public function test_resend_receipt_queues_delivery_with_resend_context_key_after_cooldown_has_elapsed(): void
+    {
+        Queue::fake();
+        config(['mail.safety.manual_send_cooldown_minutes' => 0]);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Resend Co',
+            'email' => 'resend@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RESEND-OK',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampleresendok',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        // Prior receipt that was already sent
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'context_key' => 'original_receipt',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'dispatched_at' => now()->subHours(2),
+            'sent_at' => now()->subHours(2),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt.resend', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Receipt resend queued.');
+
+        $resend = InvoiceDelivery::where('invoice_id', $invoice->id)
+            ->where('type', 'receipt')
+            ->where('status', 'queued')
+            ->first();
+
+        $this->assertNotNull($resend);
+        $this->assertStringStartsWith('resend_', $resend->context_key);
+    }
+
+    public function test_resend_receipt_within_cooldown_returns_throttle_message_and_creates_no_new_row(): void
+    {
+        Queue::fake();
+        config(['mail.safety.manual_send_cooldown_minutes' => 60]);
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Throttle Co',
+            'email' => 'throttle@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RESEND-THROTTLE',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampleresendthrottle',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        // Recent sent receipt well within the 60-minute cooldown
+        InvoiceDelivery::create([
+            'invoice_id' => $invoice->id,
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'context_key' => 'original_receipt_recent',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'dispatched_at' => now()->subMinutes(5),
+            'sent_at' => now()->subMinutes(5),
+        ]);
+
+        $countBefore = InvoiceDelivery::where('invoice_id', $invoice->id)->count();
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt.resend', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Receipt was sent recently. Please wait 60 minutes before resending.');
+
+        $this->assertSame($countBefore, InvoiceDelivery::where('invoice_id', $invoice->id)->count());
+    }
+
+    public function test_resend_receipt_is_blocked_when_no_prior_receipt_delivery_exists(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'No Prior Receipt Co',
+            'email' => 'noreceipt@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RESEND-NOPRIOR',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampleresendnoprior',
+            'status' => 'paid',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt.resend', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'No receipt has been sent yet.');
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
+    public function test_resend_receipt_is_blocked_when_invoice_is_not_paid(): void
+    {
+        Queue::fake();
+
+        $owner = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $owner->id,
+            'name' => 'Unpaid Co',
+            'email' => 'unpaid@example.com',
+        ]);
+
+        $invoice = Invoice::create([
+            'user_id' => $owner->id,
+            'client_id' => $client->id,
+            'number' => 'INV-RESEND-UNPAID',
+            'amount_usd' => 150,
+            'btc_rate' => 30_000,
+            'amount_btc' => 0.005,
+            'payment_address' => 'tb1qq0exampleresendunpaid',
+            'status' => 'sent',
+            'invoice_date' => now()->toDateString(),
+        ]);
+
+        $response = $this
+            ->actingAs($owner)
+            ->post(route('invoices.deliver.receipt.resend', $invoice));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Only paid invoices can send a receipt.');
+
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'receipt',
+        ]);
+    }
+
 }

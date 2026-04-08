@@ -12,7 +12,7 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 ## Current
 - Active milestone: **MS17 - Product Readiness**
 - Status: `active`
-- Next action: MS17 Phases 1–4 complete — Phase 5 (mail audit and hardening) is active; begin with [`docs/strategies/17.5_MAIL_AUDIT.md`](strategies/17.5_MAIL_AUDIT.md).
+- Next action: MS17 all phases complete — review exit criteria and close out milestone before advancing to MS18.
 - Primary next doc: [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md)
 - Most recently completed milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
 

@@ -12,7 +12,7 @@ Your invoice for **${{ number_format($invoice->amount_usd, 2) }}** is ready. Fol
 <x-mail::panel>
 **Due date:** {{ optional($invoice->due_date)->toFormattedDateString() ?? '—' }}  
 **Amount (BTC):** {{ $invoice->amount_btc ?? '—' }}  
-**Status:** {{ strtoupper($invoice->status ?? 'draft') }}
+**Status:** Open
 </x-mail::panel>
 
 <x-mail::panel>

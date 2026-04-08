@@ -6,7 +6,7 @@
 @component('mail::message', ['invoice' => $invoice])
 # Invoice {{ $invoice->number ?? $invoice->id }} is past due
 
-Our records show an outstanding balance of approximately **${{ number_format($outstandingUsd, 2) }} USD**.
+Our records show an outstanding balance of **${{ number_format($outstandingUsd, 2) }} USD**.
 
 Please review the invoice and settle the remaining amount. If you already paid, just reply to this email so we can reconcile it.
 

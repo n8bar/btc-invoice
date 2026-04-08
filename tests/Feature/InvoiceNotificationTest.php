@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Events\InvoicePaid;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\InvoiceDelivery;
 use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Services\InvoiceAlertService;
@@ -581,18 +582,150 @@ class InvoiceNotificationTest extends TestCase
 
         app(InvoiceAlertService::class)->checkPaymentThresholds($invoice->fresh('payments'));
 
-        // Second attempt should be skipped, not queued
+        // The deliveryExists() guard fires before queue() — no new row is created at all.
         $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
             'status' => 'queued',
         ]);
 
-        $this->assertDatabaseHas('invoice_deliveries', [
+        $this->assertDatabaseMissing('invoice_deliveries', [
             'invoice_id' => $invoice->id,
             'type' => 'client_underpay_alert',
             'status' => 'skipped',
-            'context_key' => 'tx-underpay-failed',
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Past-due delivery deduplication fix tests
+    // -------------------------------------------------------------------------
+
+    /**
+     * Test A — A second sendPastDueAlerts() call against an invoice that already
+     * has all 3 past-due slots with status = 'sent' creates no new InvoiceDelivery rows.
+     */
+    public function test_past_due_second_call_creates_no_rows_when_all_slots_already_sent(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(20)->toDateString(),
+        ])->save();
+
+        // Seed all 6 delivery rows (issuer + client × 3 slots) as 'sent'
+        foreach (['past_due_1', 'past_due_2', 'past_due_3'] as $contextKey) {
+            $invoice->deliveries()->create([
+                'user_id' => $owner->id,
+                'type' => 'past_due_issuer',
+                'status' => 'sent',
+                'recipient' => $owner->email,
+                'context_key' => $contextKey,
+                'dispatched_at' => now()->subDays(5),
+            ]);
+            $invoice->deliveries()->create([
+                'user_id' => $owner->id,
+                'type' => 'past_due_client',
+                'status' => 'sent',
+                'recipient' => $client->email,
+                'context_key' => $contextKey,
+                'dispatched_at' => now()->subDays(5),
+            ]);
+        }
+
+        $countBefore = InvoiceDelivery::count();
+
+        app(InvoiceAlertService::class)->sendPastDueAlerts($invoice->fresh(['client', 'user', 'deliveries']));
+
+        $this->assertSame($countBefore, InvoiceDelivery::count());
+    }
+
+    /**
+     * Test B — A fresh past-due invoice (no existing deliveries) produces a
+     * 'queued' delivery row for slot 1 on the first sendPastDueAlerts() call.
+     */
+    public function test_past_due_first_call_queues_slot_1_for_fresh_invoice(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(2)->toDateString(),
+        ])->save();
+
+        app(InvoiceAlertService::class)->sendPastDueAlerts($invoice->fresh(['client', 'user', 'deliveries']));
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_issuer',
+            'context_key' => 'past_due_1',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_client',
+            'context_key' => 'past_due_1',
+            'status' => 'queued',
+        ]);
+    }
+
+    /**
+     * Test C — When slot 1 is already 'sent' but slot 2 has no existing row and
+     * the invoice is 7+ days past due, sendPastDueAlerts() queues slot 2, not slot 1 again.
+     */
+    public function test_past_due_queues_slot_2_not_slot_1_when_slot_1_already_sent_and_7_days_past_due(): void
+    {
+        Queue::fake();
+        [$invoice, $owner, $client] = $this->makeInvoiceWithClient();
+
+        $invoice->forceFill([
+            'status' => 'sent',
+            'due_date' => now()->subDays(8)->toDateString(),
+        ])->save();
+
+        // Slot 1 already sent for both recipients
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_issuer',
+            'status' => 'sent',
+            'recipient' => $owner->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+        $invoice->deliveries()->create([
+            'user_id' => $owner->id,
+            'type' => 'past_due_client',
+            'status' => 'sent',
+            'recipient' => $client->email,
+            'context_key' => 'past_due_1',
+            'dispatched_at' => now()->subDays(7),
+        ]);
+
+        app(InvoiceAlertService::class)->sendPastDueAlerts($invoice->fresh(['client', 'user', 'deliveries']));
+
+        // Slot 2 should be queued
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_issuer',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+
+        $this->assertDatabaseHas('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'type' => 'past_due_client',
+            'context_key' => 'past_due_2',
+            'status' => 'queued',
+        ]);
+
+        // No additional slot 1 row should exist beyond the two 'sent' rows seeded above
+        $this->assertDatabaseMissing('invoice_deliveries', [
+            'invoice_id' => $invoice->id,
+            'context_key' => 'past_due_1',
+            'status' => 'queued',
         ]);
     }
 
