@@ -13,13 +13,13 @@ class GettingStartedController extends Controller
     {
         $user = $request->user();
 
-        if ($user->gettingStartedIsDone()) {
+        $snapshot = $flow->snapshot($user);
+
+        if ($user->gettingStartedIsDone() && ! ($snapshot['receipt_step_active'] ?? false)) {
             return redirect()
                 ->route('dashboard')
                 ->with('status', $flow->doneStatusMessage($user));
         }
-
-        $snapshot = $flow->snapshot($user);
 
         if ($snapshot['is_complete']) {
             $flow->markCompleted($user);
@@ -37,6 +37,11 @@ class GettingStartedController extends Controller
             if ($invoice) {
                 $routeParams['invoice'] = $invoice->id;
             }
+        } elseif ($targetStep === GettingStartedFlow::STEP_RECEIPT) {
+            $invoice = $flow->resolveReceiptInvoice($user);
+            if ($invoice) {
+                $routeParams['invoice'] = $invoice->id;
+            }
         }
 
         return redirect()->route('getting-started.step', $routeParams);
@@ -46,13 +51,13 @@ class GettingStartedController extends Controller
     {
         $user = $request->user();
 
-        if ($user->gettingStartedIsDone()) {
+        $snapshot = $flow->snapshot($user);
+
+        if ($user->gettingStartedIsDone() && ! ($snapshot['receipt_step_active'] ?? false)) {
             return redirect()
                 ->route('dashboard')
                 ->with('status', $flow->doneStatusMessage($user));
         }
-
-        $snapshot = $flow->snapshot($user);
 
         if ($snapshot['is_complete']) {
             $flow->markCompleted($user);
@@ -81,13 +86,13 @@ class GettingStartedController extends Controller
 
         $user = $request->user();
 
-        if ($user->gettingStartedIsDone()) {
+        $snapshot = $flow->snapshot($user);
+
+        if ($user->gettingStartedIsDone() && ! ($snapshot['receipt_step_active'] ?? false)) {
             return redirect()
                 ->route('dashboard')
                 ->with('status', $flow->doneStatusMessage($user));
         }
-
-        $snapshot = $flow->snapshot($user);
 
         if ($snapshot['is_complete']) {
             $flow->markCompleted($user);
@@ -114,6 +119,13 @@ class GettingStartedController extends Controller
             return redirect()->route('getting-started.step', $routeParams);
         }
 
+        $steps = $snapshot['steps'];
+
+        // Receipt step may be inactive (not in snapshot) — redirect to start rather than 404.
+        if (! isset($steps[$step])) {
+            return redirect()->route('getting-started.start');
+        }
+
         $deliverInvoice = null;
         $deliverInvoiceOptions = collect();
         if ($step === GettingStartedFlow::STEP_DELIVER) {
@@ -121,7 +133,11 @@ class GettingStartedController extends Controller
             $deliverInvoiceOptions = $flow->deliverInvoiceOptions($user);
         }
 
-        $steps = $snapshot['steps'];
+        $receiptInvoice = null;
+        if ($step === GettingStartedFlow::STEP_RECEIPT) {
+            $receiptInvoice = $flow->resolveReceiptInvoice($user);
+        }
+
         $currentStep = $steps[$step];
 
         $actionUrl = match ($step) {
@@ -133,6 +149,12 @@ class GettingStartedController extends Controller
                     'getting_started' => 1,
                 ])
                 : route('invoices.create', ['getting_started' => 1]),
+            GettingStartedFlow::STEP_RECEIPT => $receiptInvoice
+                ? route('invoices.show', [
+                    'invoice' => $receiptInvoice,
+                    'getting_started' => 1,
+                ])
+                : route('invoices.index'),
         };
         $actionLabel = $step === GettingStartedFlow::STEP_DELIVER && ! $deliverInvoice
             ? 'Create new draft invoice'
@@ -157,6 +179,12 @@ class GettingStartedController extends Controller
                     'invoice' => $deliverInvoice->id,
                 ])
                 : route('getting-started.step', ['step' => GettingStartedFlow::STEP_DELIVER]),
+            GettingStartedFlow::STEP_RECEIPT => $receiptInvoice
+                ? route('getting-started.step', [
+                    'step' => GettingStartedFlow::STEP_RECEIPT,
+                    'invoice' => $receiptInvoice->id,
+                ])
+                : route('getting-started.step', ['step' => GettingStartedFlow::STEP_RECEIPT]),
         ];
         $earliestIncompleteStepUrl = $earliestIncomplete !== null
             ? ($stepUrls[$earliestIncomplete] ?? null)
@@ -164,6 +192,9 @@ class GettingStartedController extends Controller
         $suppressRequiredStepNotice = $step === GettingStartedFlow::STEP_INVOICE
             && $earliestIncomplete === GettingStartedFlow::STEP_DELIVER;
         $showRequiredStepNotice = $currentStep['key'] !== $earliestIncomplete && ! $suppressRequiredStepNotice;
+
+        $partialPaymentPending = $step === GettingStartedFlow::STEP_DELIVER
+            && $flow->hasPartialInvoiceWithNoReceipt($user);
 
         $backUrl = route('dashboard');
 
@@ -177,10 +208,12 @@ class GettingStartedController extends Controller
             'actionLabel' => $actionLabel,
             'deliverInvoice' => $deliverInvoice,
             'deliverInvoiceOptions' => $deliverInvoiceOptions,
+            'receiptInvoice' => $receiptInvoice,
             'earliestIncompleteStep' => $earliestIncomplete,
             'earliestIncompleteStepUrl' => $earliestIncompleteStepUrl,
             'showRequiredStepNotice' => $showRequiredStepNotice,
             'showInvoiceDraftRequiredWarning' => $showInvoiceDraftRequiredWarning,
+            'partialPaymentPending' => $partialPaymentPending,
             'stepUrls' => $stepUrls,
             'backUrl' => $backUrl,
         ]);

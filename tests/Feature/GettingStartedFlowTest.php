@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
+use App\Models\InvoicePayment;
 use App\Models\User;
 use App\Models\WalletSetting;
 use App\Services\InvoicePaymentSyncService;
@@ -575,6 +576,269 @@ class GettingStartedFlowTest extends TestCase
             'href="' . route('help', ['from' => 'getting-started-wallet']) . '#dedicated-receiving-account"',
             false
         );
+    }
+
+    public function test_receipt_step_does_not_appear_in_snapshot_when_issuer_has_no_paid_invoices(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $this->createInvoice($owner, $client, ['status' => 'sent']);
+
+        $response = $this->actingAs($owner)->get(route('getting-started.start'));
+
+        $snapshot = app(\App\Services\GettingStartedFlow::class)->snapshot($owner);
+
+        $this->assertArrayNotHasKey('receipt', $snapshot['steps']);
+        $this->assertFalse($snapshot['receipt_step_active']);
+    }
+
+    public function test_receipt_step_appears_and_is_incomplete_when_paid_invoice_is_receipt_eligible(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $paidInvoice = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        InvoicePayment::create([
+            'invoice_id' => $paidInvoice->id,
+            'txid' => 'abc123def456abc123def456abc123def456abc123def456abc123def456ab01',
+            'sats_received' => 250_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+
+        $snapshot = app(\App\Services\GettingStartedFlow::class)->snapshot($owner);
+
+        $this->assertArrayHasKey('receipt', $snapshot['steps']);
+        $this->assertFalse($snapshot['steps']['receipt']['complete']);
+        $this->assertTrue($snapshot['receipt_step_active']);
+    }
+
+    public function test_receipt_step_does_not_appear_when_all_eligible_invoices_have_blocking_correction_state(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        $paidInvoice = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        // Two active on-chain payments trigger receiptReviewReasons() to return a non-empty array
+        InvoicePayment::create([
+            'invoice_id' => $paidInvoice->id,
+            'txid' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0001',
+            'sats_received' => 150_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $paidInvoice->id,
+            'txid' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0002',
+            'sats_received' => 100_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+
+        $snapshot = app(\App\Services\GettingStartedFlow::class)->snapshot($owner);
+
+        $this->assertArrayNotHasKey('receipt', $snapshot['steps']);
+        $this->assertFalse($snapshot['receipt_step_active']);
+    }
+
+    public function test_receipt_step_complete_returns_true_and_flow_finishes_when_receipt_delivery_exists(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        // Satisfy the deliver step: a draft invoice with public share and a send delivery
+        $draftInvoice = $this->createInvoice($owner, $client, ['status' => 'draft']);
+        $draftInvoice->enablePublicShare();
+        InvoiceDelivery::create([
+            'invoice_id' => $draftInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'send',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Invoice delivery',
+            'dispatched_at' => now(),
+        ]);
+
+        // A paid invoice with a queued receipt delivery
+        $paidInvoice = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $paidInvoice->id,
+            'txid' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0001',
+            'sats_received' => 250_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+        InvoiceDelivery::create([
+            'invoice_id' => $paidInvoice->id,
+            'user_id' => $owner->id,
+            'type' => 'receipt',
+            'status' => 'queued',
+            'recipient' => $client->email,
+            'cc' => null,
+            'message' => 'Receipt delivery',
+            'dispatched_at' => now(),
+        ]);
+
+        $flow = app(\App\Services\GettingStartedFlow::class);
+
+        $this->assertTrue($flow->receiptStepComplete($owner));
+
+        $snapshot = $flow->snapshot($owner);
+
+        // The paid invoice already has a receipt delivery, so receiptStepActive is false
+        // and the receipt step is not added to the snapshot — but all other steps are
+        // satisfied, so the flow reports is_complete = true.
+        $this->assertFalse($snapshot['receipt_step_active']);
+        $this->assertArrayNotHasKey('receipt', $snapshot['steps']);
+        $this->assertTrue($snapshot['is_complete']);
+    }
+
+    public function test_resolve_receipt_invoice_returns_most_recently_paid_eligible_invoice(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        // Older paid invoice — eligible
+        $older = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now()->subDays(3),
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $older->id,
+            'txid' => str_repeat('a', 62) . '01',
+            'sats_received' => 100_000,
+            'confirmed_at' => now()->subDays(3),
+            'is_adjustment' => false,
+        ]);
+
+        // More recently paid — eligible, should be preferred
+        $newer = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now()->subDay(),
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $newer->id,
+            'txid' => str_repeat('b', 62) . '02',
+            'sats_received' => 200_000,
+            'confirmed_at' => now()->subDay(),
+            'is_adjustment' => false,
+        ]);
+
+        // Most recent but blocking state (two payments) — should be skipped
+        $blocking = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $blocking->id,
+            'txid' => str_repeat('c', 62) . '03',
+            'sats_received' => 100_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $blocking->id,
+            'txid' => str_repeat('d', 62) . '04',
+            'sats_received' => 100_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+
+        $flow = app(\App\Services\GettingStartedFlow::class);
+        $resolved = $flow->resolveReceiptInvoice($owner);
+
+        $this->assertNotNull($resolved);
+        $this->assertEquals($newer->id, $resolved->id);
+    }
+
+    public function test_receipt_route_constraint_accepts_receipt_and_rejects_invalid_step(): void
+    {
+        $owner = User::factory()->create();
+
+        // Invalid step → 404 from route constraint
+        $this->actingAs($owner)->get('/getting-started/bogus')->assertNotFound();
+
+        // Valid 'receipt' step — when receipt step is inactive, controller redirects to start
+        // (not a 404), confirming the route constraint accepts 'receipt'
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+        $this->createInvoice($owner, $client, ['status' => 'draft']);
+
+        // The route constraint accepts 'receipt' (no 404) — controller redirects
+        // to start because receipt step is not yet active for this user.
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'receipt']))
+            ->assertRedirect()
+            ->assertStatus(302);
+    }
+
+    public function test_partial_payment_guidance_appears_when_on_deliver_step_with_partial_invoice_and_receipt_inactive(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        // Invoice step satisfied (draft invoice exists), deliver step NOT yet complete
+        $this->createInvoice($owner, $client, ['status' => 'draft']);
+
+        // A partial invoice — no paid invoice, so receiptStepActive remains false
+        $this->createInvoice($owner, $client, ['status' => 'partial']);
+
+        // User is on the deliver step (wallet done, invoice done, deliver not done)
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertOk()
+            ->assertSee('A client sent a partial payment.');
+    }
+
+    public function test_partial_payment_guidance_does_not_appear_when_receipt_step_is_active(): void
+    {
+        $owner = User::factory()->create();
+        $this->createWallet($owner);
+        $client = $this->createClient($owner);
+
+        // Invoice step satisfied — deliver step not yet complete
+        $this->createInvoice($owner, $client, ['status' => 'draft']);
+
+        // A partial invoice
+        $this->createInvoice($owner, $client, ['status' => 'partial']);
+
+        // A paid invoice ready for receipt — makes receiptStepActive true, suppressing guidance
+        $paidInvoice = $this->createInvoice($owner, $client, [
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+        InvoicePayment::create([
+            'invoice_id' => $paidInvoice->id,
+            'txid' => str_repeat('e', 62) . '05',
+            'sats_received' => 150_000,
+            'confirmed_at' => now(),
+            'is_adjustment' => false,
+        ]);
+
+        $this->actingAs($owner)
+            ->get(route('getting-started.step', ['step' => 'deliver']))
+            ->assertOk()
+            ->assertDontSee('A client sent a partial payment.');
     }
 
     private function createWallet(User $user): WalletSetting
