@@ -112,6 +112,43 @@ class InvoiceDeliveryController extends Controller
             ? 'Receipt queued.'
             : ($delivery->error_message ?: 'Receipt skipped.');
 
+        if ($request->boolean('getting_started')) {
+            return redirect()
+                ->route('getting-started.start')
+                ->with('status', $statusMessage);
+        }
+
         return back()->with('status', $statusMessage);
+    }
+
+    public function resendReceipt(Request $request, Invoice $invoice): RedirectResponse
+    {
+        $this->authorize('update', $invoice);
+
+        if (! $invoice->client || empty($invoice->client->email)) {
+            return back()->with('status', 'No client email on file.');
+        }
+
+        if ($invoice->status !== 'paid') {
+            return back()->with('status', 'Only paid invoices can send a receipt.');
+        }
+
+        $hasSentReceipt = $invoice->deliveries()
+            ->where('type', 'receipt')
+            ->whereIn('status', ['queued', 'sending', 'sent'])
+            ->exists();
+
+        if (! $hasSentReceipt) {
+            return back()->with('status', 'No receipt has been sent yet.');
+        }
+
+        $delivery = $this->deliveries->queueResend($invoice, 'receipt', $invoice->client->email);
+
+        if ($delivery === null) {
+            $cooldown = $this->deliveries->manualSendCooldownMinutes();
+            return back()->with('status', "Receipt was sent recently. Please wait {$cooldown} minutes before resending.");
+        }
+
+        return back()->with('status', 'Receipt resend queued.');
     }
 }

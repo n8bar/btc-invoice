@@ -62,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/getting-started/reconnect-wallet', [GettingStartedController::class, 'reconnectWallet'])
         ->name('getting-started.reconnect-wallet');
     Route::get('/getting-started/{step}', [GettingStartedController::class, 'step'])
-        ->where('step', 'wallet|invoice|deliver')
+        ->where('step', 'wallet|invoice|deliver|receipt')
         ->name('getting-started.step');
 
     // Breeze profile management
@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.deliver');
     Route::post('invoices/{invoice}/deliver/receipt', [InvoiceDeliveryController::class, 'storeReceipt'])
         ->name('invoices.deliver.receipt');
+    Route::post('invoices/{invoice}/deliver/receipt/resend', [InvoiceDeliveryController::class, 'resendReceipt'])
+        ->name('invoices.deliver.receipt.resend');
     Route::patch('invoices/{invoice}/deliver/draft', [InvoiceDeliveryController::class, 'updateDraft'])
         ->name('invoices.deliver.draft');
     Route::patch('invoices/{invoice}/payments/{payment}/note', [InvoicePaymentNoteController::class, 'update'])

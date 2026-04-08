@@ -769,6 +769,9 @@
                                                 <div class="pt-1">
                                                     <form method="POST" action="{{ route('invoices.deliver.receipt', $invoice) }}">
                                                         @csrf
+                                                        @if ($gettingStartedContext)
+                                                            <input type="hidden" name="getting_started" value="1">
+                                                        @endif
                                                         <button type="submit"
                                                                 class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-slate-900 bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition ease-in-out duration-150 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 dark:focus:ring-offset-slate-900">
                                                             Send receipt
@@ -780,6 +783,17 @@
                                                 <p class="text-xs {{ $receiptMetaClasses }}">
                                                     Latest receipt attempt: <span class="font-semibold">{{ $latestReceiptDelivery->statusLabel() }}</span>.
                                                 </p>
+                                                @if (in_array($latestReceiptDelivery->status, ['queued', 'sending', 'sent']))
+                                                    <div class="pt-1">
+                                                        <form method="POST" action="{{ route('invoices.deliver.receipt.resend', $invoice) }}">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                    class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-slate-400 bg-transparent px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-slate-700 shadow-sm transition ease-in-out duration-150 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-offset-slate-900">
+                                                                Resend receipt
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                @endif
                                             @else
                                                 <p class="text-xs {{ $receiptMetaClasses }}">No client receipt has been queued or sent yet.</p>
                                             @endif
