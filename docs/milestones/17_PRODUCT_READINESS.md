@@ -13,12 +13,12 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 - Add post-payment onboarding so paid-state invoices have a clear issuer path to receipt delivery and ledger review.
 
 ## Current Focus
-- Active phase: **Phase 5 — Mail audit and hardening**
+- Active phase: **exit criteria review**
 - Phase 1 complete: [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md)
 - Phase 2 complete: [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md)
 - Phase 3 complete: [`docs/strategies/17.3_SUPPORT_UI_AND_MONITORING.md`](../strategies/17.3_SUPPORT_UI_AND_MONITORING.md)
 - Phase 4 complete: [`docs/strategies/17.4_POST_PAYMENT_ONBOARDING.md`](../strategies/17.4_POST_PAYMENT_ONBOARDING.md)
-- Phase 5 active: [`docs/strategies/17.5_MAIL_AUDIT.md`](../strategies/17.5_MAIL_AUDIT.md)
+- Phase 5 complete: [`docs/strategies/17.5_MAIL_AUDIT.md`](../strategies/17.5_MAIL_AUDIT.md)
 
 ## Phase Rollup
 
@@ -34,7 +34,7 @@ The support UI is already complete. This phase adds a service health monitoring 
 ### Phase 4 — Post-payment onboarding ✓
 Extends the getting-started flow (MS13 task 11) with a Part 2 receipt step that activates once a paid invoice is receipt-eligible and completes when the issuer sends the first reviewed client receipt. See [`docs/strategies/17.4_POST_PAYMENT_ONBOARDING.md`](../strategies/17.4_POST_PAYMENT_ONBOARDING.md).
 
-### Phase 5 — Mail audit and hardening
+### Phase 5 — Mail audit and hardening ✓
 Five findings surfaced during Phase 4 BQA that are RC-blocking. See [`docs/strategies/17.5_MAIL_AUDIT.md`](../strategies/17.5_MAIL_AUDIT.md).
 
 **Finding 1 — Receipt TXID wraps poorly on narrow screens.**
@@ -56,7 +56,7 @@ Replies to outbound mail go nowhere. The reply-to header needs to be set to a mo
 The invoice status shown in the delivery email is "Draft" at send time. This is an internal issuer term and should never be client-facing. Use "Open" as the client-facing status label for invoices awaiting payment; reserve "Due" for date-related contexts (e.g. due date, past due).
 
 ## Exit Criteria
-- [ ] No "owner" copy remains in UI, mail templates, or docs where "issuer" is the correct term.
+- [x] No "owner" copy remains in UI, mail templates, or docs where "issuer" is the correct term.
 - [x] Test suite is intentional and passes cleanly.
 - [x] Support UI and service health monitoring are usable by a support agent.
-- [ ] Paid invoices have a clear issuer path to receipt delivery and ledger review.
+- [x] Paid invoices have a clear issuer path to receipt delivery and ledger review.
