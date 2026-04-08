@@ -139,6 +139,16 @@ class InvoiceAlertService
             }
 
             $contextKey = "past_due_{$seq}";
+
+            $issuerDone = ! $issuer || ! filled($issuer->email)
+                || $this->deliveries->deliveryExists($invoice, 'past_due_issuer', $issuer->email, $contextKey);
+            $clientDone = ! $client || ! filled($client->email)
+                || $this->deliveries->deliveryExists($invoice, 'past_due_client', $client->email, $contextKey);
+
+            if ($issuerDone && $clientDone) {
+                continue;
+            }
+
             $newlyQueued = false;
 
             if ($issuer && filled($issuer->email)) {

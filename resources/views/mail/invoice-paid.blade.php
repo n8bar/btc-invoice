@@ -8,7 +8,7 @@ Thanks for your payment. We detected funds for **${{ number_format($invoice->amo
 <x-mail::panel>
 **Amount received:** {{ $invoice->payment_amount_formatted ?? '—' }} BTC  
 **USD total:** ${{ number_format((float) $invoice->amount_usd, 2) }}  
-**TXID:** {{ $invoice->txid ?? '—' }}  
+**TXID:** <span style="word-break: break-all; font-family: monospace;">{{ $invoice->txid ?? '—' }}</span>
 **Confirmations:** {{ $invoice->payment_confirmations ?? '0' }}
 </x-mail::panel>
 

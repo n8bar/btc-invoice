@@ -118,6 +118,15 @@ class InvoiceDeliveryService
         );
     }
 
+    public function deliveryExists(
+        Invoice $invoice,
+        string $type,
+        string $recipient,
+        string $contextKey
+    ): bool {
+        return $this->matchingDeliveries($invoice, $type, $recipient, $contextKey)->exists();
+    }
+
     public function outboundEnabled(): bool
     {
         return (bool) config('mail.safety.outbound_enabled', true);

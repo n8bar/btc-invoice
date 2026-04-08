@@ -10,7 +10,7 @@ This invoice is now past its due date and still has an outstanding balance.
 
 - **Client:** {{ $invoice->client->name ?? 'N/A' }}
 - **Due date:** {{ optional($invoice->due_date)->toDateString() ?? '—' }}
-- **Outstanding:** ${{ number_format($outstandingUsd, 2) }} (approx.)
+- **Outstanding:** ${{ number_format($outstandingUsd, 2) }}
 
 Consider nudging the client or recording a manual adjustment if you've already reconciled it.
 

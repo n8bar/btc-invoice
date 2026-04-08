@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -24,6 +25,7 @@ class InvoiceReadyMail extends Mailable
     {
         return new Envelope(
             subject: 'Invoice ' . ($this->invoice->number ?? $this->invoice->id) . ' ready',
+            replyTo: [new Address($this->invoice->user->email, $this->invoice->user->name)],
         );
     }
 

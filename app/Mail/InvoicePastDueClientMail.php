@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Invoice;
 use App\Models\InvoiceDelivery;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -21,6 +22,7 @@ class InvoicePastDueClientMail extends Mailable
     {
         return new Envelope(
             subject: 'Reminder: invoice ' . ($this->invoice->number ?? $this->invoice->id) . ' is past due',
+            replyTo: [new Address($this->invoice->user->email, $this->invoice->user->name)],
         );
     }
 
