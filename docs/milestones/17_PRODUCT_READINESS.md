@@ -17,8 +17,8 @@ This is the milestone execution doc for MS17. It tracks milestone-level objectiv
 - Phase 1 complete: [`docs/strategies/17.1_ISSUER_SWEEP.md`](../strategies/17.1_ISSUER_SWEEP.md)
 - Phase 2 complete: [`docs/strategies/17.2_TEST_RATIONALIZATION.md`](../strategies/17.2_TEST_RATIONALIZATION.md)
 - Phase 3 complete: [`docs/strategies/17.3_SUPPORT_UI_AND_MONITORING.md`](../strategies/17.3_SUPPORT_UI_AND_MONITORING.md)
-- Phase 4 next doc: [`docs/strategies/17.4_POST_PAYMENT_ONBOARDING.md`](../strategies/17.4_POST_PAYMENT_ONBOARDING.md)
-- Phase 5 queued: [`docs/strategies/17.5_MAIL_AUDIT.md`](../strategies/17.5_MAIL_AUDIT.md)
+- Phase 4 complete: [`docs/strategies/17.4_POST_PAYMENT_ONBOARDING.md`](../strategies/17.4_POST_PAYMENT_ONBOARDING.md)
+- Phase 5 active: [`docs/strategies/17.5_MAIL_AUDIT.md`](../strategies/17.5_MAIL_AUDIT.md)
 
 ## Phase Rollup
 
