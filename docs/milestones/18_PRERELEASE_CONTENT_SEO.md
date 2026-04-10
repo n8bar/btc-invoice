@@ -1,4 +1,4 @@
-# MS18 - Pre-Release Content & SEO
+# MS18 - Pre-Release Content for SEO
 
 Status: Active as of 2026-04-09.
 Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
@@ -14,30 +14,27 @@ Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
 - Consider video content if time allows; explicitly defer to post-RC if not — document the outcome either way.
 
 ## Current Focus
-- Active phase: **Phase 1 — Content strategy & Helpful Notes audit**
-- Phase 1: _(strategy doc TBD)_
-- Phase 2: _(strategy doc TBD)_
-- Phase 3: _(strategy doc TBD)_
-- Phase 4: _(strategy doc TBD)_
+- Active phase: **Phase 1 — CMS Selection & Staging Setup**
+- Phase 1: [`docs/strategies/18.1_CMS_AND_STAGING.md`](../strategies/18.1_CMS_AND_STAGING.md)
+- Phase 2: [`docs/strategies/18.2_CONTENT_AUDIT_AND_PRODUCTION.md`](../strategies/18.2_CONTENT_AUDIT_AND_PRODUCTION.md)
+- Phase 3: [`docs/strategies/18.3_SITE_ARCHITECTURE_AND_PUBLISHING.md`](../strategies/18.3_SITE_ARCHITECTURE_AND_PUBLISHING.md)
 
 ## Phase Rollup
 
-### Phase 1 — Content strategy & Helpful Notes audit
-Assess the existing Helpful Notes as raw material. For each note, decide: publish as-is, adapt/customize for a general audience, or use only as article inspiration. Produce a content plan — topics, formats, rough priority order — before any production work begins.
+### Phase 1 — CMS Selection & Staging Setup
+Select a CMS and staging workflow as joint decisions — staging requirements may influence the CMS choice and vice versa. Set both up and confirm the full publish pipeline works end-to-end before any content is written.
 
-### Phase 2 — Site architecture
-Extend `site/` to support multiple pages. Establish a staging/pre-publish workflow so content can be reviewed before the live site is updated.
+### Phase 2 — Content Audit & Production
+Audit the existing Helpful Notes, make Adapt/Inspire/Skip decisions, and produce all planned content. Move directly from audit decision to writing for each piece. Video at the end if time allows.
 
-### Phase 3 — Content production
-Write and publish articles and any adapted Helpful Notes content per the Phase 1 plan. Video content produced here if time allows.
-
-### Phase 4 — Publishing & SEO hygiene
-Update `sitemap.xml` with all published URLs and accurate `lastmod` values. Verify internal linking. Run a final signal check against the MS15 baseline to confirm nothing regressed.
+### Phase 3 — Site Architecture, Publishing & SEO Hygiene
+Wire up the full multi-page structure, internal linking, and navigation around the Phase 2 content. Publish everything live. Update `sitemap.xml` and run a final signal check against the MS15 baseline.
 
 ## Exit Criteria
-- [ ] Content plan produced and approved (Phase 1 output).
-- [ ] `site/` supports multiple pages with a working staging/pre-publish path.
-- [ ] At least 2–4 articles or adapted Helpful Notes published on the live site, targeting stable educational queries.
+- [ ] CMS and staging workflow selected, set up, and verified end-to-end (Phase 1).
+- [ ] Content plan approved before Phase 2 writing begins.
+- [ ] At least 4 articles or adapted Helpful Notes published on the live site, targeting stable educational queries.
+- [ ] `site/` supports multiple pages with a working staging path.
 - [ ] `sitemap.xml` reflects all published content with accurate `lastmod`.
 - [ ] MS15 SEO baseline intact and extended — no regressions in indexing, canonical, robots, or sitemap signals.
 - [ ] Video: shipped if time allowed; explicitly deferred and documented if not.
