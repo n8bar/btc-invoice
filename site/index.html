@@ -1,298 +1,247 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CryptoZing | Bitcoin Invoicing with Payment Tracking</title>
-  <meta name="description" content="CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking.">
-  <meta name="theme-color" content="#111827">
-  <link rel="icon" type="image/png" href="images/CZ.png">
-  <link rel="apple-touch-icon" href="images/CZ.png">
-  <link rel="canonical" href="https://cryptozing.app/">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://cryptozing.app/">
-  <meta property="og:title" content="CryptoZing | Bitcoin Invoicing with Payment Tracking">
-  <meta property="og:description" content="CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking.">
-  <meta property="og:image" content="https://cryptozing.app/og-preview.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CryptoZing | Bitcoin Invoicing with Payment Tracking">
-  <meta name="twitter:description" content="CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking.">
-  <meta name="twitter:image" content="https://cryptozing.app/og-preview.png">
-  <link rel="preconnect" href="https://fonts.bunny.net">
-  <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
-  <style>
-    :root {
-      --bg-base: #111827;
-      --bg-overlay: linear-gradient(135deg, rgba(49, 46, 129, 0.88) 0%, #111827 46%, #020617 100%);
-      --card-bg: rgba(255, 255, 255, 0.05);
-      --card-border: rgba(255, 255, 255, 0.10);
-      --pill-bg: rgba(255, 255, 255, 0.05);
-      --pill-border: rgba(255, 255, 255, 0.20);
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-muted: #c7d2fe;
-      --button-bg: #4f46e5;
-      --button-bg-hover: #6366f1;
-      --button-text: #ffffff;
-      --glow: rgba(99, 102, 241, 0.20);
-      --shadow: rgba(2, 6, 23, 0.55);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      font-family: 'Instrument Sans', sans-serif;
-      background: var(--bg-base);
-      color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    .page {
-      position: relative;
-      min-height: 100vh;
-      overflow: hidden;
-      background: var(--bg-overlay);
-    }
-
-    .container {
-      position: relative;
-      max-width: 72rem;
-      min-height: 100vh;
-      margin: 0 auto;
-      padding: 3rem 1.5rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .grid {
-      width: 100%;
-      display: grid;
-      gap: 3rem;
-      align-items: center;
-    }
-
-    .content { display: grid; gap: 2rem; }
-
-    .brand-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      width: fit-content;
-      padding: 0.75rem 1rem;
-      border-radius: 999px;
-      background: var(--pill-bg);
-      border: 1px solid var(--pill-border);
-      color: var(--text-muted);
-      font-size: 1.125rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .brand-pill img { height: 3rem; width: auto; }
-
-    .hero-copy { display: grid; gap: 1.25rem; }
-    .eyebrow {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.8125rem;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      max-width: 16ch;
-      color: var(--text-primary);
-      font-size: clamp(2.75rem, 6vw, 4.5rem);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 800;
-      text-wrap: balance;
-    }
-
-    .lead {
-      margin: 0;
-      max-width: 40rem;
-      color: var(--text-secondary);
-      font-size: clamp(1.0625rem, 2vw, 1.25rem);
-      line-height: 1.75;
-    }
-
-    .cards {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .card {
-      padding: 1.25rem;
-      border-radius: 1rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      box-shadow: 0 20px 40px -24px var(--shadow);
-    }
-
-    .card-title {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-
-    .card-body {
-      margin: 0.75rem 0 0;
-      color: var(--text-secondary);
-      font-size: 0.9375rem;
-      line-height: 1.85;
-    }
-
-    .availability-note {
-      margin: -0.25rem 0 0;
-      max-width: 40rem;
-      color: var(--text-secondary);
-      font-size: 0.9375rem;
-      line-height: 1.75;
-    }
-
-    .ethos-note {
-      margin: -1.25rem 0 0;
-      color: var(--text-muted);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.9rem 1.25rem;
-      border-radius: 0.5rem;
-      background: var(--button-bg);
-      color: var(--button-text);
-      text-decoration: none;
-      font-size: 0.9375rem;
-      font-weight: 700;
-      box-shadow: 0 16px 30px -20px var(--shadow);
-      transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-    }
-
-    .button:hover { background: var(--button-bg-hover); transform: translateY(-1px); }
-    .button:focus-visible {
-      outline: 2px solid #a5b4fc;
-      outline-offset: 3px;
-    }
-
-    .visual {
-      display: flex;
-      justify-content: center;
-    }
-
-    .visual-shell {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 26rem;
-      width: 100%;
-    }
-
-    .visual-glow {
-      position: absolute;
-      inset: 2rem;
-      border-radius: 999px;
-      background: var(--glow);
-      filter: blur(56px);
-    }
-
-    .visual img {
-      position: relative;
-      width: min(100%, 26rem);
-      height: auto;
-    }
-
-    @media (min-width: 768px) {
-      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (min-width: 1024px) {
-      .container { padding-block: 4rem; }
-      .grid { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr); }
-    }
-
-    @media (max-width: 640px) {
-      .container { padding-inline: 1rem; }
-      .brand-pill { font-size: 1rem; }
-      .brand-pill img { height: 2.5rem; }
-      .visual-shell { min-height: 18rem; }
-      .visual img { width: min(100%, 18rem); }
-    }
-  </style>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "CryptoZing",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "url": "https://cryptozing.app/",
-    "image": "https://cryptozing.app/og-preview.png",
-    "description": "CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking."
+---
+layout: default.njk
+title: "CryptoZing | Bitcoin Invoicing with Payment Tracking"
+description: "CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking."
+canonical: "https://cryptozing.app/"
+og_type: "website"
+og_image: "https://cryptozing.app/og-preview.png"
+og_image_width: "1200"
+og_image_height: "630"
+hide_nav: true
+hide_footer: true
+---
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "CryptoZing",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "url": "https://cryptozing.app/",
+  "image": "https://cryptozing.app/og-preview.png",
+  "description": "CryptoZing is an open-source Bitcoin invoicing app for USD-first invoices, unique Bitcoin addresses, and reliable on-chain payment tracking."
+}
+</script>
+<style>
+  .page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--bg-overlay);
   }
-  </script>
-</head>
-<body>
-  <div class="page">
-    <main class="container">
-      <div class="grid">
-        <section class="content">
-          <div class="brand-pill">
-            <img src="images/CZ.png" alt="CryptoZing">
-            <span>CryptoZing</span>
-          </div>
 
-          <div class="hero-copy">
-            <p class="eyebrow">Bitcoin invoicing with payment tracking</p>
-            <h1>Bitcoin invoicing with clear on&#8209;chain payment tracking.</h1>
-            <p class="lead">Create and send USD-first invoices with unique Bitcoin addresses and keep every Bitcoin payment correctly matched to its invoice.</p>
-          </div>
+  .container {
+    position: relative;
+    max-width: 72rem;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    align-items: center;
+  }
 
-          <div class="cards">
-            <article class="card">
-              <p class="card-title">Purpose</p>
-              <p class="card-body">Make Bitcoin invoicing more dependable for business while maintaining self-custody and making payment tracking easier to trust.</p>
-            </article>
-            <article class="card">
-              <p class="card-title">Offering</p>
-              <p class="card-body">USD-first invoices, live BTC conversion, QR payments, and on-chain payment tracking via dedicated receiving addresses.</p>
-            </article>
-          </div>
+  .grid {
+    width: 100%;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
 
-          <p class="availability-note">CryptoZing is still in active development and is not open for public use yet. Follow development on GitHub or check back here soon.</p>
-          <p class="ethos-note">Self-custody matters: not your keys, not your coins.</p>
+  .content { display: grid; gap: 2rem; }
 
-          <div class="actions">
-            <a class="button" href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">Follow development on GitHub</a>
-          </div>
-        </section>
+  .brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: fit-content;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
 
-        <aside class="visual" aria-hidden="true">
-          <div class="visual-shell">
-            <div class="visual-glow"></div>
-            <img src="images/CZ.png" alt="">
-          </div>
-        </aside>
-      </div>
-    </main>
-  </div>
-</body>
-</html>
+  .brand-pill img { height: 3rem; width: auto; }
+
+  .hero-copy { display: grid; gap: 1.25rem; }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 16ch;
+    color: var(--text-primary);
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--text-secondary);
+    font-size: clamp(1.0625rem, 2vw, 1.25rem);
+    line-height: 1.75;
+  }
+
+  .cards { display: grid; gap: 1rem; }
+
+  .card {
+    padding: 1.25rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 20px 40px -24px rgba(2, 6, 23, 0.55);
+  }
+
+  .card-title {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .card-body {
+    margin: 0.75rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.85;
+  }
+
+  .availability-note {
+    margin: -0.25rem 0 0;
+    max-width: 40rem;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+  }
+
+  .ethos-note {
+    margin: -1.25rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.25rem;
+    border-radius: 0.5rem;
+    background: var(--button-bg);
+    color: var(--button-text);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    box-shadow: 0 16px 30px -20px rgba(2, 6, 23, 0.55);
+    transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .button:hover { background: var(--button-bg-hover); transform: translateY(-1px); }
+  .button:focus-visible { outline: 2px solid #a5b4fc; outline-offset: 3px; }
+
+  .visual { display: flex; justify-content: center; }
+
+  .visual-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26rem;
+    width: 100%;
+  }
+
+  .visual-glow {
+    position: absolute;
+    inset: 2rem;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.20);
+    filter: blur(56px);
+  }
+
+  .visual img {
+    position: relative;
+    width: min(100%, 26rem);
+    height: auto;
+  }
+
+  @media (min-width: 768px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (min-width: 1024px) {
+    .container { padding-block: 4rem; }
+    .grid { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr); }
+  }
+
+  @media (max-width: 640px) {
+    .container { padding-inline: 1rem; }
+    .brand-pill { font-size: 1rem; }
+    .brand-pill img { height: 2.5rem; }
+    .visual-shell { min-height: 18rem; }
+    .visual img { width: min(100%, 18rem); }
+  }
+</style>
+
+<div class="page">
+  <main class="container">
+    <div class="grid">
+      <section class="content">
+        <div class="brand-pill">
+          <img src="images/CZ.png" alt="CryptoZing">
+          <span>CryptoZing</span>
+        </div>
+
+        <div class="hero-copy">
+          <p class="eyebrow">Bitcoin invoicing with payment tracking</p>
+          <h1>Bitcoin invoicing with clear on&#8209;chain payment tracking.</h1>
+          <p class="lead">Create and send USD-first invoices with unique Bitcoin addresses and keep every Bitcoin payment correctly matched to its invoice.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <p class="card-title">Purpose</p>
+            <p class="card-body">Make Bitcoin invoicing more dependable for business while maintaining self-custody and making payment tracking easier to trust.</p>
+          </article>
+          <article class="card">
+            <p class="card-title">Offering</p>
+            <p class="card-body">USD-first invoices, live BTC conversion, QR payments, and on-chain payment tracking via dedicated receiving addresses.</p>
+          </article>
+        </div>
+
+        <p class="availability-note">CryptoZing is still in active development and is not open for public use yet. Follow development on GitHub or check back here soon.</p>
+        <p class="ethos-note">Self-custody matters: not your keys, not your coins.</p>
+
+        <div class="actions">
+          <a class="button" href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">Follow development on GitHub</a>
+        </div>
+      </section>
+
+      <aside class="visual" aria-hidden="true">
+        <div class="visual-shell">
+          <div class="visual-glow"></div>
+          <img src="images/CZ.png" alt="">
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
