@@ -14,7 +14,7 @@ Supporting ops doc: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](../ops/RC_ROLLOUT_CHECK
 
 ## Deferred decisions (recorded during MS18 Phase 1)
 - **Content site architecture:** Static content files served by nginx directly alongside the Laravel app — path-based split, same domain, no PHP involved for content routes. CMS is Eleventy (selected in MS18 Phase 1); evaluate at cutover whether to keep Eleventy or migrate — static output means migration is never a rework.
-- **Staging area transition:** The dev server staging area built during MS18 is intended to become the production content site at cutover — not throwaway infrastructure. Copy staging content directly to production; no rebuild or re-architecture expected.
+- **Staging area transition:** Dev server (`public/content/` via Sail) is the staging environment during MS18–MS20. At cutover, copy the built output directly to the nginx web root — no rebuild expected. Post-RC staging options to be decided at this milestone.
 - **Post-RC staging:** Define a new staging workflow at this milestone — options include a new dev path or a password-protected area on production.
 - **URL structure:** Content paths (e.g. `/articles/`) to be confirmed or adjusted based on CMS selection and nginx config at cutover.
 
