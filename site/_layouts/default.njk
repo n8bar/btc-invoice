@@ -161,6 +161,7 @@
   </style>
 </head>
 <body>
+  {% if not hide_nav %}
   <nav class="site-nav">
     <a href="/" class="nav-brand">
       <img src="/images/CZ.png" alt="CryptoZing">
@@ -170,6 +171,7 @@
       <a href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">GitHub</a>
     </div>
   </nav>
+  {% endif %}
 
   {{ content | safe }}
 
