@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}">
+  <meta name="theme-color" content="#111827">
+  <link rel="icon" type="image/png" href="/images/CZ.png">
+  <link rel="apple-touch-icon" href="/images/CZ.png">
+  <link rel="canonical" href="{{ canonical }}">
+  <meta property="og:type" content="{{ og_type if og_type else 'website' }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:image" content="{{ og_image if og_image else 'https://cryptozing.app/og-preview.png' }}">
+  {% if og_image_width %}<meta property="og:image:width" content="{{ og_image_width }}">{% endif %}
+  {% if og_image_height %}<meta property="og:image:height" content="{{ og_image_height }}">{% endif %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ description }}">
+  <meta name="twitter:image" content="{{ og_image if og_image else 'https://cryptozing.app/og-preview.png' }}">
+  <link rel="preconnect" href="https://fonts.bunny.net">
+  <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #111827;
+      --bg-overlay: linear-gradient(135deg, rgba(49, 46, 129, 0.88) 0%, #111827 46%, #020617 100%);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #c7d2fe;
+      --text-faint: #64748b;
+      --button-bg: #4f46e5;
+      --button-bg-hover: #6366f1;
+      --button-text: #ffffff;
+      --nav-border: rgba(255, 255, 255, 0.08);
+      --prose-max: 42rem;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Nav */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--nav-border);
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-brand img { height: 1.75rem; width: auto; }
+
+    .nav-links { display: flex; align-items: center; gap: 1.25rem; }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 140ms ease;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--nav-border);
+      padding: 2rem 1.5rem;
+      margin-top: 4rem;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 0.8125rem;
+    }
+
+    .site-footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* Article prose */
+    .article-wrap {
+      max-width: var(--prose-max);
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .article-wrap h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin: 0 0 1.5rem;
+    }
+
+    .article-wrap h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 2.5rem 0 0.75rem;
+    }
+
+    .article-wrap p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin: 0 0 1.25rem;
+    }
+
+    .article-wrap ul, .article-wrap ol {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-left: 1.5rem;
+      margin: 0 0 1.25rem;
+    }
+
+    .article-wrap li { margin-bottom: 0.4rem; }
+
+    .article-wrap a {
+      color: var(--text-muted);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .article-wrap strong { color: var(--text-primary); }
+
+    .article-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+
+    .article-back:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/" class="nav-brand">
+      <img src="/images/CZ.png" alt="CryptoZing">
+      CryptoZing
+    </a>
+    <div class="nav-links">
+      <a href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
+  </nav>
+
+  {{ content | safe }}
+
+  <footer class="site-footer">
+    <p>CryptoZing &mdash; Bitcoin invoicing for business. &nbsp;<a href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">Follow development on GitHub</a></p>
+  </footer>
+</body>
+</html>
