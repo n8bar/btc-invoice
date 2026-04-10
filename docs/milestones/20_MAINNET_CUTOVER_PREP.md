@@ -1,5 +1,7 @@
 # MS20 - Mainnet Cutover Preparation
 
+> **Stub** — high-level scope and decisions recorded. Phase strategy docs and detailed exit criteria to be written when this milestone becomes active.
+
 Status: Not started.
 Parent execution doc: [`docs/PLAN.md`](../PLAN.md)
 Supporting ops doc: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](../ops/RC_ROLLOUT_CHECKLIST.md)

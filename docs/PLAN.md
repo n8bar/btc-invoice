@@ -20,9 +20,9 @@ Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 | Status | ID | Milestone | Short intent | Target | Primary doc |
 |---|---|---|---|---|---|
 | [ ] | 18 | Pre-Release Content & SEO | Extend the site from a single placeholder to a lightweight content site with educational articles, adapted Helpful Notes, and a staging path — giving search engines substance to rank before RC1 ships. | 2026-05-02 | [`docs/milestones/18_PRERELEASE_CONTENT_SEO.md`](milestones/18_PRERELEASE_CONTENT_SEO.md) |
-| [ ] | 19 | RC Hardening & Ops | Document notification coverage, add auth/password policy hardening (including 419-to-login redirect and site-wide session expiry logout), and keep contributor docs current. | 2026-05-28 | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
+| [ ] | 19 | RC Hardening & Ops | Document notification coverage, add auth/password policy hardening (including 419-to-login redirect and site-wide session expiry logout), and keep contributor docs current. | 2026-05-28 | [`docs/milestones/19_RC_HARDENING_OPS.md`](milestones/19_RC_HARDENING_OPS.md) |
 | [ ] | 20 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. Includes legal layer: ToS, Privacy Policy, disclaimer placement at key UI touchpoints, and monetization-neutral copy review. | 2026-06-09 | [`docs/milestones/20_MAINNET_CUTOVER_PREP.md`](milestones/20_MAINNET_CUTOVER_PREP.md) |
-| [ ] | 21 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | 2026-06-21 | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
+| [ ] | 21 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | 2026-06-21 | [`docs/milestones/21_RC_DEPLOYMENT.md`](milestones/21_RC_DEPLOYMENT.md) |
 
 ## Completed Milestones
 | Status | ID | Milestone | Short intent | Primary doc |
