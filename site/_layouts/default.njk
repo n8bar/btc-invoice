@@ -175,8 +175,10 @@
 
   {{ content | safe }}
 
+  {% if not hide_footer %}
   <footer class="site-footer">
     <p>CryptoZing &mdash; Bitcoin invoicing for business. &nbsp;<a href="https://github.com/n8bar/CryptoZing" target="_blank" rel="noreferrer">Follow development on GitHub</a></p>
   </footer>
+  {% endif %}
 </body>
 </html>
