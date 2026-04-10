@@ -12,11 +12,12 @@ Supporting ops doc: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](../ops/RC_ROLLOUT_CHECK
 - Remove temporary mail aliasing.
 - Complete rollout verification per the RC rollout checklist.
 
-## Deferred decisions (recorded during MS18 Phase 1)
-- **Content site architecture:** Static content files served by nginx directly alongside the Laravel app — path-based split, same domain, no PHP involved for content routes. CMS is Eleventy (selected in MS18 Phase 1); evaluate at cutover whether to keep Eleventy or migrate — static output means migration is never a rework.
-- **Staging area transition:** Dev server (`public/content/` via Sail) is the staging environment during MS18–MS20. At RC deployment, copy the built output directly to the nginx web root — no rebuild expected. Post-RC staging options to be decided post-RC.
-- **Post-RC staging:** Define a new staging workflow at this milestone — options include a new dev path or a password-protected area on production.
-- **URL structure:** Content paths (e.g. `/articles/`) to be confirmed or adjusted based on CMS selection and nginx config at cutover.
+## Decisions recorded (during MS18 Phase 1)
+- **Content site architecture:** Static content files served by nginx directly alongside the Laravel app — same domain, no PHP involved for content routes. CMS is Eleventy (selected in MS18 Phase 1); evaluate at RC deployment whether to keep Eleventy or migrate — static output means migration is never a rework.
+- **URL structure:** Content lives at `cryptozing.app/learn/*`. Articles authored in `site/learn/`, Eleventy outputs to `public/content/learn/`. GitHub Pages serves these URLs pre-RC; DNS cutover at MS21 points `cryptozing.app` at nginx, which serves the same paths unchanged. SEO value built pre-RC is fully preserved — URLs never move.
+- **Cutover mechanics:** Only `cryptozing.app/` changes at cutover — the placeholder is replaced by the Laravel landing page. Everything under `/learn/` continues serving from the same URLs, just via nginx instead of GitHub Pages.
+- **Staging:** Dev server (`public/content/` via Sail) is the staging environment during MS18–MS20. At RC deployment, the built `public/content/` output is what nginx serves. Post-RC staging options to be decided post-RC.
+- **GitHub Pages retirement:** GitHub Pages is retired at DNS cutover — not deleted, just no longer the DNS target. No redirects needed; URLs are preserved by the nginx serving the same paths.
 
 ## Phases
 _(Phase strategy docs to be written when this milestone becomes active.)_
