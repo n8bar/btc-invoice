@@ -1,5 +1,5 @@
 # PLAN
-_Last updated: 2026-04-07_
+_Last updated: 2026-04-09_
 
 This is the human-facing execution dashboard for Release Candidate work.
 
@@ -10,16 +10,16 @@ Use supporting specs under `docs/specs/` for detailed local requirements.
 Use [`docs/BACKLOG.md`](BACKLOG.md) for post-MVP work only.
 
 ## Current
-- Active milestone: **MS17 - Product Readiness**
+- Active milestone: **MS18 - RC Hardening & Ops**
 - Status: `active`
-- Next action: MS17 all phases complete — review exit criteria and close out milestone before advancing to MS18.
-- Primary next doc: [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md)
-- Most recently completed milestone doc: [`docs/milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md`](milestones/16_MAILER_AND_ALERTS_POLISH_AUDIT.md)
+- Next action: Draft MS18 strategy — auth/password policy hardening (419-to-login redirect, site-wide session expiry logout), notification coverage docs, contributor docs current.
+- Primary next doc: [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md)
+- Most recently completed milestone doc: [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md)
 
 ## Active and Upcoming Milestones
 | Status | ID | Milestone | Short intent | Target | Primary doc |
 |---|---|---|---|---|---|
-| [ ] | 17 | Product Readiness | Rationalize the test suite, replace "owner" with "issuer" in all UI and mail copy, add service health monitoring to the support dashboard, and extend the getting-started flow with a post-payment receipt step. | 2026-05-02 | [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md) |
+| [x] | 17 | Product Readiness | Rationalize the test suite, replace "owner" with "issuer" in all UI and mail copy, add service health monitoring to the support dashboard, and extend the getting-started flow with a post-payment receipt step. | 2026-05-02 | [`docs/milestones/17_PRODUCT_READINESS.md`](milestones/17_PRODUCT_READINESS.md) |
 | [ ] | 18 | RC Hardening & Ops | Document notification coverage, add auth/password policy hardening (including 419-to-login redirect and site-wide session expiry logout), and keep contributor docs current. | 2026-05-28 | [`docs/ops/DOCS_DX.md`](ops/DOCS_DX.md) |
 | [ ] | 19 | Mainnet Cutover Preparation | Define and rehearse env flips, wallet validation, mail sanity, and backout steps for mainnet. | 2026-06-09 | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
 | [ ] | 20 | CryptoZing.app Deployment (RC) | Deploy the RC under `cryptozing.app`, replace the GitHub Pages placeholder at `/` with the live app landing page without breaking the SEO baseline established in MS15, remove temporary mail aliasing, and complete rollout verification. | 2026-06-21 | [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](ops/RC_ROLLOUT_CHECKLIST.md) |
