@@ -38,6 +38,7 @@
          1. That path should stay visible from the invoice payment history and from dashboard payment-review surfaces when a paid invoice still lacks a queued or sent client receipt.
       4. Later-payment ambiguity, ignore state, and reattribution state should surface truthful review context to the owner, but they are not the only reason a client receipt requires review.
       5. Requiring owner-reviewed client receipts must not suppress the owner paid notice or the owner-facing manual review/send path.
+      6. **RC1 policy (deliberate):** Client receipts remain manual for RC1. This is a deliberate product decision — not a temporary incident constraint — chosen to capture real issuer behavior before committing to automation. Revisit after RC1 has been live for a reasonable period with real usage data (target: after at least 20–30 receipts sent manually in production, or after first production feedback cycle, whichever comes first).
 
 3. **Delivery Log**
    1. Outbound invoice communication should be recorded in a shared delivery history for audit and operator review.

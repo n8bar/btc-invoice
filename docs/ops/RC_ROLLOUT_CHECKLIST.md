@@ -27,3 +27,4 @@ Use this when preparing the Release Candidate deployment; keep APP_PUBLIC_URL an
 - Review logs/alerts for mail, watcher, and error rates.
 - Spot-check invoices/clients for ownership/auth anomalies.
 - Update CHANGELOG/PLAN with any scope or operational notes observed during rollout.
+- **MS14 correction tooling exercise (part of MS19 definition of done):** Once live payments are flowing, exercise the ignore/restore/reattribute correction tooling against at least one real or plausible wrong-attribution scenario. This is the first opportunity to validate the tooling against real on-chain conditions. Document the outcome — pass or any gaps found — before considering MS19 closed.
