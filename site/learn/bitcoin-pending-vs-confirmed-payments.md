@@ -71,7 +71,7 @@ If someone pays a Bitcoin invoice, you will often see the transaction appear qui
 
 But that is not the end of the story.
 
-You still need to know:
+You still need to know things like:
 
 - does this transaction belong to the correct invoice?
 - is the amount correct?
