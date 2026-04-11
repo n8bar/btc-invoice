@@ -18,6 +18,7 @@ Supporting ops doc: [`docs/ops/RC_ROLLOUT_CHECKLIST.md`](../ops/RC_ROLLOUT_CHECK
 - **Cutover mechanics:** Only `cryptozing.app/` changes at cutover — the placeholder is replaced by the Laravel landing page. Everything under `/learn/` continues serving from the same URLs, just via nginx instead of GitHub Pages.
 - **Staging:** Dev server (`public/content/` via Sail) is the staging environment during MS18–MS20. At RC deployment, the built `public/content/` output is what nginx serves. Post-RC staging options to be decided post-RC.
 - **GitHub Pages retirement:** GitHub Pages is retired at DNS cutover — not deleted, just no longer the DNS target. No redirects needed; URLs are preserved by the nginx serving the same paths.
+- **GitHub nav link:** Remove the GitHub link from the site nav before RC deployment — it's pre-release framing. Keep the footer link as-is; consider updating copy post-RC if it no longer fits.
 
 ## Phases
 _(Phase strategy docs to be written when this milestone becomes active.)_
