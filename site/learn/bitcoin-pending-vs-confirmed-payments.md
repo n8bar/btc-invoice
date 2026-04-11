@@ -9,7 +9,7 @@ When someone sends a Bitcoin payment, it does **not** go straight from "sent" to
 
 There is an in-between stage that matters. First the transaction becomes visible to the network. Then, later, it becomes confirmed in a block. People often blur those together, but they are not the same thing.
 
-If you are sending or receiving Bitcoin for an invoice, that distinction matters more than it might seem at first.
+That distinction is what this is about.
 
 ## What a pending Bitcoin payment means
 
@@ -49,7 +49,7 @@ Each new block built on top of a transaction makes that transaction harder to re
 
 That is why confirmation count matters. It is not just trivia for block explorers. It is a rough measure of how much confidence you should place in the payment's finality.
 
-For lower-risk situations, one confirmation may be enough. For moderate-value payments, three confirmations is a common middle ground. For larger payments, six confirmations is still the conventional benchmark people tend to reach for.
+For lower-risk situations, one confirmation may be enough. For moderate-value payments, three confirmations is a common middle ground. For larger payments, six confirmations is still the conventional benchmark.
 
 There is no magic number that is correct in every case. The right threshold depends on the amount at risk and how conservative you want to be.
 
@@ -59,7 +59,7 @@ Bitcoin targets a new block about every **10 minutes on average**.
 
 The important phrase there is **on average**.
 
-A well-fee'd transaction often confirms in the next block or two. But there is no guarantee. Sometimes blocks come faster. Sometimes they take longer. If the network is busy or the fee is too low, a transaction may wait much longer than the sender expected.
+A transaction with a healthy fee often confirms in the next block or two. But there is no guarantee. Sometimes blocks come faster. Sometimes they take longer. If the network is busy or the fee is too low, a transaction may wait much longer than the sender expected.
 
 So when people say Bitcoin confirmations take ten minutes, that is a useful rule of thumb, not a promise.
 
@@ -69,13 +69,13 @@ This is where the distinction stops being theoretical.
 
 If someone pays a Bitcoin invoice, you will often see the transaction appear quickly as pending. That tells you something useful: a payment attempt exists, and you can start checking whether the amount and destination match what you expected.
 
-But if you care about clean records and reliable workflow, that is not the end of the story.
+But that is not the end of the story.
 
-You still need to know things like:
+You still need to know:
 
 - does this transaction belong to the correct invoice?
 - is the amount correct?
-- is it still pending, or is it confirmed now?
+- is it still pending, or has it confirmed?
 - how many confirmations does it have?
 - has it crossed the settlement threshold you care about?
 
@@ -89,8 +89,8 @@ That is why pending and confirmed are not interchangeable labels. They describe 
 
 A Bitcoin payment becomes trustworthy when the uncertainty around it drops low enough for the situation at hand.
 
-That usually means a few things are true at the same time. The transaction matches the expected invoice. The amount is correct. The destination is correct. The payment is visible on the network. And, most importantly, it has enough confirmations for the level of risk involved.
+That usually means a few things are true at the same time. The transaction matches the expected invoice. The amount is correct. The destination is correct. And it has enough confirmations for the level of risk involved.
 
-That last part matters because trustworthiness in Bitcoin is not all-or-nothing the moment a transaction is broadcast. A pending transaction may be real, and often is, but it is still less settled than a confirmed one. Each confirmation reduces the remaining doubt and makes the transaction harder to reverse.
+Trustworthiness in Bitcoin is not all-or-nothing the moment a transaction is broadcast. A pending transaction may be real, and often is, but it is still less settled than a confirmed one. Each confirmation reduces the remaining doubt and makes the transaction harder to reverse.
 
-So the real answer is this: what makes a Bitcoin payment trustworthy is not mere visibility, but verifiability and finality. You do not just want to know that a transaction exists. You want to know that it is the right transaction, for the right amount, tied to the right invoice, and settled far enough to rely on.
+What makes a Bitcoin payment trustworthy is not mere visibility, but verifiability and finality. You do not just want to know that a transaction exists. You want to know it is the right transaction, for the right amount, tied to the right invoice, and settled far enough to rely on.
