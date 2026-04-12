@@ -1,0 +1,81 @@
+---
+layout: default.njk
+title: "Bitcoin Guides | CryptoZing"
+description: "Plain-language guides on Bitcoin payments, confirmations, invoicing, and more."
+canonical: "https://cryptozing.app/learn/"
+eleventyExcludeFromCollections: true
+---
+<style>
+  .learn-wrap {
+    max-width: var(--prose-max);
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .learn-wrap h1 {
+    font-size: clamp(2.25rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+  }
+
+  .learn-intro {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin: 0 0 3rem;
+  }
+
+  .article-list {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .article-card {
+    display: block;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    text-decoration: none;
+    transition: border-color 140ms ease, background 140ms ease;
+  }
+
+  .article-card:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .article-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem;
+  }
+
+  .article-card-desc {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<div class="learn-wrap">
+  <h1>Bitcoin Guides</h1>
+  <p class="learn-intro">Plain-language guides on Bitcoin payments, invoicing, and what actually happens on-chain.</p>
+
+  <ul class="article-list">
+    {% for post in collections.learn | reverse %}
+    <li>
+      <a href="{{ post.url }}" class="article-card">
+        <p class="article-card-title">{{ post.data.title }}</p>
+        <p class="article-card-desc">{{ post.data.description }}</p>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
